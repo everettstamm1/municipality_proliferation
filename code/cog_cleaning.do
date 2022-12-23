@@ -237,3 +237,56 @@ forv i=2/4{
 	save "$INTDATA/cog/`tablab'.dta", replace
 
 }
+
+
+// Master unit file
+
+* describe sheets
+import excel using "$RAWDATA/cog/Govt_Units_2021_Final.xlsx", describe
+return list
+local n_worksheet = `r(N_worksheet)'
+
+* loop through all sheets, list data, then save
+forvalues i=1/`n_worksheet' {
+	import excel using "$RAWDATA/cog/Govt_Units_2021_Final.xlsx" ,sheet(`"`r(worksheet_`i')'"') firstrow clear
+	keep 	CENSUS_ID_PID6	CENSUS_ID_GIDID	UNIT_NAME	UNIT_TYPE	ADDRESS1 ADDRESS2 ///
+				CITY STATE ZIP ZIP4	WEB_ADDRESS	FIPS_STATE FIPS_COUNTY FIPS_PLACE ///
+				COUNTY_AREA_NAME IS_ACTIVE
+				
+	ren CENSUS_ID_PID6 PID
+	ren CENSUS_ID_GIDID GID
+	ren UNIT_NAME name
+	ren UNIT_TYPE subtype
+	ren FIPS_STATE fips_state
+	ren FIPS_COUNTY fips_county_2020
+	ren FIPS_PLACE fips_place_2020
+	ren COUNTY_AREA_NAME county_name
+	ren IS_ACTIVE active
+	
+	g type = `i'
+	
+	tempfile sheet_`i'
+	save `sheet_`i''
+}
+clear
+forv i=1/`n_worksheet'{
+	append using `sheet_`i''
+}
+
+
+label define type 1 "General Purpose" ///
+									2 "Special District" ///
+									3 "School District" ///
+									4 "Dependent School District"
+									
+label define subtype 	1 "County" ///
+											2 "Municipal" ///
+											3 "Township"
+
+replace subtype = substr(subtype,1,1)
+destring subtype, replace
+
+label values type type
+label values subtype subtype
+
+save "$INTDATA/cog/master_2021.dta", replace
