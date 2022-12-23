@@ -187,13 +187,17 @@ duplicates drop
 
 g incorp_year = incorp_year_text
 replace incorp_year = real(regexs(0)) if(regexm(incorporated_date,"[0-9][0-9][0-9][0-9]"))
-asdfasd
-keep if incorp_year>=1940 & incorp_year<=1970
-g n = 1
-collapse (sum) n, by(czone)
+
+
+g n = incorp_year>=1940 & incorp_year<=1970
+g n1940 = incorp_year<1940
+collapse (sum) n n1940, by(czone)
 rename n n_muni_cz
+rename n1940 n_muni_cz1940
 rename czone cz
 label var n_muni_cz "n_muni_cz"
+label var n_muni_cz "n_muni_cz1940"
+
 save "$INTDATA/n_muni_czone.dta", replace
 
 

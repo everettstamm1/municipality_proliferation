@@ -16,6 +16,6 @@ gl XWALKS "$DATA/xwalks"
 
 gl FIGS "$REPO/exhibits/figures"
 gl TABS "$REPO/exhibits/tables"
-
+gl MAPS "$REPO/exhibits/maps"
 // Settings
 set maxvar 30000
