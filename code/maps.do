@@ -13,6 +13,7 @@ maptile_install using "http://files.michaelstepner.com/geo_state.zip"
 // States (from county totals, should probably change)
 	use "$INTDATA/cog/2_county_counts.dta", clear
 foreach var of varlist  all_local_tax gen_subcounty gen_muni gen_town spdist spdist_tax schdist_ind schdist_dep schdist int_* subcty_tax all_local{
+	
 	use "$INTDATA/cog/2_county_counts.dta", clear
 	
 	local lab: variable label `var'
@@ -26,22 +27,30 @@ foreach var of varlist  all_local_tax gen_subcounty gen_muni gen_town spdist spd
 
 	bys statefips (year) : g decade_lab = string(year[_n-1])+"-"+string(year)
 
-	drop if year==1942 | statefips==. | regexm(decade_lab,"\.") | n_`var'==. | change_`var'==. | statefip == 2 | statefip == 15
-
+	drop if year==1942 | statefips==. | regexm(decade_lab,"\.") | n_`var'==. | change_`var'==. 
+	
+	// get all decade and year labels
 	levelsof decade_lab, local(decades)
+	levelsof year, local(years)
+	// Get first year for base legend
+	qui su year,d
+	local base = `r(min)'
+	drop n_`var'
+	reshape wide decade_lab p_change_`var' change_`var', i(statefips) j(year)
+	pctile breaks = change_`var'`base', n(10)
+	pctile breaks_p = p_change_`var'`base', n(10)
+)
 	foreach d in `decades'{
-		preserve
-			keep if decade_lab=="`d'" 
-			
-			maptile p_change_`var', geo(state) geoid(statefips) n(10) legd(0) twopt(title("State Percent Change in `lab', `d'") legend(title("% Change") position(6) cols(5) ring(5)) note("Data From CoG 2: County Gov't Counts"))
-			graph export "$MAPS/state/state_p_change_`var'_`d'.png", as(png) replace
-			
-			maptile change_`var', geo(state) geoid(statefips) n(10) legd(0) twopt(title("State Change in `lab', `d'") legend(title("Change") position(6) cols(5) ring(5)) note("Data From CoG 2: County Gov't Counts")) 
-			graph export "$MAPS/state/state_change_`var'_`d'.png", as(png) replace
-		restore
+		local decade_lab  = decade_lab`y'[_N]
+	
+		maptile p_change_`var'`y', geo(state) geoid(statefips) cutp(breaks_p) legd(0) twopt(title("State Percent Change in `lab', `decade_lab'") legend(title("% Change") position(6) cols(5) ring(5)) note("Data From CoG 2: County Gov't Counts"))
+		graph export "$MAPS/state/state_p_change_`var'_`decade_lab'.png", as(png) replace
+		
+		maptile change_`var'`y', geo(state) geoid(statefips) cutp(breaks) legd(0) twopt(title("State Change in `lab', `decade_lab'") legend(title("Change") position(6) cols(5) ring(5)) note("Data From CoG 2: County Gov't Counts")) 
+		graph export "$MAPS/state/state_change_`var'_`decade_lab'.png", as(png) replace
+	
 			
 	}
-
 
 	use "$INTDATA/cog/2_county_counts.dta", clear
 	g county = fips_state+fips_county_2002
@@ -55,19 +64,28 @@ foreach var of varlist  all_local_tax gen_subcounty gen_muni gen_town spdist spd
 	bys county (year) : g decade_lab = string(year[_n-1])+"-"+string(year)
 
 	drop if year==1942 | county==. | regexm(decade_lab,"\.") | `var'==. | change_`var'==. 
-
+	drop  `var'
+	
+	// get all decade and year labels
 	levelsof decade_lab, local(decades)
-	foreach d in `decades'{
-		preserve
-			keep if decade_lab=="`d'" 
-			
-			maptile p_change_`var', geo(county2000)  legd(0) n(10) twopt(title("County Percent Change in `lab', `d'") legend(title("% Change") position(6)  cols(5) ring(5)) note("Data From CoG 2: County Gov't Counts"))
-			graph export "$MAPS/county/county_p_change_`var'_`d'.png", as(png) replace
-			
-			maptile change_`var', geo(county2000) legd(0) n(10) twopt(title("County Change in `lab', `d'") legend(title("Change") position(6) cols(5) ring(5)) note("Data From CoG 2: County Gov't Counts"))
-			graph export "$MAPS/county/county_change_`var'_`d'.png", as(png) replace
-		restore
-			
+	levelsof year, local(years)
+	// Get first year for base legend
+	qui su year,d
+	local base = `r(min)'
+	
+	reshape wide decade_lab p_change_`var' change_`var', i(county) j(year)
+	pctile breaks = change_`var'`base', n(10)
+	pctile breaks_p = p_change_`var'`base', n(10)
+
+	foreach y in `years'{
+		local decade_lab  = decade_lab`y'[_N]
+		
+		maptile p_change_`var'`y', geo(county2000)  legd(0) cutp(breaks_p) twopt(title("County Percent Change in `lab', `decade_lab'") legend(title("% Change") position(6)  cols(5) ring(5)) note("Data From CoG 2: County Gov't Counts"))
+		graph export "$MAPS/county/county_p_change_`var'_`decade_lab'.png", as(png) replace
+		
+		maptile change_`var'`y', geo(county2000) legd(0) cutp(breaks) twopt(title("County Change in `lab', `decade_lab'") legend(title("Change") position(6) cols(5) ring(5)) note("Data From CoG 2: County Gov't Counts"))
+		graph export "$MAPS/county/county_change_`var'_`decade_lab'.png", as(png) replace
+		
 	}
 
 
@@ -84,17 +102,27 @@ foreach var of varlist  all_local_tax gen_subcounty gen_muni gen_town spdist spd
 	bys cz (year) : g decade_lab = string(year[_n-1])+"-"+string(year)
 
 	drop if year==1942 | regexm(decade_lab,"\.") | n_`var'==. | change_`var'==. 
-
+	drop n_`var'
+	
+	// get all decade and year labels
 	levelsof decade_lab, local(decades)
-	foreach d in `decades'{
-		preserve
-			keep if decade_lab=="`d'" 
-			
-			maptile p_change_`var', geo(cz1990)  legd(0) n(10) twopt(title("CZ Percent Change in `lab', `d'") legend(title("% Change") position(6) cols(5) ring(5)) note("Data From CoG 2: County Gov't Counts"))
-			graph export "$MAPS/cz/cz_p_change_`var'_`d'.png", as(png) replace
-			
-			maptile change_`var', geo(cz1990) legd(0) n(10) twopt(title("CZ Change in `lab', `d'") legend(title("Change") position(6) cols(5) ring(5)) note("Data From CoG 2: County Gov't Counts"))
-			graph export "$MAPS/cz/cz_change_`var'_`d'.png", as(png) replace
-		restore
+	levelsof year, local(years)
+	// Get first year for base legend
+	qui su year,d
+	local base = `r(min)'
+	
+	reshape wide decade_lab p_change_`var' change_`var', i(cz) j(year)
+	pctile breaks = change_`var'`base', n(10)
+	pctile breaks_p = p_change_`var'`base', n(10)
+
+	foreach y in `years'{
+		local decade_lab  = decade_lab`y'[_N]
+
+		
+		maptile p_change_`var'`y', geo(cz1990)  legd(0) cutp(breaks_p) twopt(title("CZ Percent Change in `lab', `decade_lab'") legend(title("% Change") position(6) cols(5) ring(5)) note("Data From CoG 2: County Gov't Counts"))
+		graph export "$MAPS/cz/cz_p_change_`var'_`decade_lab'.png", as(png) replace
+		
+		maptile change_`var'`y', geo(cz1990) legd(0) cutp(breaks) twopt(title("CZ Change in `lab', `decade_lab'") legend(title("Change") position(6) cols(5) ring(5)) note("Data From CoG 2: County Gov't Counts"))
+		graph export "$MAPS/cz/cz_change_`var'_`decade_lab'.png", as(png) replace
 	}
 }
