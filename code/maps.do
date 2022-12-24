@@ -39,10 +39,10 @@ foreach var of varlist  all_local_tax gen_subcounty gen_muni gen_town spdist spd
 	reshape wide decade_lab p_change_`var' change_`var', i(statefips) j(year)
 	pctile breaks = change_`var'`base', n(10)
 	pctile breaks_p = p_change_`var'`base', n(10)
-)
-	foreach d in `decades'{
+
+	foreach y in `years'{
+
 		local decade_lab  = decade_lab`y'[_N]
-	
 		maptile p_change_`var'`y', geo(state) geoid(statefips) cutp(breaks_p) legd(0) twopt(title("State Percent Change in `lab', `decade_lab'") legend(title("% Change") position(6) cols(5) ring(5)) note("Data From CoG 2: County Gov't Counts"))
 		graph export "$MAPS/state/state_p_change_`var'_`decade_lab'.png", as(png) replace
 		
