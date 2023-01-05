@@ -3,6 +3,7 @@
 if "`c(username)'"=="Everett Stamm"{
 	gl DROPBOX "/Users/Everett Stamm/Dropbox/municipality_proliferation/"
 	gl REPO "/Users/Everett Stamm/Documents/Github/municipality_proliferation/"
+	gl FFMPEG "/Users/Everett Stamm/ffmpeg/bin/ffmpeg.exe"
 }
 
 gl DATA "$DROPBOX/data"

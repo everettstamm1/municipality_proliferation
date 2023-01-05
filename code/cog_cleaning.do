@@ -1,4 +1,64 @@
 // Crossswalk Construction
+// Creating an xwalk for msa-pmsa codes to their names since it doesn't exist in the cog data.
+// source: https://www2.census.gov/programs-surveys/metro-micro/geographies/reference-files/1999/historical-delineation-files/99mfips.txt
+
+import delimited using "$RAWDATA/census/99mfips.txt", clear rowr(21:2173) delim("@")
+
+g fips_msa_cmsa = substr(v1,1,4)
+g fips_pmsa = substr(v1,9,4)
+g fips_cmsa_alt = substr(v1,17,2)
+g fips_state = substr(v1,25,2)
+g fips_county = substr(v1,27,3)
+g central_outlying = substr(v1,33,1)
+g fips_entity = substr(v1,41,4)
+g name = substr(v1,49,.)
+
+drop v1
+foreach var of varlist _all{
+	replace `var' = strtrim(`var')
+}
+
+g is_cmsa = regexm(name,"CMSA")==1
+g is_pmsa = regexm(name,"PMSA")==1
+g is_msa = regexm(name,"MSA")==1 & regexm(name,"CMSA")==0 & regexm(name,"PMSA")==0
+
+bys fips_msa_cmsa (is_cmsa) : g in_cmsa = is_cmsa[_N]
+bys fips_pmsa (is_pmsa) : g in_pmsa = is_pmsa[_N]
+bys fips_msa_cmsa (is_msa) : g in_msa = is_msa[_N]
+
+g name_cmsa = name if is_cmsa==1
+g name_pmsa = name if is_pmsa==1
+g name_msa = name if is_msa==1
+
+bys fips_msa_cmsa (is_cmsa) : replace name_cmsa = name_cmsa[_N]
+bys fips_pmsa (is_pmsa) : replace name_pmsa = name_pmsa[_N]
+bys fips_msa_cmsa (is_msa) : replace name_msa = name_msa[_N]
+
+g msapmsa_name = cond(name_pmsa!="",name_pmsa,name_msa)
+g fips_msapmsa = cond(fips_pmsa!="",fips_pmsa,fips_msa_cmsa)
+// county-pmsa/msa xwalk
+preserve
+	keep if fips_state!="" &  fips_county!=""
+	destring fips_msapmsa, gen(msapmsa2000)
+	g county = fips_state + fips_county
+	destring county, replace
+	keep msapmsa2000 county msapmsa_name
+	duplicates drop
+	
+	// Some counties repeated between MSAs. Forcing a random drop for now, come up with better solution later
+	duplicates drop county, force
+	rename county cty_fips
+	save "$XWALKS/county_pmsa_xwalk.dta", replace
+restore
+
+// pmsa names xwalk
+
+destring fips_msapmsa, gen(fips_code_msa)
+keep fips_code_msa msapmsa_name
+duplicates drop
+save "$XWALKS/pmsa_names.dta", replace
+
+
 // Crosswalking to 2002 Place FIPS codes
 import excel using "$RAWDATA/cog/4_Govt_Org_Directory_Surveys/GOVS_ID_to_FIPS_Place_Codes_2002.xls",  cellrange(B17) firstrow clear
 drop C 
@@ -111,15 +171,16 @@ drop ID
 // Local Govts only
 keep if level == 2
 
-merge m:1 ID_state ID_county using "$XWALKS/cog_ID_fips_xwalk_12.dta", nogen
+merge m:1 ID_state ID_county using "$XWALKS/cog_ID_fips_xwalk_12.dta", nogen keep(1 3)
 
-merge m:1 ID_state ID_county using "$XWALKS/cog_ID_fips_xwalk_02_07.dta", nogen
+merge m:1 ID_state ID_county using "$XWALKS/cog_ID_fips_xwalk_02_07.dta", nogen keep(1 3)
 
 g cty_fips = fips_state+fips_county_2002
 destring cty_fips, replace
-merge m:1 cty_fips using "$XWALKS/cw_cty_czone.dta", nogen
-drop cty_fips
 
+merge m:1 cty_fips using "$XWALKS/cw_cty_czone.dta", nogen keep(1 3)
+merge m:1 cty_fips using "$XWALKS/county_pmsa_xwalk.dta", nogen keep(1 3)
+drop cty_fips
 
 lab var name "Name"
 lab var year "CoG Year"
@@ -151,7 +212,6 @@ save "$INTDATA/cog/2_county_counts.dta", replace
 
 // Note: Need to have odbc setup and 4_Govt_Org_Directory_Surveys linked for this code to work
 // FAQ for Window's setup: https://www.stata.com/support/faqs/data-management/configuring-odbc-win/
-
 
 
 // Need to pre-clean column names as they're 1. too long and 2. contain invalid characters in stata (:)
@@ -234,6 +294,7 @@ forv i=2/4{
 	merge m:1 cty_fips using "$XWALKS/cw_cty_czone.dta", keep(1 3) nogen
 	drop cty_fips
 	
+	
 		
 	// Destringing everything
 	foreach var of varlist *{
@@ -243,6 +304,9 @@ forv i=2/4{
 			destring `var', replace
 		}
 	}
+	
+	merge m:1 fips_code_msa using "$XWALKS/pmsa_names.dta", keep(1 3) nogen
+	
 	save "$INTDATA/cog/`tablab'.dta", replace
 
 }
