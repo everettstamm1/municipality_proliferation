@@ -1,0 +1,23 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y=Number of Town and Township Govts`pclab by CZ 1940-70, with baseline y and division FEs}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{GM}&\multicolumn{1}{c}{y}&\multicolumn{1}{c}{y}&\multicolumn{1}{c}{y}\\
+\midrule
+$\hat{GM}$          &       0.591***&               &  0.00000888*  &               \\
+                    &    (0.0715)   &               &(0.00000530)   &               \\
+\addlinespace
+GM                  &               &   0.0000165***&               &   0.0000150*  \\
+                    &               &(0.00000520)   &               &(0.00000853)   \\
+\midrule
+F-Stat              &      16.665   &               &               &               \\
+R-squared           &               &        .119   &        .069   &               \\
+Observations        &         130   &         130   &         130   &         130   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}
