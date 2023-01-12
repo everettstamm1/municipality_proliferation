@@ -15,53 +15,115 @@ maptile_install using "http://files.michaelstepner.com/geo_state.zip"
 set graphics off
 
 
+msa state cz county sample_msas
+foreach level in   county{
+	use "$INTDATA/cog/2_county_counts.dta", clear
+	drop if fips_state == "02" | fips_state=="15"
 
-use "$INTDATA/cog/2_county_counts.dta", clear
-drop if fips_state == "02" | fips_state=="15"
-
-labmask msapmsa2000, values(msapmsa_name)
-
-foreach level in msa{
+	labmask msapmsa2000, values(msapmsa_name)
 	if "`level'" == "state"{
 		local levelvar = "statefips"
 		local leveldb = "state"
 		local levellab = "State"
+		
+		ren year cog_year
+		g year = cog_year-2
+		ren fips_state statefip
+		merge m:1 year statefip using "$INTDATA/census/state_race_data.dta"
+		drop if year<1940 | year>2010
+		replace cog_year = year+2 if _merge==2
+		g use = _merge==3
+		bys statefip (use) : replace use = use[_N]
+		drop year
+		ren cog_year year
+				ren statefip fips_state
+
 	}
 	else if "`level'" == "cz"{
 		local levelvar = "cz"
 		local leveldb = "cz1990"
 		local levellab = "CZ"
+		
+		ren year cog_year
+		g year = cog_year-2
+		ren czone cz
+		merge m:1 year cz using "$INTDATA/census/cz_race_data.dta"
+		drop if year<1940 | year>2010
+		replace cog_year = year+2 if _merge==2
+		g use = _merge==3
+		bys cz (use) : replace use = use[_N]
+		drop year
+		ren cog_year year
+		ren cz czone
 	}
 	else if "`level'" == "county"{
 		local levelvar = "county"
 		local leveldb = "county2000"
 		local levellab = "County"
+		
+		ren year cog_year
+		g year = cog_year-2
+		ren fips_state statefip
+		ren fips_county_2002 countyfip
+		merge m:1 year statefip countyfip using "$INTDATA/census/county_race_data.dta", keep(1 3)
+		//drop if year<1940 | year>2010
+		//replace cog_year = year+2 if _merge==2
+		g use = 1
+		//bys countyfip statefip (use) : replace use = use[_N]
+		drop year
+		ren cog_year year
+		ren statefip fips_state
+		ren countyfip fips_county_2002
 	}
 	else if "`level'" == "msa"{
 		local levelvar = "msapmsa2000"
 		local leveldb = "msapmsa2000"
 		local levellab = "MSA"
+		
+		ren year cog_year
+		tostring msapmsa2000, gen(smsa)
+		g year = cog_year-2
+		merge m:1 year smsa using "$INTDATA/census/msa_race_data.dta"
+		drop if year<1940 | year>2010
+		replace cog_year = year+2 if _merge==2
+		g use = _merge==3
+		bys smsa (use) : replace use = use[_N]
+		drop year smsa
+		ren cog_year year
 	}
 	else if "`level'" == "sample_msas"{
 		local levelvar = "msapmsa2000"
 		local leveldb = "msapmsa2000"
 		local levellab = "MSA"
+		
+		ren year cog_year
+		tostring msapmsa2000, gen(smsa)
+		g year = cog_year-2
+		merge m:1 year smsa using "$INTDATA/census/msa_race_data.dta"
+				drop if year<1940 | year>2010
+
+		replace cog_year = year+2 if _merge==2
+		g use = _merge==3
+		bys smsa (use) : replace use = use[_N]
+		drop year smsa
+		ren cog_year year
 	}
 	foreach var of varlist gen_subcounty gen_muni gen_town spdist spdist_tax schdist_ind schdist_dep schdist int_* subcty_tax all_local_tax all_local {
 		preserve
-		
 			local lab: variable label `var'
 
 			destring fips_state, gen(statefips)
-			
+			replace fips_state = "" if fips_state=="."
+			replace fips_county_2002 = "" if fips_county_2002=="."
+
+			drop if  fips_state=="" | fips_county_2002==""
 			g county = fips_state+fips_county_2002
-			drop if fips_state=="" | fips_county_2002==""
 			destring county, replace
 			
 			rename czone cz
 			
 			bys `levelvar' year : egen n_`var' = total(`var'), missing
-			keep `levelvar' year n_`var'
+			keep `levelvar' year n_`var' black_share use
 			duplicates drop
 			
 			
@@ -70,29 +132,49 @@ foreach level in msa{
 
 			bys `levelvar' (year) : g decade_lab = string(year[_n-1])+"-"+string(year)
 
-			drop if year==1942 | `levelvar'==. | regexm(decade_lab,"\.") | n_`var'==. | change_`var'==. 
+			//drop if year==1942 | `levelvar'==. | regexm(decade_lab,"\.") | n_`var'==. | change_`var'==. 
 	
 			// Bar Graphs
 			g change_`var'_pos = change_`var' if change_`var'>0
 			g p_change_`var'_pos = p_change_`var' if change_`var'>0
 			
 			if "`level'"!="sample_msas"{
-				graph bar change_`var'  change_`var'_pos, over(decade_lab, label(angle(45))) ///
-								legend(cols(1) order(1 "Mean {&Delta} `lab'" 2 "Mean {&Delta} `lab', Positive Values Only")) ///
-								title("Mean {&Delta} `lab', `levellab' Level") ///
-								note("Data From CoG 2: County Gov't Counts") 
-								
+				g year1 = year-2
+				g year2 = year-6.25 if year==1952
+				g year3 = year-3.75 if year==1952
+				replace year2 = year-3.75 if year>1952
+				replace year3 = year-1.25 if year>1952
+				
+				egen mean = mean(change_`var'), by(year)
+				egen mean_pos = mean(change_`var'_pos), by(year)
+				egen p_mean = mean(change_`var'), by(year)
+				egen p_mean_pos = mean(change_`var'_pos), by(year)
+				egen mean_black_share = mean(black_share), by(year1)
+				replace mean_black_share = mean_black_share*100
+				
+				twoway (bar mean year2 if use==1, barwidth(2.5) sort xaxis(1) yaxis(1) xtitle("CoG Year") ytitle("Mean {&Delta} `lab'") ///
+				) || (bar mean_pos year3 if use==1, barwidth(2.5) sort xaxis(1) yaxis(1)) || (connected mean_black_share year1 if use==1, ///
+				sort xaxis(2) xlabel(1940(10)2010) xtitle("Census Year", axis(2)) yaxis(2) ytitle("`levellab' Pct Share Black", axis(2)) yline(0, lp(dash))) ///
+				|| , xlabel(1940 "" 1947 "1942-1952" 1954.5 "1952-1957" 1959.5 "1957-1962" 1964.5 "1962-1967" 1969.5 "1967-1972" 1974.5 "1972-1977" ///
+				1979.5 "1977-1982" 1984.5 "1982-1987" 1989.5 "1987-1992" 1994.5 "1992-1997" 1999.5 "1997-2002" 2004.5 "2002-2007" 2009.5 "2007-2012"  ///
+				, angle(45) axis(1)) xlabel(1940(10)2010, axis(2)) legend(cols(1) order(1 "Mean {&Delta} `lab'" 2 "Mean {&Delta} `lab', Positive Values Only" 3 "Mean Black Population Share")) title("Mean {&Delta} `lab', `levellab' Level")
+				
 				graph export "$FIGS/2_county_counts/`level'/`level'_change_`var'.png", as(png) replace
 
-				graph bar change_`var'  change_`var'_pos, over(decade_lab, label(angle(45))) ///
-								legend(cols(1) order(1 "Mean %{&Delta} `lab'" 2 "Mean %{&Delta} `lab', Positive Values Only")) ///
-								title("Mean %{&Delta} in `lab', `levellab' Level") ///
-								note("Data From CoG 2: County Gov't Counts") 
+				
+				twoway (bar p_mean year2 if use==1, barwidth(2.5) sort xaxis(1) yaxis(1) xtitle("CoG Year") ytitle("Mean {&Delta} `lab'") ///
+				) || (bar p_mean_pos year3 if use==1, barwidth(2.5) sort xaxis(1) yaxis(1)) || (connected mean_black_share year1 if use==1, ///
+				sort xaxis(2) xlabel(1940(10)2010) xtitle("Census Year", axis(2)) yaxis(2) ytitle("`levellab' Pct Share Black", axis(2)) yline(0, lp(dash))) ///
+				|| , xlabel(1940 "" 1947 "1942-1952" 1954.5 "1952-1957" 1959.5 "1957-1962" 1964.5 "1962-1967" 1969.5 "1967-1972" 1974.5 "1972-1977" ///
+				1979.5 "1977-1982" 1984.5 "1982-1987" 1989.5 "1987-1992" 1994.5 "1992-1997" 1999.5 "1997-2002" 2004.5 "2002-2007" 2009.5 "2007-2012"  ///
+				, angle(45) axis(1)) xlabel(1940(10)2010, axis(2)) legend(cols(1) order(1 "Mean %{&Delta} `lab'" 2 "Mean %{&Delta} `lab', Positive Values Only" 3 "Mean Black Population Share")) title("Mean %{&Delta} `lab', `levellab' Level")
 				
 				graph export "$FIGS/2_county_counts/`level'/`level'_p_change_`var'.png", as(png) replace
 					
-				drop *_pos
+				drop *_pos *mean* year? black_share
 				
+				drop if year<=1942 | `levelvar'==. | regexm(decade_lab,"\.") | n_`var'==. | change_`var'==. 
+
 				// get all decade and year labels
 				levelsof decade_lab, local(decades)
 				levelsof year, local(years)
@@ -148,19 +230,41 @@ foreach level in msa{
 				
 				levelsof msapmsa2000, local(msas)
 				local lbe : value label msapmsa2000
+				
+				g year1 = year-2
+				g year2 = year-5 if year==1952
+				replace year2 = year-2.5 if year>1952
+				
+				egen mean = mean(change_`var'), by(year msapmsa2000)
+				egen mean_pos = mean(change_`var'_pos), by(year msapmsa2000)
+				egen p_mean = mean(change_`var'), by(year msapmsa2000)
+				egen p_mean_pos = mean(change_`var'_pos), by(year msapmsa2000)
+				egen mean_black_share = mean(black_share), by(year1 msapmsa2000)
+				replace mean_black_share = mean_black_share*100
+				
+				
+					
 				foreach msa in `msas'{
 					local msa_lab : label `lbe' `msa'
-
-					graph bar change_`var' if msapmsa2000 == `msa', over(decade_lab, label(angle(45))) ///
-									legend(cols(1) order(1 "Mean New `lab'")) ///
-									title("Mean {&Delta} `lab' in `msa_lab'") ///
-									note("Data From CoG 2: County Gov't Counts") 
-					graph export "$FIGS/2_county_counts/`level'/`level'_`msa'_change_`var'.png", as(png) replace
 					
-					graph bar p_change_`var' if msapmsa2000 == `msa', over(decade_lab, label(angle(45))) ///
-									legend(cols(1) order(1 "Mean New `lab'")) ///
-									title("Mean %{&Delta} `lab' in `msa_lab'") ///
-									note("Data From CoG 2: County Gov't Counts") 
+					twoway (bar mean year2 if msapmsa2000 == `msa', barwidth(5) sort xaxis(1) yaxis(1) xtitle("CoG Year") ytitle("Mean {&Delta} `lab'") ///
+					) || (connected mean_black_share year1 if msapmsa2000 == `msa', ///
+					sort xaxis(2) xlabel(1940(10)2010) xtitle("Census Year", axis(2)) yaxis(2) ytitle("Mean Black Population Share", axis(2)) yline(0, lp(dash))) ///
+					|| , xlabel(1947 "1942-1952" 1954.5 "1952-1957" 1959.5 "1957-1962" 1964.5 "1962-1967" 1969.5 "1967-1972" 1974.5 "1972-1977" ///
+					1979.5 "1977-1982" 1984.5 "1982-1987" 1989.5 "1987-1992" 1994.5 "1992-1997" 1999.5 "1997-2002" 2004.5 "2002-2007" 2009.5 "2007-2012"  ///
+					, axis(1) angle(45))  xlabel(1940(10)2010, axis(2)) legend(cols(1) order(1 "Mean New `lab'" 2 "Mean Black Population Share")) note("Data From CoG 2: County Gov't Counts") 	title("Mean {&Delta} `lab' in `msa_lab'")
+
+					
+					graph export "$FIGS/2_county_counts/`level'/`level'_`msa'_change_`var'.png", as(png) replace
+
+					
+					twoway (bar p_mean year2 if use==1 & msapmsa2000 == `msa', barwidth(5) sort xaxis(1) yaxis(1) xtitle("CoG Year") ytitle("Mean %{&Delta} `lab'") ///
+					) || (connected mean_black_share year1 if use==1 & msapmsa2000 == `msa', ///
+					sort xaxis(2) xlabel(1940(10)2010) xtitle("Census Year", axis(2)) yaxis(2) ytitle("`levellab' Pct Share Black", axis(2)) yline(0, lp(dash))) ///
+					|| , xlabel(1940 "" 1947 "1942-1952" 1954.5 "1952-1957" 1959.5 "1957-1962" 1964.5 "1962-1967" 1969.5 "1967-1972" 1974.5 "1972-1977" ///
+					1979.5 "1977-1982" 1984.5 "1982-1987" 1989.5 "1987-1992" 1994.5 "1992-1997" 1999.5 "1997-2002" 2004.5 "2002-2007" 2009.5 "2007-2012"  ///
+					, angle(45) axis(1))  xlabel(1940(10)2010, axis(2)) legend(cols(1) order(1 "Mean New `lab'" 2 "Mean Black Population Share")) note("Data From CoG 2: County Gov't Counts") 	title("Mean %{&Delta} `lab' in `msa_lab'")
+
 					graph export "$FIGS/2_county_counts/`level'/`level'_`msa'_p_change_`var'.png", as(png) replace
 				}
 			}
@@ -196,34 +300,98 @@ destring county, replace
 destring fips_code_state, gen(statefips)
 rename czone cz
 
-foreach level in state county cz msa sample_msas {
+/* NOT CURRENTLY FUNCTIONAL, DON'T USE
+//foreach level in state county cz msa sample_msas {
+local level = "msa"
 	if "`level'" == "state"{
 		local levelvar = "statefips"
 		local leveldb = "state"
 		local levellab = "State"
+		
+		ren year cog_year
+		g year = cog_year-2
+		ren fips_state statefip
+		merge m:1 year statefip using "$INTDATA/census/state_race_data.dta"
+		drop if year<1940 | year>2010
+		replace cog_year = year+2 if _merge==2
+		g use = _merge==3
+		bys statefip (use) : replace use = use[_N]
+		drop year
+		ren cog_year year
+				ren statefip fips_state
+
 	}
 	else if "`level'" == "cz"{
 		local levelvar = "cz"
 		local leveldb = "cz1990"
 		local levellab = "CZ"
+		
+		ren year cog_year
+		g year = cog_year-2
+		ren czone cz
+		merge m:1 year cz using "$INTDATA/census/cz_race_data.dta"
+		drop if year<1940 | year>2010
+		replace cog_year = year+2 if _merge==2
+		g use = _merge==3
+		bys cz (use) : replace use = use[_N]
+		drop year
+		ren cog_year year
+		ren cz czone
 	}
 	else if "`level'" == "county"{
 		local levelvar = "county"
 		local leveldb = "county2000"
 		local levellab = "County"
+		
+		ren year cog_year
+		g year = cog_year-2
+		ren fips_state statefip
+		ren fips_county_2002 countyfip
+		merge m:1 year statefip countyfip using "$INTDATA/census/county_race_data.dta"
+		drop if year<1940 | year>2010
+		replace cog_year = year+2 if _merge==2
+		g use = _merge==3
+		bys countyfip statefip (use) : replace use = use[_N]
+		drop year
+		ren cog_year year
+		ren statefip fips_state
+		ren countyfip fips_county_2002
 	}
 	else if "`level'" == "msa"{
 		local levelvar = "msapmsa2000"
 		local leveldb = "msapmsa2000"
 		local levellab = "MSA"
+		
+		ren year cog_year
+		tostring msapmsa2000, gen(smsa)
+		g year = cog_year-2
+		merge m:1 year smsa using "$INTDATA/census/msa_race_data.dta"
+		drop if year<1940 | year>2010
+		replace cog_year = year+2 if _merge==2
+		g use = _merge==3
+		bys smsa (use) : replace use = use[_N]
+		drop year smsa
+		ren cog_year year
 	}
 	else if "`level'" == "sample_msas"{
 		local levelvar = "msapmsa2000"
 		local leveldb = "msapmsa2000"
 		local levellab = "MSA"
+		
+		ren year cog_year
+		tostring msapmsa2000, gen(smsa)
+		g year = cog_year-2
+		merge m:1 year smsa using "$INTDATA/census/msa_race_data.dta"
+				drop if year<1940 | year>2010
+
+		replace cog_year = year+2 if _merge==2
+		g use = _merge==3
+		bys smsa (use) : replace use = use[_N]
+		drop year smsa
+		ren cog_year year
 	}
-	
-	foreach var of varlist  incorp_date*{
+	local var = "incorp_date1"
+	//foreach var of varlist  incorp_date*{
 		preserve
 		
 			local lab: variable label `var'
@@ -249,6 +417,22 @@ foreach level in state county cz msa sample_msas {
 			drop if year==1942 | `levelvar'==. | regexm(decade_lab,"\.") | n_`var'==. | decade_lab==""
 
 			if "`level'"!="sample_msas"{
+				g year1 = year-2
+				g year2 = year-5 if year==1952
+				replace year2 = year-2.5 if year>1952
+				
+				egen mean = mean(n_`var'), by(year msapmsa2000)
+				egen mean_black_share = mean(black_share), by(year1 msapmsa2000)
+				replace mean_black_share = mean_black_share*100
+				
+				
+				twoway (bar mean year2 if msapmsa2000 == `msa', barwidth(5) sort xaxis(1) yaxis(1) xtitle("CoG Year") ytitle("Mean New `lab'") ///
+					) || (connected mean_black_share year1 if msapmsa2000 == `msa', ///
+					sort xaxis(2) xlabel(1940(10)2010) xtitle("Census Year", axis(2)) yaxis(2) ytitle("Mean Black Population Share", axis(2)) yline(0, lp(dash))) ///
+					|| , xlabel(1947 "1942-1952" 1954.5 "1952-1957" 1959.5 "1957-1962" 1964.5 "1962-1967" 1969.5 "1967-1972" 1974.5 "1972-1977" ///
+					1979.5 "1977-1982" 1984.5 "1982-1987" 1989.5 "1987-1992" 1994.5 "1992-1997" 1999.5 "1997-2002" 2004.5 "2002-2007" 2009.5 "2007-2012"  ///
+					, axis(1) angle(45))  xlabel(1940(10)2010, axis(2)) legend(cols(1) order(1 "Mean New `lab'" 2 "Mean Black Population Share")) note("Data From CoG 4: Gov't Org Directory Surveys") 	title("Mean New `lab' in `levellab' Level")
+
 				// Bar Graphs
 				graph bar n_`var'  , over(decade_lab, label(angle(45))) ///
 								legend(cols(1) order(1 "Mean New `lab'")) ///
@@ -322,7 +506,7 @@ foreach level in state county cz msa sample_msas {
 		restore
 	}
 }
-
+*/
 // Animating them
 
 // Need a palatte or else shadows will be messed up

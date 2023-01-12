@@ -9,7 +9,7 @@ collapse (sum) perwt, by(stateicp countyicp)
 merge 1:1 stateicp countyicp using "$DCOURT/data/crosswalks/county1940_crosswalks.dta", keep(1 3) nogen
 collapse (sum) perwt, by(cz)
 
-ren perwt pop1940
+ren perwt czpop1940
 
 tempfile czpop1940
 save `czpop1940'
@@ -225,7 +225,7 @@ forv pc=0/1{
 							"R-squared" ///
 							"Observations" ///
 							)) ///
-							title("Dererencourt Table Two with y=`ylab'`pclab by CZ 1940-70, with `lab1'") ///
+							title("Dererencourt Table Two with y=`ylab'`pclab' by CZ 1940-70, with `lab1'") ///
 							keep($x_iv $x_ols) ///
 							mgroups("First Stage" "OLS" "Reduced Form" "2SLS", pattern(1 1 1 1))
 		}
@@ -427,7 +427,7 @@ forv pc=0/1{
 								"R-squared" ///
 								"Observations" ///
 								)) ///
-								title("Dererencourt Table Two with y=`ylab'`pclab by decade in CZ 1940-70, with `lab1'") ///
+								title("Dererencourt Table Two with y=`ylab'`pclab' by decade in CZ 1940-70, with `lab1'") ///
 								keep($x_iv $x_ols) ///
 								mgroups("First Stage" "OLS" "Reduced Form" "2SLS", pattern(1 1 1 1))
 			}

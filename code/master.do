@@ -4,6 +4,7 @@ if "`c(username)'"=="Everett Stamm"{
 	gl DROPBOX "/Users/Everett Stamm/Dropbox/municipality_proliferation/"
 	gl REPO "/Users/Everett Stamm/Documents/Github/municipality_proliferation/"
 	gl FFMPEG "/Users/Everett Stamm/ffmpeg/bin/ffmpeg.exe"
+	gl use_gzuse = 0
 }
 
 gl DATA "$DROPBOX/data"
@@ -18,5 +19,8 @@ gl XWALKS "$DATA/xwalks"
 gl FIGS "$REPO/exhibits/figures"
 gl TABS "$REPO/exhibits/tables"
 gl MAPS "$REPO/exhibits/maps"
+
+adopath ++ "$CODE/ado"
+
 // Settings
 set maxvar 30000

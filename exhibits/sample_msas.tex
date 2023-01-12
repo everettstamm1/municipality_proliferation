@@ -1,0 +1,32 @@
+\documentclass{article}
+\usepackage{blindtext}
+\usepackage{booktabs}
+\usepackage[margin=0.25in]{geometry}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage{tikz}
+
+
+\title{Maps for Municipality Proliferation}
+
+\begin{document}
+\maketitle
+\tableofcontents
+{\footnotesize 
+\listoffigures
+\listoftables}
+\clearpage
+
+\section{Figures}
+\foreach \msa in {1600, 1680, 2160,3280,4480,7360}{
+	\begin{figure}[h!]
+	\centering
+	\includegraphics[scale=0.25]{figures/2_county_counts/sample_msas/sample_msas_\msa_change_gen_muni.png}
+	\end{figure}
+	\clearpage
+}
+
+\end{document}
