@@ -1,0 +1,23 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y=Number of Independent School Districts, Per Capita (1940) by County 1960-70, with baseline y, division FEs, and mfg and black mig share}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{GM}&\multicolumn{1}{c}{y}&\multicolumn{1}{c}{y}&\multicolumn{1}{c}{y}\\
+\midrule
+$\hat{GM}$          &       0.370***&               &   0.0000147** &               \\
+                    &    (0.0642)   &               &(0.00000666)   &               \\
+\addlinespace
+GM                  &               &   0.0000252***&               &   0.0000397** \\
+                    &               &(0.00000624)   &               & (0.0000175)   \\
+\midrule
+F-Stat              &      18.145   &               &               &               \\
+R-squared           &               &        .495   &         .47   &               \\
+Observations        &         238   &         238   &         238   &         238   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

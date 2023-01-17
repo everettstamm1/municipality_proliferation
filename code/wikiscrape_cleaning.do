@@ -181,8 +181,67 @@ replace cty_fips = 12025 if cty_fips == 12086 // Miami-Dade County
 // CZ Merge
 merge m:1 cty_fips using "$XWALKS/cw_cty_czone.dta", keep(3) assert(2 3) nogen
 
-// Drop vars from county merge - keeping only commuting zones and info from settlement_infobox2
-keep czone wid qid fips page_title unincorporated incorp_year_text incorporated_date text
+preserve
+	// Drop vars from county merge - keeping only commuting zones and info from settlement_infobox2
+	keep czone wid qid fips page_title unincorporated incorp_year_text incorporated_date text
+	duplicates drop 
+
+	g incorp_year = incorp_year_text
+	replace incorp_year = real(regexs(0)) if(regexm(incorporated_date,"[0-9][0-9][0-9][0-9]"))
+
+
+	g n = incorp_year>=1940 & incorp_year<=1970
+
+
+	g n1940 = incorp_year<1940
+	g n1950 = incorp_year<1950 
+	g n1960 = incorp_year<1960
+	g n1970 = incorp_year<1970
+	g n1980 = incorp_year<1980
+
+	g n1940_1950 = incorp_year>=1940 & incorp_year<1950
+	g n1950_1960 = incorp_year>=1950 & incorp_year<1960
+	g n1960_1970 = incorp_year>=1960 & incorp_year<1970
+	g n1970_1980 = incorp_year>=1970 & incorp_year<1980
+	g n1980_1990 = incorp_year>=1980 & incorp_year<1990
+
+
+	collapse (sum) n*, by(czone)
+
+	rename n n_muni_cz
+
+	rename n1940 base_muni_cz1940
+	rename n1950 base_muni_cz1950
+	rename n1960 base_muni_cz1960
+	rename n1970 base_muni_cz1970
+	rename n1980 base_muni_cz1980
+
+	rename n1940_1950 n_muni_cz_1940_1950
+	rename n1950_1960 n_muni_cz_1950_1960
+	rename n1960_1970 n_muni_cz_1960_1970
+	rename n1970_1980 n_muni_cz_1970_1980
+	rename n1980_1990 n_muni_cz_1980_1990
+
+	rename czone cz
+	label var n_muni_cz "n_muni_cz"
+
+	label var base_muni_cz1940 "base_muni_cz1940"
+	label var base_muni_cz1950 "base_muni_cz1950"
+	label var base_muni_cz1960 "base_muni_cz1960"
+	label var base_muni_cz1970 "base_muni_cz1970"
+	label var base_muni_cz1980 "base_muni_cz1980"
+
+	label var n_muni_cz_1940_1950 "n_muni_cz1940"
+	label var n_muni_cz_1950_1960 "n_muni_cz1950"
+	label var n_muni_cz_1960_1970 "n_muni_cz1960"
+	label var n_muni_cz_1970_1980 "n_muni_cz1970"
+	label var n_muni_cz_1980_1990 "n_muni_cz1980"
+
+	save "$INTDATA/n_muni_cz.dta", replace
+restore
+
+// county totals
+keep cty_fips wid qid fips page_title unincorporated incorp_year_text incorporated_date text
 duplicates drop 
 
 g incorp_year = incorp_year_text
@@ -204,40 +263,39 @@ g n1960_1970 = incorp_year>=1960 & incorp_year<1970
 g n1970_1980 = incorp_year>=1970 & incorp_year<1980
 g n1980_1990 = incorp_year>=1980 & incorp_year<1990
 
-collapse (sum) n*, by(czone)
 
-rename n n_muni_cz
+collapse (sum) n*, by(cty_fips)
 
-rename n1940 base_muni_cz1940
-rename n1950 base_muni_cz1950
-rename n1960 base_muni_cz1960
-rename n1970 base_muni_cz1970
-rename n1980 base_muni_cz1980
+rename n n_muni_county
 
-rename n1940_1950 n_muni_cz_1940_1950
-rename n1950_1960 n_muni_cz_1950_1960
-rename n1960_1970 n_muni_cz_1960_1970
-rename n1970_1980 n_muni_cz_1970_1980
-rename n1980_1990 n_muni_cz_1980_1990
+rename n1940 base_muni_county1940
+rename n1950 base_muni_county1950
+rename n1960 base_muni_county1960
+rename n1970 base_muni_county1970
+rename n1980 base_muni_county1980
 
-rename czone cz
-label var n_muni_cz "n_muni_cz"
+rename n1940_1950 n_muni_county_1940_1950
+rename n1950_1960 n_muni_county_1950_1960
+rename n1960_1970 n_muni_county_1960_1970
+rename n1970_1980 n_muni_county_1970_1980
+rename n1980_1990 n_muni_county_1980_1990
 
-label var base_muni_cz1940 "base_muni_cz1940"
-label var base_muni_cz1950 "base_muni_cz1950"
-label var base_muni_cz1960 "base_muni_cz1960"
-label var base_muni_cz1970 "base_muni_cz1970"
-label var base_muni_cz1980 "base_muni_cz1980"
+rename cty_fips fips
+label var n_muni_county "n_muni_county"
 
-label var n_muni_cz_1940_1950 "n_muni_cz1940"
-label var n_muni_cz_1950_1960 "n_muni_cz1950"
-label var n_muni_cz_1960_1970 "n_muni_cz1960"
-label var n_muni_cz_1970_1980 "n_muni_cz1970"
-label var n_muni_cz_1980_1990 "n_muni_cz1980"
+label var base_muni_county1940 "base_muni_county1940"
+label var base_muni_county1950 "base_muni_county1950"
+label var base_muni_county1960 "base_muni_county1960"
+label var base_muni_county1970 "base_muni_county1970"
+label var base_muni_county1980 "base_muni_county1980"
 
-save "$INTDATA/n_muni_czone.dta", replace
+label var n_muni_county_1940_1950 "n_muni_county1940"
+label var n_muni_county_1950_1960 "n_muni_county1950"
+label var n_muni_county_1960_1970 "n_muni_county1960"
+label var n_muni_county_1970_1980 "n_muni_county1970"
+label var n_muni_county_1980_1990 "n_muni_county1980"
 
-
+save "$INTDATA/n_muni_county.dta", replace
 
 //merge 1:1 cz using "$INTDATA/n_muni_czone.dta",keep(1 2)
 //rename _merge muni_merge

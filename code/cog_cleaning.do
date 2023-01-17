@@ -175,6 +175,12 @@ merge m:1 ID_state ID_county using "$XWALKS/cog_ID_fips_xwalk_12.dta", nogen kee
 
 merge m:1 ID_state ID_county using "$XWALKS/cog_ID_fips_xwalk_02_07.dta", nogen keep(1 3)
 
+
+// Looks like some misses
+replace fips_state = "51" if ID_state=="47" & fips_state==""
+replace fips_state = "46" if ID_state=="42" & fips_state==""
+
+
 g cty_fips = fips_state+fips_county_2002
 destring cty_fips, replace
 
@@ -289,17 +295,20 @@ forv i=2/4{
 	
 	merge m:1 ID_state ID_county ID_type ID_unit using "$XWALKS/cog_ID_fips_place_xwalk_02.dta", keep(1 3) nogen
 	
+	// Looks like some misses
+	replace fips_state = "51" if ID_state=="47" & fips_state==""
+	replace fips_state = "46" if ID_state=="42" & fips_state==""
+
+	
 	g cty_fips = fips_state+fips_county_2002
 	destring cty_fips, replace
 	merge m:1 cty_fips using "$XWALKS/cw_cty_czone.dta", keep(1 3) nogen
 	drop cty_fips
 	
-	
-		
 	// Destringing everything
 	foreach var of varlist *{
 		cap confirm string var `var'
-		if _rc==0 & inlist("`var'","name","source","ID","fips_code_state","fips_code_county")==0{
+		if _rc==0 & inlist("`var'","name","source","ID","fips_code_state","fips_code_county","id")==0{
 			replace `var' = "" if `var'=="-"
 			destring `var', replace
 		}

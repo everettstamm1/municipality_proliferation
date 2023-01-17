@@ -15,8 +15,8 @@ maptile_install using "http://files.michaelstepner.com/geo_state.zip"
 set graphics off
 
 
-msa state cz county sample_msas
-foreach level in   county{
+foreach level in  msa state cz county sample_msas
+ county{
 	use "$INTDATA/cog/2_county_counts.dta", clear
 	drop if fips_state == "02" | fips_state=="15"
 
