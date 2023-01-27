@@ -10,7 +10,7 @@
 \usepackage{tikz}
 
 
-\title{Maps for Municipality Proliferation}
+\title{Sample MSA Figures for Municipality Proliferation}
 
 \begin{document}
 \maketitle
@@ -20,13 +20,41 @@
 \listoftables}
 \clearpage
 
-\section{Figures}
+\section{Selected Major MSAs}
 \foreach \msa in {1600, 1680, 2160,3280,4480,7360}{
-	\begin{figure}[h!]
-	\centering
-	\includegraphics[scale=0.25]{figures/2_county_counts/sample_msas/sample_msas_\msa_change_gen_muni.png}
-	\end{figure}
-	\clearpage
-}
+	\ifnum \msa = 1600{\subsection{Chicago PMSA}}\fi
+	\ifnum \msa = 1680{\subsection{Cleveland-Lorain-Elyria PMSA}}\fi
+	\ifnum \msa = 2160{\subsection{Detroit PMSA}}\fi
+	\ifnum \msa = 3280{\subsection{Hartford PMSA}}\fi
+	\ifnum \msa = 4480{\subsection{Los Angeles-Long Beach PMSA}}\fi
+	\ifnum \msa = 7360{\subsection{San Francisco PMSA}}\fi
 
+	\foreach \var in {gen_muni, schdist_ind, all_local}{
+		\begin{figure}[h!]
+		\centering
+		\includegraphics[scale=0.25]{figures/2_county_counts/sample_msas/sample_msas_\msa_change_\var.png}
+		\end{figure}
+		\clearpage
+	}
+}
+\section{Selected Low Black Change MSAs}
+\foreach \msa in {8240, 1440, 6520,6480,7080, 2400, 7160,7500, 6440, 7600}{
+	\ifnum \msa = 8240{\subsection{Tallahassee MSA}}\fi
+	\ifnum \msa = 1440{\subsection{Charleston-North Charleston MSA}}\fi
+	\ifnum \msa = 6520{\subsection{Provo-Orem MSA}}\fi
+	\ifnum \msa = 6480{\subsection{Providence-Fall River-Warwick MSA}}\fi
+	\ifnum \msa = 7080{\subsection{Salem MSA}}\fi
+	\ifnum \msa = 2400{\subsection{Eugene-Springfield PMSA}}\fi
+	\ifnum \msa = 7160{\subsection{Salt Lake City-Ogden MSA}}\fi
+	\ifnum \msa = 7500{\subsection{Santa Rosa PMSA}}\fi
+	\ifnum \msa = 6440{\subsection{Portland-Vancouver PMSA}}\fi
+	\ifnum \msa = 7600{\subsection{Seattle-Bellevue-Everett PMSA}}\fi
+	\foreach \var in {gen_muni, schdist_ind, all_local}{
+		\begin{figure}[h!]
+		\centering
+		\includegraphics[scale=0.25]{figures/2_county_counts/sample_msas/sample_msas_\msa_change_\var.png}
+		\end{figure}
+		\clearpage
+	}
+}
 \end{document}

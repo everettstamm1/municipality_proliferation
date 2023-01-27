@@ -17,6 +17,16 @@ preserve
 	save `czpop1940'
 restore
 
+
+preserve
+	collapse (sum) perwt, by(smsa)
+
+	ren perwt msapop1940
+	destring smsa, gen(msapmsa2000)
+	tempfile msapop1940
+	save `msapop1940'
+restore
+
 collapse (sum) perwt, by(fips)
 
 ren perwt countypop1940
@@ -25,7 +35,7 @@ tempfile countypop1940
 save `countypop1940'
 
 
-foreach level in cz county{
+foreach level in cz county msa{
 	if "`level'"=="cz"{
 		local levelvar cz
 		local levellab "CZ"
@@ -33,6 +43,10 @@ foreach level in cz county{
 	else if "`level'"=="county"{
 		local levelvar fips
 		local levellab "County"
+	}
+	else if "`level'"=="msa"{
+		local levelvar msapmsa2000
+		local levellab "MSA"
 	}
 	// Preclean county data
 
@@ -42,7 +56,7 @@ foreach level in cz county{
 	destring fips, replace
 	rename czone cz
 
-	foreach var of varlist gen_subcounty gen_muni gen_town spdist schdist_ind schdist all_local {
+	foreach var of varlist gen_muni schdist_ind all_local {
 		preserve
 			local lab: variable label `var'
 
@@ -88,7 +102,7 @@ foreach level in cz county{
 	drop if fips_code_state == "02" | fips_code_state=="15"
 	g fips = 1000*fips_state+fips_county_2002
 	rename czone cz
-
+	rename fips_code_msa msapmsa2000
 	keep if ID_type == 2 | ID_type == 3 // keeping only municipal and town/township observations
 
 	g incorp_date1 = original_incorporation_date
@@ -163,7 +177,7 @@ foreach level in cz county{
 	}
 
 	forv pc=0/1{
-		foreach ds in gen_muni schdist_ind  all_local ngov3 wiki{
+		foreach ds in gen_muni schdist_ind all_local ngov3 wiki{
 			if "`ds'"=="wiki"{
 				local datapath = "$INTDATA/n_muni_`level'.dta"
 				local filepath = "$TABS/wiki"
@@ -201,11 +215,38 @@ foreach level in cz county{
 			global C4 base_muni_`level'1940 reg2 reg3 reg4 mfg_lfshare1940  v2_blackmig3539_share1940
 
 			use "$DCOURT/data/GM_`level'_final_dataset.dta", clear
+			if "`level'"=="msa"{
+				destring smsa, gen(msapmsa2000) 
+			}
 			merge 1:1 `levelvar' using "`datapath'", keep(3) nogen
 			merge 1:1 `levelvar' using ``level'pop1940', keep(3) nogen
+
+			asdf
+			
+			// Histograms
+			foreach var of varlist $y $x_ols $x_iv{
+				local lab: variable label `var'
+
+				local time = 1940
+				local time_end = 1970
+				twoway__histogram_gen `var', freq bin(15) gen(h x, replace)
+				
+				local min = `r(start)'
+				local max = `r(max)'
+				local step = `r(width)'
+				
+				twoway hist `var', freq bin(15) gap(1) ///
+				title("Historgram of `lab'"  "`levellab' Level, `time'-`time_end'") ///
+				note("Data From CoG 2: County Gov't Counts") xlab(`min'(`step')`max')
+				
+				graph export "$FIGS/2_county_counts/`level'/`level'_`var'_`time'_`time_end'_hist.png", as(png) replace
+
+			}
 			
 			local ylab: variable label $y
 			label var $y "y"
+			
+			kkjkj
 			
 			if `pc'==1{
 				replace $y = $y / `level'pop1940
@@ -294,6 +335,9 @@ foreach level in cz county{
 
 
 				use "$DCOURT/data/GM_`level'_final_dataset_split.dta", clear
+				if "`level'"=="msa"{
+					destring smsa, gen(msapmsa2000) 
+				}
 				merge 1:1 `levelvar' using "`datapath'", keep(3) nogen
 				merge 1:1 `levelvar' using ``level'pop1940', keep(3) nogen
 
@@ -365,6 +409,9 @@ foreach level in cz county{
 			// Stacked and lagged
 
 			use "$DCOURT/data/GM_`level'_final_dataset_split.dta", clear
+			if "`level'"=="msa"{
+				destring smsa, gen(msapmsa2000) 
+			}
 			merge 1:1 `levelvar' using "`datapath'", keep(3) nogen
 			merge 1:1 `levelvar' using ``level'pop1940', keep(3) nogen
 

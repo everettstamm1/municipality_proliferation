@@ -15,8 +15,7 @@ maptile_install using "http://files.michaelstepner.com/geo_state.zip"
 set graphics off
 
 
-foreach level in  msa state cz county sample_msas
- county{
+foreach level in state cz county msa sample_msas{
 	use "$INTDATA/cog/2_county_counts.dta", clear
 	drop if fips_state == "02" | fips_state=="15"
 
@@ -99,8 +98,9 @@ foreach level in  msa state cz county sample_msas
 		ren year cog_year
 		tostring msapmsa2000, gen(smsa)
 		g year = cog_year-2
+		
 		merge m:1 year smsa using "$INTDATA/census/msa_race_data.dta"
-				drop if year<1940 | year>2010
+		drop if year<1940 | year>2010
 
 		replace cog_year = year+2 if _merge==2
 		g use = _merge==3
@@ -108,7 +108,8 @@ foreach level in  msa state cz county sample_msas
 		drop year smsa
 		ren cog_year year
 	}
-	foreach var of varlist gen_subcounty gen_muni gen_town spdist spdist_tax schdist_ind schdist_dep schdist int_* subcty_tax all_local_tax all_local {
+	
+	foreach var of varlist gen_muni schdist_ind  all_local  {
 		preserve
 			local lab: variable label `var'
 
@@ -226,7 +227,17 @@ foreach level in  msa state cz county sample_msas
 								msapmsa2000 == 2160 | /// Detroit
 								msapmsa2000 == 3280 | /// Hartford
 								msapmsa2000 == 4480 | /// Los Angeles-Long Beach
-								msapmsa2000 == 7360  // San Francisco
+								msapmsa2000 == 7360 | /// San Francisco
+								msapmsa2000 == 8240 | /// Now the white ones Tallahasse 
+								msapmsa2000 == 1440 | /// Charleston 
+								msapmsa2000 == 6520 | /// Provo-Orem
+								msapmsa2000 == 6480 | /// Providence 
+								msapmsa2000 == 7080 | /// Salem 
+								msapmsa2000 == 2400 | /// Eugene Springfield
+								msapmsa2000 == 7160 | /// SLC
+								msapmsa2000 == 7500 | /// Santa Rosa
+								msapmsa2000 == 6440 | /// Portland Vancouver
+								msapmsa2000 == 7600 // Seattle
 				
 				levelsof msapmsa2000, local(msas)
 				local lbe : value label msapmsa2000
@@ -247,23 +258,50 @@ foreach level in  msa state cz county sample_msas
 				foreach msa in `msas'{
 					local msa_lab : label `lbe' `msa'
 					
-					twoway (bar mean year2 if msapmsa2000 == `msa', barwidth(5) sort xaxis(1) yaxis(1) xtitle("CoG Year") ytitle("Mean {&Delta} `lab'") ///
+					// harmonizing y axes
+					qui su mean if msapmsa2000 == `msa'
+					local min1 = `r(min)'
+					local max1 = `r(max)'
+					qui su mean_black_share if msapmsa2000 == `msa'
+					local min2 = `r(min)'
+					local max2 = `r(max)'
+
+					local min = round(cond(`min1'<`min2',`min1',`min2') - 2.5,5)
+					local max = round(cond(`max1'>`max2',`max1',`max2') + 2.5,5)
+
+					local step = (`max' - `min')/5
+					
+					twoway (bar mean year2 if msapmsa2000 == `msa', barwidth(5) sort xaxis(1) yaxis(1) ytick(`min'(`step')`max') yla(`min'(`step')`max')  xtitle("CoG Year") ytitle("")  ///
 					) || (connected mean_black_share year1 if msapmsa2000 == `msa', ///
-					sort xaxis(2) xlabel(1940(10)2010) xtitle("Census Year", axis(2)) yaxis(2) ytitle("Mean Black Population Share", axis(2)) yline(0, lp(dash))) ///
+					sort xaxis(2) xlabel(1940(10)2010) xtitle("Census Year", axis(2)) yaxis(2) ytitle("")  yscale(off range(`min'(`step')`max') axis(2))  yline(0, lp(dash))) ///
 					|| , xlabel(1947 "1942-1952" 1954.5 "1952-1957" 1959.5 "1957-1962" 1964.5 "1962-1967" 1969.5 "1967-1972" 1974.5 "1972-1977" ///
 					1979.5 "1977-1982" 1984.5 "1982-1987" 1989.5 "1987-1992" 1994.5 "1992-1997" 1999.5 "1997-2002" 2004.5 "2002-2007" 2009.5 "2007-2012"  ///
-					, axis(1) angle(45))  xlabel(1940(10)2010, axis(2)) legend(cols(1) order(1 "Mean New `lab'" 2 "Mean Black Population Share")) note("Data From CoG 2: County Gov't Counts") 	title("Mean {&Delta} `lab' in `msa_lab'")
-
-					
+					, axis(1) angle(45))  xlabel(1940(10)2010, axis(2)) legend(cols(1) order(1 "Mean New `lab'" 2 "Mean Black Population Share")) ///
+					note("Data From CoG 2: County Gov't Counts") 	title("Mean {&Delta} `lab'" "in `msa_lab'") 
+			
+	
+	
 					graph export "$FIGS/2_county_counts/`level'/`level'_`msa'_change_`var'.png", as(png) replace
 
+					su p_mean
+					local min1 = `r(min)'
+					local max1 = `r(max)'
+					su mean_black_share
+					local min2 = `r(min)'
+					local max2 = `r(max)'
 					
-					twoway (bar p_mean year2 if use==1 & msapmsa2000 == `msa', barwidth(5) sort xaxis(1) yaxis(1) xtitle("CoG Year") ytitle("Mean %{&Delta} `lab'") ///
-					) || (connected mean_black_share year1 if use==1 & msapmsa2000 == `msa', ///
-					sort xaxis(2) xlabel(1940(10)2010) xtitle("Census Year", axis(2)) yaxis(2) ytitle("`levellab' Pct Share Black", axis(2)) yline(0, lp(dash))) ///
+					local min = round(cond(`min1'<`min2',`min1',`min2') - 2.5,5)
+					local max = round(cond(`max1'>`max2',`max1',`max2') + 2.5,5)
+					
+					local step = (`max' - `min')/5
+					
+					twoway (bar p_mean year2 if use==1 & msapmsa2000 == `msa', barwidth(5) sort xaxis(1) yaxis(1) ytick(`min'(`step')`max') yla(`min'(`step')`max') xtitle("CoG Year") ytitle("") ///
+					) || (connected mean_black_share year1 if use==1 & msapmsa2000 == `msa',  ///
+					sort xaxis(2) xlabel(1940(10)2010) xtitle("Census Year", axis(2)) yaxis(2) yscale(off range(`min'(`step')`max') axis(2)) ytitle("") yline(0, lp(dash))) ///
 					|| , xlabel(1940 "" 1947 "1942-1952" 1954.5 "1952-1957" 1959.5 "1957-1962" 1964.5 "1962-1967" 1969.5 "1967-1972" 1974.5 "1972-1977" ///
 					1979.5 "1977-1982" 1984.5 "1982-1987" 1989.5 "1987-1992" 1994.5 "1992-1997" 1999.5 "1997-2002" 2004.5 "2002-2007" 2009.5 "2007-2012"  ///
-					, angle(45) axis(1))  xlabel(1940(10)2010, axis(2)) legend(cols(1) order(1 "Mean New `lab'" 2 "Mean Black Population Share")) note("Data From CoG 2: County Gov't Counts") 	title("Mean %{&Delta} `lab' in `msa_lab'")
+					, angle(45) axis(1))  xlabel(1940(10)2010, axis(2)) legend(cols(1) order(1 "Mean New `lab'" 2 "Mean Black Population Share")) ///
+					note("Data From CoG 2: County Gov't Counts") 	title("Mean %{&Delta} `lab'" "in `msa_lab'") 
 
 					graph export "$FIGS/2_county_counts/`level'/`level'_`msa'_p_change_`var'.png", as(png) replace
 				}

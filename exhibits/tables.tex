@@ -20,10 +20,10 @@
 \listoftables}
 \clearpage
 
-\section{Tables}
+
 \foreach \level in {cz, county}{
-	
 	\foreach \pc in {0,1}{
+		\ifnum \pc=1{\section{\level -Level Tables, Per Capita}} \else{\section{\level -Level Tables}} \fi
 		
 		\subsection{Wiki Scrape Data, 1940-70 sample}
 		\input{tables/wiki/table_2_ctrls3_wiki_\pc_\level.tex}
@@ -166,4 +166,5 @@
 		}
 	}
 }
+
 \end{document}

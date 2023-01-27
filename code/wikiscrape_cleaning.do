@@ -240,6 +240,67 @@ preserve
 	save "$INTDATA/n_muni_cz.dta", replace
 restore
 
+// MSA totals
+preserve
+	merge m:1 cty_fips using "$XWALKS/county_pmsa_xwalk", keep(3) nogen
+	// Drop vars from county merge - keeping only commuting zones and info from settlement_infobox2
+	keep msapmsa2000 wid qid fips page_title unincorporated incorp_year_text incorporated_date text
+	duplicates drop 
+
+	g incorp_year = incorp_year_text
+	replace incorp_year = real(regexs(0)) if(regexm(incorporated_date,"[0-9][0-9][0-9][0-9]"))
+
+
+	g n = incorp_year>=1940 & incorp_year<=1970
+
+
+	g n1940 = incorp_year<1940
+	g n1950 = incorp_year<1950 
+	g n1960 = incorp_year<1960
+	g n1970 = incorp_year<1970
+	g n1980 = incorp_year<1980
+
+	g n1940_1950 = incorp_year>=1940 & incorp_year<1950
+	g n1950_1960 = incorp_year>=1950 & incorp_year<1960
+	g n1960_1970 = incorp_year>=1960 & incorp_year<1970
+	g n1970_1980 = incorp_year>=1970 & incorp_year<1980
+	g n1980_1990 = incorp_year>=1980 & incorp_year<1990
+
+
+	collapse (sum) n*, by(msapmsa2000)
+
+	rename n n_muni_msa
+
+	rename n1940 base_muni_msa1940
+	rename n1950 base_muni_msa1950
+	rename n1960 base_muni_msa1960
+	rename n1970 base_muni_msa1970
+	rename n1980 base_muni_msa1980
+
+	rename n1940_1950 n_muni_msa_1940_1950
+	rename n1950_1960 n_muni_msa_1950_1960
+	rename n1960_1970 n_muni_msa_1960_1970
+	rename n1970_1980 n_muni_msa_1970_1980
+	rename n1980_1990 n_muni_msa_1980_1990
+
+	label var n_muni_msa "n_muni_msa"
+
+	label var base_muni_msa1940 "base_muni_msa1940"
+	label var base_muni_msa1950 "base_muni_msa1950"
+	label var base_muni_msa1960 "base_muni_msa1960"
+	label var base_muni_msa1970 "base_muni_msa1970"
+	label var base_muni_msa1980 "base_muni_msa1980"
+
+	label var n_muni_msa_1940_1950 "n_muni_msa1940"
+	label var n_muni_msa_1950_1960 "n_muni_msa1950"
+	label var n_muni_msa_1960_1970 "n_muni_msa1960"
+	label var n_muni_msa_1970_1980 "n_muni_msa1970"
+	label var n_muni_msa_1980_1990 "n_muni_msa1980"
+
+	save "$INTDATA/n_muni_msa.dta", replace
+restore
+
+
 // county totals
 keep cty_fips wid qid fips page_title unincorporated incorp_year_text incorporated_date text
 duplicates drop 
