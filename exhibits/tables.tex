@@ -21,97 +21,61 @@
 \clearpage
 
 
-\foreach \level in {cz, county}{
+\foreach \level in {county}{
 	\foreach \pc in {0,1}{
 		\ifnum \pc=1{\section{\level -Level Tables, Per Capita}} \else{\section{\level -Level Tables}} \fi
 		
-		\subsection{Wiki Scrape Data, 1940-70 sample}
-		\input{tables/wiki/table_2_ctrls3_wiki_\pc_\level.tex}
-		\input{tables/wiki/table_2_ctrls5_wiki_\pc_\level.tex}
-		\input{tables/wiki/table_2_ctrls6_wiki_\pc_\level.tex}
-		\input{tables/wiki/table_2_ctrls4_wiki_\pc_\level.tex}
-		\clearpage
+%		\subsection{Wiki Scrape Data, 1940-70 sample}
+%		\input{tables/wiki/table_2_ctrls3_wiki_\pc_\level.tex}
+%		\input{tables/wiki/table_2_ctrls5_wiki_\pc_\level.tex}
+%		\input{tables/wiki/table_2_ctrls6_wiki_\pc_\level.tex}
+%		\input{tables/wiki/table_2_ctrls4_wiki_\pc_\level.tex}
+%		\clearpage
+%		
+%		\subsection{Wiki Scrape Data, 1940-50 sample}
+%		\input{tables/wiki/table_2_ctrls3_1940_1950_wiki_\pc_\level.tex}
+%		\input{tables/wiki/table_2_ctrls5_1940_1950_wiki_\pc_\level.tex}
+%		\input{tables/wiki/table_2_ctrls6_1940_1950_wiki_\pc_\level.tex}
+%		\input{tables/wiki/table_2_ctrls4_1940_1950_wiki_\pc_\level.tex}
+%		\clearpage
+%		
+%		\subsection{Wiki Scrape Data, 1950-60 sample}
+%		\input{tables/wiki/table_2_ctrls3_1950_1960_wiki_\pc_\level.tex}
+%		\input{tables/wiki/table_2_ctrls5_1950_1960_wiki_\pc_\level.tex}
+%		\input{tables/wiki/table_2_ctrls6_1950_1960_wiki_\pc_\level.tex}
+%		\input{tables/wiki/table_2_ctrls4_1950_1960_wiki_\pc_\level.tex}
+%		\clearpage
+%		
+%		\subsection{Wiki Scrape Data, 1960-70 sample}
+%		\input{tables/wiki/table_2_ctrls3_1960_1970_wiki_\pc_\level.tex}
+%		\input{tables/wiki/table_2_ctrls5_1960_1970_wiki_\pc_\level.tex}
+%		\input{tables/wiki/table_2_ctrls6_1960_1970_wiki_\pc_\level.tex}
+%		\input{tables/wiki/table_2_ctrls4_1960_1970_wiki_\pc_\level.tex}
+%		\clearpage
+%		
+%		\subsection{Wiki Scrape Data, decades stacked, no lags}
+%		\input{tables/wiki/table_2_ctrls3_stacked_L0_wiki_\pc_\level.tex}
+%		\input{tables/wiki/table_2_ctrls5_stacked_L0_wiki_\pc_\level.tex}
+%		\input{tables/wiki/table_2_ctrls6_stacked_L0_wiki_\pc_\level.tex}
+%		\input{tables/wiki/table_2_ctrls4_stacked_L0_wiki_\pc_\level.tex}
+%		\clearpage
+%		
+%		\subsection{Wiki Scrape Data, decades stacked, one lag}
+%		\input{tables/wiki/table_2_ctrls3_stacked_L1_wiki_\pc_\level.tex}
+%		\input{tables/wiki/table_2_ctrls5_stacked_L1_wiki_\pc_\level.tex}
+%		\input{tables/wiki/table_2_ctrls6_stacked_L1_wiki_\pc_\level.tex}
+%		\input{tables/wiki/table_2_ctrls4_stacked_L1_wiki_\pc_\level.tex}
+%		\clearpage
 		
-		\subsection{Wiki Scrape Data, 1940-50 sample}
-		\input{tables/wiki/table_2_ctrls3_1940_1950_wiki_\pc_\level.tex}
-		\input{tables/wiki/table_2_ctrls5_1940_1950_wiki_\pc_\level.tex}
-		\input{tables/wiki/table_2_ctrls6_1940_1950_wiki_\pc_\level.tex}
-		\input{tables/wiki/table_2_ctrls4_1940_1950_wiki_\pc_\level.tex}
-		\clearpage
 		
-		\subsection{Wiki Scrape Data, 1950-60 sample}
-		\input{tables/wiki/table_2_ctrls3_1950_1960_wiki_\pc_\level.tex}
-		\input{tables/wiki/table_2_ctrls5_1950_1960_wiki_\pc_\level.tex}
-		\input{tables/wiki/table_2_ctrls6_1950_1960_wiki_\pc_\level.tex}
-		\input{tables/wiki/table_2_ctrls4_1950_1960_wiki_\pc_\level.tex}
-		\clearpage
-		
-		\subsection{Wiki Scrape Data, 1960-70 sample}
-		\input{tables/wiki/table_2_ctrls3_1960_1970_wiki_\pc_\level.tex}
-		\input{tables/wiki/table_2_ctrls5_1960_1970_wiki_\pc_\level.tex}
-		\input{tables/wiki/table_2_ctrls6_1960_1970_wiki_\pc_\level.tex}
-		\input{tables/wiki/table_2_ctrls4_1960_1970_wiki_\pc_\level.tex}
-		\clearpage
-		
-		\subsection{Wiki Scrape Data, decades stacked, no lags}
-		\input{tables/wiki/table_2_ctrls3_stacked_L0_wiki_\pc_\level.tex}
-		\input{tables/wiki/table_2_ctrls5_stacked_L0_wiki_\pc_\level.tex}
-		\input{tables/wiki/table_2_ctrls6_stacked_L0_wiki_\pc_\level.tex}
-		\input{tables/wiki/table_2_ctrls4_stacked_L0_wiki_\pc_\level.tex}
-		\clearpage
-		
-		\subsection{Wiki Scrape Data, decades stacked, one lag}
-		\input{tables/wiki/table_2_ctrls3_stacked_L1_wiki_\pc_\level.tex}
-		\input{tables/wiki/table_2_ctrls5_stacked_L1_wiki_\pc_\level.tex}
-		\input{tables/wiki/table_2_ctrls6_stacked_L1_wiki_\pc_\level.tex}
-		\input{tables/wiki/table_2_ctrls4_stacked_L1_wiki_\pc_\level.tex}
-		\clearpage
-		
-		
-		\foreach \var in {gen_muni, schdist_ind, all_local}{
+		\foreach \var in {all_local, gen_subcounty, gen_muni, schdist_ind, spdist}{
 			
-			
-			\subsection{County Gov't Counts Data, 1940-70 sample}
-			\input{tables/2_county_counts/table_2_ctrls3_\var_\pc_\level.tex}
-			\input{tables/2_county_counts/table_2_ctrls5_\var_\pc_\level.tex}
-			\input{tables/2_county_counts/table_2_ctrls6_\var_\pc_\level.tex}
-			\input{tables/2_county_counts/table_2_ctrls4_\var_\pc_\level.tex}
-			\clearpage
-			
-			\subsection{County Gov't Counts Data, 1940-50 sample}
-			\input{tables/2_county_counts/table_2_ctrls3_1940_1950_\var_\pc_\level.tex}
-			\input{tables/2_county_counts/table_2_ctrls5_1940_1950_\var_\pc_\level.tex}
-			\input{tables/2_county_counts/table_2_ctrls6_1940_1950_\var_\pc_\level.tex}
-			\input{tables/2_county_counts/table_2_ctrls4_1940_1950_\var_\pc_\level.tex}
-			\clearpage
-			
-			\subsection{County Gov't Counts Data, 1950-60 sample}
-			\input{tables/2_county_counts/table_2_ctrls3_1950_1960_\var_\pc_\level.tex}
-			\input{tables/2_county_counts/table_2_ctrls5_1950_1960_\var_\pc_\level.tex}
-			\input{tables/2_county_counts/table_2_ctrls6_1950_1960_\var_\pc_\level.tex}
-			\input{tables/2_county_counts/table_2_ctrls4_1950_1960_\var_\pc_\level.tex}
-			\clearpage
-			
-			\subsection{County Gov't Counts Data, 1960-70 sample}
-			\input{tables/2_county_counts/table_2_ctrls3_1960_1970_\var_\pc_\level.tex}
-			\input{tables/2_county_counts/table_2_ctrls5_1960_1970_\var_\pc_\level.tex}
-			\input{tables/2_county_counts/table_2_ctrls6_1960_1970_\var_\pc_\level.tex}
-			\input{tables/2_county_counts/table_2_ctrls4_1960_1970_\var_\pc_\level.tex}
-			\clearpage
 			
 			\subsection{County Gov't Counts Data, decades stacked, no lags}
 			\input{tables/2_county_counts/table_2_ctrls3_stacked_L0_\var_\pc_\level.tex}
-			\input{tables/2_county_counts/table_2_ctrls5_stacked_L0_\var_\pc_\level.tex}
-			\input{tables/2_county_counts/table_2_ctrls6_stacked_L0_\var_\pc_\level.tex}
 			\input{tables/2_county_counts/table_2_ctrls4_stacked_L0_\var_\pc_\level.tex}
 			\clearpage
 			
-			\subsection{County Gov't Counts Data, decades stacked, one lag}
-			\input{tables/2_county_counts/table_2_ctrls3_stacked_L1_\var_\pc_\level.tex}
-			\input{tables/2_county_counts/table_2_ctrls5_stacked_L1_\var_\pc_\level.tex}
-			\input{tables/2_county_counts/table_2_ctrls6_stacked_L1_\var_\pc_\level.tex}
-			\input{tables/2_county_counts/table_2_ctrls4_stacked_L1_\var_\pc_\level.tex}
-			\clearpage
 			
 			
 			
@@ -119,49 +83,11 @@
 		
 		\foreach \i in {3}{
 			
-			\subsection{Gov't Org Directory Survey Data, 1940-70 sample}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls3_ngov\i_\pc_\level.tex}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls5_ngov\i_\pc_\level.tex}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls6_ngov\i_\pc_\level.tex}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls4_ngov\i_\pc_\level.tex}
-			\clearpage
-			
-			\subsection{Gov't Org Directory Survey Data, 1940-50 sample}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls3_1940_1950_ngov\i_\pc_\level.tex}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls5_1940_1950_ngov\i_\pc_\level.tex}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls6_1940_1950_ngov\i_\pc_\level.tex}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls4_1940_1950_ngov\i_\pc_\level.tex}
-			\clearpage
-			
-			\subsection{Gov't Org Directory Survey Data, 1950-60 sample}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls3_1950_1960_ngov\i_\pc_\level.tex}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls5_1950_1960_ngov\i_\pc_\level.tex}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls6_1950_1960_ngov\i_\pc_\level.tex}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls4_1950_1960_ngov\i_\pc_\level.tex}
-			\clearpage
-			
-			\subsection{Gov't Org Directory Survey Data, 1960-70 sample}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls3_1960_1970_ngov\i_\pc_\level.tex}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls5_1960_1970_ngov\i_\pc_\level.tex}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls6_1960_1970_ngov\i_\pc_\level.tex}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls4_1960_1970_ngov\i_\pc_\level.tex}
-			\clearpage
-			
 			\subsection{Gov't Org Directory Survey Data, decades stacked, no lags}
 			\input{tables/4_1_general_purpose_govts/table_2_ctrls3_stacked_L0_ngov\i_\pc_\level.tex}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls5_stacked_L0_ngov\i_\pc_\level.tex}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls6_stacked_L0_ngov\i_\pc_\level.tex}
 			\input{tables/4_1_general_purpose_govts/table_2_ctrls4_stacked_L0_ngov\i_\pc_\level.tex}
 			\clearpage
-			
-			\subsection{Gov't Org Directory Survey Data, decades stacked, one lag}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls3_stacked_L1_ngov\i_\pc_\level.tex}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls5_stacked_L1_ngov\i_\pc_\level.tex}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls6_stacked_L1_ngov\i_\pc_\level.tex}
-			\input{tables/4_1_general_purpose_govts/table_2_ctrls4_stacked_L1_ngov\i_\pc_\level.tex}
-			\clearpage
-			
-			
+
 			
 		}
 	}

@@ -35,7 +35,7 @@ tempfile countypop1940
 save `countypop1940'
 
 
-foreach level in cz county msa{
+foreach level in county{
 	if "`level'"=="cz"{
 		local levelvar cz
 		local levellab "CZ"
@@ -56,7 +56,7 @@ foreach level in cz county msa{
 	destring fips, replace
 	rename czone cz
 
-	foreach var of varlist gen_muni schdist_ind all_local {
+	foreach var of varlist gen_muni schdist_ind all_local gen_subcounty spdist {
 		preserve
 			local lab: variable label `var'
 
@@ -177,7 +177,7 @@ foreach level in cz county msa{
 	}
 
 	forv pc=0/1{
-		foreach ds in gen_muni schdist_ind all_local ngov3 wiki{
+		foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist{
 			if "`ds'"=="wiki"{
 				local datapath = "$INTDATA/n_muni_`level'.dta"
 				local filepath = "$TABS/wiki"
@@ -221,7 +221,7 @@ foreach level in cz county msa{
 			merge 1:1 `levelvar' using "`datapath'", keep(3) nogen
 			merge 1:1 `levelvar' using ``level'pop1940', keep(3) nogen
 
-			asdf
+			
 			
 			// Histograms
 			foreach var of varlist $y $x_ols $x_iv{
@@ -246,7 +246,6 @@ foreach level in cz county msa{
 			local ylab: variable label $y
 			label var $y "y"
 			
-			kkjkj
 			
 			if `pc'==1{
 				replace $y = $y / `level'pop1940
@@ -255,7 +254,8 @@ foreach level in cz county msa{
 			else{
 				local pclab ""
 			}
-			forv i=3/6{
+			/*
+			forv i=3/4{
 				if `i'==3{
 					local lab1 "baseline y and division FEs"
 				}
@@ -271,21 +271,29 @@ foreach level in cz county msa{
 					local lab1 "baseline y, division FEs, and mfg and black mig share"
 				}
 				
-				eststo clear
-				eststo fs : reg $x_ols $x_iv ${C`i'}
+				su $x_ols
+				local x_mean : di %6.3f `r(mean)'
+				su $y
+				local y_mean : di %6.3f  `r(mean)'
+				eststo fs : reg $x_ols $x_iv ${C`i'}, r 
 				local F : di %6.3f e(F)
 				estadd local Fstat = `F'
-				eststo ols : reg $y $x_ols ${C`i'}
+				estadd local dep_mean = `x_mean'
+				
+				eststo ols : reg $y $x_ols ${C`i'}, r 
 				local r2 : di %6.3f e(r2)
 
 				estadd local Rsquared = `r2'
+				estadd local dep_mean = `y_mean'
 
-				eststo rf : reg $y $x_iv ${C`i'}
+				eststo rf : reg $y $x_iv ${C`i'}, r
 				local r2 : di %6.3f e(r2)
 
 				estadd local Rsquared = `r2'
+				estadd local dep_mean = `y_mean'
 
-				eststo tsls : ivreg2 $y ($x_ols = $x_iv) ${C`i'}
+				eststo tsls : ivreg2 $y ($x_ols = $x_iv) ${C`i'}, r
+				estadd local dep_mean = `y_mean'
 
 				esttab 	fs ///
 								ols ///
@@ -297,6 +305,7 @@ foreach level in cz county msa{
 								stats(Fstat Rsquared N, labels( ///
 								"F-Stat"	///
 								"R-squared" ///
+								"Dep Var Mean" ///
 								"Observations" ///
 								)) ///
 								title("Dererencourt Table Two with y=`ylab'`pclab' by `levellab' 1940-70, with `lab1'") ///
@@ -304,7 +313,8 @@ foreach level in cz county msa{
 								mgroups("First Stage" "OLS" "Reduced Form" "2SLS", pattern(1 1 1 1))
 			}
 
-			// split decades	
+			// split decades
+			
 			foreach d in _1940_1950 _1950_1960 _1960_1970{
 					if "`d'"=="_1940_1950"{
 						local labd "1940-50"
@@ -355,7 +365,7 @@ foreach level in cz county msa{
 				la var $x_iv "$\hat{GM}$"
 				la var $x_ols "GM"
 				
-				forv i=3/6{
+				forv i=3/4{
 					if `i'==3{
 						local lab1 "baseline y and division FEs"
 					}
@@ -371,21 +381,29 @@ foreach level in cz county msa{
 						local lab1 "baseline y, division FEs, and mfg and black mig share"
 					}
 					
-					eststo clear
-					eststo fs : reg $x_ols $x_iv ${C`i'}
+					su $x_ols
+					local x_mean : di %6.3f  `r(mean)'
+					su $y
+					local y_mean : di %6.3f  `r(mean)'
+					eststo fs : reg $x_ols $x_iv ${C`i'}, r 
 					local F : di %6.3f e(F)
 					estadd local Fstat = `F'
-					eststo ols : reg $y $x_ols ${C`i'}
+					estadd local dep_mean = `x_mean'
+					
+					eststo ols : reg $y $x_ols ${C`i'}, r 
 					local r2 : di %6.3f e(r2)
 
 					estadd local Rsquared = `r2'
+					estadd local dep_mean = `y_mean'
 
-					eststo rf : reg $y $x_iv ${C`i'}
+					eststo rf : reg $y $x_iv ${C`i'}, r
 					local r2 : di %6.3f e(r2)
 
 					estadd local Rsquared = `r2'
+					estadd local dep_mean = `y_mean'
 
-					eststo tsls : ivreg2 $y ($x_ols = $x_iv) ${C`i'}
+					eststo tsls : ivreg2 $y ($x_ols = $x_iv) ${C`i'}, r
+					estadd local dep_mean = `y_mean'
 
 					esttab 	fs ///
 									ols ///
@@ -394,9 +412,10 @@ foreach level in cz county msa{
 									using "`filepath'/table_2_ctrls`i'`d'_`ds'_`pc'_`level'.tex", ///
 									replace label se booktabs num noconstant ///
 									starlevels( * 0.10 ** 0.05 *** 0.01) ///
-									stats(Fstat Rsquared N, labels( ///
+									stats(Fstat Rsquared dep_mean N, labels( ///
 									"F-Stat"	///
 									"R-squared" ///
+									"Dep Var Mean" ///
 									"Observations" ///
 									)) ///
 									title("Dererencourt Table Two with y=`ylab'`pclab' by `levellab' `labd', with `lab1'") ///
@@ -404,7 +423,7 @@ foreach level in cz county msa{
 									mgroups("First Stage" "OLS" "Reduced Form" "2SLS", pattern(1 1 1 1))
 				}
 			}
-
+		*/
 
 			// Stacked and lagged
 
@@ -433,11 +452,11 @@ foreach level in cz county msa{
 
 			bys `levelvar' (decade) : g base_muni_`level'_L1 = base_muni_`level'[_n-1] if decade-10 == decade[_n-1]
 			bys `levelvar' (decade) : g base_muni_`level'_L2 = base_muni_`level'[_n-2] if decade-20 == decade[_n-2]
-
+			
 			ren n_muni_`level' n_muni_`level'_L0
 			ren base_muni_`level' base_muni_`level'_L0
-
-			forv lag = 0/1{
+			asdfasd
+			forv lag = 0/0{
 				if `lag'==0{
 					local labl "no lags"
 				}
@@ -469,7 +488,7 @@ foreach level in cz county msa{
 				global C4 base_muni_`level'_L`lag' reg2 reg3 reg4 mfg_lfshare v2_blackmig3539_share i.decade
 
 								
-				forv i=3/6{
+				forv i=3/4{
 					if `i'==3{
 						local lab1 "baseline y and division FEs"
 					}
@@ -485,20 +504,29 @@ foreach level in cz county msa{
 						local lab1 "baseline y, division FEs, and mfg and black mig share"
 					}
 					eststo clear
-					eststo fs : reg $x_ols $x_iv ${C`i'}
+					su $x_ols
+					local x_mean : di %6.3f  `r(mean)'
+					su $y
+					local y_mean : di %6.3f  `r(mean)'
+					eststo fs : reg $x_ols $x_iv ${C`i'}, r 
 					local F : di %6.3f e(F)
 					estadd local Fstat = `F'
-					eststo ols : reg $y $x_ols ${C`i'}
+					estadd local dep_mean = `x_mean'
+					
+					eststo ols : reg $y $x_ols ${C`i'}, r 
 					local r2 : di %6.3f e(r2)
 
 					estadd local Rsquared = `r2'
+					estadd local dep_mean = `y_mean'
 
-					eststo rf : reg $y $x_iv ${C`i'}
+					eststo rf : reg $y $x_iv ${C`i'}, r
 					local r2 : di %6.3f e(r2)
 
 					estadd local Rsquared = `r2'
+					estadd local dep_mean = `y_mean'
 
-					eststo tsls : ivreg2 $y ($x_ols = $x_iv) ${C`i'}
+					eststo tsls : ivreg2 $y ($x_ols = $x_iv) ${C`i'}, r
+					estadd local dep_mean = `y_mean'
 
 					esttab 	fs ///
 									ols ///
@@ -507,9 +535,10 @@ foreach level in cz county msa{
 									using "`filepath'/table_2_ctrls`i'_stacked_L`lag'_`ds'_`pc'_`level'.tex", ///
 									replace label se booktabs num noconstant ///
 									starlevels( * 0.10 ** 0.05 *** 0.01) ///
-									stats(Fstat Rsquared N, labels( ///
+									stats(Fstat Rsquared dep_mean N, labels( ///
 									"F-Stat"	///
 									"R-squared" ///
+									"Dep Var Mean" ///
 									"Observations" ///
 									)) ///
 									title("Dererencourt Table Two with y=`ylab'`pclab' by decade in `levellab' 1940-70, with `lab1'") ///
