@@ -1,38 +1,47 @@
 // Merges n_muni_cz variable with derenoncourt data, replicates table 2 using it as outcome variable with and without controls
 
 
-// Preclean 1940 census data
-use "$DCOURT/data/mobility/raw/usa_00097.dta", clear
-keep stateicp countyicp perwt
-collapse (sum) perwt, by(stateicp countyicp)
+// Preclean population data
 
-merge 1:1 stateicp countyicp using "$DCOURT/data/crosswalks/county1940_crosswalks.dta", keep(1 3) nogen
+use "$INTDATA/cog/2_county_counts.dta", clear
+drop if fips_state == "02" | fips_state=="15"
+g fips = fips_state+fips_county_2002
+destring fips, replace
+rename czone cz
+
+replace year = year-2
 
 preserve
-	collapse (sum) perwt, by(cz)
+	collapse (sum) Pop, by(cz year)
 
-	ren perwt czpop1940
-
-	tempfile czpop1940
-	save `czpop1940'
+	ren Pop czpop
+	
+	reshape wide czpop, i(cz) j(year)
+	tempfile czpop
+	save `czpop'
 restore
 
 
 preserve
-	collapse (sum) perwt, by(smsa)
+	collapse (sum) Pop, by(msapmsa2000 year)
 
-	ren perwt msapop1940
-	destring smsa, gen(msapmsa2000)
-	tempfile msapop1940
-	save `msapop1940'
+	ren Pop msapop
+	
+	reshape wide msapop, i(msapmsa2000) j(year)
+
+	tempfile msapop
+	save `msapop'
 restore
 
-collapse (sum) perwt, by(fips)
+collapse (sum) Pop, by(fips year)
 
-ren perwt countypop1940
+ren Pop countypop
 
-tempfile countypop1940
-save `countypop1940'
+reshape wide countypop, i(fips) j(year)
+
+tempfile countypop
+save `countypop'
+
 
 
 foreach level in county{
@@ -55,7 +64,7 @@ foreach level in county{
 	g fips = fips_state+fips_county_2002
 	destring fips, replace
 	rename czone cz
-
+	
 	foreach var of varlist gen_muni schdist_ind all_local gen_subcounty spdist {
 		preserve
 			local lab: variable label `var'
@@ -219,7 +228,7 @@ foreach level in county{
 				destring smsa, gen(msapmsa2000) 
 			}
 			merge 1:1 `levelvar' using "`datapath'", keep(3) nogen
-			merge 1:1 `levelvar' using ``level'pop1940', keep(3) nogen
+			merge 1:1 `levelvar' using ``level'pop', keep(3) nogen
 
 			
 			
@@ -249,7 +258,7 @@ foreach level in county{
 			
 			if `pc'==1{
 				replace $y = $y / `level'pop1940
-				local pclab ", Per Capita (1940)"
+				local pclab ", Per Capita"
 			}
 			else{
 				local pclab ""
@@ -432,7 +441,7 @@ foreach level in county{
 				destring smsa, gen(msapmsa2000) 
 			}
 			merge 1:1 `levelvar' using "`datapath'", keep(3) nogen
-			merge 1:1 `levelvar' using ``level'pop1940', keep(3) nogen
+			merge 1:1 `levelvar' using ``level'pop', keep(3) nogen
 
 			local ylab: variable label n_muni_`level'
 
@@ -440,8 +449,8 @@ foreach level in county{
 			rename *1950_1960 *1950
 			rename *1960_1970 *1960
 
-			keep GM_???? GM_hat2_???? frac_all_upm* mfg_lfshare* v2_blackmig3539_share* `levelvar' reg2 reg3 reg4  n_muni_`level'_???? base_muni_`level'???? `level'pop1940
-			reshape long base_muni_`level' n_muni_`level'_ GM_ GM_hat2_ frac_all_upm mfg_lfshare v2_blackmig3539_share, i(`levelvar') j(decade)
+			keep GM_???? GM_hat2_????  mfg_lfshare* v2_blackmig3539_share* `levelvar' reg2 reg3 reg4  n_muni_`level'_???? base_muni_`level'???? `level'pop*
+			reshape long base_muni_`level' n_muni_`level'_ GM_ GM_hat2_  mfg_lfshare v2_blackmig3539_share `level'pop, i(`levelvar') j(decade)
 
 			ren n_muni_`level'_ n_muni_`level'
 			ren GM_ GM
@@ -455,7 +464,7 @@ foreach level in county{
 			
 			ren n_muni_`level' n_muni_`level'_L0
 			ren base_muni_`level' base_muni_`level'_L0
-			asdfasd
+			
 			forv lag = 0/0{
 				if `lag'==0{
 					local labl "no lags"
@@ -476,8 +485,8 @@ foreach level in county{
 				label var $y "y_L`lag'"
 				
 				if `pc'==1{
-					replace $y = $y / `level'pop1940
-					local pclab ", Per Capita (1940)"
+					replace $y = 1000*$y / `level'pop
+					local pclab ", Per Capita (1,000)"
 				}
 
 				global C3 base_muni_`level'_L`lag' reg2 reg3 reg4 i.decade
@@ -503,6 +512,7 @@ foreach level in county{
 					else if `i'==4{
 						local lab1 "baseline y, division FEs, and mfg and black mig share"
 					}
+					
 					eststo clear
 					su $x_ols
 					local x_mean : di %6.3f  `r(mean)'
