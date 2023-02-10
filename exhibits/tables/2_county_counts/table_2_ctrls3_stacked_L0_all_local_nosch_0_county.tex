@@ -1,0 +1,24 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y= by decade in County 1940-70, with baseline y and division FEs}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{GM}&\multicolumn{1}{c}{y\_L0}&\multicolumn{1}{c}{y\_L0}&\multicolumn{1}{c}{y\_L0}\\
+\midrule
+$\hat{GM}$          &       0.518***&               &      0.0230*  &               \\
+                    &    (0.0342)   &               &    (0.0123)   &               \\
+\addlinespace
+GM                  &               &      0.0222*  &               &      0.0444*  \\
+                    &               &    (0.0123)   &               &    (0.0238)   \\
+\midrule
+F-Stat              &      47.763   &               &               &               \\
+R-squared           &               &        .119   &        .119   &               \\
+Dep Var Mean        &      50.286   &       1.728   &       1.728   &       1.728   \\
+Observations        &         714   &         714   &         714   &         714   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

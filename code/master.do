@@ -13,6 +13,7 @@ gl DCOURT "$DROPBOX/derenoncourt_opportunity/replication_AER"
 
 gl RAWDATA "$DATA/raw"
 gl INTDATA "$DATA/interim"
+gl CLEANDATA "$DATA/clean"
 
 gl XWALKS "$DATA/xwalks"
 

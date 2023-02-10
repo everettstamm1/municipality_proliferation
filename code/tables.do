@@ -1,48 +1,6 @@
 // Merges n_muni_cz variable with derenoncourt data, replicates table 2 using it as outcome variable with and without controls
 
 
-// Preclean population data
-
-use "$INTDATA/cog/2_county_counts.dta", clear
-drop if fips_state == "02" | fips_state=="15"
-g fips = fips_state+fips_county_2002
-destring fips, replace
-rename czone cz
-
-replace year = year-2
-
-preserve
-	collapse (sum) Pop, by(cz year)
-
-	ren Pop czpop
-	
-	reshape wide czpop, i(cz) j(year)
-	tempfile czpop
-	save `czpop'
-restore
-
-
-preserve
-	collapse (sum) Pop, by(msapmsa2000 year)
-
-	ren Pop msapop
-	
-	reshape wide msapop, i(msapmsa2000) j(year)
-
-	tempfile msapop
-	save `msapop'
-restore
-
-collapse (sum) Pop, by(fips year)
-
-ren Pop countypop
-
-reshape wide countypop, i(fips) j(year)
-
-tempfile countypop
-save `countypop'
-
-
 
 foreach level in county{
 	if "`level'"=="cz"{
@@ -57,156 +15,24 @@ foreach level in county{
 		local levelvar msapmsa2000
 		local levellab "MSA"
 	}
-	// Preclean county data
-
-	use "$INTDATA/cog/2_county_counts.dta", clear
-	drop if fips_state == "02" | fips_state=="15"
-	g fips = fips_state+fips_county_2002
-	destring fips, replace
-	rename czone cz
-	
-	foreach var of varlist gen_muni schdist_ind all_local gen_subcounty spdist {
-		preserve
-			local lab: variable label `var'
-
-			bys `levelvar' year : egen n = total(`var'), missing
-			keep `levelvar' year n
-			duplicates drop 
-			
-			reshape wide n, i(`levelvar') j(year)
-			
-			g n_muni_`level' = n1972 - n1942
-			g n_muni_`level'_1940_1950 = n1952 - n1942
-			g n_muni_`level'_1950_1960 = n1962 - n1952
-			g n_muni_`level'_1960_1970 = n1972 - n1962
-			g n_muni_`level'_1970_1980 = n1982 - n1972
-			g n_muni_`level'_1980_1990 = n1992 - n1982
-			
-			ren n1942 base_muni_`level'1940
-			ren n1952 base_muni_`level'1950
-			ren n1962 base_muni_`level'1960
-			ren n1972 base_muni_`level'1970
-			ren n1982 base_muni_`level'1980
-			
-			label var base_muni_`level'1940 "Base `lab' 1940"
-			label var base_muni_`level'1950 "Base `lab' 1950"
-			label var base_muni_`level'1960 "Base `lab' 1960"
-			label var base_muni_`level'1970 "Base `lab' 1970"
-			label var base_muni_`level'1980 "Base `lab' 1980"
-
-			label var n_muni_`level'_1940_1950 "`lab'"
-			label var n_muni_`level'_1950_1960 "`lab'"
-			label var n_muni_`level'_1960_1970 "`lab'"
-			label var n_muni_`level'_1970_1980 "`lab'"
-			label var n_muni_`level'_1980_1990 "`lab'"
-			label var n_muni_`level' "`lab'"
-			
-			tempfile `var'
-			save ``var''
-		restore
-	}
-
-	// Preclean general purpose govts data
-	use "$INTDATA/cog/4_1_general_purpose_govts.dta", clear
-	drop if fips_code_state == "02" | fips_code_state=="15"
-	g fips = 1000*fips_state+fips_county_2002
-	rename czone cz
-	rename fips_code_msa msapmsa2000
-	keep if ID_type == 2 | ID_type == 3 // keeping only municipal and town/township observations
-
-	g incorp_date1 = original_incorporation_date
-	g incorp_date2 = year_home_rule_adopted
-
-	// Documentation notes some inconsistencies in incorporation dates and home rule charters, so we'll take the earliest reported
-	bys id (incorp_date1) : replace incorp_date1 = incorp_date1[1] 
-	bys id (incorp_date2) : replace incorp_date2 = incorp_date2[1] 
-
-	g incorp_date3 = cond(incorp_date1<.,incorp_date1,incorp_date2)
-	drop if incorp_date3==.
-
-	lab var incorp_date1 "Incorporations"
-	lab var incorp_date2 "Home Rule Adoptions"
-	lab var incorp_date3 "Incorporations or Home Rule Adoptions"
-
-	keep incorp_date* id `levelvar'
-	duplicates drop
-
-	forv i=1/3{
-		preserve
-			keep `levelvar' incorp_date`i'
-			local lab: variable label incorp_date`i'
-
-			g n = incorp_date`i'>=1940 & incorp_date`i'<=1970
-
-
-			g n1940 = incorp_date`i'<1940
-			g n1950 = incorp_date`i'<1950 
-			g n1960 = incorp_date`i'<1960
-			g n1970 = incorp_date`i'<1970
-			g n1980 = incorp_date`i'<1980
-
-			g n1940_1950 = incorp_date`i'>=1940 & incorp_date`i'<1950
-			g n1950_1960 = incorp_date`i'>=1950 & incorp_date`i'<1960
-			g n1960_1970 = incorp_date`i'>=1960 & incorp_date`i'<1970
-			g n1970_1980 = incorp_date`i'>=1970 & incorp_date`i'<1980
-			g n1980_1990 = incorp_date`i'>=1980 & incorp_date`i'<1990
-
-			collapse (sum) n*, by(`levelvar')
-
-			rename n n_muni_`level'
-
-			rename n1940 base_muni_`level'1940
-			rename n1950 base_muni_`level'1950
-			rename n1960 base_muni_`level'1960
-			rename n1970 base_muni_`level'1970
-			rename n1980 base_muni_`level'1980
-
-			rename n1940_1950 n_muni_`level'_1940_1950
-			rename n1950_1960 n_muni_`level'_1950_1960
-			rename n1960_1970 n_muni_`level'_1960_1970
-			rename n1970_1980 n_muni_`level'_1970_1980
-			rename n1980_1990 n_muni_`level'_1980_1990
-
-			label var base_muni_`level'1940 "Base `lab' 1940"
-			label var base_muni_`level'1950 "Base `lab' 1950"
-			label var base_muni_`level'1960 "Base `lab' 1960"
-			label var base_muni_`level'1970 "Base `lab' 1970"
-			label var base_muni_`level'1980 "Base `lab' 1980"
-
-			label var n_muni_`level'_1940_1950 "`lab'"
-			label var n_muni_`level'_1950_1960 "`lab'"
-			label var n_muni_`level'_1960_1970 "`lab'"
-			label var n_muni_`level'_1970_1980 "`lab'"
-			label var n_muni_`level'_1980_1990 "`lab'"
-			label var n_muni_`level' "`lab'"
-
-			tempfile ngov`i'
-			save `ngov`i''
-		restore
-	}
 
 	forv pc=0/1{
-		foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist{
+		foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist all_local_nosch{
 			if "`ds'"=="wiki"{
-				local datapath = "$INTDATA/n_muni_`level'.dta"
 				local filepath = "$TABS/wiki"
 			}
 			else if "`ds'"=="ngov1"{
-				local datapath ``ds''
 				local filepath = "$TABS/4_1_general_purpose_govts"
 
 			}
 			else if "`ds'"=="ngov2"{
-				local datapath ``ds''
 				local filepath = "$TABS/4_1_general_purpose_govts"
 			
 			}
 			else if "`ds'"=="ngov3"{
-				local datapath ``ds''
 				local filepath = "$TABS/4_1_general_purpose_govts"
 				}
 			else{
-				local datapath ``ds''
 				local filepath = "$TABS/2_county_counts"
 
 			}
@@ -223,13 +49,8 @@ foreach level in county{
 
 			global C4 base_muni_`level'1940 reg2 reg3 reg4 mfg_lfshare1940  v2_blackmig3539_share1940
 
-			use "$DCOURT/data/GM_`level'_final_dataset.dta", clear
-			if "`level'"=="msa"{
-				destring smsa, gen(msapmsa2000) 
-			}
-			merge 1:1 `levelvar' using "`datapath'", keep(3) nogen
-			merge 1:1 `levelvar' using ``level'pop', keep(3) nogen
-
+			
+			use "$CLEANDATA/`level'_`ds'_pooled", clear
 			
 			
 			// Histograms
@@ -436,35 +257,7 @@ foreach level in county{
 
 			// Stacked and lagged
 
-			use "$DCOURT/data/GM_`level'_final_dataset_split.dta", clear
-			if "`level'"=="msa"{
-				destring smsa, gen(msapmsa2000) 
-			}
-			merge 1:1 `levelvar' using "`datapath'", keep(3) nogen
-			merge 1:1 `levelvar' using ``level'pop', keep(3) nogen
-
-			local ylab: variable label n_muni_`level'
-
-			rename *1940_1950 *1940
-			rename *1950_1960 *1950
-			rename *1960_1970 *1960
-
-			keep GM_???? GM_hat2_????  mfg_lfshare* v2_blackmig3539_share* `levelvar' reg2 reg3 reg4  n_muni_`level'_???? base_muni_`level'???? `level'pop*
-			reshape long base_muni_`level' n_muni_`level'_ GM_ GM_hat2_  mfg_lfshare v2_blackmig3539_share `level'pop, i(`levelvar') j(decade)
-
-			ren n_muni_`level'_ n_muni_`level'
-			ren GM_ GM
-			ren GM_hat2_ GM_hat2
-
-			bys `levelvar' (decade) : g n_muni_`level'_L1 = n_muni_`level'[_n-1] if decade-10 == decade[_n-1]
-			bys `levelvar' (decade) : g n_muni_`level'_L2 = n_muni_`level'[_n-2] if decade-20 == decade[_n-2]
-
-			bys `levelvar' (decade) : g base_muni_`level'_L1 = base_muni_`level'[_n-1] if decade-10 == decade[_n-1]
-			bys `levelvar' (decade) : g base_muni_`level'_L2 = base_muni_`level'[_n-2] if decade-20 == decade[_n-2]
-			
-			ren n_muni_`level' n_muni_`level'_L0
-			ren base_muni_`level' base_muni_`level'_L0
-			
+			use "$CLEANDATA/`level'_`ds'_stacked.dta", clear
 			forv lag = 0/0{
 				if `lag'==0{
 					local labl "no lags"
