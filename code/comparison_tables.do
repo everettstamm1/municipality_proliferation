@@ -4,7 +4,7 @@ use "$CLEANDATA/county_all_local_stacked.dta", clear
 keep fips decade v2_blackmig3539_share GM GM_hat2 reg* base_muni_county_L0 mfg_lfshare n_muni_county_L0
 
 keep if decade == 1940
-drop if GM==.
+drop if GM==. | fips == . | reg3 == 1 
 sort decade v2_blackmig3539_share
 
 order decade fips v2_blackmig3539_share GM GM_hat2
@@ -21,9 +21,11 @@ sort decade blackmig_bin reg GM
 
 order decade v2_blackmig3539_share blackmig_bin reg GM 
 
-bys  decade blackmig_bin reg (GM) : keep if _n==1 | _n ==_N
+bys decade blackmig_bin reg (GM) : g n = _N
+bys  decade blackmig_bin reg (GM) : keep if (_n==1 | _n ==_N) & _N>1
 bys  decade blackmig_bin reg (GM) : g treated = _n == _N
 
+drop if blackmig_bin == 0 | blackmig_bin == 9
 keep fips treated blackmig_bin reg
 duplicates drop
 tempfile compare_fips
@@ -53,11 +55,16 @@ ren n_muni_county_L0 new_schdist_ind
 
 keep if decade==1940 | decade == 1950 | decade == 1960
 
-g decadeXreg = string(decade) + " " + reg + " region"
-g decadeXbin = string(decade) + ", blackmig decile " + string(blackmig_bin)
-g regXbin = reg + " region, decile " + string(blackmig_bin)
+ 
+g decade_end = decade+10
+g decade_str = string(decade)+"-"+string(decade_end)
+drop decade decade_end
+ren decade_str decade
+//g decadeXreg = string(decade) + " " + reg + " region"
+//g decadeXbin = string(decade) + ", blackmig decile " + string(blackmig_bin)
+g regXbin = reg + " region, decile " + string(blackmig_bin+1)
 
-foreach var of varlist GM GM_hat2 v2_blackmig3539_share base* new* countypop{
+foreach var of varlist GM GM_hat2 v2_blackmig3539_share mfg_lfshare base* new* countypop{
 	
 	 
 	#delimit ;
@@ -86,7 +93,7 @@ foreach var of varlist GM GM_hat2 v2_blackmig3539_share base* new* countypop{
 	#delimit cr
 }
 
-
+/*
 foreach var of varlist GM GM_hat2 v2_blackmig3539_share base* new*{
 	
 	 
@@ -145,34 +152,36 @@ foreach var of varlist GM GM_hat2 v2_blackmig3539_share base* new*{
 	collabels("Mean" "Std Dev" "Obs");
 	#delimit cr
 }
-
+*/
 levelsof regXbin, local(regbin)
 
+lab var countypop "countypop"
 foreach i in `regbin'{
-	preserve 
-		keep if regXbin == "`i'"
-		local bin = blackmig_bin[1]
-		local reg = reg[1]
-		
-		sort treated
-		eststo clear
-		local control_name = county_name[1]
+	eststo clear
 
-		local treat_name = county_name[_N]
-
-		forv j=0/1{
+	forv j=0/1{
+		preserve 
+			keep if regXbin == "`i'" & treated == `j'
+			local bin = blackmig_bin[1]
+			local reg = reg[1]
 			
-			cap estpost tabstat v2_blackmig3539_share GM GM_hat2 base* new* mfg_lfshare countypop if treated==`j', ///
+			if `j'==0{
+				local control_name = county_name[1]
+			}
+			else {
+				local treat_name = county_name[1]
+			}				
+			qui estpost tabstat v2_blackmig3539_share GM GM_hat2 base* new* mfg_lfshare countypop, ///
 			statistics(mean) ///
 			by(decade) columns(statistics) missing nototal
 			eststo est`j' 
-		}
-		esttab est1 est0 using "$TABS/comparison_counties/byregXbin_`reg'_bin_`bin'.tex", booktabs nonumber label replace lines noobs ///
-			title("`i'"\label{tab1}) ///
-			mtitles("`treat_name' (Treated)" "`control_name' (Control)") ///
-			cells((mean(fmt(2)) sd(fmt(2)) count(fmt(0)))) ///
-			collabels("Mean")
-	restore
+		restore
+	}
 
+	esttab est1 est0 using "$TABS/comparison_counties/byregXbin_`reg'_bin_`bin'.tex", booktabs nonumber label replace lines noobs ///
+		title("`i'"\label{tab1}) ///
+		mtitles("`treat_name' (Treated)" "`control_name' (Control)") ///
+		cells((mean(fmt(2)))) ///
+		collabels("Mean")
 }
 			

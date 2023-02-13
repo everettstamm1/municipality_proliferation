@@ -164,7 +164,7 @@ local levelvar = "fips"
 	}
 	order statefips
 	reshape long cog2_ cog4_ wiki_, i(statefips) j(var) string
-adsafs
+
 	g diff = (100* (cog_ - wiki_)/cog_)
 	replace diff = 0 if cog_==0 & wiki_ == 0
 	collapse (mean) diff, by(statefips)

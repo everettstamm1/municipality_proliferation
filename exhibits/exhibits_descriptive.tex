@@ -1,0 +1,55 @@
+\documentclass{article}
+\usepackage{blindtext}
+\usepackage{booktabs}
+\usepackage[margin=0.25in]{geometry}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage{tikz}
+
+
+\title{Descriptive Tables and Figures for Municipality Proliferation}
+
+\begin{document}
+\maketitle
+\tableofcontents
+{\footnotesize 
+\listoffigures
+\listoftables}
+\clearpage
+
+\section{LA vs. Chicago}
+Note that Los Angeles-Long Beach, CA PMSA has one county, Los Angeles County, whereas Chicago, IL PMSA has four: Cook, Kane, Lake, and Will Counties. 
+\begin{figure}
+	\includegraphics[width=.33\textwidth]{figures/descriptive/la_chicago_gm_hat2.png}
+\end{figure}
+\clearpage
+\section{Goldsmith-Pinkham Table}
+\begin{landscape}
+\input{tables/gp/gp_county.tex}
+\clearpage
+\end{landscape}
+
+\section{County Comparisons: Overall}
+
+This compares a set of "Treated" and "Control" counties in aggregate. The set is constructed by creating deciles of the county-level recent (1935-39) black migrant share of the 1940 population, then taking the counties with the largest (treated) and smallest (control) 1940-50 change in black population from each decile-census region (10 deciles x 3 regions = 30 possible pairs = 60 possible counties).The 1st and 10th deciles are dropped as the bins are constructed by frequencies, not values, thus their 1940 v2\_blackmig3539\_share values may not actually be that close. Doing this leaves us with 24 pairs/48 counties.
+
+ These tables give summary statistics by decade on the endogenous X variable (GM), instrument (GM\_hat2), control variables (v2\_blackmig3539\_share and mfg\_lfshare), base values of outcome variables (base\_all\_local and base\_schdist\_ind), values of outcome variables (new\_all\_local and new\_schdist\_ind), and county population (countypop).
+
+\foreach \var in {GM, GM_hat2, v2_blackmig3539_share, mfg_lfshare, base_all_local, base_schdist_ind, new_all_local, new_schdist_ind, countypop}{
+	\input{tables/comparison_counties/overall_\var.tex}
+}
+\clearpage
+\section{County Comparisons: By Region and blackmig3539\_share bins}
+This section compares summary statistics for the 24 decile-census region pairs individually. 
+\foreach \reg in {Northeast, Midwest, West}{
+	\subsection{\reg Region}
+	\foreach \bin in {1,2,3,4,5,6,7,8}{
+		\input{tables/comparison_counties/byregXbin_\reg_bin_\bin.tex}
+	}
+	\clearpage
+}
+
+\end{document}

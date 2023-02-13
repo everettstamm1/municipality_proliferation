@@ -50,7 +50,7 @@ foreach level in county msa cz{
 	replace schdist_ind = schdist_ind_impute if year==1942 & inlist(fips_state,"28","45")
 	
 	g all_local_nosch = all_local - schdist_ind
-
+	lab var all_local_nosch "Number of Local Govts (no school districts)"
 	
 	foreach var of varlist gen_muni schdist_ind all_local gen_subcounty spdist all_local_nosch{
 		preserve
