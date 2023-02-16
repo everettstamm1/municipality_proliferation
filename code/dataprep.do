@@ -1,6 +1,5 @@
 
 
-
 foreach level in county msa cz{
 	if "`level'"=="cz"{
 		local levelvar cz
@@ -256,14 +255,16 @@ foreach level in county msa cz{
 			rename *1950_1960 *1950
 			rename *1960_1970 *1960
 
-			keep GM_???? GM_hat2_????  mfg_lfshare* v2_blackmig3539_share* `levelvar' reg2 reg3 reg4  n_muni_`level'_???? base_muni_`level'???? `level'pop*
+			keep GM_???? GM_hat2_???? GM_raw_???? GM_hat2_raw_???? mfg_lfshare* v2_blackmig3539_share* `levelvar' reg2 reg3 reg4  n_muni_`level'_???? base_muni_`level'???? `level'pop*
 			
-			reshape long base_muni_`level' n_muni_`level'_ GM_ GM_hat2_  mfg_lfshare v2_blackmig3539_share `level'pop, i(`levelvar') j(decade)
+			reshape long base_muni_`level' n_muni_`level'_ GM_ GM_hat2_ GM_raw_ GM_hat2_raw_  mfg_lfshare v2_blackmig3539_share `level'pop, i(`levelvar') j(decade)
 
 			ren n_muni_`level'_ n_muni_`level'
 			ren GM_ GM
 			ren GM_hat2_ GM_hat2
-
+			ren GM_raw_ GM_raw
+			ren GM_hat2_raw_ GM_hat2_raw
+			
 			bys `levelvar' (decade) : g n_muni_`level'_L1 = n_muni_`level'[_n-1] if decade-10 == decade[_n-1]
 			bys `levelvar' (decade) : g n_muni_`level'_L2 = n_muni_`level'[_n-2] if decade-20 == decade[_n-2]
 
