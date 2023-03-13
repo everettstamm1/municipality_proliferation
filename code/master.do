@@ -1,3 +1,6 @@
+// Flag to run
+gl run = 0
+
 
 // ADD AN IF ELSE BLOCK WITH YOUR COMPUTER'S ABSOLUTE PATH TO THE MUNICIPALITY PROLIFERATION DROPBOX FOLDER
 if "`c(username)'"=="Everett Stamm"{
@@ -25,3 +28,44 @@ adopath ++ "$CODE/ado"
 
 // Settings
 set maxvar 30000
+
+if `run'==1{
+	
+	// CLEANING
+	
+		// Cleaning wikipedia scrape data
+		do "$CODE/cleaning/wikiscrape_cleaning.do"
+		
+		// Cleaning CoG data
+		do "$CODE/cleaning/cog_cleaning.do"
+		
+		// Cleaning Census Data
+		do "$CODE/cleaning/census_race_cleaning.do"
+		
+		// Creating master file (INCOMPLETE, MAY NOT BE USED)
+		// do "$CODE/cleaning/master_file_creation.do"
+		
+		// Harmonizing datasets
+		do "$CODE/cleaning/dataprep.do"
+	
+	// ANALYSIS
+	
+		// Main tables
+		do "$CODE/analysis/tables.do"
+		
+		// Maps
+		do "$CODE/analysis/maps.do"
+		
+		// Treated vs. Control comparison tables
+		do "$CODE/analysis/comparison_tables.do"
+		
+		// Goldsmith Pinkham Table
+		do "$CODE/analysis/goldsmith_pinkham_table.do"
+		
+		// LA vs Chicago Comparison
+		do "$CODE/analysis/la_vs_chicago.do"
+		
+		// Patterns of missingness (INCOMPLETE, MAY NOT BE USED)
+		// do "$CODE/analysis/patterns_of_missingness.do"
+	
+}

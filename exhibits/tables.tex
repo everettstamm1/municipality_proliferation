@@ -19,12 +19,13 @@
 \listoffigures
 \listoftables}
 \clearpage
-\foreach \pc  in {0,1}{
-	\foreach \level in {county}{
-		\ifnum \pc=1{\section{\level -Level Tables, Per Capita}} \else{\section{\level -Level Tables}} \fi
-		\foreach \x in {rank, raw}{
-			\foreach \drop in {0,1}{
-				\ifnum \drop=1{\subsection{1940-1950 Dropped, \x-instrument}} \else{\subsection{All years, \x-instrument}} \fi
+\foreach \inst in {og, full}{
+	\foreach \pc  in {0,1}{
+		\foreach \level in {county}{
+			\ifnum \pc=1{\section{\level -Level Tables, Per Capita, \inst-sample}} \else{\section{\level -Level Tables, \inst-sample}} \fi
+			\foreach \x in {rank, raw}{
+				\foreach \drop in {0,1}{
+					\ifnum \drop=1{\subsection{1940-1950 Dropped, \x-instrument}} \else{\subsection{All years, \x-instrument}} \fi
 				
 		%		\subsection{Wiki Scrape Data, 1940-70 sample}
 		%		\input{tables/wiki/table_2_ctrls3_wiki_\pc_\level.tex}
@@ -69,28 +70,30 @@
 		%		\clearpage
 				
 				
-				\foreach \var in {all_local, all_local_nosch, schdist_ind}{
-					
-					
+					\foreach \var in {all_local, all_local_nosch, schdist_ind}{
 
-					\input{tables/2_county_counts/table_2_ctrls3_stacked_L0_\var_\pc_\level_\x_\drop.tex}
-					\input{tables/2_county_counts/table_2_ctrls4_stacked_L0_\var_\pc_\level_\x_\drop.tex}
+						\input{tables/2_county_counts/table_2_ctrls3_stacked_L0_\var_\pc_\level_\x_\drop_\inst.tex}
+						\input{tables/2_county_counts/table_2_ctrls4_stacked_L0_\var_\pc_\level_\x_\drop_\inst.tex}
+						\clearpage
+					
+					
+					
+					}
+
+					\input{tables/cgoodman/table_2_ctrls3_stacked_L0_cgoodman_\pc_\level_\x_\drop_\inst.tex}
+					\input{tables/cgoodman/table_2_ctrls4_stacked_L0_cgoodman_\pc_\level_\x_\drop_\inst.tex}
 					\clearpage
-					
-					
-					
-					
-				}
 				
-%				\foreach \i in {3}{
+%					\foreach \i in {3}{
 %					
 %
-%					\input{tables/4_1_general_purpose_govts/table_2_ctrls3_stacked_L0_ngov\i_\pc_\level_\x_\drop.tex}
-%					\input{tables/4_1_general_purpose_govts/table_2_ctrls4_stacked_L0_ngov\i_\pc_\level_\x_\drop.tex}
-%					\clearpage
+%						\input{tables/4_1_general_purpose_govts/table_2_ctrls3_stacked_L0_ngov\i_\pc_\level_\x_\drop.tex}
+%						\input{tables/4_1_general_purpose_govts/table_2_ctrls4_stacked_L0_ngov\i_\pc_\level_\x_\drop.tex}
+%						\clearpage
 %		
 %					
-%				}
+%					}
+				}
 			}
 		}
 	}
