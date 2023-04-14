@@ -224,7 +224,7 @@ foreach inst in og full ccdb{
 		
 		// Preclean cgoodman data
 		
-		use "$REPO/cbgoodman/muni-incorporation/muni-incorporation/exports/muni_incorporation_date.dta", clear
+		use "$RAWDATA/cbgoodman/muni_incorporation_date.dta", clear
 		destring statefips countyfips, replace
 		drop if statefips == 02 | statefips==15
 		g cty_fips = 1000*statefips+countyfips
@@ -344,6 +344,54 @@ foreach inst in og full ccdb{
 				ren n_muni_`level' n_muni_`level'_L0
 				ren base_muni_`level' base_muni_`level'_L0
 				lab var n_muni_`level'_L0 "`ylab'"
+				
+				merge 1:1 fips decade using "$INTDATA/cgoodman/county_geogs.dta", keep(1 3) 
+				replace frac_land = 0 if _merge==1
+				replace frac_total = 0 if _merge==1
+				drop _merge
+				
+				
+				keep if inlist(decade, 1940, 1950, 1960)
+				merge 1:1 fips decade using "$INTDATA/land_cover/frac_unusable", keep(1 3) nogen
+
+				foreach geog in land total unusable{
+					qui su frac_`geog' if decade == 1940 & GM < . & n_muni_`level'_L0 < .,d
+					g above_med_temp = frac_`geog'>=`r(p50)' if decade == 1940 & GM < . & n_muni_`level'_L0 < .
+					bys fips : egen above_med_`geog' = max(above_med_temp)
+					g GM_X_above_med_`geog' = GM * above_med_`geog'
+					g GM_hat_X_above_med_`geog' = GM_hat * above_med_`geog'
+
+					drop above_med_temp
+				}
+				
+				g `level'pop1940 = `level'pop if decade == 1940
+				bys `levelvar' (`level'pop1940) : replace `level'pop1940 = `level'pop1940[1]
+				
+								
+				preserve
+					use "$RAWDATA/other/district_court_order_data_feb2021.dta", clear
+					drop if status_2020 >=4 // Dropping dismissed court orders
+					keep cfips 
+					ren cfip fips
+					destring fips, replace
+					duplicates drop
+					tempfile co
+					save `co'
+				restore
+
+				merge m:1 fips using `co', keep(1 3)
+				g co_2020 = _merge == 3
+				lab var co_2020 "Desegregation Order"
+
+				g GM_X_co_2020 = GM * co_2020
+				g GM_hat_X_co_2020 = GM_hat * co_2020
+				drop _merge
+				/*
+				merge m:1 fips using "$INTDATA/land_cover/county_tri", keep(3) nogen
+				g add_tri_ctrl = cond(mean_tri<.,0,1)
+				replace mean_tri = 0 if add_tri_ctrl==1
+				*/
+				merge m:1 fips using "$CLEANDATA/nces/nces_finance_data.dta", keep(3) nogen
 				save "$CLEANDATA/`level'_`ds'_stacked_`inst'", replace
 		}
 	}

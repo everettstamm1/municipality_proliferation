@@ -11,7 +11,7 @@ foreach level in county{
 			local yvar = "GM_hat"
 		}
 		else{
-			use "$CLEANDATA/`level'_`ds'_stacked.dta_og", clear
+			use "$CLEANDATA/`level'_`ds'_stacked_og.dta", clear
 			local yvar = "`ds'"
 
 		}

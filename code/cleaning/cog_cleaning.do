@@ -61,7 +61,7 @@ save "$XWALKS/pmsa_names.dta", replace
 
 // Crosswalking to 2002 Place FIPS codes
 import excel using "$RAWDATA/cog/4_Govt_Org_Directory_Surveys/GOVS_ID_to_FIPS_Place_Codes_2002.xls",  cellrange(B17) firstrow clear
-drop C 
+rename C census_id
 rename digit ID
 rename code ID_state
 rename E ID_type
@@ -74,6 +74,7 @@ rename K fips_place_2002
 
 g ID_unit = substr(ID,7,9)
 drop ID
+drop if census_id==""
 duplicates drop
 save "$XWALKS/cog_ID_fips_place_xwalk_02.dta", replace
 

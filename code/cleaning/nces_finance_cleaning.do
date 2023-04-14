@@ -3,6 +3,16 @@ import delimited "$RAWDATA/nces/districts_saipe.csv", clear
 
 save "$INTDATA/nces/district_poverty.dta", replace 
 
+import delimited "$RAWDATA/nces/schools_nhgis_geog_2000.csv", clear
+
+// leaid-county fips xwalk, 2000 definitions
+import delimited "$RAWDATA/nces/school-districts_lea_directory.csv", clear
+
+drop if county_code < 0 | leaid == . 
+keep leaid county_code fips year
+
+save "$XWALKS/leaid_county_xwalk.dta", replace
+
 import delimited "$RAWDATA/nces/districts_ccd_finance.csv", clear 
 
 drop if leaid<0
@@ -15,6 +25,23 @@ foreach i of varlist district_id-est_population_5_17_pct {
 	replace `i'=. if `i'<0
 }
 
+drop if enrollment_fall_responsible==0
+drop if enrollment_fall_responsible==.
+drop if leaid==260
+
+merge 1:1 year leaid using "$XWALKS/leaid_county_xwalk", keep(3) nogen
+
+collapse (sum) exp_total rev_local_total enrollment_fall_responsible, by(county_code year)
+g exp_pp = exp_total/enrollment_fall_responsible
+g locrev_pp = rev_local_total/enrollment_fall_responsible
+
+drop if year<1994
+collapse (mean) exp_pp locrev_pp, by(county_code)
+
+ren county_code fips
+save "$CLEANDATA/nces/nces_finance_data.dta", replace
+
+/* old code, come back to if needed
 drop district_id 
 drop if enrollment_fall_responsible==0
 drop if enrollment_fall_responsible==.
@@ -46,5 +73,4 @@ gen bilingual_revenue=rev_state_bilingual_ed+ rev_fed_state_bilingual_ed
 gen bilrev_pp=bilingual_revenue/enrollment_fall_responsible
 
 order district_name year leaid fips finance_reform_00 finance_reform_10 totrev_pp-exp_pp bilrev_pp enrollment_fall_responsible
-
-save "$CLEANDATA/nces/nces_finance_data.dta", replace
+*/

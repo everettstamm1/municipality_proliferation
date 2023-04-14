@@ -1,0 +1,24 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y=Number of Local Govts, Per Capita (100,000) by decade in County 1940-70, with baseline y, division FEs, mfg and black mig share, below median area incorporated.}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{GM  (rank)}&\multicolumn{1}{c}{y\_L0}&\multicolumn{1}{c}{y\_L0}&\multicolumn{1}{c}{y\_L0}\\
+\midrule
+$\hat{GM}$ (rank)   &       0.129***&               &       0.148** &               \\
+                    &    (0.0483)   &               &    (0.0694)   &               \\
+\addlinespace
+GM  (rank)          &               &       0.225***&               &       1.146*  \\
+                    &               &    (0.0701)   &               &     (0.602)   \\
+\midrule
+F-Stat              &      11.236   &               &               &               \\
+R-squared           &               &        .411   &        .407   &               \\
+Dep Var Mean        &      40.238   &     -35.076   &     -35.076   &     -35.076   \\
+Observations        &         804   &         804   &         804   &         804   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

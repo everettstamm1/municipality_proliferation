@@ -250,6 +250,288 @@ drop dup
 save "$XWALKS/US_place_point_2010_crosswalks.dta", replace
 
 
+// Note: This is copied from clean_cz_industry_employment_1940_1970.do from the Derenoncourt Repo and modified to be at county level
+/*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
+
+1. This do-file cleans/builds all the county to metropolitan area crosswalk files created using GIS and adds an urban-rural county classification scheme.
+
+*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
+STEPS:
+	*1. Read in raw 1940 data, clean geography and merge with crosswalk, construct industry employment measures at CZ level. 
+	*2. Repeat for 1970.
+	*3. Merge 1940 and 1970 cz industry employment datasets.
+	*4. Construct Bartik measure for employment change.
+*first created: 10/04/2019
+*last updated:  10/07/2019
+*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/	
+	
+*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
+*1. Read in raw 1940 data, clean geography and merge with crosswalk, construct industry employment measures.
+*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
+foreach level in county{
+		if "`level'"=="cz"{
+			local levelvar cz
+		}
+		else if "`level'"=="county"{
+			local levelvar fips
+		}
+		else if "`level'"=="msa"{
+			local levelvar smsa
+		}
+		use "$RAWDATA/dcourt/jobs/raw/complete_census_1940_industry_employment.dta", clear
+
+		* Information on the mapping of IPUMS Census industry codes to 1-digit SIC1 codes can be found at the following website:
+		* https://usa.ipums.org/usa/volii/ind1940.shtml
+		
+		gen SIC1 = ""
+		* Argriculture
+		replace SIC1 = "ag" if inrange(ind,0,3)
+		* Mining
+		replace SIC1 = "min" if inrange(ind,4,10)
+		* Construction
+		replace SIC1 = "const" if inrange(ind,11,11)
+		* Manufacturing
+		replace SIC1 = "man" if inrange(ind,12,72)
+		* Transportation, communication, and utilities
+		replace SIC1 = "tcu" if inrange(ind,73,89)
+		* Wholesale
+		replace SIC1 = "wh" if inrange(ind,90,90)
+		* Retail
+		replace SIC1 = "rtl" if inrange(ind,91,110)
+		* Finance and real estate
+		replace SIC1 = "fire" if inrange(ind,111,113)
+		* Services
+		replace SIC1 = "svc" if inrange(ind,114,127)
+		* Government
+		replace SIC1 = "gov" if inrange(ind,128,131)
+		* Unclassified
+		replace SIC1 = "nr" if inrange(ind,995,999)
+
+
+		* Collapse key variables to county level, keeping ind + vars needed to clean geography (see below)
+		collapse (sum) emp_ = empstat , by(SIC1 year countyicp statefip)
+		
+		reshape wide emp_, i(countyicp statefip) j(SIC1) string
+		local sectorlist ag const fire gov man min nr rtl svc tcu wh
+		local new_varlist ""
+		foreach sector in `sectorlist' {
+			local year = year
+			rename emp_`sector' emp_`sector'`year'
+			local new_varlist `new_varlist' emp_`sector'
+		}
+		drop year
+		
+		egen emp_tot1940 = rowtotal(`new_varlist')
+		
+		* Clean geography
+		rename statefip state_fips
+		statastates, fips(state_fips)
+		keep if _merge==3
+		drop _merge
+		rename state_fips statefip
+		
+		tostring county, g(county_str)
+		
+		*Create Fips Code
+		tostring statefip, g(state_str)
+		replace state_str="0"+state_str if length(state_str)==1
+		
+		replace county_str = substr(county_str, 1, length(county_str)-1)
+		replace county_str= "0" + county_str if length(county_str)==2
+		replace county_str= "00" + county_str if length(county_str)==1
+		
+		g fips_str=state_str+county_str
+		
+		
+		* Adjust for county changes
+		replace fips_str="24510" if fips_str=="24007"
+		replace fips_str="29186" if fips_str=="29193"
+		replace fips_str="41061" if fips_str=="41060"
+		replace fips_str="32025" if fips_str=="32051"
+		
+		destring(fips_str), g(fips)
+		*duplicates list fips //no duplicates 
+		
+		* Merge with County Crosswalk
+		merge m:1 fips_str using "$XWALKS/county1940_crosswalks.dta", keepusing(cz cz_name smsa)
+		* Note that there is one unmatched observation in the master file: fips 51785
+		drop if _merge == 2 | _merge == 1
+		drop _merge
+		
+		* Remove Alaska and Hawaii
+		drop if statefip==2 | statefip==15
+		
+		drop statefip
+		
+		* Collapse again to commuting zone (CZ) level and save as tempfile
+		collapse (sum) `new_varlist' emp_tot1940, by(`levelvar')
+		
+		tempfile ind_emp_1940
+		save `ind_emp_1940'
+
+	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
+	*2. Repeat for 1970. 
+	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
+			
+		/* Load the data. */
+		use "$RAWDATA/dcourt/jobs/raw/nhgis0061_fixed/nhgis0061_ds98_1970_county.dta", clear
+		
+		/* Generate fips code, drop duplicate counties. Come back to this if you have merge problems. */
+		g fips_str = substr(statea, 1, 2) + substr(countya, 1, 3)
+		count if strlen(fips_str) ~= 5
+		assert r(N) == 0
+		destring fips_str, gen(fips)
+		//duplicates list fips // 1 Set of Duplicates (FIPS 51780 = (1)South Boston City, VA and (2) South Norfolk, VA.
+							 // Both of the above cities were later incorporated into a different county or ind. city, and 
+							 // since we want this 1960 file to merge with later 1990, 2000, and even 2010 files, we will adjust their fips
+							 // to reflect this change and add to new county's enrollment counts.
+							 
+							 // There must be other counties or cities which also underwent name / county designation; but these will be detected
+							 // at the time of merging across years and be adjusted then.
+							 
+		replace fips = 51083 if fips == 51780 & county == "South Boston City"
+		replace fips = 51550 if fips == 51780 & county == "South Norfolk City"
+		
+		duplicates list fips
+		drop if fips == 51083 // The 1960 file only contains private school enrollment rate, not counts, and thus we cannot merge these two entities.
+								// Given VA is not in our sample, the drop should be okay but can be revisited later. 		
+		rename statea state_str
+		
+		/* Keep only necessary vars. */
+		keeporder state_str county fips c09001 c09002 c09003 c09004 c09005 c09006 c09007 c09008 c09009 c09010 c09011 c09012 c09013 c09014
+		
+		* Adjusting County Names and FIps to Help Merge
+		replace fips = 2210 if fips == 2201
+		replace county = "Seward" if state ==  "Alaska" & county == "Seward - Elec District 11"			
+		g fips_str = fips
+		tostring fips_str, format(%05.0f) replace
+		
+		merge m:1 fips_str using "$XWALKS/county1940_crosswalks.dta", nogen keep(3) keepusing(cz cz_name state_name county_name smsa)
+		
+		* Rename employment variables consistent with 1940 data
+		rename c09001 emp_ag1970
+		rename c09002 emp_min1970
+		rename c09003 emp_const1970
+		* adding together c09004 (Manufacturing, durable goods) and c09005 (Manufacturing, nondurable goods) to create composite manufacturing variable
+		replace c09004 = c09004 + c09005
+		drop c09005
+		rename c09004 emp_man1970
+		rename c09006 emp_tcu1970
+		rename c09007 emp_wh1970
+		rename c09008 emp_rtl1970
+		rename c09009 emp_fire1970
+		* adding together c09010 (Business and repair services), c09011 (Personal services), c09012 (Entertainment and recreation services), and c09013 (Professional and related services) to create composite services variable
+		replace c09010 = c09010 + c09011 + c09012 + c09013
+		drop c09011 c09012 c09013
+		rename c09010 emp_svc1970
+		* Assuming public admin is equivalent with gov
+		rename c09014 emp_gov1970
+		gen emp_nr1970 = 0
+		
+		* Drop if Hawaii or Alaska
+		drop if state_str=="02" | state_str=="15"
+		
+		* Create industry employment measures
+		* Collapse again to commuting zone (CZ) level and save as tempfile
+		local new_varlist emp_ag1970 emp_min1970 emp_nr1970 emp_const1970 emp_man1970 emp_tcu1970 emp_wh1970 emp_rtl1970 emp_fire1970 emp_svc1970 emp_gov1970
+		egen emp_tot1970 = rowtotal(`new_varlist')
+		collapse (sum) `new_varlist' emp_tot1970, by(`levelvar')
+		
+		tempfile ind_emp_1970
+		save `ind_emp_1970'
+		
+	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
+	*4. Merge in 1940-1970 share of labor force in manufacturing from cleaned CZ-level County Data Books, 1947-1977. Save final dataset.
+	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
+
+		* Input raw data.
+		use "$RAWDATA/dcourt/ICPSR_07736_County_Book_1947_1977/DS0001/County_Book_1947_1977.dta", clear
+		drop if FIPSCNTY=="000" // Drop state-level data
+		g fips_str=FIPSTATE+ FIPSCNTY // Create county fips identifier for merging with other geographies
+		destring fips_str, gen(fips)
+		* Merge in harmonized geo identifiers.
+		merge 1:1 fips_str using "$XWALKS/county1940_crosswalks.dta", keepusing(cz smsa)
+		tab _merge // Check and see what counties are matching and not matching. Create a comment in the code detailing non-matching counties.
+		keep if _merge==3 
+		drop _merge
+		
+		* Add vars to this list
+		local varlist CC00012 CC00013 CC00014 CC00015 CC00016 CC00017 CC00018 CC00038 CC00039 CC00040 CC00041 CC00051 CC00052 CC00053 CC00054 CC00055 CC00056 CC00057 CC00061 CC00062 CC00071 CC00073 CC00074 CC00107 CC00108 CC00109 CC00110 CC00111 CC00112 CC00115 CC00123 CC00128 CC00129 CC00132 CC00133 CC00134 CC00135 CC00150 CC00152 CC00153 CC00154 CC00155 CC00156 CC00157 CC00158 CC00159 CC00160 CC00161 CC00162 CC00163 CC00164 CC00165 CC00166 CC00167 CC00168 CC00169 CC00170 CC00171 CC00172 CC00173 CC00174 CC00175 CC00176 CC00177 CC00178 CC00179 CC00180 CC00181 CC00182 CC00183 CC00184 CC00185 CC00186 CC00187 CC00188 CC00189 CC00190 CC00191 CC00192 CC00193 CC00194 CC00195 CC00196 CC00197 CC00198 CC00199 CC00200 CC00201 CC00202 CC00203 CC00204 CC00205 CC00206 CC00207 CC00208 CC00209 CC00210 CC00211 CC00212 CC00213 CC00214 CC00215 CC00216 CC00217 CC00218 CC00219 CC00220 CC00221 CC00222 CC00223 CC00224 CC00225 CC00226 CC00227 CC00228 CC00229 CC00230 CC00231 CC00232 CC00233 CC00234 CC00235 CC00236 CC00237 CC00238 CC00239 CC00240 CC00241 CC00242 CC00243 CC00244 CC00245 CC00246 CC00247 CC00248 CC00249 CC00250 CC00251 CC00252 CC00253 CC00254 CC00255 CC00256 CC00257 CC00258 CC00259 CC00260 CC00261 CC00262 CC00263 CC00264 CC00265 CC00266 CC00267 CC00268 CC00269 CC00270 CC00271 CC00272 CC00273 CC00274 CC00275 CC00276 CC00277 CC00278 CC00279 CC00280 CC00282 CC00283 CC00284 CC00285 CC00286 CC00287 CC00288 CC00289 CC00290 CC00291 CC00292 CC00293 CC00294 CC00295 CC00296 CC00297 CC00298 CC00299 CC00300 CC00301 CC00302 CC00303 CC00304 CC00305 CC00306 CC00307 CC00308 CC00309 CC00310 CC00311 CC00312 CC00313 CC00314 CC00315 CC00316 CC00317 CC00318 CC00319 CC00320 CC00321 CC00322 CC00323 CC00324 CC00325 CC00326 CC00327 CC00328 CC00329 CC00330 CC00331 CC00332 CC00333 CC00334 CC00335 CC00336 CC00337 CC00338 CC00339 CC00340 CC00341 CC00342 CC00343 CC00344 CC00345 CC00346 CC00347 CC00348 CC00349 CC00350 CC00351 CC00352 CC00353 CC00354 CC00355 CC00356 CC00357 CC00358 CC00359 CC00360 CC00361 CC00362 CC00363 CC00364 CC00365 CC00366 CC00367 CC00368 CC00369 CC00370 CC00371 CC00372 CC00373 CC00374 CC00375 CC00376 CC00377 CC00378 CC00379 CC00380 CC00381 CC00382 CC00383 CC00384 CC00386 CC00387 CC00388 CC00389 CC00390 CC00391 CC00392 CC00393 CC00394 CC00395 CC00396 CC00397 CC00398 CC00399 CC00400 CC00401 CC00402 CC00403 CC00404 CC00405 CC00406 CC00407 CC00408 CC00409 CC00410 CC00411 CC00412 CC00413 CC00414 CC00415 CC00416 CC00417 CC00418 CC00419 CC00420 CC00421 CC00422 CC00423 CC00424 CC00425 CC00426 CC00427 CC00428 CC00429 CC00430 CC00431 CC00432 CC00433 CC00434 CC00435 CC00436 CC00437 CC00438 CC00439 CC00440 CC00441 CC00442
+		
+		* Replace values as missing if identified as missing according to the Codebook. Check that this is the right approach to dealing with the missing values.
+		foreach var in `varlist'{
+		replace `var'=. if (`var'F=="1"|`var'F=="2"|`var'F=="3"|`var'F=="6"|`var'F=="7")
+		}
+
+		********************
+		**** EMPLOYMENT ****
+		********************
+		
+		* CIVILIAN LABOR FORCE
+		g civlf1940 = CC00154 //note slight difference in naming of this variable in consolidated codebook-- i checked the respective individual ccdbs (1947 vs. 1952, 62, etc.) and it appears the definitions are comparable, but let's confirm this somehow
+		g civlf1950 = CC00160
+		g civlf1960 = CC00161
+		g civlf1970 = CC00162
+		
+		* EMPLOYED
+		g employed1940 = CC00168
+		g employed1950 = CC00169
+		g employed1960 = CC00170
+		g employed1970 = CC00171
+
+		* EMPLOYED IN MANUFACTURING
+		g emp_mfg1940 = CC00181
+		g emp_mfg1950 = CC00182
+		//CC00183 gives percent employed in manufacturing 1950, duplicates CC00182
+		g emp_mfg1960 = (CC00184/100)*employed1960
+		g emp_mfg1970 = (CC00185/100)*employed1970
+		
+
+		***********************
+		** PREPARE FOR MERGE **
+		***********************
+		
+		drop CC* FIP* AREA* // Drop unnecessary vars
+				
+	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
+	*2. Collapse dataset to sum baseline variables to CZ level and create measures with the collapsed data. 
+	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
+		qui ds fips_str fips cz smsa, not // Get list of all non geographic identifier, count vars for collapsing
+		collapse (sum) `r(varlist)', by(`levelvar') // Collapse to CZ level
+
+		********************
+		**** EMPLOYMENT ****
+		********************
+		
+		* Time-series vars
+		
+		* EMPLOYMENT SHARE
+		local year 40 50 60 70
+		foreach var in `year' {
+		g emp_share19`var' = employed19`var'*100/civlf19`var'
+		la var emp_share19`var' "Share of LF employed, 19`var'"
+		}
+		
+		* MANUFACTURING EMPLOYMENT SHARE
+		local year 40 50 60 70
+		foreach var in `year' {
+		g mfg_lfshare19`var' = emp_mfg19`var'*100/civlf19`var'
+		la var mfg_lfshare19`var' "Share of LF employed in manufacturing, 19`var'"
+		}
+		
+		tempfile mfg_lfshare
+		save `mfg_lfshare'
+			
+	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
+	*3. Merge industry employment datasets. 
+	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
+
+		use `ind_emp_1940', clear
+		merge 1:1 `levelvar' using `ind_emp_1970', nogen	
+		merge 1:1 `levelvar' using `mfg_lfshare', keepusing(mfg_lfshare1940 mfg_lfshare1950 mfg_lfshare1960 mfg_lfshare1970) nogenerate
+		
+		save "$INTDATA/dcourt/clean_`level'_industry_employment_1940_1970.dta", replace
+	}
 
 
 // Note: This is copied directly from clean_IPUMS_1935_1940_extract_to_construct_migration_weights.do from the Derenoncourt Repo
@@ -1183,7 +1465,7 @@ drop if statea == 155 | statea == 25 // drop  hawaii, alaksa territory
 drop if countya == 8999 // Virgina Independent Cities
 
 egen pop = rowtotal(b3p*) 
-egen bpop = rowtotal(b3p003 b3p004)
+egen bpop = rowtotal(b3p003 b3p007)
 
 keep year statea countya pop bpop
 
@@ -1281,11 +1563,11 @@ foreach d in 1950 1960 1970{
 ren dest_fips fips
 
 // mfg lfshare controls
-merge 1:1 fips using "$jobs/clean_county_industry_employment_1940_1970.dta", keepusing(mfg_lfshare*) keep(3) nogen // Bring this code in here!!
+merge 1:1 fips using "$INTDATA/dcourt/clean_county_industry_employment_1940_1970.dta", keepusing(mfg_lfshare*) keep(3) nogen 
 
 // Region dummies
 preserve 
-	use $xwalks/cz_state_region_crosswalk.dta, clear
+	use "$RAWDATA/dcourt/cz_state_region_crosswalk.dta", clear
 	keep state_id region
 	duplicates drop
 	tempfile regions

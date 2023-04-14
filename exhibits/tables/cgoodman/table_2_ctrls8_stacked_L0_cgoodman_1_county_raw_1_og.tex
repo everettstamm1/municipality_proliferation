@@ -1,0 +1,24 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y=Earliest Year of Municipal Incorporation, Per Capita (1,000) by decade in County 1950-70, with baseline y, division FEs, mfg and black mig share, and baseline incorporated area}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{GM  (raw)}&\multicolumn{1}{c}{y\_L0}&\multicolumn{1}{c}{y\_L0}&\multicolumn{1}{c}{y\_L0}\\
+\midrule
+$\hat{GM}$ (raw)    &       0.169   &               &     0.00104   &               \\
+                    &     (0.376)   &               &   (0.00338)   &               \\
+\addlinespace
+GM  (raw)           &               &  -0.0000890   &               &     0.00613   \\
+                    &               &  (0.000466)   &               &    (0.0236)   \\
+\midrule
+F-Stat              &      40.836   &               &               &               \\
+R-squared           &               &        .076   &        .077   &               \\
+Dep Var Mean        &       2.888   &        .009   &        .009   &        .009   \\
+Observations        &         476   &         476   &         476   &         476   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

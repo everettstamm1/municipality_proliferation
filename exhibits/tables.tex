@@ -8,7 +8,7 @@
 \usepackage{hyperref}
 \usepackage{pdflscape}
 \usepackage{tikz}
-
+\usepackage{threeparttable}
 
 \title{Exhibits for Municipality Proliferation}
 
@@ -19,80 +19,124 @@
 \listoffigures
 \listoftables}
 \clearpage
+
+\section{County-Level Stacked Tables, Unweighted}
+\subsection{Unusable Area}
+\input{tables/stacked/stacked_schdist_ind_0_above_med_unusable.tex}
+\clearpage
+\subsection{Incorporated Area}
+\input{tables/stacked/stacked_schdist_ind_0_above_med_land.tex}
+\clearpage\
+\subsection{Desegregation Plan}
+\input{tables/stacked/stacked_schdist_ind_0_co_2020.tex}
+\clearpage
+\section{County-Level Stacked Tables, 1940 Population Weighted}
+\subsection{Unusable Area}
+\input{tables/stacked/stacked_schdist_ind_1_above_med_unusable.tex}
+\clearpage
+\subsection{Incorporated Area}
+\input{tables/stacked/stacked_schdist_ind_1_above_med_land.tex}
+\clearpage\
+\subsection{Desegregation Plan}
+\input{tables/stacked/stacked_schdist_ind_1_co_2020.tex}
+\clearpage
+
+\section{School Finance Outcomes}
+\subsection{Unweighted}
+\input{tables/leaid_outcomes/schdist_ind_0_0.tex}
+\input{tables/leaid_outcomes/schdist_ind_0_1.tex}
+\clearpage
+\subsection{1940 Population Weighted}
+\input{tables/leaid_outcomes/schdist_ind_1_0.tex}
+\input{tables/leaid_outcomes/schdist_ind_1_1.tex}
+\clearpage
+
+
 \foreach \inst in {og, full}{
 	\foreach \pc  in {0,1}{
 		\foreach \level in {county}{
 			\ifnum \pc=1{\section{\level -Level Tables, Per Capita, \inst-sample}} \else{\section{\level -Level Tables, \inst-sample}} \fi
-			\foreach \x in {rank, raw}{
-				\foreach \drop in {0,1}{
-					\ifnum \drop=1{\subsection{1940-1950 Dropped, \x-instrument}} \else{\subsection{All years, \x-instrument}} \fi
-				
-		%		\subsection{Wiki Scrape Data, 1940-70 sample}
-		%		\input{tables/wiki/table_2_ctrls3_wiki_\pc_\level.tex}
-		%		\input{tables/wiki/table_2_ctrls5_wiki_\pc_\level.tex}
-		%		\input{tables/wiki/table_2_ctrls6_wiki_\pc_\level.tex}
-		%		\input{tables/wiki/table_2_ctrls4_wiki_\pc_\level.tex}
-		%		\clearpage
-		%		
-		%		\subsection{Wiki Scrape Data, 1940-50 sample}
-		%		\input{tables/wiki/table_2_ctrls3_1940_1950_wiki_\pc_\level.tex}
-		%		\input{tables/wiki/table_2_ctrls5_1940_1950_wiki_\pc_\level.tex}
-		%		\input{tables/wiki/table_2_ctrls6_1940_1950_wiki_\pc_\level.tex}
-		%		\input{tables/wiki/table_2_ctrls4_1940_1950_wiki_\pc_\level.tex}
-		%		\clearpage
-		%		
-		%		\subsection{Wiki Scrape Data, 1950-60 sample}
-		%		\input{tables/wiki/table_2_ctrls3_1950_1960_wiki_\pc_\level.tex}
-		%		\input{tables/wiki/table_2_ctrls5_1950_1960_wiki_\pc_\level.tex}
-		%		\input{tables/wiki/table_2_ctrls6_1950_1960_wiki_\pc_\level.tex}
-		%		\input{tables/wiki/table_2_ctrls4_1950_1960_wiki_\pc_\level.tex}
-		%		\clearpage
-		%		
-		%		\subsection{Wiki Scrape Data, 1960-70 sample}
-		%		\input{tables/wiki/table_2_ctrls3_1960_1970_wiki_\pc_\level.tex}
-		%		\input{tables/wiki/table_2_ctrls5_1960_1970_wiki_\pc_\level.tex}
-		%		\input{tables/wiki/table_2_ctrls6_1960_1970_wiki_\pc_\level.tex}
-		%		\input{tables/wiki/table_2_ctrls4_1960_1970_wiki_\pc_\level.tex}
-		%		\clearpage
-		%		
-		%		\subsection{Wiki Scrape Data, decades stacked, no lags}
-		%		\input{tables/wiki/table_2_ctrls3_stacked_L0_wiki_\pc_\level.tex}
-		%		\input{tables/wiki/table_2_ctrls5_stacked_L0_wiki_\pc_\level.tex}
-		%		\input{tables/wiki/table_2_ctrls6_stacked_L0_wiki_\pc_\level.tex}
-		%		\input{tables/wiki/table_2_ctrls4_stacked_L0_wiki_\pc_\level.tex}
-		%		\clearpage
-		%		
-		%		\subsection{Wiki Scrape Data, decades stacked, one lag}
-		%		\input{tables/wiki/table_2_ctrls3_stacked_L1_wiki_\pc_\level.tex}
-		%		\input{tables/wiki/table_2_ctrls5_stacked_L1_wiki_\pc_\level.tex}
-		%		\input{tables/wiki/table_2_ctrls6_stacked_L1_wiki_\pc_\level.tex}
-		%		\input{tables/wiki/table_2_ctrls4_stacked_L1_wiki_\pc_\level.tex}
-		%		\clearpage
-				
-				
-					\foreach \var in {all_local, all_local_nosch, schdist_ind}{
-
-						\input{tables/2_county_counts/table_2_ctrls3_stacked_L0_\var_\pc_\level_\x_\drop_\inst.tex}
-						\input{tables/2_county_counts/table_2_ctrls4_stacked_L0_\var_\pc_\level_\x_\drop_\inst.tex}
-						\clearpage
+			\foreach \w in {0,1}{
+				\foreach \x in {rank}{
+					\foreach \drop in {0}{
+						\ifnum \w=1{\subsection{1940 Population Weighted}} \else{\subsection{Unweighted}} \fi
+					
+			%		\subsection{Wiki Scrape Data, 1940-70 sample}
+			%		\input{tables/wiki/table_2_ctrls3_wiki_\pc_\level.tex}
+			%		\input{tables/wiki/table_2_ctrls5_wiki_\pc_\level.tex}
+			%		\input{tables/wiki/table_2_ctrls6_wiki_\pc_\level.tex}
+			%		\input{tables/wiki/table_2_ctrls4_wiki_\pc_\level.tex}
+			%		\clearpage
+			%		
+			%		\subsection{Wiki Scrape Data, 1940-50 sample}
+			%		\input{tables/wiki/table_2_ctrls3_1940_1950_wiki_\pc_\level.tex}
+			%		\input{tables/wiki/table_2_ctrls5_1940_1950_wiki_\pc_\level.tex}
+			%		\input{tables/wiki/table_2_ctrls6_1940_1950_wiki_\pc_\level.tex}
+			%		\input{tables/wiki/table_2_ctrls4_1940_1950_wiki_\pc_\level.tex}
+			%		\clearpage
+			%		
+			%		\subsection{Wiki Scrape Data, 1950-60 sample}
+			%		\input{tables/wiki/table_2_ctrls3_1950_1960_wiki_\pc_\level.tex}
+			%		\input{tables/wiki/table_2_ctrls5_1950_1960_wiki_\pc_\level.tex}
+			%		\input{tables/wiki/table_2_ctrls6_1950_1960_wiki_\pc_\level.tex}
+			%		\input{tables/wiki/table_2_ctrls4_1950_1960_wiki_\pc_\level.tex}
+			%		\clearpage
+			%		
+			%		\subsection{Wiki Scrape Data, 1960-70 sample}
+			%		\input{tables/wiki/table_2_ctrls3_1960_1970_wiki_\pc_\level.tex}
+			%		\input{tables/wiki/table_2_ctrls5_1960_1970_wiki_\pc_\level.tex}
+			%		\input{tables/wiki/table_2_ctrls6_1960_1970_wiki_\pc_\level.tex}
+			%		\input{tables/wiki/table_2_ctrls4_1960_1970_wiki_\pc_\level.tex}
+			%		\clearpage
+			%		
+			%		\subsection{Wiki Scrape Data, decades stacked, no lags}
+			%		\input{tables/wiki/table_2_ctrls3_stacked_L0_wiki_\pc_\level.tex}
+			%		\input{tables/wiki/table_2_ctrls5_stacked_L0_wiki_\pc_\level.tex}
+			%		\input{tables/wiki/table_2_ctrls6_stacked_L0_wiki_\pc_\level.tex}
+			%		\input{tables/wiki/table_2_ctrls4_stacked_L0_wiki_\pc_\level.tex}
+			%		\clearpage
+			%		
+			%		\subsection{Wiki Scrape Data, decades stacked, one lag}
+			%		\input{tables/wiki/table_2_ctrls3_stacked_L1_wiki_\pc_\level.tex}
+			%		\input{tables/wiki/table_2_ctrls5_stacked_L1_wiki_\pc_\level.tex}
+			%		\input{tables/wiki/table_2_ctrls6_stacked_L1_wiki_\pc_\level.tex}
+			%		\input{tables/wiki/table_2_ctrls4_stacked_L1_wiki_\pc_\level.tex}
+			%		\clearpage
 					
 					
-					
-					}
-
-					\input{tables/cgoodman/table_2_ctrls3_stacked_L0_cgoodman_\pc_\level_\x_\drop_\inst.tex}
-					\input{tables/cgoodman/table_2_ctrls4_stacked_L0_cgoodman_\pc_\level_\x_\drop_\inst.tex}
-					\clearpage
-				
-%					\foreach \i in {3}{
-%					
-%
-%						\input{tables/4_1_general_purpose_govts/table_2_ctrls3_stacked_L0_ngov\i_\pc_\level_\x_\drop.tex}
-%						\input{tables/4_1_general_purpose_govts/table_2_ctrls4_stacked_L0_ngov\i_\pc_\level_\x_\drop.tex}
+						\foreach \var in {schdist_ind}{
+	
+							\input{tables/2_county_counts/table_2_ctrls3_stacked_L0_\var_\pc_\level_\x_\drop_\inst_\w.tex}
+							\input{tables/2_county_counts/table_2_ctrls3_stacked_L0_\var_\pc_\level_\x_\drop_\inst_0_\w.tex}
+							\input{tables/2_county_counts/table_2_ctrls3_stacked_L0_\var_\pc_\level_\x_\drop_\inst_1_\w.tex}
+							\clearpage
+							\input{tables/2_county_counts/table_2_ctrls4_stacked_L0_\var_\pc_\level_\x_\drop_\inst_\w.tex}
+							\input{tables/2_county_counts/table_2_ctrls4_stacked_L0_\var_\pc_\level_\x_\drop_\inst_0_\w.tex}
+							\input{tables/2_county_counts/table_2_ctrls4_stacked_L0_\var_\pc_\level_\x_\drop_\inst_1_\w.tex}
+							\clearpage
+							\input{tables/2_county_counts/table_2_ctrls5_stacked_L0_\var_\pc_\level_\x_\drop_\inst_\w.tex}
+							\input{tables/2_county_counts/table_2_ctrls5_stacked_L0_\var_\pc_\level_\x_\drop_\inst_0_\w.tex}
+							\input{tables/2_county_counts/table_2_ctrls5_stacked_L0_\var_\pc_\level_\x_\drop_\inst_1_\w.tex}
+							\clearpage
+							\clearpage
+						
+						
+						
+						}
+	
+%						\input{tables/cgoodman/table_2_ctrls3_stacked_L0_cgoodman_\pc_\level_\x_\drop_\inst_\w.tex}
+%						\input{tables/cgoodman/table_2_ctrls4_stacked_L0_cgoodman_\pc_\level_\x_\drop_\inst_\w.tex}
 %						\clearpage
-%		
-%					
-%					}
+	%					\foreach \i in {3}{
+	%					
+	%
+	%						\input{tables/4_1_general_purpose_govts/table_2_ctrls3_stacked_L0_ngov\i_\pc_\level_\x_\drop.tex}
+	%						\input{tables/4_1_general_purpose_govts/table_2_ctrls4_stacked_L0_ngov\i_\pc_\level_\x_\drop.tex}
+	%						\clearpage
+	%		
+	%					
+	%					}
+					}
 				}
 			}
 		}
