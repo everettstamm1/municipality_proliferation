@@ -1,0 +1,24 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y=Number of Local Govts by decade in County 1940-70, with baseline y and division FEs, above median area incorporated.}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{GM  (raw)}&\multicolumn{1}{c}{y\_L0}&\multicolumn{1}{c}{y\_L0}&\multicolumn{1}{c}{y\_L0}\\
+\midrule
+$\hat{GM}$ (raw)    &      0.0816   &               &       1.287*  &               \\
+                    &     (0.302)   &               &     (0.777)   &               \\
+\addlinespace
+GM  (raw)           &               &       1.161***&               &       15.77   \\
+                    &               &     (0.373)   &               &     (52.12)   \\
+\midrule
+F-Stat              &       5.929   &               &               &               \\
+R-squared           &               &        .315   &        .309   &               \\
+Dep Var Mean        &       1.563   &     -11.242   &     -11.242   &     -11.242   \\
+Observations        &         804   &         804   &         804   &         804   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

@@ -1,0 +1,51 @@
+\documentclass{article}
+\usepackage{blindtext}
+\usepackage{booktabs}
+\usepackage[margin=0.25in]{geometry}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage{tikz}
+
+
+\title{First Stage Binscatters for Municipality Proliferation}
+
+\begin{document}
+\maketitle
+\tableofcontents
+{\footnotesize 
+\listoffigures
+\listoftables}
+\clearpage
+\foreach \inst in {og, full}{
+	\foreach \pc  in {0,1}{
+		\foreach \level in {county}{
+			\ifnum \pc=1{\section{\level -Level Tables, Per Capita, \inst-sample}} \else{\section{\level -Level Tables, \inst-sample}} \fi
+			\foreach \x in {rank, raw}{
+				\foreach \drop in {0}{
+					\ifnum \drop=1{\subsection{1940-1950 Dropped, \x-instrument}} \else{\subsection{All years, \x-instrument}} \fi
+					\clearpage
+				
+					\foreach \var in {schdist_ind}{
+						\begin{figure}
+							\centering
+							\includegraphics{figures/binscatter/binscatter_ctrls3_stacked_L0_\var_\pc_\level_\x_\drop_\inst.pdf}
+						\end{figure}
+\clearpage
+						\begin{figure}
+							\centering
+							\includegraphics{figures/binscatter/binscatter_ctrls4_stacked_L0_\var_\pc_\level_\x_\drop_\inst.pdf}
+						\end{figure}
+						\clearpage
+					
+					
+					
+					}
+				}
+			}
+		}
+	}
+}
+\end{document}

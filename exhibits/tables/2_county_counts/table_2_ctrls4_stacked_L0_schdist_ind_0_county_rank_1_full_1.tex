@@ -1,0 +1,24 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y=Number of Independent School Districts by decade in County 1950-70, with baseline y, division FEs, and mfg and black mig share, above median area incorporated.}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{GM  (rank)}&\multicolumn{1}{c}{y\_L0}&\multicolumn{1}{c}{y\_L0}&\multicolumn{1}{c}{y\_L0}\\
+\midrule
+$\hat{GM}$ (rank)   &       0.447***&               &      0.0564***&               \\
+                    &    (0.0483)   &               &    (0.0201)   &               \\
+\addlinespace
+GM  (rank)          &               &      0.0896***&               &       0.126***\\
+                    &               &    (0.0200)   &               &    (0.0424)   \\
+\midrule
+F-Stat              &      25.434   &               &               &               \\
+R-squared           &               &        .642   &        .633   &               \\
+Dep Var Mean        &      60.754   &      -12.48   &      -12.48   &      -12.48   \\
+Observations        &         536   &         536   &         536   &         536   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}
