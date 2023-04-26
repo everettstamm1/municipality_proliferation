@@ -997,7 +997,7 @@ global destination_id_code dest_fips_code
 global dest_sample dest_sample
 global weights_data "$INTDATA/dcourt/2_lasso_boustan_predict_mig.dta"
 global version full
-global weight_types pr // took out act
+global weight_types pr act
 global weight_var outmig
 global start_year 1940
 global panel_length 3
@@ -1018,10 +1018,12 @@ drop total* black*
 tempfile dest_fips_blackmigshare3539
 save `dest_fips_blackmigshare3539'
 
-use "$INTDATA/bartik/2_black_proutmigorigin_fips19401970_collapsed_wide.dta", clear
-merge 1:1 dest_fips using `dest_fips_blackmigshare3539', keep(3) nogenerate
+foreach w in pr act {
+	use "$INTDATA/bartik/full_black_`w'outmigorigin_fips19401970_collapsed_wide.dta", clear
+	merge 1:1 dest_fips using `dest_fips_blackmigshare3539', keep(3) nogenerate
 
-save "$INTDATA/dcourt/2_black_prmig_1940_1970_wide_xw.dta", replace
+	save "$INTDATA/dcourt/full_black_`w'mig_1940_1970_wide_xw.dta", replace
+}
 
 // Predicted ccdb
 
@@ -1036,7 +1038,7 @@ global destination_id_code dest_fips_code
 global dest_sample ccdb_sample
 global weights_data "$INTDATA/dcourt/2_lasso_boustan_predict_mig.dta"
 global version ccdb
-global weight_types pr // took out act
+global weight_types pr act
 global weight_var outmig
 global start_year 1940
 global panel_length 3
@@ -1044,6 +1046,7 @@ global panel_length 3
 use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
 
 do "$CODE/helper/bartik_generic.do"
+
 
 *10. Clean and standardize city names and output final instrument measures at the city-level	
 		
@@ -1057,12 +1060,12 @@ drop total* black*
 tempfile dest_fips_blackmigshare3539
 save `dest_fips_blackmigshare3539'
 
-use "$INTDATA/bartik/20_black_proutmigorigin_fips19401970_collapsed_wide.dta", clear
-merge 1:1 dest_fips using `dest_fips_blackmigshare3539', keep(3) nogenerate
+foreach w in pr act{
+	use "$INTDATA/bartik/ccdb_black_`w'outmigorigin_fips19401970_collapsed_wide.dta", clear
+	merge 1:1 dest_fips using `dest_fips_blackmigshare3539', keep(3) nogenerate
 
-save "$INTDATA/dcourt/20_black_prmig_1940_1970_wide_xw.dta", replace
-
-
+	save "$INTDATA/dcourt/ccdb_black_`w'mig_1940_1970_wide_xw.dta", replace
+}
 
 // CCDB City Populations for 1970
 
@@ -1528,21 +1531,23 @@ use "$INTDATA/dcourt/nhgis_county_pops", clear
 
 g dest_fips = statefip*100 + countyfip/10
 
-merge 1:1 dest_fips using "$INTDATA/dcourt/2_black_prmig_1940_1970_wide_xw.dta", keep(1 3)
+merge 1:1 dest_fips using "$INTDATA/dcourt/full_black_prmig_1940_1970_wide_xw.dta", keep(1 3)
 g full_sample = _merge == 3
 drop _merge
+merge 1:1 dest_fips using "$INTDATA/dcourt/full_black_actmig_1940_1970_wide_xw.dta", keep(1 3) nogen
 
-foreach var of varlist black_proutmigpr*{
+foreach var of varlist black_proutmigpr* black_actoutmigact*{
 	replace `var' = 0 if `var'==.
 	ren `var' vfull_`var'
 }
 
-merge 1:1 dest_fips using "$INTDATA/dcourt/20_black_prmig_1940_1970_wide_xw.dta", keep(1 3)
+merge 1:1 dest_fips using "$INTDATA/dcourt/ccdb_black_prmig_1940_1970_wide_xw.dta", keep(1 3)
 g ccdb_sample = _merge == 3
 drop _merge
+merge 1:1 dest_fips using "$INTDATA/dcourt/ccdb_black_actmig_1940_1970_wide_xw.dta", keep(1 3) nogen
 
 
-foreach var of varlist black_proutmigpr*{
+foreach var of varlist black_proutmigpr* black_actoutmigact*{
 	replace `var' = 0 if `var'==.
 	ren `var' vccdb_`var'
 }
@@ -1555,6 +1560,7 @@ foreach d in 1950 1960 1970{
 	g bpopchange`base'_`d'=100*(bpop`d'-bpop`base')/pop`base'
 	foreach v in full ccdb{
 		g v`v'_bpopchange_pred`base'_`d'=100*v`v'_black_proutmigpr`d'/pop`base'
+		g v`v'_bpopchange_act`base'_`d'=100*v`v'_black_actoutmigact`d'/pop`base'
 		g v`v'_blackmig3539_share`base'=100*v`v'_totblackmigdest_fips3539/pop`base'
 	}
 	local base = `d'
@@ -1584,7 +1590,9 @@ foreach d in 1950 1960 1970{
 	xtile GM_`base'_`d' = bpopchange`base'_`d', nq(100) 
 	xtile GM_hatfull_`base'_`d' = vfull_bpopchange_pred`base'_`d', nq(100) 
 	xtile GM_hatccdb_`base'_`d' = vccdb_bpopchange_pred`base'_`d', nq(100) 
-
+	
+	xtile GM_actfull_`base'_`d' = vfull_bpopchange_act`base'_`d', nq(100) 
+	xtile GM_actccdb_`base'_`d' = vccdb_bpopchange_act`base'_`d', nq(100) 
 	local base = `d'
 }
 
@@ -1598,6 +1606,8 @@ foreach d in 1950 1960 1970{
 	ren bpopchange`base'_`d' GM_raw_`base'_`d'
 	ren vfull_bpopchange_pred`base'_`d' GM_hatfull_raw_`base'_`d'
 	ren vccdb_bpopchange_pred`base'_`d' GM_hatccdb_raw_`base'_`d'
+	ren vfull_bpopchange_act`base'_`d' GM_actfull_raw_`base'_`d'
+	ren vccdb_bpopchange_act`base'_`d' GM_actccdb_raw_`base'_`d'
 	local base = `d'
 }
 

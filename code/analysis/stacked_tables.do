@@ -1,5 +1,8 @@
+global C3 base_muni_county_L0 reg2 reg3 reg4 i.decade
+global C4 base_muni_county_L0 reg2 reg3 reg4 mfg_lfshare blackmig3539_share i.decade
 
-foreach medvar in co_2020 above_med_land above_med_unusable{
+
+foreach medvar in co_2020 above_med_land above_med_unusable above_med_total_00 above_med_total_05 above_med_total_10 above_med_total_15 above_med_total_20 above_med_lu_ml_2010 above_med_lu_ml_mean above_med_ub_1 above_med_ub_2{
 	estimates clear
 	eststo clear
 	forv weight = 0/1{

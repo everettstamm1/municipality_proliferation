@@ -325,15 +325,23 @@ foreach inst in og full ccdb{
 				rename *1950_1960 *1950
 				rename *1960_1970 *1960
 
-				keep GM_???? GM_hat_???? GM_raw_???? GM_hat_raw_???? mfg_lfshare* blackmig3539_share* `levelvar' reg2 reg3 reg4  n_muni_`level'_???? base_muni_`level'???? `level'pop*
-				
-				reshape long base_muni_`level' n_muni_`level'_ GM_ GM_hat_ GM_raw_ GM_hat_raw_  mfg_lfshare blackmig3539_share `level'pop, i(`levelvar') j(decade)
+				keep GM_*  mfg_lfshare* blackmig3539_share* `levelvar' reg2 reg3 reg4  n_muni_`level'_???? base_muni_`level'???? `level'pop*
+				cap drop GM_hat0*  GM_hat1*  GM_hatr* GM_hat7r* GM_hat8* 
+				reshape long base_muni_`level' n_muni_`level'_ GM_ GM_hat_ GM_raw_ GM_hat_raw_ GM_hatfull_raw_ GM_actfull_raw_ GM_hatccdb_raw_ GM_actccdb_raw_  GM_hatfull_ GM_actfull_ GM_hatccdb_ GM_actccdb_ mfg_lfshare blackmig3539_share `level'pop, i(`levelvar') j(decade)
 
 				ren n_muni_`level'_ n_muni_`level'
 				ren GM_ GM
 				ren GM_hat_ GM_hat
 				ren GM_raw_ GM_raw
 				ren GM_hat_raw_ GM_hat_raw
+				cap ren GM_actfull_ GM_actfull
+				cap ren GM_actfull_raw_ GM_actfull_raw
+				cap ren GM_actccdb_ GM_actccdb
+				cap ren GM_actccdb_raw_ GM_actccdb_raw
+				cap ren GM_actfull_ GM_actfull
+				cap ren GM_actfull_raw_ GM_actfull_raw
+				cap ren GM_actccdb_ GM_actccdb
+				cap ren GM_actccdb_raw_ GM_actccdb_raw
 				
 				bys `levelvar' (decade) : g n_muni_`level'_L1 = n_muni_`level'[_n-1] if decade-10 == decade[_n-1]
 				bys `levelvar' (decade) : g n_muni_`level'_L2 = n_muni_`level'[_n-2] if decade-20 == decade[_n-2]
@@ -353,8 +361,9 @@ foreach inst in og full ccdb{
 				
 				keep if inlist(decade, 1940, 1950, 1960)
 				merge 1:1 fips decade using "$INTDATA/land_cover/frac_unusable", keep(1 3) nogen
-
-				foreach geog in land total unusable{
+				merge m:1 fips using "$INTDATA/lu_lutz_sand/lu_lutz_sand_indicators", keep(1 3) nogen
+				ren frac_unbuildable_* frac_ub_*
+				foreach geog in land total unusable total_00 total_05 total_10 total_15 total_20 lu_ml_2010 lu_ml_mean ub_1 ub_2{
 					qui su frac_`geog' if decade == 1940 & GM < . & n_muni_`level'_L0 < .,d
 					g above_med_temp = frac_`geog'>=`r(p50)' if decade == 1940 & GM < . & n_muni_`level'_L0 < .
 					bys fips : egen above_med_`geog' = max(above_med_temp)
