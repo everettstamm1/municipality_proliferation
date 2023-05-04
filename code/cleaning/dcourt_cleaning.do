@@ -268,7 +268,7 @@ STEPS:
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 *1. Read in raw 1940 data, clean geography and merge with crosswalk, construct industry employment measures.
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
-foreach level in county{
+foreach level in cz county{
 		if "`level'"=="cz"{
 			local levelvar cz
 		}
@@ -984,46 +984,48 @@ keep origin_fips year proutmig actoutmig netbmig_pred
 save "$INTDATA/dcourt/2_lasso_boustan_predict_mig.dta", replace
 
 // Instrument creation
-
-// Predicted full
-clear all
-	
-global groups black // took out white
-global origin_id origin_fips
-global origin_id_code origin_fips_code
-global origin_sample origin_sample
-global destination_id dest_fips
-global destination_id_code dest_fips_code
-global dest_sample dest_sample
-global weights_data "$INTDATA/dcourt/2_lasso_boustan_predict_mig.dta"
-global version full
-global weight_types pr act
-global weight_var outmig
-global start_year 1940
-global panel_length 3
-
-use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
-
-do "$CODE/helper/bartik_generic.do"
-
-*10. Clean and standardize city names and output final instrument measures at the city-level	
+foreach destid in dest_fips city{
+	// Predicted full
+	clear all
 		
-use "$INTDATA/bartik/2_blackorigin_fips1940.dta", clear
+	global groups black // took out white
+	global origin_id origin_fips
+	global origin_id_code origin_fips_code
+	global origin_sample origin_sample
+	global destination_id `destid'
+	global destination_id_code `destid'_code
+	global dest_sample dest_sample
+	global weights_data "$INTDATA/dcourt/2_lasso_boustan_predict_mig.dta"
+	global version full
+	global weight_types pr act
+	global weight_var outmig
+	global start_year 1940
+	global panel_length 3
 
-order black* total*
-egen vfull_totblackmigdest_fips3539=rowmean(total_blackdest_fips*)
-sum vfull_totblackmigdest_fips3539
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
 
-drop total* black*
-tempfile dest_fips_blackmigshare3539
-save `dest_fips_blackmigshare3539'
+	do "$CODE/helper/bartik_generic.do"
 
-foreach w in pr act {
-	use "$INTDATA/bartik/full_black_`w'outmigorigin_fips19401970_collapsed_wide.dta", clear
-	merge 1:1 dest_fips using `dest_fips_blackmigshare3539', keep(3) nogenerate
+	*10. Clean and standardize city names and output final instrument measures at the city-level	
+			
+	use "$INTDATA/bartik/full_blackorigin_fips1940.dta", clear
+	order black* total*
+	egen vfull_totblackmig`destid'3539=rowmean(total_black`destid'*)
+	sum vfull_totblackmig`destid'3539
 
-	save "$INTDATA/dcourt/full_black_`w'mig_1940_1970_wide_xw.dta", replace
+	drop total* black*
+	tempfile dest_fips_blackmigshare3539
+	save `dest_fips_blackmigshare3539'
+
+	foreach w in pr act {
+		use "$INTDATA/bartik/full_black_`w'outmigorigin_fips19401970_collapsed_wide.dta", clear
+		merge 1:1 `destid' using `dest_fips_blackmigshare3539', keep(3) nogenerate
+
+		save "$INTDATA/dcourt/full_black_`w'mig_1940_1970_wide_xw_`destid'.dta", replace
+	}
 }
+
+
 
 // Predicted ccdb
 
@@ -1517,98 +1519,118 @@ collapse (sum) pop bpop, by(year nhgisst_1990 nhgiscty_1990)
 ren nhgisst_1990 statefip
 ren nhgiscty_1990 countyfip
 
-reshape wide pop bpop, i(statefip countyfip) j(year)
+g cty_fips = statefip*100+countyfip/10
+
+merge m:1 cty_fips using "$XWALKS/cw_cty_czone", assert(3) nogen
+ren cty_fips fips
+ren czone cz
+/*
+ren statefip state_fips
+merge m:1 state_fips countyfip using "$xwalks/US_place_point_2010_crosswalks.dta", keepusing(city) keep(1 3) nogen
+ren state_fips statefip 
+
+*/
+
+reshape wide pop bpop, i(fips) j(year)
 
 drop if bpop1940 ==. | bpop1950 ==. | bpop1960 ==. | bpop1970 ==. | ///
 					pop1940 ==. | pop1950 ==. | pop1960 ==. | pop1970 ==.
 
 keep if pop1940 >=25000 | pop1970>=25000
-	
+
 save "$INTDATA/dcourt/nhgis_county_pops", replace
 
+foreach level in county cz{
+	if "`level'"=="cz"{
+			local levelvar cz
+			local levellab "CZ"
+			
+		}
+		else if "`level'"=="county"{
+			local levelvar fips
+			local levellab "County"
 
-use "$INTDATA/dcourt/nhgis_county_pops", clear
-
-g dest_fips = statefip*100 + countyfip/10
-
-merge 1:1 dest_fips using "$INTDATA/dcourt/full_black_prmig_1940_1970_wide_xw.dta", keep(1 3)
-g full_sample = _merge == 3
-drop _merge
-merge 1:1 dest_fips using "$INTDATA/dcourt/full_black_actmig_1940_1970_wide_xw.dta", keep(1 3) nogen
-
-foreach var of varlist black_proutmigpr* black_actoutmigact*{
-	replace `var' = 0 if `var'==.
-	ren `var' vfull_`var'
-}
-
-merge 1:1 dest_fips using "$INTDATA/dcourt/ccdb_black_prmig_1940_1970_wide_xw.dta", keep(1 3)
-g ccdb_sample = _merge == 3
-drop _merge
-merge 1:1 dest_fips using "$INTDATA/dcourt/ccdb_black_actmig_1940_1970_wide_xw.dta", keep(1 3) nogen
-
-
-foreach var of varlist black_proutmigpr* black_actoutmigact*{
-	replace `var' = 0 if `var'==.
-	ren `var' vccdb_`var'
-}
-
-keep if full_sample == 1 | ccdb_sample == 1
-
-local base = 1940
-foreach d in 1950 1960 1970{
-	* Actual black pop change in city
-	g bpopchange`base'_`d'=100*(bpop`d'-bpop`base')/pop`base'
-	foreach v in full ccdb{
-		g v`v'_bpopchange_pred`base'_`d'=100*v`v'_black_proutmigpr`d'/pop`base'
-		g v`v'_bpopchange_act`base'_`d'=100*v`v'_black_actoutmigact`d'/pop`base'
-		g v`v'_blackmig3539_share`base'=100*v`v'_totblackmigdest_fips3539/pop`base'
-	}
-	local base = `d'
-}
-
-ren dest_fips fips
-
-// mfg lfshare controls
-merge 1:1 fips using "$INTDATA/dcourt/clean_county_industry_employment_1940_1970.dta", keepusing(mfg_lfshare*) keep(3) nogen 
-
-// Region dummies
-preserve 
-	use "$RAWDATA/dcourt/cz_state_region_crosswalk.dta", clear
-	keep state_id region
-	duplicates drop
-	tempfile regions
-	save `regions'
-restore 
-g state_id = floor(fips/1000)
-merge m:1 state_id using `regions', keep(1 3) nogen
-tabulate region, gen(reg)	
-drop state_id
-
-// Rank measures
-local base = 1940
-foreach d in 1950 1960 1970{
-	xtile GM_`base'_`d' = bpopchange`base'_`d', nq(100) 
-	xtile GM_hatfull_`base'_`d' = vfull_bpopchange_pred`base'_`d', nq(100) 
-	xtile GM_hatccdb_`base'_`d' = vccdb_bpopchange_pred`base'_`d', nq(100) 
+		}
+		else if "`level'"=="msa"{
+			local levelvar msapmsa2000
+			local levellab "MSA"
+		}
 	
-	xtile GM_actfull_`base'_`d' = vfull_bpopchange_act`base'_`d', nq(100) 
-	xtile GM_actccdb_`base'_`d' = vccdb_bpopchange_act`base'_`d', nq(100) 
-	local base = `d'
+
+
+	use "$INTDATA/dcourt/nhgis_county_pops", clear
+	ren fips dest_fips
+
+	merge 1:1 dest_fips using "$INTDATA/dcourt/full_black_prmig_1940_1970_wide_xw.dta", keep(1 3)
+	g full_sample = _merge == 3
+	drop _merge
+	merge 1:1 dest_fips using "$INTDATA/dcourt/full_black_actmig_1940_1970_wide_xw.dta", keep(1 3) nogen
+
+	foreach var of varlist black_proutmigpr* black_actoutmigact*{
+		replace `var' = 0 if `var'==.
+		ren `var' vfull_`var'
+	}
+	
+	keep if full_sample==1
+	ren dest_fips fips
+	collapse (sum) pop* bpop* vfull_*, by(`levelvar')
+
+	local base = 1940
+	foreach d in 1950 1960 1970{
+		* Actual black pop change in city
+		g bpopchange`base'_`d'=100*(bpop`d'-bpop`base')/pop`base'
+		foreach v in full {
+			g v`v'_bpopchange_pred`base'_`d'=100*v`v'_black_proutmigpr`d'/pop`base'
+			g v`v'_bpopchange_act`base'_`d'=100*v`v'_black_actoutmigact`d'/pop`base'
+			g v`v'_blackmig3539_share`base'=100*v`v'_totblackmigdest_fips3539/pop`base'
+		}
+		local base = `d'
+	}
+
+	// mfg lfshare controls
+	merge 1:1 `levelvar' using "$INTDATA/dcourt/clean_`level'_industry_employment_1940_1970.dta", keepusing(mfg_lfshare*) keep(3) nogen 
+
+	if "`level'" == "county"{
+		// Region dummies
+		preserve 
+			use "$RAWDATA/dcourt/cz_state_region_crosswalk.dta", clear
+			keep state_id region
+			duplicates drop
+			tempfile regions
+			save `regions'
+		restore 
+		g state_id = floor(fips/1000)
+		merge m:1 state_id using `regions', keep(1 3) nogen
+		drop state_id
+
+	}
+	else{
+		merge 1:1 cz using "$RAWDATA/dcourt/cz_state_region_crosswalk.dta", keep(3) nogen
+	}
+	tabulate region, gen(reg)	
+
+	// Rank measures
+	local base = 1940
+	foreach d in 1950 1960 1970{
+		xtile GM_`base'_`d' = bpopchange`base'_`d', nq(100) 
+		xtile GM_hatfull_`base'_`d' = vfull_bpopchange_pred`base'_`d', nq(100) 
+		
+		xtile GM_actfull_`base'_`d' = vfull_bpopchange_act`base'_`d', nq(100) 
+		local base = `d'
+	}
+
+	la var vfull_blackmig3539_share1940 "Black Southern Mig 1935-1940"
+	la var reg2 "Midwest"
+	la var reg3 "South"
+	la var reg4 "West"	
+
+	local base = 1940
+	foreach d in 1950 1960 1970{
+		ren bpopchange`base'_`d' GM_raw_`base'_`d'
+		ren vfull_bpopchange_pred`base'_`d' GM_hatfull_raw_`base'_`d'
+		ren vfull_bpopchange_act`base'_`d' GM_actfull_raw_`base'_`d'
+		local base = `d'
+	}
+
+	save "$CLEANDATA/dcourt/GM_`level'_final_dataset_split", replace
 }
-
-la var vfull_blackmig3539_share1940 "Black Southern Mig 1935-1940"
-la var reg2 "Midwest"
-la var reg3 "South"
-la var reg4 "West"	
-
-local base = 1940
-foreach d in 1950 1960 1970{
-	ren bpopchange`base'_`d' GM_raw_`base'_`d'
-	ren vfull_bpopchange_pred`base'_`d' GM_hatfull_raw_`base'_`d'
-	ren vccdb_bpopchange_pred`base'_`d' GM_hatccdb_raw_`base'_`d'
-	ren vfull_bpopchange_act`base'_`d' GM_actfull_raw_`base'_`d'
-	ren vccdb_bpopchange_act`base'_`d' GM_actccdb_raw_`base'_`d'
-	local base = `d'
-}
-
-save "$CLEANDATA/dcourt/GM_county_final_dataset_split", replace

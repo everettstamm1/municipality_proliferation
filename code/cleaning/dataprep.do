@@ -1,6 +1,6 @@
 
-foreach inst in og full ccdb{
-	foreach level in county{
+foreach inst in og full{
+	foreach level in cz county{
 		if "`level'"=="cz"{
 			local levelvar cz
 			local levellab "CZ"
@@ -38,7 +38,7 @@ foreach inst in og full ccdb{
 		// preclean ccdb urbanpop data (from dcourt)
 		preserve
 			use "$DCOURT/data/GM_`level'_final_dataset_split.dta", clear
-			keep fips popc1940 popc1950 popc1960 popc1970
+			keep `levelvar' popc1940 popc1950 popc1960 popc1970
 			ren popc* `level'pop*
 			save "$INTDATA/dcourt_populations/`level'pop", replace
 		restore
@@ -301,10 +301,10 @@ foreach inst in og full ccdb{
 					ren GM_hat2_* GM_hat_*
 					ren v2_* *
 				}
-				else if "`inst'"!="og" & "`level'"=="county"{
+				else if "`inst'"!="og"{
 					use "$CLEANDATA/dcourt/GM_`level'_final_dataset_split"
 					
-					keep if `inst'_sample == 1
+					//keep if `inst'_sample == 1
 					ren GM_hat`inst'_* GM_hat_*
 					ren v`inst'_* *
 				}
@@ -353,55 +353,106 @@ foreach inst in og full ccdb{
 				ren base_muni_`level' base_muni_`level'_L0
 				lab var n_muni_`level'_L0 "`ylab'"
 				
-				merge 1:1 fips decade using "$INTDATA/cgoodman/county_geogs.dta", keep(1 3) 
-				replace frac_land = 0 if _merge==1
-				replace frac_total = 0 if _merge==1
-				drop _merge
-				
-				
-				keep if inlist(decade, 1940, 1950, 1960)
-				merge 1:1 fips decade using "$INTDATA/land_cover/frac_unusable", keep(1 3) nogen
-				merge m:1 fips using "$INTDATA/lu_lutz_sand/lu_lutz_sand_indicators", keep(1 3) nogen
-				ren frac_unbuildable_* frac_ub_*
-				foreach geog in land total unusable total_00 total_05 total_10 total_15 total_20 lu_ml_2010 lu_ml_mean ub_1 ub_2{
-					qui su frac_`geog' if decade == 1940 & GM < . & n_muni_`level'_L0 < .,d
-					g above_med_temp = frac_`geog'>=`r(p50)' if decade == 1940 & GM < . & n_muni_`level'_L0 < .
-					bys fips : egen above_med_`geog' = max(above_med_temp)
-					g GM_X_above_med_`geog' = GM * above_med_`geog'
-					g GM_hat_X_above_med_`geog' = GM_hat * above_med_`geog'
-
-					drop above_med_temp
-				}
+			
 				
 				g `level'pop1940 = `level'pop if decade == 1940
 				bys `levelvar' (`level'pop1940) : replace `level'pop1940 = `level'pop1940[1]
 				
-								
-				preserve
-					use "$RAWDATA/other/district_court_order_data_feb2021.dta", clear
-					drop if status_2020 >=4 // Dropping dismissed court orders
-					keep cfips 
-					ren cfip fips
-					destring fips, replace
-					duplicates drop
-					tempfile co
-					save `co'
-				restore
+				keep if inlist(decade, 1940, 1950, 1960)
+				if "`level"=="county"{
+					merge 1:1 fips decade using "$INTDATA/cgoodman/county_geogs.dta", keep(1 3) 
+					replace frac_land = 0 if _merge==1
+					replace frac_total = 0 if _merge==1
+					drop _merge
+					merge 1:1 fips decade using "$INTDATA/land_cover/frac_unusable", keep(1 3) nogen
+					merge m:1 fips using "$INTDATA/lu_lutz_sand/lu_lutz_sand_indicators", keep(1 3) nogen
+					ren frac_unbuildable_* frac_ub_*
+					foreach geog in land total unusable total_00 total_05 total_10 total_15 total_20 lu_ml_2010 lu_ml_mean ub_1 ub_2{
+						qui su frac_`geog' if decade == 1940 & GM < . & n_muni_`level'_L0 < .,d
+						g above_med_temp = frac_`geog'>=`r(p50)' if decade == 1940 & GM < . & n_muni_`level'_L0 < .
+						bys `levelvar' : egen above_med_`geog' = max(above_med_temp)
+						g GM_X_above_med_`geog' = GM * above_med_`geog'
+						g GM_hat_X_above_med_`geog' = GM_hat * above_med_`geog'
 
-				merge m:1 fips using `co', keep(1 3)
-				g co_2020 = _merge == 3
-				lab var co_2020 "Desegregation Order"
+						drop above_med_temp
+					}
+					
+					
+					
+					preserve
+						use "$RAWDATA/other/district_court_order_data_feb2021.dta", clear
+						drop if status_2020 >=4 // Dropping dismissed court orders
+						keep cfips 
+						ren cfip fips
+						destring fips, replace
+						duplicates drop
+						tempfile co
+						save `co'
+					restore
 
-				g GM_X_co_2020 = GM * co_2020
-				g GM_hat_X_co_2020 = GM_hat * co_2020
-				drop _merge
-				/*
-				merge m:1 fips using "$INTDATA/land_cover/county_tri", keep(3) nogen
-				g add_tri_ctrl = cond(mean_tri<.,0,1)
-				replace mean_tri = 0 if add_tri_ctrl==1
-				*/
-				merge m:1 fips using "$CLEANDATA/nces/nces_finance_data.dta", keep(3) nogen
-				save "$CLEANDATA/`level'_`ds'_stacked_`inst'", replace
+					merge m:1 fips using `co', keep(1 3)
+					g co_2020 = _merge == 3
+					lab var co_2020 "Desegregation Order"
+
+					g GM_X_co_2020 = GM * co_2020
+					g GM_hat_X_co_2020 = GM_hat * co_2020
+					drop _merge
+					/*
+					merge m:1 fips using "$INTDATA/land_cover/county_tri", keep(3) nogen
+					g add_tri_ctrl = cond(mean_tri<.,0,1)
+					replace mean_tri = 0 if add_tri_ctrl==1
+					*/
+					merge m:1 fips using "$CLEANDATA/nces/nces_finance_data.dta", keep(3) nogen
+				}
+
+			preserve
+				use "$RAWDATA/dcourt/ICPSR_07735_City_Book_1944_1977/DS0001/City_Book_1944_1977.dta", clear
+
+				*Standardize State Names
+				drop if PLACE1=="0000"
+				destring STATE1, replace
+				statastates, fips(STATE1)  nogen
+
+				cityfix_ccdb
+
+				
+							
+				ren CC0007 popc1940
+				ren CC0010 popc1970
+				
+				keep if popc1940>25000 & popc1970>25000
+				
+				merge 1:1 city using "$XWALKS/US_place_point_2010_crosswalks.dta", keepusing(state_fips countyfip cz) keep(1 3) 
+				g fips = state_fips*1000+real(countyfip)
+
+				replace cz = 19600 if city == "Belleville, NJ"
+				replace fips = 34013 if city == "Belleville, NJ"
+				keep `levelvar'
+				duplicates drop
+				tempfile urban
+				save `urban'
+			restore
+			merge m:1 `levelvar' using `urban', keep(1 3)
+			g urban = _merge==3
+			drop _merge
+			
+			preserve 
+				use "$DCOURT/data/GM_cz_final_dataset.dta", clear
+				ren cz czone
+				merge 1:m czone using "$XWALKS/cw_cty_czone", keep(3) nogen
+				ren czone cz
+				ren cty_fips fips
+				keep `levelvar'
+				duplicates drop
+				tempfile dcourt
+				save `dcourt'
+			restore
+			merge m:1 `levelvar' using `dcourt', keep(1 3)
+			g dcourt = _merge==3
+			drop _merge
+			
+			
+			save "$CLEANDATA/`level'_`ds'_stacked_`inst'", replace
 		}
 	}
 }
