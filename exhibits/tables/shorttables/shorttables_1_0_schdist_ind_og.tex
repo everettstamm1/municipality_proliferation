@@ -1,0 +1,18 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{TSLS Estimation Results, y=Number of Independent School Districts, Per Capita (100,000)}
+\begin{tabular}{l*{6}{c}}
+\toprule
+                &\multicolumn{3}{c}{County}            &\multicolumn{3}{c}{CZ}                \\\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+\midrule
+GM              &   -0.176   &   -0.300   &   -0.254   &    4.633***&    4.160***&    4.157***\\
+                &  (1.279)   &  (1.386)   &  (1.305)   &  (0.757)   &  (0.682)   &  (0.674)   \\
+\midrule
+Sample          &     Full   &    Urban   &   DCourt   &     Full   &    Urban   &   DCourt   \\
+Dep Var Mean    &  -55.725   &  -52.001   &  -53.557   & -148.734   & -132.778   & -132.013   \\
+Observations    &      714   &      621   &      663   &      438   &      384   &      390   \\
+\bottomrule
+\multicolumn{7}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{7}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

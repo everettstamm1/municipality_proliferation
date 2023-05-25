@@ -1,12 +1,15 @@
+global C3 base_muni_county_L0 reg2 reg3 reg4 i.decade
+global C4 base_muni_county_L0 reg2 reg3 reg4 mfg_lfshare blackmig3539_share i.decade
 
-foreach medvar in co_2020 above_med_land above_med_unusable{
+
+foreach medvar in co_2020 above_med_land above_med_unusable above_med_total_00 above_med_ub_1 above_med_ub_2{
 	estimates clear
 	eststo clear
 	forv weight = 0/1{
 		if "`weight'"=="0" local w = 1
 		if "`weight'"=="1" local w ="countypop1940"
 		
-		foreach ds in schdist_ind all_local cgoodman{
+		foreach ds in schdist_ind all_local_nosch gen_muni{
 			if "`ds'"=="wiki"{
 				local filepath = "$TABS/wiki"
 			}
@@ -49,6 +52,10 @@ foreach medvar in co_2020 above_med_land above_med_unusable{
 					if "`medvar'" == "above_med_unusable" la var $x_olsX "GM X Above Median Area Unusable"
 					if "`medvar'" == "co_2020" la var $x_ivX "$\hat{GM}$ X Desegregation Order"
 					if "`medvar'" == "co_2020" la var $x_olsX "GM X Desegregation Order"
+					if "`medvar'" == "above_med_total_00" la var $x_ivX "$\hat{GM}$ X Above Median Naturally Unbuildable"
+					if "`medvar'" == "above_med_total_00" la var $x_olsX "GM X Above Median County Unbuildable"
+					if "`medvar'" == "above_med_ub_1" la var $x_ivX "$\hat{GM}$ X Above Median Total Unbuildable"
+					if "`medvar'" == "above_med_ub_1" la var $x_olsX "GM X Above Median Total Unbuildable"
 					local ylab: variable label $y
 
 					label var $y "y_L0"

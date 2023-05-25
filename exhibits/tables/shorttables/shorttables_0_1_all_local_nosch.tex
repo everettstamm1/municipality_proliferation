@@ -1,0 +1,18 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{TSLS Estimation Results, y=Number of Local Govts (no school districts)}
+\begin{tabular}{l*{6}{c}}
+\toprule
+                &\multicolumn{3}{c}{County}            &\multicolumn{3}{c}{CZ}                \\\cmidrule(lr){2-4}\cmidrule(lr){5-7}
+\midrule
+GM              &   0.0929   &    0.153   &    0.108   &  -0.0588   &  0.00326   &  0.00113   \\
+                & (0.0978)   &  (0.189)   &  (0.114)   &  (0.364)   &  (0.409)   &  (0.432)   \\
+\midrule
+Sample          &     Full   &    Urban   &   DCourt   &     Full   &    Urban   &   DCourt   \\
+Dep Var Mean    &     4.17   &    5.596   &    4.583   &   15.264   &   19.505   &   19.696   \\
+Observations    &     1608   &      582   &     1200   &      639   &      378   &      369   \\
+\bottomrule
+\multicolumn{7}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{7}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}
