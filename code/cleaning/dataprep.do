@@ -311,6 +311,7 @@ foreach inst in og full{
 				if "`level'"=="msa"{
 					destring smsa, gen(msapmsa2000) 
 				}
+				
 				merge 1:1 `levelvar' using "$INTDATA/counts/`ds'_`level'", keep(3) nogen
 				if "`inst'" == "og" {
 					merge 1:1 `levelvar' using "$INTDATA/dcourt_populations/`level'pop", keep(3) nogen 
@@ -359,7 +360,7 @@ foreach inst in og full{
 				bys `levelvar' (`level'pop1940) : replace `level'pop1940 = `level'pop1940[1]
 				
 				keep if inlist(decade, 1940, 1950, 1960)
-				if "`level"=="county"{
+				if "`level'"=="county"{
 					merge 1:1 fips decade using "$INTDATA/cgoodman/county_geogs.dta", keep(1 3) 
 					replace frac_land = 0 if _merge==1
 					replace frac_total = 0 if _merge==1

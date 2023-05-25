@@ -9,7 +9,7 @@ foreach medvar in co_2020 above_med_land above_med_unusable above_med_total_00 a
 		if "`weight'"=="0" local w = 1
 		if "`weight'"=="1" local w ="countypop1940"
 		
-		foreach ds in schdist_ind all_local cgoodman{
+		foreach ds in schdist_ind all_local_nosch gen_muni{
 			if "`ds'"=="wiki"{
 				local filepath = "$TABS/wiki"
 			}
