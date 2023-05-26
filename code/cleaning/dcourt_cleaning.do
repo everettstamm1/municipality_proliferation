@@ -1579,10 +1579,15 @@ foreach level in county cz{
 	foreach d in 1950 1960 1970{
 		* Actual black pop change in city
 		g bpopchange`base'_`d'=100*(bpop`d'-bpop`base')/pop`base'
+		g bpopchangepp`base'_`d'=100*((bpop`d'/pop`d')-(bpop`base'/pop`base'))
+
 		foreach v in full {
 			g v`v'_bpopchange_pred`base'_`d'=100*v`v'_black_proutmigpr`d'/pop`base'
 			g v`v'_bpopchange_act`base'_`d'=100*v`v'_black_actoutmigact`d'/pop`base'
 			g v`v'_blackmig3539_share`base'=100*v`v'_totblackmigdest_fips3539/pop`base'
+			
+			g v`v'_bpopchangepp_act`base'_`d'=100*((v`v'_black_proutmigpr`d'+bpop`base')/(v`v'_black_proutmigpr`d'+ pop`base') - bpop`base'/pop`base')
+
 		}
 		local base = `d'
 	}
@@ -1616,6 +1621,7 @@ foreach level in county cz{
 		xtile GM_hatfull_`base'_`d' = vfull_bpopchange_pred`base'_`d', nq(100) 
 		
 		xtile GM_actfull_`base'_`d' = vfull_bpopchange_act`base'_`d', nq(100) 
+		
 		local base = `d'
 	}
 
@@ -1627,6 +1633,9 @@ foreach level in county cz{
 	local base = 1940
 	foreach d in 1950 1960 1970{
 		ren bpopchange`base'_`d' GM_raw_`base'_`d'
+		ren bpopchangepp`base'_`d' GM_raw_pp_`base'_`d'
+		ren vfull_bpopchangepp_act`base'_`d' GM_hat_raw_pp_`base'_`d'
+
 		ren vfull_bpopchange_pred`base'_`d' GM_hatfull_raw_`base'_`d'
 		ren vfull_bpopchange_act`base'_`d' GM_actfull_raw_`base'_`d'
 		local base = `d'
