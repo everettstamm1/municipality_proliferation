@@ -298,6 +298,17 @@ foreach inst in  full og{
 			}
 			merge 1:1 `levelvar' using "$INTDATA/cog_populations/`level'pop", keep(3) nogen
 			
+			if "`level'"=="cz"{
+				preserve
+					use "$XWALKS/US_place_point_2010_crosswalks.dta", clear
+					keep cz cz_name
+					duplicates drop
+					tempfile cznames
+					save `cznames'
+				restore
+				
+				merge 1:1 `levelvar' using `cznames', keep(1 3) nogen
+			}
 			save "$CLEANDATA/`level'_pooled", replace
 			
 			// Creating stacked version of data
@@ -313,6 +324,18 @@ foreach inst in  full og{
 				//keep if `inst'_sample == 1
 				ren GM_hat`inst'_* GM_hat_*
 				ren v`inst'_* *
+				preserve
+					use "$DCOURT/data/GM_`level'_final_dataset_split.dta", clear
+					keep `levelvar' GM_raw_pp* GM_hat2_raw_pp* popc???? mfg_lfshare* v2_blackmig3539_share* reg2 reg3 reg4 
+					
+					ren *pp* *ppc*
+					ren v2_blackmig3539_share* blackmig3539_share*
+					tempfile dcourt
+					save `dcourt'
+				restore
+				
+				merge 1:1 `levelvar' using `dcourt', nogen update
+				
 			}
 			if "`level'"=="msa"{
 				destring smsa, gen(msapmsa2000) 
@@ -350,7 +373,7 @@ foreach inst in  full og{
 
 			}
 			
-			reshape long `stubs' GM_ GM_hat_ GM_raw_ GM_raw_pp_ GM_hat_raw_pp_ GM_hat_raw_ GM_hatfull_raw_ GM_actfull_raw_ GM_hatccdb_raw_ GM_actccdb_raw_  GM_hatfull_ GM_actfull_ GM_hatccdb_ GM_actccdb_ mfg_lfshare blackmig3539_share `level'pop bpop pop bpopc popc, i(`levelvar') j(decade)
+			reshape long `stubs' GM_raw_ppc_ GM_hat2_raw_ppc_ GM_ GM_hat_ GM_raw_ GM_raw_pp_ GM_hat_raw_pp_ GM_hat_raw_ GM_hatfull_raw_ GM_actfull_raw_ GM_hatccdb_raw_ GM_actccdb_raw_  GM_hatfull_ GM_actfull_ GM_hatccdb_ GM_actccdb_ mfg_lfshare blackmig3539_share `level'pop bpop pop bpopc popc, i(`levelvar') j(decade)
 			
 			
 			foreach ds in gen_muni schdist_ind  cgoodman {
@@ -374,9 +397,9 @@ foreach inst in  full og{
 			g `level'pop1940 = `level'pop if decade == 1940
 			bys `levelvar' (`level'pop1940) : replace `level'pop1940 = `level'pop1940[1]
 			
-		
 
 			keep if inlist(decade, 1940, 1950, 1960, 1970)
+			
 			if "`level'"=="county"{
 				merge 1:1 fips decade using "$INTDATA/cgoodman/county_geogs.dta", keep(1 3) 
 				replace frac_land = 0 if _merge==1
@@ -469,29 +492,20 @@ foreach inst in  full og{
 		g dcourt = _merge==3
 		drop _merge
 		
-		if "`inst'"=="full" drop popc bpopc
-		preserve
-
-			use "$DCOURT/data/GM_`level'_final_dataset_split.dta", clear
-			keep `levelvar' GM_raw_pp* GM_hat2_raw_pp* popc????
-			rename *_1940_1950 *40
-			rename *_1950_1960 *50
-			rename *_1960_1970 *60
-			rename *1940 *40
-			rename *1950 *50
-			rename *1960 *60
-			rename *1970 *70
-
-			reshape long GM_hat2_raw_pp GM_raw_pp popc, i(`levelvar') j(decade)
-			replace decade = decade+1900
-			ren *pp* *ppc*
-			tempfile dcourt
-			save `dcourt'
-		restore
 		
-		merge 1:1 `levelvar' decade using `dcourt', keep(1 3) nogen
-		
+		if "`level'"=="cz"{
+			preserve
+				use "$XWALKS/US_place_point_2010_crosswalks.dta", clear
+				keep cz cz_name
+				duplicates drop
+				replace cz_name="Louisville, KY" if cz==13101 // Fill in Louisville, KY name, which was missing.
 
+				tempfile cznames
+				save `cznames'
+			restore
+			
+			merge m:1 `levelvar' using `cznames', keep(1 3) nogen
+		}
 		save "$CLEANDATA/`level'_stacked_`inst'", replace
 		
 	}
