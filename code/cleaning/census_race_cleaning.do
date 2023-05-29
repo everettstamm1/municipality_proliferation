@@ -177,10 +177,10 @@ g cty_fips = statefip*100+countyfip/10
 merge m:1 cty_fips using "$XWALKS/cw_cty_czone", keep(3) nogen
 ren cty_fips fips
 ren czone cz
-
+ren year decade
 
 preserve 
-	collapse (sum) pop pop_urban pop_city pop_urbarea pop_urbpop, by(cz)
+	collapse (sum) pop pop_urban pop_city pop_urbarea pop_urbpop, by(cz decade)
 
 	save "$INTDATA/census/cz_urbanization_1900_1930.dta", replace
 restore
