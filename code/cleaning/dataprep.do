@@ -226,7 +226,6 @@ foreach inst in  full og{
 		restore
 		
 		// Preclean cgoodman data
-		
 		use "$RAWDATA/cbgoodman/muni_incorporation_date.dta", clear
 		destring statefips countyfips, replace
 		drop if statefips == 02 | statefips==15
@@ -241,35 +240,23 @@ foreach inst in  full og{
 
 		g n = yr_incorp>=1940 & yr_incorp<=1970
 
-
-		g n1940 = yr_incorp<1940
-		g n1950 = yr_incorp<1950 
-		g n1960 = yr_incorp<1960
-		g n1970 = yr_incorp<1970
-		g n1980 = yr_incorp<1980
-
-		g n40_50 = yr_incorp>=1940 & yr_incorp<1950
-		g n50_60 = yr_incorp>=1950 & yr_incorp<1960
-		g n60_70 = yr_incorp>=1960 & yr_incorp<1970
-		g n70_80 = yr_incorp>=1970 & yr_incorp<1980
-		g n80_90 = yr_incorp>=1980 & yr_incorp<1990
+		forv d=1900(10)1980{
+			local step = `d'+10
+			
+			g n`d' = yr_incorp<`d'
+			g n`d'_`step' = yr_incorp>=`d' & yr_incorp<`step'
+		}
+		
+		
 
 		collapse (sum) n*, by(`levelvar')
 
 		rename n n_muni_`level'
-
-		rename n1940 b_muni_`level'1940
-		rename n1950 b_muni_`level'1950
-		rename n1960 b_muni_`level'1960
-		rename n1970 b_muni_`level'1970
-		rename n1980 b_muni_`level'1980
-
-		rename n40_50 n_muni_`level'40_50
-		rename n50_60 n_muni_`level'50_60
-		rename n60_70 n_muni_`level'60_70
-		rename n70_80 n_muni_`level'70_80
-		rename n80_90 n_muni_`level'80_90
-
+		rename n19?? b_muni_`level'19??
+		
+		ren n19* n_muni_`level'*
+		ren *_19?? *_??
+		
 		label var b_muni_`level'1940 "Base `lab' 1940"
 		label var b_muni_`level'1950 "Base `lab' 1950"
 		label var b_muni_`level'1960 "Base `lab' 1960"
@@ -342,7 +329,7 @@ foreach inst in  full og{
 			}
 			
 
-			foreach ds in gen_muni schdist_ind all_local ngov3  spdist  cgoodman{
+			foreach ds in gen_muni schdist_ind  cgoodman{
 				merge 1:1 `levelvar' using "$INTDATA/counts/`ds'_`level'", keep(1 3) nogen
 				 
 			}
@@ -355,20 +342,29 @@ foreach inst in  full og{
 				merge 1:1 `levelvar' using "$INTDATA/cog_populations/`level'pop", keep(3) nogen
 				
 			}
+		
+			rename *1940_1950 *1940
+			rename *1950_1960 *1950
+			rename *1960_1970 *1960
 			
-			rename *1940_1950 *40
-			rename *1950_1960 *50
-			rename *1960_1970 *60
-			rename *40_50 *40
-			rename *50_60 *50
-			rename *60_70 *60
-			ren *19* **
-			keep GM_*  mfg_lfshare* blackmig3539_share* `levelvar' reg2 reg3 reg4  n_*_`level'?? b_*_`level'?? `level'pop* bpop* pop*
+			rename *00_10 *1900
+			rename *10_20 *1910
+			rename *20_30 *1920
+			rename *30_40 *1930
+			rename *40_50 *1940
+			rename *50_60 *1950
+			rename *60_70 *1960
+			rename *70_80 *1970
+			rename *80_90 *1980
+
+			
+			
+			keep GM_*  mfg_lfshare* blackmig3539_share* `levelvar' reg2 reg3 reg4  n_*_`level'???? b_*_`level'???? `level'pop* bpop* pop*
 			cap drop GM_hat0*  GM_hat1*  GM_hatr* GM_hat7r* GM_hat8* 
 
 			local stubs 
 			foreach ds in gen_muni schdist_ind  cgoodman {
-				local lab`ds' : variable label n_`ds'_`level'40
+				local lab`ds' : variable label n_`ds'_`level'1940
 				local stubs `stubs' n_`ds'_`level' b_`ds'_`level'
 
 			}
@@ -381,7 +377,6 @@ foreach inst in  full og{
 
 			}
 			ren *_ *
-			replace decade = decade+1900
 			/*
 			bys `levelvar' (decade) : g n_*_`level'_L1 = n_*_`level'[_n-1] if decade-10 == decade[_n-1]
 			bys `levelvar' (decade) : g n_*_`level'_L2 = n_*_`level'[_n-2] if decade-20 == decade[_n-2]
@@ -398,7 +393,7 @@ foreach inst in  full og{
 			bys `levelvar' (`level'pop1940) : replace `level'pop1940 = `level'pop1940[1]
 			
 
-			keep if inlist(decade, 1940, 1950, 1960, 1970)
+			keep if mod(decade,10)==0
 			
 			if "`level'"=="county"{
 				merge 1:1 fips decade using "$INTDATA/cgoodman/county_geogs.dta", keep(1 3) 
@@ -506,6 +501,11 @@ foreach inst in  full og{
 			
 			merge m:1 `levelvar' using `cznames', keep(1 3) nogen
 		}
+		
+		// Bringing in 1900-30 urbanization rates
+		merge 1:1 decade `levelvar' using "$INTDATA/census/`level'_urbanization_1900_1930", keep(1 3) nogen
+		
+		
 		save "$CLEANDATA/`level'_stacked_`inst'", replace
 		
 	}
