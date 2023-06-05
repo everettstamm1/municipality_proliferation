@@ -235,23 +235,22 @@ foreach inst in  full og{
 		ren czone cz 
 		ren cty_fips fips
 		
-		keep `levelvar' yr_incorp
+		keep `levelvar' yr_incorp muniname
 		local lab: variable label yr_incorp
-
+		
 		g n = yr_incorp>=1940 & yr_incorp<=1970
-
 		forv d=1900(10)1980{
 			local step = `d'+10
 			
 			g n`d' = yr_incorp<`d'
 			g n`d'_`step' = yr_incorp>=`d' & yr_incorp<`step'
+
 		}
-		
-		
+
 
 		collapse (sum) n*, by(`levelvar')
-
 		rename n n_muni_`level'
+		
 		rename n19?? b_muni_`level'19??
 		
 		ren n19* n_muni_`level'*
@@ -269,11 +268,13 @@ foreach inst in  full og{
 		label var n_muni_`level'70_80 "`lab'"
 		label var n_muni_`level'80_90 "`lab'"
 		label var n_muni_`level' "`lab'"
+	
 		
 		ren *muni* *cgoodman*
 		save "$INTDATA/counts/cgoodman_`level'", replace
-
 		
+	
+			
 			// Pooled
 			use "$DCOURT/data/GM_`level'_final_dataset.dta", clear
 			if "`level'"=="msa"{
@@ -329,7 +330,7 @@ foreach inst in  full og{
 			}
 			
 
-			foreach ds in gen_muni schdist_ind  cgoodman{
+			foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist   cgoodman{
 				merge 1:1 `levelvar' using "$INTDATA/counts/`ds'_`level'", keep(1 3) nogen
 				 
 			}
@@ -363,7 +364,7 @@ foreach inst in  full og{
 			cap drop GM_hat0*  GM_hat1*  GM_hatr* GM_hat7r* GM_hat8* 
 
 			local stubs 
-			foreach ds in gen_muni schdist_ind  cgoodman {
+			foreach ds in  gen_muni schdist_ind all_local ngov3 gen_subcounty spdist   cgoodman  {
 				local lab`ds' : variable label n_`ds'_`level'1940
 				local stubs `stubs' n_`ds'_`level' b_`ds'_`level'
 
@@ -372,7 +373,7 @@ foreach inst in  full og{
 			reshape long `stubs' GM_raw_ppc_ GM_hat2_raw_ppc_ GM_ GM_hat_ GM_raw_ GM_raw_pp_ GM_hat_raw_pp_ GM_hat_raw_ GM_hatfull_raw_ GM_actfull_raw_ GM_hatccdb_raw_ GM_actccdb_raw_  GM_hatfull_ GM_actfull_ GM_hatccdb_ GM_actccdb_ mfg_lfshare blackmig3539_share `level'pop bpop pop bpopc popc, i(`levelvar') j(decade)
 			
 			
-			foreach ds in gen_muni schdist_ind  cgoodman {
+			foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist   cgoodman {
 				label var n_`ds'_`level' "`lab`ds''"
 
 			}
