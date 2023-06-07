@@ -65,7 +65,7 @@ graph bar GM_raw_pp, over(cz_name, lab(angle(45))) ytitle("GM_raw_pp") title("19
 
 graph export "$FIGS/simplefigs/gm_raw_pp_barchart.pdf", as(pdf) replace
 
-use "$CLEANDATA/cz_stacked_full.dta", clear
+use "$CLEANDATA/cz_stacked.dta", clear
 sort decade
 drop if decade>1980
 twoway (connected b_cgoodman_cz_L0 decade if cz_name =="San Jose, CA") ///
@@ -93,10 +93,8 @@ twoway (connected b_cgoodman_cz_L0 decade if cz_name =="San Jose, CA") ///
 graph export "$FIGS/simplefigs/b_cgoodman_linegraph.pdf", as(pdf) replace
 
 
-use "$CLEANDATA/cz_stacked_full.dta", clear
-g urban_population = popc
-replace urban_population = pop_urban if popc==.
-g b_cgoodman_cz_L0_urb = b_cgoodman_cz_L0 /(urban_population/10000)
+use "$CLEANDATA/cz_stacked.dta", clear
+g b_cgoodman_cz_L0_urb = b_cgoodman_cz_L0 /(popc/10000)
 sort decade
 drop if decade>1970
 twoway (connected b_cgoodman_cz_L0_urb decade if cz_name =="San Jose, CA") ///
@@ -124,7 +122,7 @@ twoway (connected b_cgoodman_cz_L0_urb decade if cz_name =="San Jose, CA") ///
 												
 graph export "$FIGS/simplefigs/b_cgoodman_linegraph_pc.pdf", as(pdf) replace
 
-replace urban_population = log(urban_population)
+g urban_population = log(popc)
 twoway (connected urban_population decade if cz_name =="San Jose, CA") ///
 												(connected urban_population decade if cz_name =="San Francisco, CA") ///
 												(connected urban_population decade if cz_name =="Phoenix, AZ") ///

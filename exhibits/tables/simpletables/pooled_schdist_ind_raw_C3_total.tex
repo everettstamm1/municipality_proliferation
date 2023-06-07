@@ -1,0 +1,21 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y=Number of Independent School Districts  Pooled,, Total Population, Census Region controls.}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}   &\multicolumn{1}{c}{(2)}   &\multicolumn{1}{c}{(3)}   &\multicolumn{1}{c}{(4)}   \\
+\midrule
+GM\_hat\_raw\_pp\_totpop&       0.407***&               &      -6.937   &               \\
+                    &     (0.147)   &               &     (10.13)   &               \\
+\addlinespace
+GM\_raw\_pp\_totpop    &               &      -16.65*  &               &      -17.03   \\
+                    &               &     (8.598)   &               &     (22.06)   \\
+\midrule
+F-Stat              &       2.585   &               &               &               \\
+Observations        &         213   &         213   &         213   &         213   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

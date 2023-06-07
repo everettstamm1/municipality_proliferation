@@ -1025,7 +1025,7 @@ foreach destid in dest_fips city{
 	}
 }
 
-
+/*
 
 // Predicted ccdb
 
@@ -1068,7 +1068,7 @@ foreach w in pr act{
 
 	save "$INTDATA/dcourt/ccdb_black_`w'mig_1940_1970_wide_xw.dta", replace
 }
-
+*/
 // CCDB City Populations for 1970
 
 /*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
@@ -1561,17 +1561,15 @@ foreach level in county cz{
 	use "$INTDATA/dcourt/nhgis_county_pops", clear
 	ren fips dest_fips
 
-	merge 1:1 dest_fips using "$INTDATA/dcourt/full_black_prmig_1940_1970_wide_xw.dta", keep(1 3)
+	merge 1:1 dest_fips using "$INTDATA/dcourt/full_black_prmig_1940_1970_wide_xw_dest_fips.dta", keep(1 3)
 	g full_sample = _merge == 3
 	drop _merge
-	merge 1:1 dest_fips using "$INTDATA/dcourt/full_black_actmig_1940_1970_wide_xw.dta", keep(1 3) nogen
 
-	foreach var of varlist black_proutmigpr* black_actoutmigact*{
+	foreach var of varlist black_proutmigpr*{
 		replace `var' = 0 if `var'==.
 		ren `var' vfull_`var'
 	}
 	
-	keep if full_sample==1
 	ren dest_fips fips
 	collapse (sum) pop* bpop* vfull_*, by(`levelvar')
 
@@ -1582,11 +1580,10 @@ foreach level in county cz{
 		g bpopchangepp`base'_`d'=100*((bpop`d'/pop`d')-(bpop`base'/pop`base'))
 
 		foreach v in full {
-			g v`v'_bpopchange_pred`base'_`d'=100*v`v'_black_proutmigpr`d'/pop`base'
-			g v`v'_bpopchange_act`base'_`d'=100*v`v'_black_actoutmigact`d'/pop`base'
+			g v`v'_bpopchange`base'_`d'=100*v`v'_black_proutmigpr`d'/pop`base'
 			g v`v'_blackmig3539_share`base'=100*v`v'_totblackmigdest_fips3539/pop`base'
 			
-			g v`v'_bpopchangepp_act`base'_`d'=100*((v`v'_black_proutmigpr`d'+bpop`base')/(v`v'_black_proutmigpr`d'+ pop`base') - bpop`base'/pop`base')
+			g v`v'_bpopchangepp`base'_`d'=100*((v`v'_black_proutmigpr`d'+bpop`base')/(v`v'_black_proutmigpr`d'+ pop`base') - bpop`base'/pop`base')
 
 		}
 		local base = `d'
@@ -1614,17 +1611,15 @@ foreach level in county cz{
 	}
 	tabulate region, gen(reg)	
 
-	// Rank measures
+	/* Rank measures
 	local base = 1940
 	foreach d in 1950 1960 1970{
 		xtile GM_`base'_`d' = bpopchange`base'_`d', nq(100) 
-		xtile GM_hatfull_`base'_`d' = vfull_bpopchange_pred`base'_`d', nq(100) 
-		
-		xtile GM_actfull_`base'_`d' = vfull_bpopchange_act`base'_`d', nq(100) 
-		
+		xtile GM_hat_`base'_`d' = vfull_bpopchange`base'_`d', nq(100) 
+				
 		local base = `d'
 	}
-
+*/
 	la var vfull_blackmig3539_share1940 "Black Southern Mig 1935-1940"
 	la var reg2 "Midwest"
 	la var reg3 "South"
@@ -1634,12 +1629,22 @@ foreach level in county cz{
 	foreach d in 1950 1960 1970{
 		ren bpopchange`base'_`d' GM_raw_`base'_`d'
 		ren bpopchangepp`base'_`d' GM_raw_pp_`base'_`d'
-		ren vfull_bpopchangepp_act`base'_`d' GM_hat_raw_pp_`base'_`d'
+		ren vfull_bpopchangepp`base'_`d' GM_hat_raw_pp_`base'_`d'
 
-		ren vfull_bpopchange_pred`base'_`d' GM_hatfull_raw_`base'_`d'
-		ren vfull_bpopchange_act`base'_`d' GM_actfull_raw_`base'_`d'
+		ren vfull_bpopchange`base'_`d' GM_hat_raw_`base'_`d'
 		local base = `d'
 	}
 
+	// Creating 1940-70 variables
+	g GM_raw = 100*(bpop1970 - bpop1940)/pop1940
+	g GM_raw_pp=100*((bpop1970/pop1970)-(bpop1940/pop1940))
+
+	foreach v in full {
+		g GM_hat_raw=100*v`v'_black_proutmigpr1970/pop1940
+		g v`v'_blackmig3539_share=100*v`v'_totblackmigdest_fips3539/pop1940
+		
+		g GM_hat_raw_pp=100*((v`v'_black_proutmigpr1970+bpop1940)/(v`v'_black_proutmigpr1970+ pop1940) - bpop1940/pop1940)
+	}
 	save "$CLEANDATA/dcourt/GM_`level'_final_dataset_split", replace
+
 }
