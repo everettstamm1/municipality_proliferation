@@ -6,7 +6,9 @@ library(stringr)
 
 RAWDATA <- "C:/Users/Everett Stamm/Dropbox/municipality_proliferation/data/raw/"
 INTDATA <- "C:/Users/Everett Stamm/Dropbox/municipality_proliferation/data/interim/"
+XWALKS <- "C:/Users/Everett Stamm/Dropbox/municipality_proliferation/data/xwalks/"
 
+county_cz_xwalk <- read_dta(paste0(XWALKS,"cw_cty_czone.dta"))
 
 cbgoodman <- read_dta(paste0(RAWDATA,"cbgoodman/muni_incorporation_date.dta")) %>% 
   select(placefips,statefips,countyfips, yr_incorp) %>% 
@@ -29,7 +31,10 @@ counties <- counties()  %>%
   st_drop_geometry() %>% 
   select(ALAND, AWATER, STATEFP, COUNTYFP) %>% 
   rename(county_land = ALAND, county_water = AWATER) %>% 
-  mutate(county_total = county_land+county_water)
+  mutate(county_total = county_land+county_water,
+         cty_fips = as.numeric(paste0(STATEFP,COUNTYFP))) %>% 
+  merge(county_cz_xwalk, by="cty_fips")
+  
 
 
 places <- places(cb=TRUE)  %>% 
