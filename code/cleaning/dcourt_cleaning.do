@@ -1538,6 +1538,23 @@ drop if bpop1940 ==. | bpop1950 ==. | bpop1960 ==. | bpop1970 ==. | ///
 
 keep if pop1940 >=25000 | pop1970>=25000
 
+// Dropping southern sample
+drop if statefip == 10 | ///
+				statefip == 50 | ///					
+				statefip == 120 | ///
+				statefip == 130 | ///
+				statefip == 210 | ///
+				statefip == 220 | ///
+				statefip == 280 | ///
+				statefip == 370 | ///
+				statefip == 400 | ///
+				statefip == 450 | ///
+				statefip == 470 | ///
+				statefip == 480 | ///
+				statefip == 510 | ///
+				statefip == 540
+
+
 save "$INTDATA/dcourt/nhgis_county_pops", replace
 
 foreach level in county cz{
@@ -1562,6 +1579,7 @@ foreach level in county cz{
 	ren fips dest_fips
 
 	merge 1:1 dest_fips using "$INTDATA/dcourt/full_black_prmig_1940_1970_wide_xw_dest_fips.dta", keep(1 3)
+	
 	g full_sample = _merge == 3
 	drop _merge
 
