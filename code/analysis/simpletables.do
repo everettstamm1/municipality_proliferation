@@ -31,7 +31,7 @@ foreach samp in urban total{
 				if "`ctrls'"=="3" local controls reg2 reg3 reg4
 				if "`ctrls'"=="3" local ctrllab "Census Region"
 
-				if "`ctrls'"=="4" local controls mfg_lfshare1940 v2_blackmig3539_share1940 reg2 reg3 reg4
+				if "`ctrls'"=="4" local controls mfg_lfshare1940 blackmig3539_share`poptab' reg2 reg3 reg4
 				if "`ctrls'"=="4" local ctrllab "Census Region and Mfg+Blackmig Shares"
 
 				// Loop 3: over raw/per capita
@@ -130,7 +130,7 @@ use "$CLEANDATA/cz_stacked.dta", clear
 
 // Loop 0: over urban/total populations
 foreach samp in urban total{
-	if "`samp'"=="urban" local poptab "c"
+	if "`samp'"=="urban" local poptab ""
 	if "`samp'"=="total" local poptab "_totpop"
 	
 	if "`samp'"=="urban" local popname "c"
@@ -153,7 +153,7 @@ foreach samp in urban total{
 		preserve
 			// Dropping decades out of sample
 			keep if inlist(decade,1940,1950,1960)
-			if "`samp'"=="total" drop if GM_hat_raw_totpop==0
+			//if "`samp'"=="total" drop if GM_hat_raw_totpop==0
 			// Loop 2: over with/without controls
 			forv ctrls=3/4{
 				

@@ -1,19 +1,19 @@
 \begin{table}[htbp]\centering
 \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
-\caption{Dererencourt Table Two with y=Number of Subcounty Govts (town, twp, muni) Per Capita (100,000) Pooled,, Total Population, Census Region and Mfg+Blackmig Shares controls.}
+\caption{Dererencourt Table Two with y=New Govs, Number of Subcounty Govts (town, twp, muni) Per Capita (100,000) Pooled,, Total Population, Census Region and Mfg+Blackmig Shares controls.}
 \begin{tabular}{l*{4}{c}}
 \toprule
                     & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
                     &\multicolumn{1}{c}{(1)}   &\multicolumn{1}{c}{(2)}   &\multicolumn{1}{c}{(3)}   &\multicolumn{1}{c}{(4)}   \\
 \midrule
-GM\_hat\_raw\_pp\_totpop&       3.155***&               &       2.424** &               \\
-                    &     (0.661)   &               &     (1.215)   &               \\
+Predicted Percentage Point Change in Total Black Population&       0.400***&               &      0.0707   &               \\
+                    &     (0.147)   &               &     (1.925)   &               \\
 \addlinespace
-GM\_raw\_pp\_totpop    &               &      0.0356   &               &       0.769** \\
-                    &               &     (0.282)   &               &     (0.384)   \\
+Percentage Point Change in Total Black Population&               &      -1.370   &               &       0.177   \\
+                    &               &     (0.979)   &               &     (4.743)   \\
 \midrule
-F-Stat              &      13.731   &               &               &               \\
-Observations        &         123   &         123   &         123   &         123   \\
+F-Stat              &       8.372   &               &               &               \\
+Observations        &         213   &         213   &         213   &         213   \\
 \bottomrule
 \multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
 \multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\

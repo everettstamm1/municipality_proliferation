@@ -80,6 +80,7 @@ foreach level in cz county{
 			label var n_muni_`level' "`lab'"
 			
 			ren *muni* *`var'*
+			keep b_* n_* `levelvar'
 			save "$INTDATA/counts/`var'_`level'", replace
 		restore
 	}
@@ -276,16 +277,19 @@ foreach level in cz county{
 		
 		// Pooled
 		use "$DCOURT/data/GM_`level'_final_dataset.dta", clear
+		keep `levelvar' GM_raw GM_raw_pp GM_hat_raw GM_hat_raw_pp v2_blackmig3539_share1940 popc* bpopc*
+		ren v2_blackmig3539_share1940 blackmig3539_share 
 		if "`level'"=="msa"{
 			destring smsa, gen(msapmsa2000) 
 		}
 		
 		preserve
 			use "$CLEANDATA/dcourt/GM_`level'_final_dataset_split", clear
-			keep `levelvar' GM_raw GM_raw_pp GM_hat_raw GM_hat_raw_pp vfull_blackmig3539_share reg* pop* bpop* mfg_lfshare*
+			keep `levelvar' GM_raw GM_raw_pp GM_hat_raw GM_hat_raw_pp vfull_blackmig3539_share reg* pop1940 bpop1940 mfg_lfshare1940 pop1970 bpop1970 mfg_lfshare1970
 			foreach var of varlist GM_raw GM_raw_pp GM_hat_raw GM_hat_raw_pp vfull_blackmig3539_share{
 				ren `var' `var'_totpop
 			}
+			ren vfull_blackmig3539_share_totpop blackmig3539_share_totpop
 			tempfile totpop_insts
 			save `totpop_insts'
 		restore
@@ -294,9 +298,10 @@ foreach level in cz county{
 		
 		foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist  cgoodman{
 
-			merge 1:1 `levelvar' using "$INTDATA/counts/`ds'_`level'", keep(1 3) nogen
+			merge 1:1 `levelvar' using "$INTDATA/counts/`ds'_`level'", keep(1 3) nogen keepusing(n_`ds'_`level' b_`ds'_`level'1970 b_`ds'_`level'1940)
 		}
-		merge 1:1 `levelvar' using "$INTDATA/cog_populations/`level'pop", keep(3) nogen
+		
+		//merge 1:1 `levelvar' using "$INTDATA/cog_populations/`level'pop", keep(3) nogen
 		
 		if "`level'"=="cz"{
 			preserve
@@ -317,7 +322,45 @@ foreach level in cz county{
 		replace frac_total = 0 if _merge==1
 		drop _merge decade
 		
+		g dcourt = GM_raw<.
 		
+		// Adding labels
+		
+		foreach ds in  gen_muni schdist_ind all_local ngov3 gen_subcounty spdist   cgoodman  {
+				local label : variable label n_`ds'_`level'
+				lab var n_`ds'_`level' "New Govs, `label'"
+				lab var b_`ds'_`level'1940 "Base Govs 1940, `label'"
+				lab var b_`ds'_`level'1970 "Base Govs 1970, `label'"
+
+		}
+		
+		lab var GM_raw_totpop "Percentage Change in Total Black Population"
+		lab var GM_hat_raw_totpop "Predicted Percentage Change in Total Black Population"
+		lab var GM_raw_pp_totpop "Percentage Point Change in Total Black Population"
+		lab var GM_hat_raw_pp_totpop "Predicted Percentage Point Change in Total Black Population"
+		lab var GM_raw_pp "Percentage Point Change in Urban Black Population"
+		lab var GM_hat_raw_pp "Predicted Percentage Point Change in Urban Black Population"
+		lab var GM_raw "Percentage Change in Urban Black Population"
+		lab var GM_hat_raw "Predicted Percentage Change in Urban Black Population"
+		
+		lab var blackmig3539_share_totpop "Total Population Share of 1935-39 Black Migrants"
+		lab var blackmig3539_share "Urban Population Share of 1935-39 Black Migrants"
+
+	
+
+		foreach y in 1940 1970{
+			lab var bpop`y' "Total Black Population, `y'"
+			lab var bpopc`y' "Urban Black Population, `y'"
+			lab var pop`y' "Total Population, `y'"
+			lab var popc`y' "Urban Population, `y'"
+			lab var mfg_lfshare`y' "Share of LF employed in manufacturing, `y'"
+		}
+		
+		lab var dcourt "Derenoncourt Sample of 130 CZs"
+		lab var frac_land "Fraction of CZ land incorporated"
+		lab var frac_total "Fraction of CZ area incorporated"
+		cap lab var cz "Commuting Zone (1990)"
+		cap lab var fips "County FIPS Code"
 		
 	
 		save "$CLEANDATA/`level'_pooled", replace
@@ -337,7 +380,6 @@ foreach level in cz county{
 			use "$DCOURT/data/GM_`level'_final_dataset_split.dta", clear
 			keep `levelvar' GM_raw_pp* GM_hat_raw_pp* popc???? mfg_lfshare* v2_blackmig3539_share* reg2 reg3 reg4 
 			
-			ren *pp* *ppc*
 			ren v2_blackmig3539_share* blackmig3539_share*
 			tempfile dcourt
 			save `dcourt'
@@ -358,7 +400,7 @@ foreach level in cz county{
 		
 		
 			
-		merge 1:1 `levelvar' using "$INTDATA/cog_populations/`level'pop", keep(3) nogen
+		//merge 1:1 `levelvar' using "$INTDATA/cog_populations/`level'pop", keep(3) nogen
 		
 	
 	
@@ -376,7 +418,7 @@ foreach level in cz county{
 		rename *70_80 *1970
 		rename *80_90 *1980
 
-		keep totpop_* GM_*  mfg_lfshare* blackmig3539_share* `levelvar' reg2 reg3 reg4  n_*_`level'???? b_*_`level'???? `level'pop* bpop* pop*
+		keep totpop_* GM_*  mfg_lfshare* blackmig3539_share* `levelvar' reg2 reg3 reg4  n_*_`level'???? b_*_`level'????  bpop* pop*
 		cap drop GM_hat0* GM_hat2*  GM_hat1*  GM_hatr* GM_hat7r* GM_hat8* 
 		cap drop totpop_blackmig3539_share
 		local stubs 
@@ -386,10 +428,10 @@ foreach level in cz county{
 
 		}
 		
-		reshape long `stubs' totpop_GM_raw_ totpop_GM_raw_pp_ totpop_GM_hat_raw_ totpop_GM_hat_raw_pp_ GM_raw_ppc_ GM_hat_raw_ppc_  mfg_lfshare blackmig3539_share `level'pop bpop pop bpopc popc, i(`levelvar') j(decade)
+		qui reshape long `stubs' totpop_GM_raw_ totpop_GM_raw_pp_ totpop_GM_hat_raw_ totpop_GM_hat_raw_pp_ GM_raw_pp_ GM_hat_raw_pp_  mfg_lfshare totpop_blackmig3539_share blackmig3539_share bpop pop bpopc popc, i(`levelvar') j(decade)
 		
 		
-		foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist   cgoodman {
+		foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist cgoodman {
 			label var n_`ds'_`level' "`lab`ds''"
 
 		}
@@ -409,7 +451,7 @@ foreach level in cz county{
 		
 		// Bringing in 1900-30 total and urban populations
 		merge 1:1 decade `levelvar' using "$INTDATA/census/`level'_urbanization_1900_1930", update nogen 
-
+		
 		
 		foreach var of varlist pop popc bpop bpopc{
 			foreach year in 1940 1970{
@@ -468,6 +510,8 @@ foreach level in cz county{
 			merge m:1 fips using "$CLEANDATA/nces/nces_finance_data.dta", keep(3) nogen
 		}
 		*/
+	
+	/*
 	preserve
 		use "$RAWDATA/dcourt/ICPSR_07735_City_Book_1944_1977/DS0001/City_Book_1944_1977.dta", clear
 
@@ -498,7 +542,7 @@ foreach level in cz county{
 	merge m:1 `levelvar' using `urban', keep(1 3)
 	g urban = _merge==3
 	drop _merge
-	
+	*/
 	preserve 
 		use "$DCOURT/data/GM_cz_final_dataset.dta", clear
 		ren cz czone
@@ -528,6 +572,45 @@ foreach level in cz county{
 		
 		merge m:1 `levelvar' using `cznames', keep(1 3) nogen
 	}
+	
+	
+	// Adding labels
+	lab var decade "Decade Start"
+	
+	foreach ds in  gen_muni schdist_ind all_local ngov3 gen_subcounty spdist   cgoodman  {
+		  local label : variable label n_`ds'_`level'_L0
+			lab var n_`ds'_`level'_L0 "New Govs, `label'"
+			lab var b_`ds'_`level'_L0 "Base Govs, `label'"
+	}
+	
+	lab var GM_raw_totpop "Percentage Change in Total Black Population"
+	lab var GM_hat_raw_totpop "Predicted Percentage Change in Total Black Population"
+	lab var GM_raw_pp_totpop "Percentage Point Change in Total Black Population"
+	lab var GM_hat_raw_pp_totpop "Predicted Percentage Point Change in Total Black Population"
+	lab var GM_raw_pp "Percentage Point Change in Urban Black Population"
+	lab var GM_hat_raw_pp "Predicted Percentage Point Change in Urban Black Population"
+	
+	lab var mfg_lfshare "Share of LF employed in manufacturing"
+	lab var blackmig3539_share_totpop "Total Population Share of 1935-39 Black Migrants"
+	lab var blackmig3539_share "Urban Population Share of 1935-39 Black Migrants"
+
+	lab var bpop "Total Black Population"
+	lab var bpopc "Urban Black Population"
+	lab var pop "Total Population"
+	lab var popc "Urban Population"
+
+	foreach y in 1940 1970{
+		lab var bpop`y' "Total Black Population, `y'"
+		lab var bpopc`y' "Urban Black Population, `y'"
+		lab var pop`y' "Total Population, `y'"
+		lab var popc`y' "Urban Population, `y'"
+	}
+	
+	lab var dcourt "Derenoncourt Sample of 130 CZs"
+	lab var frac_land "Fraction of CZ land incorporated"
+	lab var frac_total "Fraction of CZ area incorporated"
+	lab var cz "Commuting Zone (1990)"
+	cap lab var fips "County FIPS Code"
 	
 	save "$CLEANDATA/`level'_stacked", replace
 	
