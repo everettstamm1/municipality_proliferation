@@ -2,24 +2,47 @@
 use "$INTDATA/cgoodman/cgoodman_place_county_geog.dta", clear
 
 destring *FP, replace
-g fips = STATEFP*1000 + COUNTYFP
+g cty_fips = STATEFP*1000 + COUNTYFP
+merge m:1 cty_fips using "$XWALKS/cw_cty_czone.dta", keep(3) nogen
+ren cty_fips fips
+ren czone cz
 
-foreach geog in land total{
-	forv d=1940(10)1970{
-		bys fips : egen `geog'`d' = total(place_`geog') if yr_incorp<=`d'
-		replace `geog'`d' = 0 if `geog'`d' == .
-		g frac_`geog'`d' = `geog'`d' / county_`geog'
-		replace frac_`geog'`d' = min(frac_`geog'`d',1)
-	}
+
+preserve
+	keep cz fips county_land county_total
+	duplicates drop
+	collapse (sum) county_land county_total, by(cz)
+	ren county* cz*
+	tempfile cz_land
+	save `cz_land'
+restore
+
+merge m:1 cz using `cz_land', assert(3) nogen
+
+// Stacked
+foreach level in county cz{
+	if "`level'"=="county" local levelvar "fips"
+	if "`level'"=="cz" local levelvar "cz"
+	preserve
+		foreach geog in land total{
+			forv d=1940(10)1970{
+				bys `levelvar' : egen `geog'`d' = total(place_`geog') if yr_incorp<=`d'
+				replace `geog'`d' = 0 if `geog'`d' == .
+				g frac_`geog'`d' = `geog'`d' / `level'_`geog'
+				replace frac_`geog'`d' = min(frac_`geog'`d',1)
+			}
+		}
+
+
+		keep `levelvar' frac_land19* frac_total19*
+
+		collapse (max) frac_land19* frac_total19*, by(`levelvar')
+
+		reshape long frac_land frac_total, i(`levelvar') j(decade) 
+
+		save "$INTDATA/cgoodman/`level'_geogs.dta", replace
+	restore
 }
-
-keep fips frac_land19* frac_total19*
-
-collapse (max) frac_land19* frac_total19*, by(fips)
-
-reshape long frac_land frac_total, i(fips) j(decade) 
-
-save "$INTDATA/cgoodman/county_geogs.dta", replace
 
 // Incorp + Rugged land split
 local files : dir "$INTDATA/land_cover/states/" files *
