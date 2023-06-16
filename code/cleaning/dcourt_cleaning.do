@@ -563,6 +563,10 @@ use "$RAWDATA/dcourt//IPUMS_1940_extract_to_construct_migration_weights.dta", cl
 decode migplac5, gen(origin_state)
 g origin_sample=(origin_state=="Alabama" | origin_state=="Arkansas" | origin_state=="Florida" | origin_state=="Georgia" | origin_state=="Kentucky"| origin_state=="Louisiana" | origin_state=="Mississippi" | origin_state=="North Carolina" | origin_state=="Oklahoma" | origin_state=="South Carolina" | origin_state=="Tennessee" | origin_state=="Texas" | origin_state=="Virginia" | origin_state=="West Virginia")
 
+g origin_sample_rural = origin_sample==1 & migcity5==0
+g origin_sample_notx = origin_sample==1 | origin_state=="Texas"
+g origin_sample_rural_notx = (origin_sample==1 | origin_state=="Texas") & migcity5==0
+
 drop if migcounty==9999
 
 /* Generate an origin state icp code variable. Note that MIGPLAC5 appears to 
@@ -627,6 +631,10 @@ replace dest_state_name=proper(dest_state_name)
 g dest_sample=1
 replace dest_sample=0  if (dest_state_name=="Alabama" | dest_state_name=="Arkansas" | dest_state_name=="Florida" | dest_state_name=="Georgia" | dest_state_name=="Kentucky"| dest_state_name=="Louisiana" | dest_state_name=="Mississippi" | dest_state_name=="North Carolina" | dest_state_name=="Oklahoma" | dest_state_name=="South Carolina" | dest_state_name=="Tennessee" | dest_state_name=="Texas" | dest_state_name=="Virginia" | dest_state_name=="West Virginia")
 
+g dest_sample_allcities = city!=9999 // Use with origin_sample_rural and origin_sample_rural_notx
+g dest_sample_tx = dest_sample==1 | dest_state_name=="Texas" // Use with origin_sample_notx
+
+
 g ccdb_sample = dest_sample
 preserve
 	use "$RAWDATA/dcourt/ICPSR_07735_City_Book_1944_1977/DS0001/City_Book_1944_1977.dta", clear
@@ -655,6 +663,8 @@ replace ccdb_sample=0 if _merge==1 // Sample is counties that have a city in the
 drop _merge
 
 replace dest_sample = 0 if dest_fips ==.
+replace dest_sample_allcities = 0 if dest_fips ==.
+replace dest_sample_tx = 0 if dest_fips ==.
 
 /* Create clean grade variable */
 g grade_completed=.
@@ -984,19 +994,27 @@ keep origin_fips year proutmig actoutmig netbmig_pred
 save "$INTDATA/dcourt/2_lasso_boustan_predict_mig.dta", replace
 
 // Instrument creation
-foreach destid in dest_fips{
-	// Predicted full
+foreach inst in full fullrm fullnt fullrmnt{
+	if "`inst'"=="full" local ds_var = "dest_sample"
+	if "`inst'"=="fullrm" local ds_var = "dest_sample"
+	if "`inst'"=="fullnt" local ds_var = "dest_sample_tx"
+	if "`inst'"=="fullrmnt" local ds_var = "dest_sample_tx"
+
+	if "`inst'"=="full" local os_var = "origin_sample"
+	if "`inst'"=="fullrm" local os_var = "origin_sample_rural"
+	if "`inst'"=="fullnt" local os_var = "origin_sample_notx"
+	if "`inst'"=="fullrmnt" local os_var = "origin_sample_rural_notx"
 	clear all
 		
 	global groups black // took out white
 	global origin_id origin_fips
 	global origin_id_code origin_fips_code
-	global origin_sample origin_sample
-	global destination_id `destid'
-	global destination_id_code `destid'_code
-	global dest_sample dest_sample
+	global origin_sample `os_var'
+	global destination_id dest_fips
+	global destination_id_code dest_fips_code
+	global dest_sample `ds_var'
 	global weights_data "$INTDATA/dcourt/2_lasso_boustan_predict_mig.dta"
-	global version full
+	global version `inst'
 	global weight_types pr
 	global weight_var outmig
 	global start_year 1940
@@ -1007,23 +1025,25 @@ foreach destid in dest_fips{
 	do "$CODE/helper/bartik_generic.do"
 
 	*10. Clean and standardize city names and output final instrument measures at the city-level	
-			
-	use "$INTDATA/bartik/full_blackorigin_fips1940.dta", clear
+	use "$INTDATA/bartik/`inst'_blackorigin_fips1940.dta", clear
 	order black* total*
-	egen vfull_totblackmig`destid'3539=rowmean(total_black`destid'*)
-	sum vfull_totblackmig`destid'3539
+	egen v`inst'_totblackmigdest_fips3539=rowmean(total_blackdest_fips*)
+	sum v`inst'_totblackmigdest_fips3539
 
 	drop total* black*
 	tempfile dest_fips_blackmigshare3539
 	save `dest_fips_blackmigshare3539'
 
 	foreach w in pr {
-		use "$INTDATA/bartik/full_black_`w'outmigorigin_fips19401970_collapsed_wide.dta", clear
-		merge 1:1 `destid' using `dest_fips_blackmigshare3539', keep(3) nogenerate
+		use "$INTDATA/bartik/`inst'_black_`w'outmigorigin_fips19401970_collapsed_wide.dta", clear
+		merge 1:1 dest_fips using `dest_fips_blackmigshare3539', keep(3) nogenerate
 
-		save "$INTDATA/dcourt/full_black_`w'mig_1940_1970_wide_xw_`destid'.dta", replace
+		save "$INTDATA/dcourt/`inst'_black_`w'mig_1940_1970_wide_xw_dest_fips.dta", replace
 	}
 }
+
+
+
 
 /*
 
@@ -1539,7 +1559,8 @@ drop if bpop1940 ==. | bpop1950 ==. | bpop1960 ==. | bpop1970 ==. | ///
 keep if pop1940 >=25000 | pop1970>=25000
 
 // Dropping southern sample
-drop if statefip == 10 | ///
+drop if ///
+				statefip == 10 | ///
 				statefip == 50 | ///					
 				statefip == 120 | ///
 				statefip == 130 | ///
@@ -1550,10 +1571,10 @@ drop if statefip == 10 | ///
 				statefip == 400 | ///
 				statefip == 450 | ///
 				statefip == 470 | ///
-				statefip == 480 | ///
 				statefip == 510 | ///
 				statefip == 540
-
+				
+g texas = statefip == 480
 
 save "$INTDATA/dcourt/nhgis_county_pops", replace
 
@@ -1576,19 +1597,16 @@ foreach level in county cz{
 
 	use "$INTDATA/dcourt/nhgis_county_pops", clear
 	ren fips dest_fips
-
-	merge 1:1 dest_fips using "$INTDATA/dcourt/full_black_prmig_1940_1970_wide_xw_dest_fips.dta", keep(1 3)
 	
-	g full_sample = _merge == 3
-	drop _merge
-
-	foreach var of varlist black_proutmigpr*{
-		replace `var' = 0 if `var'==.
-		ren `var' vfull_`var'
+	foreach inst in full fullrm fullnt fullrmnt{
+		merge 1:1 dest_fips using "$INTDATA/dcourt/full_black_prmig_1940_1970_wide_xw_dest_fips.dta", keep(1 3) nogen
+		foreach var of varlist black_proutmigpr*{
+			replace `var' = 0 if `var'==.
+			ren `var' v`inst'_`var'
+		}	
 	}
-	
 	ren dest_fips fips
-	collapse (sum) pop* bpop* vfull_*, by(`levelvar')
+	collapse (sum) pop* bpop* vfull*, by(`levelvar')
 
 	local base = 1940
 	foreach d in 1950 1960 1970{
@@ -1596,7 +1614,7 @@ foreach level in county cz{
 		g bpopchange`base'_`d'=100*(bpop`d'-bpop`base')/pop`base'
 		g bpopchangepp`base'_`d'=100*((bpop`d'/pop`d')-(bpop`base'/pop`base'))
 
-		foreach v in full {
+		foreach v in full fullrm fullnt fullrmnt {
 			g v`v'_bpopchange`base'_`d'=100*v`v'_black_proutmigpr`d'/pop`base'
 			g v`v'_blackmig3539_share`base'=100*v`v'_totblackmigdest_fips3539/pop`base'
 			
@@ -1638,6 +1656,10 @@ foreach level in county cz{
 	}
 */
 	la var vfull_blackmig3539_share1940 "Black Southern Mig 1935-1940"
+	la var vfullrm_blackmig3539_share1940 "Black Southern Mig 1935-1940, Rural Migrants Only"
+	la var vfullnt_blackmig3539_share1940 "Black Southern Mig 1935-1940, Nonsouthern Texas"
+	la var vfullrmnt_blackmig3539_share1940 "Black Southern Mig 1935-1940, Rural Migrants Only, Nonsouthern Texas"
+
 	la var reg2 "Midwest"
 	la var reg3 "South"
 	la var reg4 "West"	
@@ -1649,6 +1671,11 @@ foreach level in county cz{
 		ren vfull_bpopchangepp`base'_`d' GM_hat_raw_pp_`base'_`d'
 
 		ren vfull_bpopchange`base'_`d' GM_hat_raw_`base'_`d'
+		foreach v in rm nt rmnt {
+			ren vfull`v'_bpopchangepp`base'_`d' GM_`v'_hat_raw_pp_`base'_`d'
+			ren vfull`v'_bpopchange`base'_`d' GM_`v'_hat_raw_`base'_`d'
+		}
+		
 		local base = `d'
 	}
 
@@ -1656,11 +1683,16 @@ foreach level in county cz{
 	g GM_raw = 100*(bpop1970 - bpop1940)/pop1940
 	g GM_raw_pp=100*((bpop1970/pop1970)-(bpop1940/pop1940))
 
-	foreach v in full {
-		g GM_hat_raw=100*v`v'_black_proutmigpr1970/pop1940
-		g v`v'_blackmig3539_share=100*v`v'_totblackmigdest_fips3539/pop1940
-		
-		g GM_hat_raw_pp=100*((v`v'_black_proutmigpr1970+bpop1940)/(v`v'_black_proutmigpr1970+ pop1940) - bpop1940/pop1940)
+	g GM_hat_raw=100*vfull_black_proutmigpr1970/pop1940
+	g vfull_blackmig3539_share=100*vfull_totblackmigdest_fips3539/pop1940
+	
+	g GM_hat_raw_pp=100*((vfull_black_proutmigpr1970+bpop1940)/(vfull_black_proutmigpr1970+ pop1940) - bpop1940/pop1940)
+		foreach v in rm nt rmnt {
+			g GM_`v'_hat_raw=100*vfull`v'_black_proutmigpr1970/pop1940
+			g GM_`v'_hat_raw_pp=100*((vfull`v'_black_proutmigpr1970+bpop1940)/(vfull`v'_black_proutmigpr1970+ pop1940) - bpop1940/pop1940)
+		}
+
+
 	}
 	save "$CLEANDATA/dcourt/GM_`level'_final_dataset_split", replace
 

@@ -322,8 +322,21 @@ foreach level in cz county{
 		replace frac_total = 0 if _merge==1
 		drop _merge decade
 		
-		g dcourt = GM_raw<.
 		
+		foreach geog in land total{
+			qui su frac_`geog' if GM_raw_pp < .,d
+			g above_med_temp = frac_`geog'>=`r(p50)' if  GM_raw_pp < . 
+			bys `levelvar' : egen above_med_`geog' = max(above_med_temp)
+			drop above_med_temp
+			
+			qui su frac_`geog' if  GM_raw_pp_totpop < .,d
+			g above_med_temp = frac_`geog'>=`r(p50)' if GM_raw_pp_totpop < . 
+			bys `levelvar' : egen above_med_`geog'_totpop = max(above_med_temp)
+			drop above_med_temp
+		}
+		
+		g dcourt = GM_raw<.
+
 		// Adding labels
 		
 		foreach ds in  gen_muni schdist_ind all_local ngov3 gen_subcounty spdist   cgoodman  {
@@ -366,7 +379,6 @@ foreach level in cz county{
 		save "$CLEANDATA/`level'_pooled", replace
 		
 		// Creating stacked version of data
-		
 		use "$CLEANDATA/dcourt/GM_`level'_final_dataset_split",clear
 		
 		ren vfull_* *
@@ -378,7 +390,7 @@ foreach level in cz county{
 
 		preserve
 			use "$DCOURT/data/GM_`level'_final_dataset_split.dta", clear
-			keep `levelvar' GM_raw_pp* GM_hat_raw_pp* popc???? mfg_lfshare* v2_blackmig3539_share* reg2 reg3 reg4 
+			keep `levelvar' GM_raw_pp* GM_hat_raw_pp* popc???? bpopc???? mfg_lfshare* v2_blackmig3539_share* reg2 reg3 reg4 
 			
 			ren v2_blackmig3539_share* blackmig3539_share*
 			tempfile dcourt
@@ -466,6 +478,19 @@ foreach level in cz county{
 		replace frac_land = 0 if _merge==1
 		replace frac_total = 0 if _merge==1
 		drop _merge
+		
+		foreach geog in land total{
+			qui su frac_`geog' if decade == 1940 & GM_raw_pp < .,d
+			g above_med_temp = frac_`geog'>=`r(p50)' if decade == 1940 & GM_raw_pp < . 
+			bys `levelvar' : egen above_med_`geog' = max(above_med_temp)
+			drop above_med_temp
+			
+			qui su frac_`geog' if decade == 1940 & GM_raw_pp_totpop < .,d
+			g above_med_temp = frac_`geog'>=`r(p50)' if decade == 1940 & GM_raw_pp_totpop < . 
+			bys `levelvar' : egen above_med_`geog'_totpop = max(above_med_temp)
+			drop above_med_temp
+		}
+		
 		/*
 		if "`level'"=="county"{
 			
@@ -611,6 +636,8 @@ foreach level in cz county{
 	lab var frac_total "Fraction of CZ area incorporated"
 	lab var cz "Commuting Zone (1990)"
 	cap lab var fips "County FIPS Code"
+	
+	if "`level'"=="cz" merge m:1 cz using "$RAWDATA/dcourt/cz_names.dta", update keep(1 3) nogen
 	
 	save "$CLEANDATA/`level'_stacked", replace
 	

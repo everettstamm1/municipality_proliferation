@@ -42,7 +42,7 @@ places <- places(cb=TRUE)  %>%
   select(ALAND, AWATER, STATEFP, PLACEFP) %>% 
   rename(place_land = ALAND, place_water = AWATER) %>% 
   mutate(place_total = place_land+place_water) %>% 
-  merge(cbgoodman, by = c("PLACEFP","STATEFP")) %>% 
+  merge(cbgoodman, by = c("PLACEFP","STATEFP"),all=TRUE) %>% 
   mutate(COUNTYFP = str_pad(COUNTYFP,3,side="left",pad = "0")) %>% 
   merge(counties, by = c("COUNTYFP","STATEFP")) %>% 
   mutate(frac_land = place_land/county_land, frac_total = place_total/county_total)
