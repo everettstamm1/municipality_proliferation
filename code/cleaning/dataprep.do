@@ -274,22 +274,34 @@ foreach level in cz county{
 	save "$INTDATA/counts/cgoodman_`level'", replace
 	
 
-		
+	foreach samp in dcourt south{
+		if "`samp'" == "dcourt" {
+			local samptab = ""
+			local outsamptab = ""
+
+		}
+		if "`samp'" == "south" {
+			local samptab = "_full"
+			local outsamptab = "_south"
+		}
 		// Pooled
-		use "$DCOURT/data/GM_`level'_final_dataset.dta", clear
-		keep `levelvar' GM_raw GM_raw_pp GM_hat_raw GM_hat_raw_pp v2_blackmig3539_share1940 popc* bpopc*
-		ren v2_blackmig3539_share1940 blackmig3539_share 
+		
+		use "$DCOURT/data/GM_`level'_final_dataset`samptab'.dta", clear
+		keep `levelvar' GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*_blackmig3539_share1940 popc* bpopc* mfg_lfshare1940
+		ren v2*_blackmig3539_share1940 *blackmig3539_share
+
 		if "`level'"=="msa"{
 			destring smsa, gen(msapmsa2000) 
 		}
 		
 		preserve
-			use "$CLEANDATA/dcourt/GM_`level'_final_dataset_split", clear
-			keep `levelvar' GM_raw GM_raw_pp GM_hat_raw GM_hat_raw_pp vfull_blackmig3539_share reg* pop1940 bpop1940 mfg_lfshare1940 pop1970 bpop1970 mfg_lfshare1970
-			foreach var of varlist GM_raw GM_raw_pp GM_hat_raw GM_hat_raw_pp vfull_blackmig3539_share{
+			use "$CLEANDATA/dcourt/GM_`level'_final_dataset_split`samptab'", clear
+			keep `levelvar' GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v*_blackmig3539_share reg* pop1940 bpop1940 mfg_lfshare1940 pop1970 bpop1970 mfg_lfshare1970
+			ren vfull*_blackmig3539_share *blackmig3539_share
+			foreach var of varlist GM* *blackmig3539_share mfg_lfshare1940{
 				ren `var' `var'_totpop
 			}
-			ren vfull_blackmig3539_share_totpop blackmig3539_share_totpop
+			
 			tempfile totpop_insts
 			save `totpop_insts'
 		restore
@@ -335,8 +347,15 @@ foreach level in cz county{
 			drop above_med_temp
 		}
 		
-		g dcourt = GM_raw<.
+		if "`level'" == "cz"{
+			merge 1:1 cz using "$DCOURT/data/crosswalks/original_130_czs"
+			
+			g dcourt = _merge==3
+			drop _merge
+			lab var dcourt "Derenoncourt Sample of 130 CZs"
 
+		}
+	
 		// Adding labels
 		
 		foreach ds in  gen_muni schdist_ind all_local ngov3 gen_subcounty spdist   cgoodman  {
@@ -369,17 +388,16 @@ foreach level in cz county{
 			lab var mfg_lfshare`y' "Share of LF employed in manufacturing, `y'"
 		}
 		
-		lab var dcourt "Derenoncourt Sample of 130 CZs"
 		lab var frac_land "Fraction of CZ land incorporated"
 		lab var frac_total "Fraction of CZ area incorporated"
 		cap lab var cz "Commuting Zone (1990)"
 		cap lab var fips "County FIPS Code"
 		
 	
-		save "$CLEANDATA/`level'_pooled", replace
+		save "$CLEANDATA/`level'_pooled`outsamptab'", replace
 		
 		// Creating stacked version of data
-		use "$CLEANDATA/dcourt/GM_`level'_final_dataset_split",clear
+		use "$CLEANDATA/dcourt/GM_`level'_final_dataset_split`samptab'",clear
 		
 		ren vfull_* *
 		foreach var of varlist GM_raw* GM_hat_raw* blackmig3539_share*{
@@ -389,7 +407,7 @@ foreach level in cz county{
 		drop totpop_GM_raw totpop_GM_raw_pp totpop_GM_hat_raw totpop_GM_hat_raw_pp
 
 		preserve
-			use "$DCOURT/data/GM_`level'_final_dataset_split.dta", clear
+			use "$DCOURT/data/GM_`level'_final_dataset_split`samptab'.dta", clear
 			keep `levelvar' GM_raw_pp* GM_hat_raw_pp* popc???? bpopc???? mfg_lfshare* v2_blackmig3539_share* reg2 reg3 reg4 
 			
 			ren v2_blackmig3539_share* blackmig3539_share*
@@ -491,6 +509,7 @@ foreach level in cz county{
 			drop above_med_temp
 		}
 		
+		
 		/*
 		if "`level'"=="county"{
 			
@@ -568,23 +587,18 @@ foreach level in cz county{
 	g urban = _merge==3
 	drop _merge
 	*/
-	preserve 
-		use "$DCOURT/data/GM_cz_final_dataset.dta", clear
-		ren cz czone
-		merge 1:m czone using "$XWALKS/cw_cty_czone", keep(3) nogen
-		ren czone cz
-		ren cty_fips fips
-		keep `levelvar'
-		duplicates drop
-		tempfile dcourt
-		save `dcourt'
-	restore
-	merge m:1 `levelvar' using `dcourt', keep(1 3)
-	g dcourt = _merge==3
-	drop _merge
+	
 	
 	
 	if "`level'"=="cz"{
+		
+		merge m:1 cz using "$DCOURT/data/crosswalks/original_130_czs"
+			
+		g dcourt = _merge==3
+		drop _merge
+		lab var dcourt "Derenoncourt Sample of 130 CZs"
+		
+		
 		preserve
 			use "$XWALKS/US_place_point_2010_crosswalks.dta", clear
 			keep cz cz_name
@@ -596,6 +610,7 @@ foreach level in cz county{
 		restore
 		
 		merge m:1 `levelvar' using `cznames', keep(1 3) nogen
+		
 	}
 	
 	
@@ -631,16 +646,15 @@ foreach level in cz county{
 		lab var popc`y' "Urban Population, `y'"
 	}
 	
-	lab var dcourt "Derenoncourt Sample of 130 CZs"
 	lab var frac_land "Fraction of CZ land incorporated"
 	lab var frac_total "Fraction of CZ area incorporated"
 	lab var cz "Commuting Zone (1990)"
 	cap lab var fips "County FIPS Code"
 	
 	if "`level'"=="cz" merge m:1 cz using "$RAWDATA/dcourt/cz_names.dta", update keep(1 3) nogen
-	
-	save "$CLEANDATA/`level'_stacked", replace
-	
+
+	save "$CLEANDATA/`level'_stacked`outsamptab'", replace
+	}
 }
 
 

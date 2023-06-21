@@ -1,0 +1,46 @@
+{
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\begin{tabular}{l*{5}{c}}
+\toprule
+                &\multicolumn{3}{c}{County Counts Outcomes}  &\multicolumn{1}{c}{CGoodman Data}&\multicolumn{1}{c}{Instrument}\\\cmidrule(lr){2-4}\cmidrule(lr){5-5}\cmidrule(lr){6-6}
+                &\multicolumn{1}{c}{n\_schdist\_ind\_cz\_L0\_pc}&\multicolumn{1}{c}{n\_gen\_subcounty\_cz\_L0\_pc}&\multicolumn{1}{c}{n\_gen\_muni\_cz\_L0\_pc}&\multicolumn{1}{c}{n\_cgoodman\_cz\_L0\_pc}&\multicolumn{1}{c}{GM\_hat\_raw\_pp\_totpop}\\
+\midrule
+base\_outcome    &      -0.50***&      -0.10***&      -0.04*  &      -0.04*  &              \\
+                &     (0.05)   &     (0.02)   &     (0.02)   &     (0.02)   &              \\
+\addlinespace
+mfg\_lfshare     &       0.06   &      -0.04   &       0.02   &       0.01   &       0.01***\\
+                &     (0.18)   &     (0.03)   &     (0.02)   &     (0.02)   &     (0.00)   \\
+\addlinespace
+blackmig3539\_share\_totpop&      -0.88   &       4.41*  &       4.23** &       5.02** &       4.26***\\
+                &     (4.49)   &     (2.25)   &     (1.78)   &     (1.97)   &     (1.09)   \\
+\addlinespace
+pop             &      -0.00   &       0.00   &       0.00   &       0.00   &       0.00   \\
+                &     (0.00)   &     (0.00)   &     (0.00)   &     (0.00)   &     (0.00)   \\
+\addlinespace
+frac\_land       &       9.20   &      -7.89***&      -2.37   &      -2.14   &      -0.50   \\
+                &    (16.79)   &     (2.65)   &     (1.53)   &     (1.36)   &     (0.53)   \\
+\addlinespace
+reg2            &      -3.47   &      -0.88** &      -0.58** &      -0.56** &       0.10   \\
+                &     (3.15)   &     (0.44)   &     (0.26)   &     (0.24)   &     (0.08)   \\
+\addlinespace
+reg3            &       6.36*  &       0.70   &       0.47   &      -0.26   &      -0.12   \\
+                &     (3.55)   &     (1.39)   &     (0.89)   &     (0.91)   &     (0.30)   \\
+\addlinespace
+reg4            &      -0.86   &      -3.09***&      -0.86*  &      -1.13** &      -0.49** \\
+                &     (4.25)   &     (1.04)   &     (0.52)   &     (0.45)   &     (0.19)   \\
+\addlinespace
+1940.decade     &       0.00   &       0.00   &       0.00   &       0.00   &       0.00   \\
+                &        (.)   &        (.)   &        (.)   &        (.)   &        (.)   \\
+\addlinespace
+1950.decade     &     -24.16***&       0.53   &       0.67*  &       0.33   &       0.32***\\
+                &     (5.48)   &     (0.60)   &     (0.34)   &     (0.31)   &     (0.11)   \\
+\addlinespace
+1960.decade     &     -20.08***&       2.05***&       1.27***&       1.22***&       0.25** \\
+                &     (5.08)   &     (0.62)   &     (0.30)   &     (0.32)   &     (0.12)   \\
+\midrule
+Observations    &     405.00   &     405.00   &     405.00   &     405.00   &     405.00   \\
+\bottomrule
+\multicolumn{6}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{6}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+}

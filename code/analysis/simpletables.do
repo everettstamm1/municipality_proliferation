@@ -150,7 +150,7 @@ foreach samp in urban total{
 		// Create PC dependent variables
 		cap drop n_`y'_cz_L0_pc
 		g frac = b_`y'_cz/(pop`popname'/100000)
-		bys cz (decade) : g n_`y'_cz_L0_pc = 100*(frac[_n+1] - frac)
+		bys cz (decade) : g n_`y'_cz_L0_pc = frac[_n+1] - frac
 		drop frac
 		
 		preserve
@@ -400,7 +400,7 @@ foreach samp in urban total{
 		// Create PC dependent variables
 		cap drop n_`y'_cz_L0_pc
 		g frac = b_`y'_cz/(pop`popname'/100000)
-		bys cz (decade) : g n_`y'_cz_L0_pc = 100*(frac[_n+1] - frac)
+		bys cz (decade) : g n_`y'_cz_L0_pc = frac[_n+1] - frac
 		drop frac
 		
 		preserve
@@ -638,7 +638,7 @@ foreach samp in urban total{
 		// Create PC dependent variables
 		cap drop n_`y'_cz_L0_pc
 		g frac = b_`y'_cz/(pop`popname'/100000)
-		bys cz (decade) : g n_`y'_cz_L0_pc = 100*(frac[_n+1] - frac)
+		bys cz (decade) : g n_`y'_cz_L0_pc = frac[_n+1] - frac
 		drop frac
 		
 		preserve
