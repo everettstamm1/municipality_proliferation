@@ -1027,8 +1027,10 @@ foreach inst in full fullrm fullnt fullrmnt{
 	*10. Clean and standardize city names and output final instrument measures at the city-level	
 	use "$INTDATA/bartik/`inst'_blackorigin_fips1940.dta", clear
 	order black* total*
-	egen v`inst'_totblackmigdest_fips3539=rowmean(total_blackdest_fips*)
-	sum v`inst'_totblackmigdest_fips3539
+	
+	egen v`inst'_totbmigdest_fips3539=rowmean(total_blackdest_fips*)
+
+	sum v`inst'_totbmigdest_fips3539
 
 	drop total* black*
 	tempfile dest_fips_blackmigshare3539
@@ -1556,7 +1558,7 @@ reshape wide pop bpop, i(fips) j(year)
 drop if bpop1940 ==. | bpop1950 ==. | bpop1960 ==. | bpop1970 ==. | ///
 					pop1940 ==. | pop1950 ==. | pop1960 ==. | pop1970 ==.
 
-keep if pop1940 >=25000 | pop1970>=25000
+//keep if pop1940 >=25000 | pop1970>=25000
 
 // Dropping southern sample
 drop if ///
@@ -1578,122 +1580,146 @@ g texas = statefip == 480
 
 save "$INTDATA/dcourt/nhgis_county_pops", replace
 
-foreach level in county cz{
-	if "`level'"=="cz"{
-			local levelvar cz
-			local levellab "CZ"
-			
-		}
-		else if "`level'"=="county"{
-			local levelvar fips
-			local levellab "County"
+foreach samp in full dcourt{
+	if "`samp'"=="full" local samptab = "_full"
+	if "`samp'"=="dcourt" local samptab = ""
 
-		}
-		else if "`level'"=="msa"{
-			local levelvar msapmsa2000
-			local levellab "MSA"
-		}
-	
-
-	use "$INTDATA/dcourt/nhgis_county_pops", clear
-	ren fips dest_fips
-	
-	foreach inst in full fullrm fullnt fullrmnt{
-		merge 1:1 dest_fips using "$INTDATA/dcourt/full_black_prmig_1940_1970_wide_xw_dest_fips.dta", keep(1 3) nogen
-		foreach var of varlist black_proutmigpr*{
-			replace `var' = 0 if `var'==.
-			ren `var' v`inst'_`var'
-		}	
-	}
-	ren dest_fips fips
-	collapse (sum) pop* bpop* vfull*, by(`levelvar')
-
-	local base = 1940
-	foreach d in 1950 1960 1970{
-		* Actual black pop change in city
-		g bpopchange`base'_`d'=100*(bpop`d'-bpop`base')/pop`base'
-		g bpopchangepp`base'_`d'=100*((bpop`d'/pop`d')-(bpop`base'/pop`base'))
-
-		foreach v in full fullrm fullnt fullrmnt {
-			g v`v'_bpopchange`base'_`d'=100*v`v'_black_proutmigpr`d'/pop`base'
-			g v`v'_blackmig3539_share`base'=100*v`v'_totblackmigdest_fips3539/pop`base'
-			
-			g v`v'_bpopchangepp`base'_`d'=100*((v`v'_black_proutmigpr`d'+bpop`base')/(v`v'_black_proutmigpr`d'+ pop`base') - bpop`base'/pop`base')
-
-		}
-		local base = `d'
-	}
-
-	// mfg lfshare controls
-	merge 1:1 `levelvar' using "$INTDATA/dcourt/clean_`level'_industry_employment_1940_1970.dta", keepusing(mfg_lfshare*) keep(3) nogen 
-
-	if "`level'" == "county"{
-		// Region dummies
-		preserve 
-			use "$RAWDATA/dcourt/cz_state_region_crosswalk.dta", clear
-			keep state_id region
-			duplicates drop
-			tempfile regions
-			save `regions'
-		restore 
-		g state_id = floor(fips/1000)
-		merge m:1 state_id using `regions', keep(1 3) nogen
-		drop state_id
-
-	}
-	else{
-		merge 1:1 cz using "$RAWDATA/dcourt/cz_state_region_crosswalk.dta", keep(3) nogen
-	}
-	tabulate region, gen(reg)	
-
-	/* Rank measures
-	local base = 1940
-	foreach d in 1950 1960 1970{
-		xtile GM_`base'_`d' = bpopchange`base'_`d', nq(100) 
-		xtile GM_hat_`base'_`d' = vfull_bpopchange`base'_`d', nq(100) 
+	foreach level in county cz{
+		if "`level'"=="cz"{
+				local levelvar cz
+				local levellab "CZ"
 				
-		local base = `d'
-	}
-*/
-	la var vfull_blackmig3539_share1940 "Black Southern Mig 1935-1940"
-	la var vfullrm_blackmig3539_share1940 "Black Southern Mig 1935-1940, Rural Migrants Only"
-	la var vfullnt_blackmig3539_share1940 "Black Southern Mig 1935-1940, Nonsouthern Texas"
-	la var vfullrmnt_blackmig3539_share1940 "Black Southern Mig 1935-1940, Rural Migrants Only, Nonsouthern Texas"
+			}
+			else if "`level'"=="county"{
+				local levelvar fips
+				local levellab "County"
 
-	la var reg2 "Midwest"
-	la var reg3 "South"
-	la var reg4 "West"	
-
-	local base = 1940
-	foreach d in 1950 1960 1970{
-		ren bpopchange`base'_`d' GM_raw_`base'_`d'
-		ren bpopchangepp`base'_`d' GM_raw_pp_`base'_`d'
-		ren vfull_bpopchangepp`base'_`d' GM_hat_raw_pp_`base'_`d'
-
-		ren vfull_bpopchange`base'_`d' GM_hat_raw_`base'_`d'
-		foreach v in rm nt rmnt {
-			ren vfull`v'_bpopchangepp`base'_`d' GM_`v'_hat_raw_pp_`base'_`d'
-			ren vfull`v'_bpopchange`base'_`d' GM_`v'_hat_raw_`base'_`d'
-		}
+			}
+			else if "`level'"=="msa"{
+				local levelvar msapmsa2000
+				local levellab "MSA"
+			}
 		
-		local base = `d'
-	}
 
-	// Creating 1940-70 variables
-	g GM_raw = 100*(bpop1970 - bpop1940)/pop1940
-	g GM_raw_pp=100*((bpop1970/pop1970)-(bpop1940/pop1940))
+		use "$INTDATA/dcourt/nhgis_county_pops", clear
+		ren fips dest_fips
+		
+		if "`samp'"=="dcourt" drop if texas==1
+		
+		if "`samp'"=="full" local insts "full fullrm fullnt fullrmnt"
+		if "`samp'"=="dcourt" local insts "full"
 
-	g GM_hat_raw=100*vfull_black_proutmigpr1970/pop1940
-	g vfull_blackmig3539_share=100*vfull_totblackmigdest_fips3539/pop1940
-	
-	g GM_hat_raw_pp=100*((vfull_black_proutmigpr1970+bpop1940)/(vfull_black_proutmigpr1970+ pop1940) - bpop1940/pop1940)
-		foreach v in rm nt rmnt {
-			g GM_`v'_hat_raw=100*vfull`v'_black_proutmigpr1970/pop1940
-			g GM_`v'_hat_raw_pp=100*((vfull`v'_black_proutmigpr1970+bpop1940)/(vfull`v'_black_proutmigpr1970+ pop1940) - bpop1940/pop1940)
+		foreach inst in full fullrm fullnt fullrmnt{
+			merge 1:1 dest_fips using "$INTDATA/dcourt/`inst'_black_prmig_1940_1970_wide_xw_dest_fips.dta", keep(1 3) nogen
+			foreach var of varlist black_proutmigpr*{
+				if "`samp'"=="dcourt" replace `var' = 0 if `var'==.
+				ren `var' v`inst'_`var'
+			}	
+		}
+		ren dest_fips fips
+		collapse (sum) pop* bpop* vfull*, by(`levelvar')
+
+		local base = 1940
+		foreach d in 1950 1960 1970{
+			* Actual black pop change in city
+			g bpopchange`base'_`d'=100*(bpop`d'-bpop`base')/pop`base'
+			g bpopchangepp`base'_`d'=100*((bpop`d'/pop`d')-(bpop`base'/pop`base'))
+
+			foreach v in full fullrm fullnt fullrmnt {
+				g v`v'_bpopchange`base'_`d'=100*v`v'_black_proutmigpr`d'/pop`base'
+				
+				g v`v'_blackmig3539_share`base'=100*v`v'_totbmigdest_fips3539/pop`base'
+				
+				g v`v'_bpopchangepp`base'_`d'=100*((v`v'_black_proutmigpr`d'+bpop`base')/(v`v'_black_proutmigpr`d'+ pop`base') - bpop`base'/pop`base')
+
+			}
+			local base = `d'
 		}
 
+		// mfg lfshare controls
+		merge 1:1 `levelvar' using "$INTDATA/dcourt/clean_`level'_industry_employment_1940_1970.dta", keepusing(mfg_lfshare*) keep(3) nogen 
+
+		if "`level'" == "county"{
+			// Region dummies
+			preserve 
+				use "$RAWDATA/dcourt/cz_state_region_crosswalk.dta", clear
+				keep state_id region
+				duplicates drop
+				tempfile regions
+				save `regions'
+			restore 
+			g state_id = floor(fips/1000)
+			merge m:1 state_id using `regions', keep(1 3) nogen
+			drop state_id
+
+		}
+		else{
+			merge 1:1 cz using "$RAWDATA/dcourt/cz_state_region_crosswalk.dta", keep(3) nogen
+		}
+		tabulate region, gen(reg)	
+
+		/* Rank measures
+		local base = 1940
+		foreach d in 1950 1960 1970{
+			xtile GM_`base'_`d' = bpopchange`base'_`d', nq(100) 
+			xtile GM_hat_`base'_`d' = vfull_bpopchange`base'_`d', nq(100) 
+					
+			local base = `d'
+		}
+	*/
+		la var vfull_blackmig3539_share1940 "Black Southern Mig 1935-1940"
+		la var vfullrm_blackmig3539_share1940 "Black Southern Mig 1935-1940, Rural Migrants Only"
+		la var vfullnt_blackmig3539_share1940 "Black Southern Mig 1935-1940, Nonsouthern Texas"
+		la var vfullrmnt_blackmig3539_share1940 "Black Southern Mig 1935-1940, Rural Migrants Only, Nonsouthern Texas"
+
+		la var reg2 "Midwest"
+		la var reg3 "South"
+		la var reg4 "West"	
+
+		local base = 1940
+		foreach d in 1950 1960 1970{
+			ren bpopchange`base'_`d' GM_raw_`base'_`d'
+			ren bpopchangepp`base'_`d' GM_raw_pp_`base'_`d'
+			ren vfull_bpopchangepp`base'_`d' GM_hat_raw_pp_`base'_`d'
+
+			ren vfull_bpopchange`base'_`d' GM_hat_raw_`base'_`d'
+			
+			xtile GM_`base'_`d' = GM_raw_`base'_`d', nq(100) 
+			xtile GM_hat_`base'_`d' = GM_hat_raw_`base'_`d', nq(100)
+			
+			foreach v in rm nt rmnt {
+				ren vfull`v'_bpopchangepp`base'_`d' GM_`v'_hat_raw_pp_`base'_`d'
+				ren vfull`v'_bpopchange`base'_`d' GM_`v'_hat_raw_`base'_`d'
+			}
+			
+			local base = `d'
+		}
+
+		
+		
+		// Creating 1940-70 variables
+
+		g GM_raw = 100*(bpop1970 - bpop1940)/pop1940
+		g GM_raw_pp=100*((bpop1970/pop1970)-(bpop1940/pop1940))
+
+		g GM_hat_raw=100*vfull_black_proutmigpr1970/pop1940
+		g vfull_blackmig3539_share=100*vfull_totbmigdest_fips3539/pop1940
+		
+		g GM_hat_raw_pp=100*((vfull_black_proutmigpr1970+bpop1940)/(vfull_black_proutmigpr1970+ pop1940) - bpop1940/pop1940)
+			foreach v in rm nt rmnt {
+				g GM_`v'_hat_raw=100*vfull`v'_black_proutmigpr1970/pop1940
+				g GM_`v'_hat_raw_pp=100*((vfull`v'_black_proutmigpr1970+bpop1940)/(vfull`v'_black_proutmigpr1970+ pop1940) - bpop1940/pop1940)
+				
+				g vfull`v'_blackmig3539_share=100*vfull`v'_totbmigdest_fips3539/pop1940
+				
+				
+			}
+
+
+		xtile GM = GM_raw, nq(100) 
+		xtile GM_hat = GM_hat_raw, nq(100) 
+
+		save "$CLEANDATA/dcourt/GM_`level'_final_dataset_split`samptab'", replace
 
 	}
-	save "$CLEANDATA/dcourt/GM_`level'_final_dataset_split", replace
-
 }
