@@ -1,34 +1,34 @@
- \begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi} \begin{threeparttable} \caption{Outcome variable cgoodman} \begin{tabular}{l*{11}{c}} \toprule
+ \begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi} \begin{threeparttable} \caption{Outcome variable gen\_subcounty} \begin{tabular}{l*{11}{c}} \toprule
           &\multicolumn{5}{c}{Basic controls}                                   &\multicolumn{5}{c}{Robust controls}                                  \\\cmidrule(lr){2-6}\cmidrule(lr){7-11}
           &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}&\multicolumn{1}{c}{(7)}&\multicolumn{1}{c}{(8)}&\multicolumn{1}{c}{(9)}&\multicolumn{1}{c}{(10)}\\
           &\multicolumn{1}{c}{1940-1970 Pooled}&\multicolumn{1}{c}{1940-1950}&\multicolumn{1}{c}{1950-1960}&\multicolumn{1}{c}{1960-1970}&\multicolumn{1}{c}{Stacked}&\multicolumn{1}{c}{1940-1970 Pooled}&\multicolumn{1}{c}{1940-1950}&\multicolumn{1}{c}{1950-1960}&\multicolumn{1}{c}{1960-1970}&\multicolumn{1}{c}{Stacked}\\
 \cmidrule(lr){1-11}
 \multicolumn{10}{l}{Panel A: First Stage}\\
 \cmidrule(lr){1-11}
-GM\_hat\_raw\_pp&      3.04***&      3.24***&     10.28***&     13.38***&      4.88***&      2.91***&      1.57***&      9.58***&      4.85** &      0.48   \\
-          &    (0.31)   &    (0.52)   &    (0.86)   &    (1.56)   &    (0.92)   &    (0.48)   &    (0.29)   &    (2.08)   &    (2.19)   &    (0.69)   \\
+GM\_hat\_raw\_pp\_totpop&      4.67***&      0.98***&      1.90***&      2.68***&      1.14***&      1.85** &      0.23*  &      1.09** &      0.88*  &      0.13   \\
+          &    (1.07)   &    (0.28)   &    (0.32)   &    (0.79)   &    (0.26)   &    (0.93)   &    (0.13)   &    (0.44)   &    (0.48)   &    (0.10)   \\
 \midrule
-F-Stat    &     62.54   &    111.30   &    190.68   &     27.88   &     15.39   &     50.68   &     51.44   &    176.86   &    113.51   &     48.88   \\
+F-Stat    &      4.85   &      4.12   &     14.25   &      3.86   &      4.26   &     42.16   &     72.63   &     50.03   &     25.74   &     31.85   \\
 Observations&    130.00   &    130.00   &    130.00   &    130.00   &    390.00   &    130.00   &    130.00   &    130.00   &    130.00   &    390.00   \\
 \cmidrule[\heavyrulewidth](lr){1-11} \\ \cmidrule[\heavyrulewidth](lr){1-11}
 \multicolumn{10}{l}{Panel B: OLS}\\
 \cmidrule(lr){1-11}
-GM\_raw\_pp &      0.02** &      0.02***&      0.01*  &      0.00   &      0.01***&      0.01   &      0.01   &      0.01   &      0.00   &      0.00   \\
-          &    (0.01)   &    (0.01)   &    (0.00)   &    (0.00)   &    (0.00)   &    (0.01)   &    (0.01)   &    (0.01)   &    (0.00)   &    (0.00)   \\
+GM\_raw\_pp\_totpop&      0.07***&      0.07***&      0.07***&      0.03***&      0.05***&     -0.02   &      0.03   &     -0.03   &     -0.02   &     -0.01   \\
+          &    (0.01)   &    (0.02)   &    (0.02)   &    (0.01)   &    (0.01)   &    (0.02)   &    (0.03)   &    (0.03)   &    (0.02)   &    (0.02)   \\
 \midrule
 Observations&    130.00   &    130.00   &    130.00   &    130.00   &    390.00   &    130.00   &    130.00   &    130.00   &    130.00   &    390.00   \\
 \cmidrule[\heavyrulewidth](lr){1-11} \\ \cmidrule[\heavyrulewidth](lr){1-11}
 \multicolumn{10}{l}{Panel C: Reduced Form}\\
 \cmidrule(lr){1-11}
-GM\_hat\_raw\_pp&      0.09** &      0.07***&      0.09   &      0.06   &      0.06***&      0.07   &      0.02   &      0.11   &      0.12   &      0.03   \\
-          &    (0.04)   &    (0.03)   &    (0.06)   &    (0.05)   &    (0.02)   &    (0.05)   &    (0.02)   &    (0.14)   &    (0.08)   &    (0.02)   \\
+GM\_hat\_raw\_pp\_totpop&      0.48***&      0.09** &      0.19***&      0.18***&      0.11***&      0.21** &      0.03   &     -0.03   &      0.01   &      0.01   \\
+          &    (0.08)   &    (0.04)   &    (0.05)   &    (0.04)   &    (0.03)   &    (0.10)   &    (0.02)   &    (0.08)   &    (0.07)   &    (0.01)   \\
 \midrule
 Observations&    130.00   &    130.00   &    130.00   &    130.00   &    390.00   &    130.00   &    130.00   &    130.00   &    130.00   &    390.00   \\
 \cmidrule[\heavyrulewidth](lr){1-11} \\ \cmidrule[\heavyrulewidth](lr){1-11}
 \multicolumn{10}{l}{Panel D: 2SLS}\\
 \cmidrule(lr){1-11}
-GM\_raw\_pp &      0.03** &      0.02***&      0.01   &      0.00   &      0.01***&      0.03   &      0.01   &      0.01   &      0.02   &      0.06   \\
-          &    (0.01)   &    (0.01)   &    (0.01)   &    (0.00)   &    (0.00)   &    (0.02)   &    (0.01)   &    (0.01)   &    (0.02)   &    (0.09)   \\
+GM\_raw\_pp\_totpop&      0.10***&      0.09***&      0.10***&      0.07***&      0.09***&      0.11   &      0.13   &     -0.03   &      0.02   &      0.09   \\
+          &    (0.02)   &    (0.03)   &    (0.02)   &    (0.02)   &    (0.02)   &    (0.08)   &    (0.10)   &    (0.07)   &    (0.07)   &    (0.14)   \\
 \midrule
 Observations&    130.00   &    130.00   &    130.00   &    130.00   &    390.00   &    130.00   &    130.00   &    130.00   &    130.00   &    390.00   \\
 \hline\hline

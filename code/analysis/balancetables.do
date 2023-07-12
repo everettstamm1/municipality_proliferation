@@ -1,19 +1,20 @@
 
 
-foreach samp in  total urban  {
+foreach samp in urban total td {
 	if "`samp'"=="urban" local poptab ""
 	if "`samp'"=="total" local poptab "_totpop"
-	if "`samp'"=="total_dcourt" local poptab "_totpop"
+	if "`samp'"=="td" local poptab "_totpop"
 
 	if "`samp'"=="urban" local popname "c"
 	if "`samp'"=="total" local popname ""
-	if "`samp'"=="total_dcourt" local popname ""
+	if "`samp'"=="td" local popname ""
 
 	if "`samp'"=="urban" local poplab "Urban Population"
 	if "`samp'"=="total" local poplab "Total Population"		
-	if "`samp'"=="total_dcourt" local poplab "Total Population"		
+	if "`samp'"=="td" local poplab "Total Population"		
 
 	use "$CLEANDATA/cz_pooled", clear
+	if "`samp'"=="td" keep if dcourt==1
 	// Deeply silly thing that must be done for formatting reasons
 	forv i=1/9{
 		g d`i'=1
@@ -21,7 +22,7 @@ foreach samp in  total urban  {
 	ren mfg_lfshare1940`poptab' mfg_lfshare
 	ren blackmig3539_share`poptab' blackmig3539
 
-	local covars mfg_lfshare blackmig3539 frac_land transpo_cost_1920 coastal has_port avg_precip avg_temp n_wells totfrac_in_main_city urbfrac_in_main_city m_rr m_rr_sqm2 
+	local covars b_cgoodman_cz1940_pc`popname' b_schdist_ind_cz1940_pc`popname' b_gen_subcounty_cz1940_pc`popname' b_spdist_cz1940_pc`popname' mfg_lfshare blackmig3539 frac_land transpo_cost_1920 coastal has_port avg_precip avg_temp n_wells totfrac_in_main_city urbfrac_in_main_city m_rr m_rr_sqm2 
 	
 	local pooled_covars_`samp'  ""
 	foreach covar in `covars' {
@@ -32,8 +33,8 @@ foreach samp in  total urban  {
 		eststo `covar': reg `covar' GM`covar' reg2 reg3 reg4 d1 d2 d3 d4 d5 d6 d7 d8 d9 [aw=pop`popname'1940], r
 		local p =2*ttail(e(df_r),abs(_b[GM`covar']/_se[GM`covar']))
 		if `p'<=0.05{
-			if !inlist("`covar'","mfg_lfshare", "blackmig3539") local pooled_covars_`samp'  "`pooled_covars_`samp'' `covar' `covar'_m"
-			if inlist("`covar'","mfg_lfshare", "blackmig3539") local pooled_covars_`samp'  "`pooled_covars_`samp'' `covar'"
+			if (!inlist("`covar'","mfg_lfshare", "blackmig3539") & !regexm("`covar'","cz1940_pc")) local pooled_covars_`samp'  "`pooled_covars_`samp'' `covar' `covar'_m"
+			if (inlist("`covar'","mfg_lfshare", "blackmig3539") | regexm("`covar'","cz1940_pc")) local pooled_covars_`samp'  "`pooled_covars_`samp'' `covar'"
 		}
 	}
 
@@ -44,6 +45,8 @@ foreach samp in  total urban  {
 	
 	foreach decade in 1940 1950 1960{
 		use "$CLEANDATA/cz_stacked", clear
+			if "`samp'"=="td" keep if dcourt==1
+
 		ren blackmig3539_share`poptab' blackmig3539
 
 		// Deeply silly thing that must be done for formatting reasons
@@ -61,8 +64,8 @@ foreach samp in  total urban  {
 			eststo `covar': reg `covar' GM`covar' reg2 reg3 reg4 d1 d2 d3 d4 d5 d6 d7 d8 d9 [aw=pop`popname'] if decade==`decade', r
 			local p =2*ttail(e(df_r),abs(_b[GM`covar']/_se[GM`covar']))
 			if `p'<=0.05{
-				if !inlist("`covar'","mfg_lfshare", "blackmig3539") local stacked_covars_`decade'_`samp' "`stacked_covars_`decade'_`samp''  `covar' `covar'_m"
-				if inlist("`covar'","mfg_lfshare", "blackmig3539") local stacked_covars_`decade'_`samp' "`stacked_covars_`decade'_`samp''  `covar'"
+			if (!inlist("`covar'","mfg_lfshare", "blackmig3539") & !regexm("`covar'","cz1940_pc")) local stacked_covars_`decade'  "`stacked_covars_`decade'' `covar' `covar'_m"
+			if (inlist("`covar'","mfg_lfshare", "blackmig3539") | regexm("`covar'","cz1940_pc")) local stacked_covars_`decade'  "`stacked_covars_`decade'' `covar'"
 			}
 		}
 		eststo stacked_`decade'_`samp' : appendmodels `covars'
@@ -70,6 +73,8 @@ foreach samp in  total urban  {
 	}
 	
 	use "$CLEANDATA/cz_stacked", clear
+		if "`samp'"=="td" keep if dcourt==1
+
 	ren blackmig3539_share`poptab' blackmig3539
 
 	tab decade, gen(d)
@@ -83,8 +88,8 @@ foreach samp in  total urban  {
 		eststo `covar': reg `covar' GM`covar' reg2 reg3 reg4 d1 d2 d3 d4 d5 d6 d7 d8 d9 [aw=pop`popname'], r
 		local p =2*ttail(e(df_r),abs(_b[GM`covar']/_se[GM`covar']))
 		if `p'<=0.05{
-			if !inlist("`covar'","mfg_lfshare", "blackmig3539") local stacked_covars_`samp' "`stacked_covars_`samp'' `covar' `covar'_m"
-			if inlist("`covar'","mfg_lfshare", "blackmig3539") local stacked_covars_`samp' "`stacked_covars_`samp'' `covar'"
+			if (!inlist("`covar'","mfg_lfshare", "blackmig3539") & !regexm("`covar'","cz1940_pc")) local stacked_covars  "`stacked_covars' `covar' `covar'_m"
+			if (inlist("`covar'","mfg_lfshare", "blackmig3539") | regexm("`covar'","cz1940_pc")) local stacked_covars  "`stacked_covars' `covar'"
 		}
 	}
 	eststo stacked_`samp'  : appendmodels `covars'
@@ -98,16 +103,19 @@ foreach samp in  total urban  {
 					coeflabel(mfg_lfshare blackmig3539_share frac_land transpo_cost_1920 coastal has_port avg_precip avg_temp n_wells totfrac_in_main_city urbfrac_in_main_city m_rr m_rr_sqm2)
 					
 	
-	foreach outcome in schdist_ind cgoodman{
+	foreach outcome in schdist_ind cgoodman spdist gen_subcounty{
 		eststo clear
 
 		local controls reg2 reg3 reg4
 
 		use "$CLEANDATA/cz_pooled", clear
+			if "`samp'"=="td" keep if dcourt==1
+
 		ren blackmig3539_share`poptab' blackmig3539
 
 		// FS
 		eststo pooled_fs_nc_`samp' : reg GM_raw_pp`poptab' GM_hat_raw_pp`poptab' `controls' [aw=pop`popname'1940], r
+		test GM_hat_raw_pp`poptab'==0
 		local F : di %6.2f e(F)
 		estadd local Fstat = `F'
 		
@@ -121,11 +129,14 @@ foreach samp in  total urban  {
 		eststo pooled_iv_nc_`samp' : ivreg2 n_`outcome'_cz_pc`popname' (GM_raw_pp`poptab' = GM_hat_raw_pp`poptab') `controls' [aw=pop`popname'1940], r
 		
 		use "$CLEANDATA/cz_stacked", clear
+			if "`samp'"=="td" keep if dcourt==1
+
 		ren blackmig3539_share`poptab' blackmig3539
 
 		foreach decade in 1940 1950 1960{
 			// FS
 			eststo stacked`decade'_fs_nc_`samp' : reg GM_raw_pp`poptab' GM_hat_raw_pp`poptab' `controls' [aw=pop`popname'1940] if decade==`decade', r
+			test GM_hat_raw_pp`poptab'==0
 			local F : di %6.2f e(F)
 			estadd local Fstat = `F'
 			
@@ -141,6 +152,7 @@ foreach samp in  total urban  {
 		
 		// FS
 		eststo stacked_fs_nc_`samp' : reg GM_raw_pp`poptab' GM_hat_raw_pp`poptab' `controls' i.decade [aw=pop`popname'1940], r
+		test GM_hat_raw_pp`poptab'==0
 		local F : di %6.2f e(F)
 		estadd local Fstat = `F'
 		
@@ -154,14 +166,23 @@ foreach samp in  total urban  {
 		eststo stacked_iv_nc_`samp' : ivreg2 n_`outcome'_cz_L0_pc`popname' (GM_raw_pp`poptab' = GM_hat_raw_pp`poptab') `controls' i.decade [aw=pop`popname'1940], r
 		
 		// With controls
-		local controls reg2 reg3 reg4 `pooled_covars_`samp''
+		local controls reg2 reg3 reg4
+		
+		// Dropping baselines that aren't current outcome variable
+		foreach i in `pooled_covars_`samp''{
+			if regexm("`i'","cz1940_pc")==0 | regexm("`i'","`outcome'")==1{
+				local controls `controls' `i'
+			}
+		}
 
 		use "$CLEANDATA/cz_pooled", clear
+			if "`samp'"=="td" keep if dcourt==1
+
 		ren mfg_lfshare1940`poptab' mfg_lfshare
 		ren blackmig3539_share`poptab' blackmig3539
-
 		// FS
 		eststo pooled_fs_c_`samp' : reg GM_raw_pp`poptab' GM_hat_raw_pp`poptab' `controls' [aw=pop`popname'1940], r
+		test GM_hat_raw_pp`poptab'==0
 		local F : di %6.2f e(F)
 		estadd local Fstat = `F'
 		
@@ -175,13 +196,22 @@ foreach samp in  total urban  {
 		eststo pooled_iv_c_`samp' : ivreg2 n_`outcome'_cz_pc`popname' (GM_raw_pp`poptab' = GM_hat_raw_pp`poptab') `controls' [aw=pop`popname'1940], r
 		
 		use "$CLEANDATA/cz_stacked", clear
+			if "`samp'"=="td" keep if dcourt==1
+
 		ren blackmig3539_share`poptab' blackmig3539
 
 		foreach decade in 1940 1950 1960{
-			local controls reg2 reg3 reg4 `stacked_covars_`decade'_`samp''
-
+			local controls reg2 reg3 reg4
+					
+			// Dropping baselines that aren't current outcome variable
+			foreach i in `stacked_covars_`decade''{
+				if regexm("`i'","cz1940_pc")==0 | regexm("`i'","`outcome'")==1{
+					local controls `controls' `i'
+				}
+			}
 			// FS
 			eststo stacked`decade'_fs_c_`samp' : reg GM_raw_pp`poptab' GM_hat_raw_pp`poptab' `controls' [aw=pop`popname'1940] if decade==`decade', r
+			test GM_hat_raw_pp`poptab'==0
 			local F : di %6.2f e(F)
 			estadd local Fstat = `F'
 			
@@ -195,9 +225,18 @@ foreach samp in  total urban  {
 			eststo stacked`decade'_iv_c_`samp' : ivreg2 n_`outcome'_cz_L0_pc`popname' (GM_raw_pp`poptab' = GM_hat_raw_pp`poptab') `controls' [aw=pop`popname'1940] if decade==`decade', r
 		}
 		
-		local controls reg2 reg3 reg4 `stacked_covars_`samp''
+		local controls reg2 reg3 reg4
+		// Dropping baselines that aren't current outcome variable
+		foreach i in `stacked_covars'{
+			if regexm("`i'","cz1940_pc")==0 | regexm("`i'","`outcome'")==1{
+				local controls `controls' `i'
+			}
+		}
+	
 		// FS
 		eststo stacked_fs_c_`samp' : reg GM_raw_pp`poptab' GM_hat_raw_pp`poptab' `controls' i.decade [aw=pop`popname'1940], r
+
+		test GM_hat_raw_pp`poptab'==0
 		local F : di %6.2f e(F)
 		estadd local Fstat = `F'
 		

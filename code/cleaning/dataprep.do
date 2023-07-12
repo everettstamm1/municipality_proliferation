@@ -287,7 +287,7 @@ foreach level in cz {
 		// Pooled
 		
 		use "$DCOURT/data/GM_`level'_final_dataset`samptab'.dta", clear
-		keep `levelvar' GM GM_hat2 GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg* frac_all_upm1940
+		keep `levelvar' GM GM_hat2 GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg* frac_all_upm1940  GM_hat_raw_r*
 		ren GM_hat2 GM_hat
 		if "`samp'"=="south" ren v2*_blackmig3539_share1940 *blackmig3539_share
 		if "`samp'"=="dcourt" ren v2_blackmig3539_share1940 blackmig3539_share
@@ -376,6 +376,8 @@ foreach level in cz {
 				lab var b_`ds'_`level'1940 "Base Govs 1940, `label'"
 				lab var b_`ds'_`level'1970 "Base Govs 1970, `label'"
 				
+				g b_`ds'_`level'1940_pc = b_`ds'_`level'1940/(pop1940/10000) 
+				g b_`ds'_`level'1940_pcc = b_`ds'_`level'1940/(popc1940/10000) 
 				g n_`ds'_`level'_pc = b_`ds'_`level'1970/(pop1970/10000) - b_`ds'_`level'1940/(pop1940/10000) 
 				g n_`ds'_`level'_pcc = b_`ds'_`level'1970/(popc1970/10000) - b_`ds'_`level'1940/(popc1940/10000) 
 				lab var n_`ds'_`level'_pc "New `label', P.C. (total)"
@@ -529,8 +531,16 @@ foreach level in cz {
 			
 			bys cz (decade) : g n_`ds'_`level'_L0_pc = frac[_n+1] - frac
 			bys cz (decade) : g n_`ds'_`level'_L0_pcc = fracc[_n+1] - fracc
+			
+			g b_`ds'_`level'1940_pc = frac if decade == 1940
+			g b_`ds'_`level'1940_pcc = fracc if decade == 1940
+
+			bys cz (b_`ds'_`level'1940_pc) : replace b_`ds'_`level'1940_pc = b_`ds'_`level'1940_pc[1]
+			bys cz (b_`ds'_`level'1940_pcc) : replace b_`ds'_`level'1940_pcc = b_`ds'_`level'1940_pcc[1]
+
 			lab var n_`ds'_`level'_L0_pc "New `lab`ds'', P.C. (total)"
 			lab var n_`ds'_`level'_L0_pcc "New `lab`ds'', P.C. (urban)"
+		
 			drop frac fracc
 		}
 		
