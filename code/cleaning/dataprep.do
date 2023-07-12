@@ -357,15 +357,29 @@ foreach level in cz {
 			lab var dcourt "Derenoncourt Sample of 130 CZs"
 			
 			merge 1:1 cz using "$INTDATA/covariates/covariates.dta", keep(1 3) nogen
+			merge 1:1 cz using "$INTDATA/census/maxcitypop", keep(1 3) nogen
+
 		}
-	
+		// Missing dummies
+		foreach var of varlist frac_land transpo_cost_1920 coastal has_port avg_precip avg_temp n_wells totfrac_in_main_city urbfrac_in_main_city m_rr m_rr_sqm2{
+			g `var'_m = `var'==.
+			replace `var' = 0 if `var'==.
+		}
+		replace n_cgoodman_cz = 0 if n_cgoodman_cz==.
+		replace b_cgoodman_cz1940 = 0 if b_cgoodman_cz1940==.
+		replace b_cgoodman_cz1970 = 0 if b_cgoodman_cz1970==.
 		// Adding labels
-		
+
 		foreach ds in  gen_muni schdist_ind all_local ngov3 gen_subcounty spdist   cgoodman  {
 				local label : variable label n_`ds'_`level'
 				lab var n_`ds'_`level' "New Govs, `label'"
 				lab var b_`ds'_`level'1940 "Base Govs 1940, `label'"
 				lab var b_`ds'_`level'1970 "Base Govs 1970, `label'"
+				
+				g n_`ds'_`level'_pc = b_`ds'_`level'1970/(pop1970/10000) - b_`ds'_`level'1940/(pop1940/10000) 
+				g n_`ds'_`level'_pcc = b_`ds'_`level'1970/(popc1970/10000) - b_`ds'_`level'1940/(popc1940/10000) 
+				lab var n_`ds'_`level'_pc "New `label', P.C. (total)"
+				lab var n_`ds'_`level'_pcc "New `label', P.C. (urban)"
 
 		}
 		
@@ -400,7 +414,6 @@ foreach level in cz {
 		cap lab var cz "Commuting Zone (1990)"
 		cap lab var fips "County FIPS Code"
 		
-		if "`level'"=="cz" merge 1:1 cz using "$INTDATA/census/maxcitypop", keep(1 3) nogen
 
 		lab var totfrac_in_main_city "Fraction of population in largest city"
 		lab var urbfrac_in_main_city "Fraction of urban population in largest city"
@@ -426,20 +439,20 @@ foreach level in cz {
 		
 		ren vfull_* *
 		ren vfull* *
+		drop rm_* nt_* rmnt_* 
 
 		foreach var of varlist GM* blackmig3539_share*{
 				ren `var' totpop_`var'
 		}
 		
-		foreach var of varlist *_blackmig3539_share*{
-				ren `var' tp_`var'
-		}
+		
 		
 		// Dropping 1940-70 versions
 		drop totpop_GM_raw totpop_GM_raw_pp totpop_GM_hat_raw totpop_GM_hat_raw_pp totpop_GM totpop_GM_hat
 
 		preserve
 			use "$DCOURT/data/GM_`level'_final_dataset_split`samptab'.dta", clear
+
 			keep `levelvar' GM* popc???? bpopc???? mfg_lfshare* v2*blackmig3539_share* reg2 reg3 reg4  frac_all_upm*
 			drop GM_hat0* GM_hat7r* GM_hat8*
 			ren GM_hat2_* GM_hat_*
@@ -505,10 +518,20 @@ foreach level in cz {
 			
 		qui reshape long `stubs' frac_all_upm totpop_GM_ GM_ GM_hat_ totpop_GM_hat totpop_GM_raw_ totpop_GM_raw_pp_ totpop_GM_hat_raw_ totpop_GM_hat_raw_pp_ GM_raw_pp_ GM_hat_raw_pp_  mfg_lfshare totpop_blackmig3539_share blackmig3539_share bpop pop bpopc popc, i(`levelvar') j(decade)
 		
-		
+		replace n_cgoodman_cz = 0 if n_cgoodman_cz==.
+		replace b_cgoodman_cz = 0 if b_cgoodman_cz==.
+
 		foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist cgoodman {
 			label var n_`ds'_`level' "`lab`ds''"
 
+			g frac = b_`ds'_`level'/(pop/10000)
+			g fracc = b_`ds'_`level'/(popc/10000)
+			
+			bys cz (decade) : g n_`ds'_`level'_L0_pc = frac[_n+1] - frac
+			bys cz (decade) : g n_`ds'_`level'_L0_pcc = fracc[_n+1] - fracc
+			lab var n_`ds'_`level'_L0_pc "New `lab`ds'', P.C. (total)"
+			lab var n_`ds'_`level'_L0_pcc "New `lab`ds'', P.C. (urban)"
+			drop frac fracc
 		}
 		
 		ren *_ *
@@ -555,85 +578,6 @@ foreach level in cz {
 			drop above_med_temp
 		}
 		
-		
-		/*
-		if "`level'"=="county"{
-			
-			merge 1:1 fips decade using "$INTDATA/land_cover/frac_unusable", keep(1 3) nogen
-			merge m:1 fips using "$INTDATA/lu_lutz_sand/lu_lutz_sand_indicators", keep(1 3) nogen
-			ren frac_unbuildable_* frac_ub_*
-			foreach geog in land total unusable total_00 total_05 total_10 total_15 total_20 lu_ml_2010 lu_ml_mean ub_1 ub_2{
-				qui su frac_`geog' if decade == 1940 & GM < .,d
-				g above_med_temp = frac_`geog'>=`r(p50)' if decade == 1940 & GM_raw < . 
-				bys `levelvar' : egen above_med_`geog' = max(above_med_temp)
-				g GM_X_above_med_`geog' = GM * above_med_`geog'
-				g GM_hat_X_above_med_`geog' = GM_hat * above_med_`geog'
-
-				drop above_med_temp
-			}
-			
-			
-			
-			preserve
-				use "$RAWDATA/other/district_court_order_data_feb2021.dta", clear
-				drop if status_2020 >=4 // Dropping dismissed court orders
-				keep cfips 
-				ren cfip fips
-				destring fips, replace
-				duplicates drop
-				tempfile co
-				save `co'
-			restore
-
-			merge m:1 fips using `co', keep(1 3)
-			g co_2020 = _merge == 3
-			lab var co_2020 "Desegregation Order"
-			
-			g GM_X_co_2020 = GM * co_2020
-			g GM_hat_X_co_2020 = GM_hat * co_2020
-			drop _merge
-			/*
-			merge m:1 fips using "$INTDATA/land_cover/county_tri", keep(3) nogen
-			g add_tri_ctrl = cond(mean_tri<.,0,1)
-			replace mean_tri = 0 if add_tri_ctrl==1
-			*/
-			merge m:1 fips using "$CLEANDATA/nces/nces_finance_data.dta", keep(3) nogen
-		}
-		*/
-	
-	/*
-	preserve
-		use "$RAWDATA/dcourt/ICPSR_07735_City_Book_1944_1977/DS0001/City_Book_1944_1977.dta", clear
-
-		*Standardize State Names
-		drop if PLACE1=="0000"
-		destring STATE1, replace
-		statastates, fips(STATE1)  nogen
-
-		cityfix_ccdb
-
-		
-					
-		ren CC0007 popc1940
-		ren CC0010 popc1970
-		
-		keep if popc1940>25000 & popc1970>25000
-		
-		merge 1:1 city using "$XWALKS/US_place_point_2010_crosswalks.dta", keepusing(state_fips countyfip cz) keep(1 3) 
-		g fips = state_fips*1000+real(countyfip)
-
-		replace cz = 19600 if city == "Belleville, NJ"
-		replace fips = 34013 if city == "Belleville, NJ"
-		keep `levelvar'
-		duplicates drop
-		tempfile urban
-		save `urban'
-	restore
-	merge m:1 `levelvar' using `urban', keep(1 3)
-	g urban = _merge==3
-	drop _merge
-	*/
-	
 	
 	
 	if "`level'"=="cz"{
@@ -660,6 +604,13 @@ foreach level in cz {
 	}
 	
 	merge m:1 cz using "$INTDATA/covariates/covariates.dta", keep(1 3) nogen
+	merge m:1 cz using "$INTDATA/census/maxcitypop", keep(1 3) nogen
+	
+	// Missing dummies
+	foreach var of varlist frac_land transpo_cost_1920 coastal has_port avg_precip avg_temp n_wells totfrac_in_main_city urbfrac_in_main_city m_rr m_rr_sqm2{
+			g `var'_m = `var'==.
+			replace `var' = 0 if `var'==.
+	}
 	
 	// Adding labels
 	lab var decade "Decade Start"
@@ -669,7 +620,6 @@ foreach level in cz {
 			lab var n_`ds'_`level'_L0 "New Govs, `label'"
 			lab var b_`ds'_`level'_L0 "Base Govs, `label'"
 	}
-	
 	
 	lab var GM_raw_totpop "Percentage Change in Total Black Population"
 	lab var GM_hat_raw_totpop "Predicted Percentage Change in Total Black Population"
@@ -698,9 +648,7 @@ foreach level in cz {
 	lab var frac_total "Fraction of CZ area incorporated"
 	lab var cz "Commuting Zone (1990)"
 	cap lab var fips "County FIPS Code"
-	
-	if "`level'"=="cz" merge m:1 cz using "$INTDATA/census/maxcitypop", keep(1 3) nogen
-	
+		
 	lab var totfrac_in_main_city "Fraction of population in largest city"
 	lab var urbfrac_in_main_city "Fraction of urban population in largest city"
 	lab var n_wells "Number of Oil/Nat Gas Wells, 1940"
