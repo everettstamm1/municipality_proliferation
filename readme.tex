@@ -1,0 +1,76 @@
+\documentclass{article}
+\usepackage{blindtext}
+\usepackage{booktabs}
+\usepackage[margin=0.25in]{geometry}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage{tikz}
+\usepackage{threeparttable}
+\usepackage{natbib}
+\usepackage{bibentry}
+\nobibliography*
+
+\title{Read Me for Municipality Proliferation}
+
+\begin{document}
+\section{Computational Requirements}
+\begin{itemize}
+\item Software Requirements
+\item Computational Requirements
+\item Time Requirements
+\item Package Installation
+\end{itemize}
+
+\section{Instructions}
+\subsection{Overview}
+As of July 12th, 2023 the file master.do contains the code to create the two final datasets, cz\_pooled.dta and cz\_stacked.dta. To be precise, it sets up and runs the subfiles in the correct order to create those datasets. To run it, you need to add the absolute paths on your computer to the if-else block at the top of the file as I have for my (Everett Stamm's) computer. You will need a path to the dropbox folder where the data is stored, a path to the repository where the code is stored, a path to your FFMPEG installation (only necessary for map creation, not data cleaning), a path to your Rterm.exe installation, and a flag for if you will use the gz7 function. 
+
+\subsection{gz7 setup}
+As of 05.17.2022, the gzuse package no longer works on Windows computers. To get around this, I created the wrapper function gz7 that calls 7zip to unzip the file. To set this up, please install 7zip and add it to your system path. https://www.7-zip.org/download.html
+
+\subsection{R setup}
+You will need the following R packages. Please install them before running the code:
+\begin{itemize}
+\item tidyverse
+\item sf
+\item haven
+\item tigris
+\item stringr
+\item readxl
+\end{itemize}
+
+\subsection{Derenoncourt setup}
+The entirety of the Derenoncourt "Can You Move to Opportunity? Evidence from the Great Migration." replication package is in the dropbox in "/municipality\_proliferation/derenoncourt\_opportunity/replication\_AER\". Within this, the folder "code" is her original replication code and the folder "code\_replication" replicates it to our specifications. To make things easier, I've copied the files with major changes into the repository. All of the do-files starting with A are new and used to create new data for the decades stacked sample. 4\_final\_dataset.do and 4\_final\_dataset\_split.do are modified versions of Derenoncourt's similarly named file that only includes variables we need and modifies it in some other ways for our analysis (e.g. raw instruments instead of rank).
+
+\section{Data Sources (INCOMPLETE)}
+\subsection{Derenoncourt 2022}
+Availability:
+
+Usage: Users should download the full repository into \textbf{/municipality\_proliferation/derenoncourt\_opportunity/} and then follow the instructions in ReadMe.pdf to acquire the necessary data. Note that none of the data listed as unavailable is required for our analysis.
+
+Citation: \bibentry{dcourt}
+
+\subsection{IPUMS USA}
+Availability: Extracts permitted for replication purposes.
+
+Citation: \bibentry{ipums}
+
+\subsection{NHGIS}
+Availability: Extracts permitted for replication purposes.
+
+Citation: \bibentry{nhgis}
+
+\subsection{US Census Codes}
+Availability: Public
+
+Citation: \bibentry{censusplaces}
+
+
+\bibliographystyle{plainnat}
+
+
+\bibliography{readme_bib}
+\end{document}
