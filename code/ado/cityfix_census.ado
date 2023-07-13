@@ -1,9 +1,10 @@
-cap prog drop cityfix_ccdb
-prog def cityfix_ccdb
-	syntax, codevar(varname)
+cap prog drop cityfix_census
+prog def cityfix_census
+	syntax, [codevar(varname)]
 	
 
 	if "`codevar'" == "" local codevar "citycode"
+	
 	rename city `codevar'
 	decode `codevar', gen(city)
 
@@ -53,6 +54,18 @@ prog def cityfix_ccdb
 	replace city = "Short Hills, NJ" if city == "South Orange, NJ"
 
 	// New york new jersey
-	replace city = "New York, NJ" if city == "New York, NY" & statefip==34
+	cap replace city = "New York, NJ" if city == "New York, NY" & statefip==34
 	
+	// Fixes for 1940 with southern cities
+	replace city = "Boise City, ID" if city == "Boise, ID"
+	replace city = "LaGrange, GA" if city == "La Grange, GA"
+	replace city = "McAlester, OK" if city == "Mcalester, OK"
+	replace city = "McComb, MS" if city == "Mccomb, MS"
+	replace city = "Middlesborough, KY" if city == "Middlesboro, KY"
+	replace city = "Plattsburgh, NY" if city == "Plattsburg, NY"
+	replace city = "St. Petersburg, FL" if city == "Saint Petersburg, FL"
+	replace city = "Warwick, RI" if city == "Warwick Town, RI"
+	replace city = "Texarkana, TX" if citycode == 69510
+	replace city = "Texarkana, AR" if citycode == 69511
+
 	end

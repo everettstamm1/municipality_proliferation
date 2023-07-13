@@ -1,5 +1,5 @@
 
-foreach level in cz county{
+foreach level in cz {
 	if "`level'"=="cz"{
 		local levelvar cz
 		local levellab "CZ"
@@ -274,22 +274,36 @@ foreach level in cz county{
 	save "$INTDATA/counts/cgoodman_`level'", replace
 	
 
-		
+	foreach samp in  dcourt south{
+		if "`samp'" == "dcourt" {
+			local samptab = ""
+			local outsamptab = ""
+
+		}
+		if "`samp'" == "south" {
+			local samptab = "_full"
+			local outsamptab = "_south"
+		}
 		// Pooled
-		use "$DCOURT/data/GM_`level'_final_dataset.dta", clear
-		keep `levelvar' GM_raw GM_raw_pp GM_hat_raw GM_hat_raw_pp v2_blackmig3539_share1940 popc* bpopc*
-		ren v2_blackmig3539_share1940 blackmig3539_share 
+		
+		use "$DCOURT/data/GM_`level'_final_dataset`samptab'.dta", clear
+		keep `levelvar' GM GM_hat2 GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg* frac_all_upm1940  GM_hat_raw_r*
+		ren GM_hat2 GM_hat
+		if "`samp'"=="south" ren v2*_blackmig3539_share1940 *blackmig3539_share
+		if "`samp'"=="dcourt" ren v2_blackmig3539_share1940 blackmig3539_share
+
 		if "`level'"=="msa"{
 			destring smsa, gen(msapmsa2000) 
 		}
 		
 		preserve
-			use "$CLEANDATA/dcourt/GM_`level'_final_dataset_split", clear
-			keep `levelvar' GM_raw GM_raw_pp GM_hat_raw GM_hat_raw_pp vfull_blackmig3539_share reg* pop1940 bpop1940 mfg_lfshare1940 pop1970 bpop1970 mfg_lfshare1970
-			foreach var of varlist GM_raw GM_raw_pp GM_hat_raw GM_hat_raw_pp vfull_blackmig3539_share{
+			use "$CLEANDATA/dcourt/GM_`level'_final_dataset_split`samptab'", clear
+			keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v*_blackmig3539_share reg* pop1940 bpop1940 mfg_lfshare1940 pop1970 bpop1970 mfg_lfshare1970
+			ren vfull*_blackmig3539_share *blackmig3539_share
+			foreach var of varlist GM* *blackmig3539_share mfg_lfshare1940{
 				ren `var' `var'_totpop
 			}
-			ren vfull_blackmig3539_share_totpop blackmig3539_share_totpop
+			
 			tempfile totpop_insts
 			save `totpop_insts'
 		restore
@@ -322,15 +336,52 @@ foreach level in cz county{
 		replace frac_total = 0 if _merge==1
 		drop _merge decade
 		
-		g dcourt = GM_raw<.
 		
+		foreach geog in land total{
+			qui su frac_`geog' if GM_raw_pp < .,d
+			g above_med_temp = frac_`geog'>=`r(p50)' if  GM_raw_pp < . 
+			bys `levelvar' : egen above_med_`geog' = max(above_med_temp)
+			drop above_med_temp
+			
+			qui su frac_`geog' if  GM_raw_pp_totpop < .,d
+			g above_med_temp = frac_`geog'>=`r(p50)' if GM_raw_pp_totpop < . 
+			bys `levelvar' : egen above_med_`geog'_totpop = max(above_med_temp)
+			drop above_med_temp
+		}
+		
+		if "`level'" == "cz"{
+			merge 1:1 cz using "$DCOURT/data/crosswalks/original_130_czs"
+			
+			g dcourt = _merge==3
+			drop _merge
+			lab var dcourt "Derenoncourt Sample of 130 CZs"
+			
+			merge 1:1 cz using "$INTDATA/covariates/covariates.dta", keep(1 3) nogen
+			merge 1:1 cz using "$INTDATA/census/maxcitypop", keep(1 3) nogen
+
+		}
+		// Missing dummies
+		foreach var of varlist frac_land transpo_cost_1920 coastal has_port avg_precip avg_temp n_wells totfrac_in_main_city urbfrac_in_main_city m_rr m_rr_sqm2{
+			g `var'_m = `var'==.
+			replace `var' = 0 if `var'==.
+		}
+		replace n_cgoodman_cz = 0 if n_cgoodman_cz==.
+		replace b_cgoodman_cz1940 = 0 if b_cgoodman_cz1940==.
+		replace b_cgoodman_cz1970 = 0 if b_cgoodman_cz1970==.
 		// Adding labels
-		
+
 		foreach ds in  gen_muni schdist_ind all_local ngov3 gen_subcounty spdist   cgoodman  {
 				local label : variable label n_`ds'_`level'
 				lab var n_`ds'_`level' "New Govs, `label'"
 				lab var b_`ds'_`level'1940 "Base Govs 1940, `label'"
 				lab var b_`ds'_`level'1970 "Base Govs 1970, `label'"
+				
+				g b_`ds'_`level'1940_pc = b_`ds'_`level'1940/(pop1940/10000) 
+				g b_`ds'_`level'1940_pcc = b_`ds'_`level'1940/(popc1940/10000) 
+				g n_`ds'_`level'_pc = b_`ds'_`level'1970/(pop1970/10000) - b_`ds'_`level'1940/(pop1940/10000) 
+				g n_`ds'_`level'_pcc = b_`ds'_`level'1970/(popc1970/10000) - b_`ds'_`level'1940/(popc1940/10000) 
+				lab var n_`ds'_`level'_pc "New `label', P.C. (total)"
+				lab var n_`ds'_`level'_pcc "New `label', P.C. (urban)"
 
 		}
 		
@@ -338,10 +389,14 @@ foreach level in cz county{
 		lab var GM_hat_raw_totpop "Predicted Percentage Change in Total Black Population"
 		lab var GM_raw_pp_totpop "Percentage Point Change in Total Black Population"
 		lab var GM_hat_raw_pp_totpop "Predicted Percentage Point Change in Total Black Population"
+		lab var GM_totpop "Percentile Point Change in Total Black Population"
+		lab var GM_hat_totpop "Predicted Percentile Point Change in Total Black Population"
 		lab var GM_raw_pp "Percentage Point Change in Urban Black Population"
 		lab var GM_hat_raw_pp "Predicted Percentage Point Change in Urban Black Population"
 		lab var GM_raw "Percentage Change in Urban Black Population"
 		lab var GM_hat_raw "Predicted Percentage Change in Urban Black Population"
+		lab var GM "Percentile Change in Urban Black Population"
+		lab var GM_hat "Predicted Percentile Change in Urban Black Population"
 		
 		lab var blackmig3539_share_totpop "Total Population Share of 1935-39 Black Migrants"
 		lab var blackmig3539_share "Urban Population Share of 1935-39 Black Migrants"
@@ -356,31 +411,57 @@ foreach level in cz county{
 			lab var mfg_lfshare`y' "Share of LF employed in manufacturing, `y'"
 		}
 		
-		lab var dcourt "Derenoncourt Sample of 130 CZs"
 		lab var frac_land "Fraction of CZ land incorporated"
 		lab var frac_total "Fraction of CZ area incorporated"
 		cap lab var cz "Commuting Zone (1990)"
 		cap lab var fips "County FIPS Code"
 		
-	
-		save "$CLEANDATA/`level'_pooled", replace
+
+		lab var totfrac_in_main_city "Fraction of population in largest city"
+		lab var urbfrac_in_main_city "Fraction of urban population in largest city"
+		lab var n_wells "Number of Oil/Nat Gas Wells, 1940"
+		lab var max_temp "Maximum Temperature, 1940"
+		lab var min_temp "Minimum Temperature, 1940"
+		lab var avg_temp "Average Temperature, 1940"
+		lab var avg_precip "Average Precipitation, 1940"
+		lab var has_port "Has Port, 1940"
+		lab var coastal "Coastal"
+		lab var transpo_cost_1920 "Average Transport Cost out of CZ, 1920 (Donaldson and Hornbeck)"
+		lab var m_rr "Meters of Railroad, 1940"
+		lab var m_rr_sqm2 "Meters of Railroad per Square Meter of Land, 1940"
+
+		save "$CLEANDATA/`level'_pooled`outsamptab'", replace
 		
 		// Creating stacked version of data
+		use "$CLEANDATA/dcourt/GM_`level'_final_dataset_split`samptab'",clear
 		
-		use "$CLEANDATA/dcourt/GM_`level'_final_dataset_split",clear
+		rename *1940_1950 *1940
+		rename *1950_1960 *1950
+		rename *1960_1970 *1960
 		
 		ren vfull_* *
-		foreach var of varlist GM_raw* GM_hat_raw* blackmig3539_share*{
+		ren vfull* *
+		drop rm_* nt_* rmnt_* 
+
+		foreach var of varlist GM* blackmig3539_share*{
 				ren `var' totpop_`var'
 		}
+		
+		
+		
 		// Dropping 1940-70 versions
-		drop totpop_GM_raw totpop_GM_raw_pp totpop_GM_hat_raw totpop_GM_hat_raw_pp
+		drop totpop_GM_raw totpop_GM_raw_pp totpop_GM_hat_raw totpop_GM_hat_raw_pp totpop_GM totpop_GM_hat
 
 		preserve
-			use "$DCOURT/data/GM_`level'_final_dataset_split.dta", clear
-			keep `levelvar' GM_raw_pp* GM_hat_raw_pp* popc???? mfg_lfshare* v2_blackmig3539_share* reg2 reg3 reg4 
-			
+			use "$DCOURT/data/GM_`level'_final_dataset_split`samptab'.dta", clear
+
+			keep `levelvar' GM* popc???? bpopc???? mfg_lfshare* v2*blackmig3539_share* reg2 reg3 reg4  frac_all_upm*
+			drop GM_hat0* GM_hat7r* GM_hat8*
+			ren GM_hat2_* GM_hat_*
 			ren v2_blackmig3539_share* blackmig3539_share*
+			
+			if "`samp'"=="south" ren v2*_blackmig3539_share* *_blackmig3539_share*
+
 			tempfile dcourt
 			save `dcourt'
 		restore
@@ -418,8 +499,8 @@ foreach level in cz county{
 		rename *70_80 *1970
 		rename *80_90 *1980
 
-		keep totpop_* GM_*  mfg_lfshare* blackmig3539_share* `levelvar' reg2 reg3 reg4  n_*_`level'???? b_*_`level'????  bpop* pop*
-		cap drop GM_hat0* GM_hat2*  GM_hat1*  GM_hatr* GM_hat7r* GM_hat8* 
+		keep totpop_* GM_* frac_all_upm* mfg_lfshare* blackmig3539_share* `levelvar' reg2 reg3 reg4  n_*_`level'???? b_*_`level'????  bpop* pop*
+		cap drop GM_hat0* GM_hat2* GM_hat1*  GM_hatr* GM_hat7r* GM_hat8* 
 		cap drop totpop_blackmig3539_share
 		local stubs 
 		foreach ds in  gen_muni schdist_ind all_local ngov3 gen_subcounty spdist   cgoodman  {
@@ -427,17 +508,45 @@ foreach level in cz county{
 			local stubs `stubs' n_`ds'_`level' b_`ds'_`level'
 
 		}
+		if "`samp'"=="south"{
+			foreach gm in rm nt rmnt  {
+				local stubs `stubs' totpop_GM_`gm'_hat_raw_pp_ totpop_GM_`gm'_hat_raw_ tp_`gm'_blackmig3539_share
+				drop totpop_GM_`gm'_hat_raw_pp totpop_GM_`gm'_hat_raw // dropping 1940-70 versions
+			}
+			foreach gm in rm nt rmnt rmsc scnt rmscnt {
+				local stubs `stubs' GM_`gm'_hat_raw_pp_ `gm'_blackmig3539_share
+			}
+		}
+			
+		qui reshape long `stubs' frac_all_upm totpop_GM_ GM_ GM_hat_ totpop_GM_hat totpop_GM_raw_ totpop_GM_raw_pp_ totpop_GM_hat_raw_ totpop_GM_hat_raw_pp_ GM_raw_pp_ GM_hat_raw_pp_  mfg_lfshare totpop_blackmig3539_share blackmig3539_share bpop pop bpopc popc, i(`levelvar') j(decade)
 		
-		qui reshape long `stubs' totpop_GM_raw_ totpop_GM_raw_pp_ totpop_GM_hat_raw_ totpop_GM_hat_raw_pp_ GM_raw_pp_ GM_hat_raw_pp_  mfg_lfshare totpop_blackmig3539_share blackmig3539_share bpop pop bpopc popc, i(`levelvar') j(decade)
-		
-		
+		replace n_cgoodman_cz = 0 if n_cgoodman_cz==.
+		replace b_cgoodman_cz = 0 if b_cgoodman_cz==.
+
 		foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist cgoodman {
 			label var n_`ds'_`level' "`lab`ds''"
 
+			g frac = b_`ds'_`level'/(pop/10000)
+			g fracc = b_`ds'_`level'/(popc/10000)
+			
+			bys cz (decade) : g n_`ds'_`level'_L0_pc = frac[_n+1] - frac
+			bys cz (decade) : g n_`ds'_`level'_L0_pcc = fracc[_n+1] - fracc
+			
+			g b_`ds'_`level'1940_pc = frac if decade == 1940
+			g b_`ds'_`level'1940_pcc = fracc if decade == 1940
+
+			bys cz (b_`ds'_`level'1940_pc) : replace b_`ds'_`level'1940_pc = b_`ds'_`level'1940_pc[1]
+			bys cz (b_`ds'_`level'1940_pcc) : replace b_`ds'_`level'1940_pcc = b_`ds'_`level'1940_pcc[1]
+
+			lab var n_`ds'_`level'_L0_pc "New `lab`ds'', P.C. (total)"
+			lab var n_`ds'_`level'_L0_pcc "New `lab`ds'', P.C. (urban)"
+		
+			drop frac fracc
 		}
 		
 		ren *_ *
 		ren totpop_* *_totpop
+		if "`samp'"=="south" ren tp_* *_totpop
 		/*
 		bys `levelvar' (decade) : g n_*_`level'_L1 = n_*_`level'[_n-1] if decade-10 == decade[_n-1]
 		bys `levelvar' (decade) : g n_*_`level'_L2 = n_*_`level'[_n-2] if decade-20 == decade[_n-2]
@@ -466,100 +575,30 @@ foreach level in cz county{
 		replace frac_land = 0 if _merge==1
 		replace frac_total = 0 if _merge==1
 		drop _merge
-		/*
-		if "`level'"=="county"{
+		
+		foreach geog in land total{
+			qui su frac_`geog' if decade == 1940 & GM_raw_pp < .,d
+			g above_med_temp = frac_`geog'>=`r(p50)' if decade == 1940 & GM_raw_pp < . 
+			bys `levelvar' : egen above_med_`geog' = max(above_med_temp)
+			drop above_med_temp
 			
-			merge 1:1 fips decade using "$INTDATA/land_cover/frac_unusable", keep(1 3) nogen
-			merge m:1 fips using "$INTDATA/lu_lutz_sand/lu_lutz_sand_indicators", keep(1 3) nogen
-			ren frac_unbuildable_* frac_ub_*
-			foreach geog in land total unusable total_00 total_05 total_10 total_15 total_20 lu_ml_2010 lu_ml_mean ub_1 ub_2{
-				qui su frac_`geog' if decade == 1940 & GM < .,d
-				g above_med_temp = frac_`geog'>=`r(p50)' if decade == 1940 & GM_raw < . 
-				bys `levelvar' : egen above_med_`geog' = max(above_med_temp)
-				g GM_X_above_med_`geog' = GM * above_med_`geog'
-				g GM_hat_X_above_med_`geog' = GM_hat * above_med_`geog'
-
-				drop above_med_temp
-			}
-			
-			
-			
-			preserve
-				use "$RAWDATA/other/district_court_order_data_feb2021.dta", clear
-				drop if status_2020 >=4 // Dropping dismissed court orders
-				keep cfips 
-				ren cfip fips
-				destring fips, replace
-				duplicates drop
-				tempfile co
-				save `co'
-			restore
-
-			merge m:1 fips using `co', keep(1 3)
-			g co_2020 = _merge == 3
-			lab var co_2020 "Desegregation Order"
-			
-			g GM_X_co_2020 = GM * co_2020
-			g GM_hat_X_co_2020 = GM_hat * co_2020
-			drop _merge
-			/*
-			merge m:1 fips using "$INTDATA/land_cover/county_tri", keep(3) nogen
-			g add_tri_ctrl = cond(mean_tri<.,0,1)
-			replace mean_tri = 0 if add_tri_ctrl==1
-			*/
-			merge m:1 fips using "$CLEANDATA/nces/nces_finance_data.dta", keep(3) nogen
+			qui su frac_`geog' if decade == 1940 & GM_raw_pp_totpop < .,d
+			g above_med_temp = frac_`geog'>=`r(p50)' if decade == 1940 & GM_raw_pp_totpop < . 
+			bys `levelvar' : egen above_med_`geog'_totpop = max(above_med_temp)
+			drop above_med_temp
 		}
-		*/
-	
-	/*
-	preserve
-		use "$RAWDATA/dcourt/ICPSR_07735_City_Book_1944_1977/DS0001/City_Book_1944_1977.dta", clear
-
-		*Standardize State Names
-		drop if PLACE1=="0000"
-		destring STATE1, replace
-		statastates, fips(STATE1)  nogen
-
-		cityfix_ccdb
-
 		
-					
-		ren CC0007 popc1940
-		ren CC0010 popc1970
-		
-		keep if popc1940>25000 & popc1970>25000
-		
-		merge 1:1 city using "$XWALKS/US_place_point_2010_crosswalks.dta", keepusing(state_fips countyfip cz) keep(1 3) 
-		g fips = state_fips*1000+real(countyfip)
-
-		replace cz = 19600 if city == "Belleville, NJ"
-		replace fips = 34013 if city == "Belleville, NJ"
-		keep `levelvar'
-		duplicates drop
-		tempfile urban
-		save `urban'
-	restore
-	merge m:1 `levelvar' using `urban', keep(1 3)
-	g urban = _merge==3
-	drop _merge
-	*/
-	preserve 
-		use "$DCOURT/data/GM_cz_final_dataset.dta", clear
-		ren cz czone
-		merge 1:m czone using "$XWALKS/cw_cty_czone", keep(3) nogen
-		ren czone cz
-		ren cty_fips fips
-		keep `levelvar'
-		duplicates drop
-		tempfile dcourt
-		save `dcourt'
-	restore
-	merge m:1 `levelvar' using `dcourt', keep(1 3)
-	g dcourt = _merge==3
-	drop _merge
 	
 	
 	if "`level'"=="cz"{
+		
+		merge m:1 cz using "$DCOURT/data/crosswalks/original_130_czs"
+			
+		g dcourt = _merge==3
+		drop _merge
+		lab var dcourt "Derenoncourt Sample of 130 CZs"
+		
+		
 		preserve
 			use "$XWALKS/US_place_point_2010_crosswalks.dta", clear
 			keep cz cz_name
@@ -571,8 +610,17 @@ foreach level in cz county{
 		restore
 		
 		merge m:1 `levelvar' using `cznames', keep(1 3) nogen
+		
 	}
 	
+	merge m:1 cz using "$INTDATA/covariates/covariates.dta", keep(1 3) nogen
+	merge m:1 cz using "$INTDATA/census/maxcitypop", keep(1 3) nogen
+	
+	// Missing dummies
+	foreach var of varlist frac_land transpo_cost_1920 coastal has_port avg_precip avg_temp n_wells totfrac_in_main_city urbfrac_in_main_city m_rr m_rr_sqm2{
+			g `var'_m = `var'==.
+			replace `var' = 0 if `var'==.
+	}
 	
 	// Adding labels
 	lab var decade "Decade Start"
@@ -606,14 +654,26 @@ foreach level in cz county{
 		lab var popc`y' "Urban Population, `y'"
 	}
 	
-	lab var dcourt "Derenoncourt Sample of 130 CZs"
 	lab var frac_land "Fraction of CZ land incorporated"
 	lab var frac_total "Fraction of CZ area incorporated"
 	lab var cz "Commuting Zone (1990)"
 	cap lab var fips "County FIPS Code"
+		
+	lab var totfrac_in_main_city "Fraction of population in largest city"
+	lab var urbfrac_in_main_city "Fraction of urban population in largest city"
+	lab var n_wells "Number of Oil/Nat Gas Wells, 1940"
+	lab var max_temp "Maximum Temperature, 1940"
+	lab var min_temp "Minimum Temperature, 1940"
+	lab var avg_temp "Average Temperature, 1940"
+	lab var avg_precip "Average Precipitation, 1940"
+	lab var has_port "Has Port, 1940"
+	lab var coastal "Coastal"
+	lab var transpo_cost_1920 "Average Transport Cost out of CZ, 1920 (Donaldson and Hornbeck)"
+	lab var m_rr "Meters of Railroad, 1940"
+	lab var m_rr_sqm2 "Meters of Railroad per Square Meter of Land, 1940"
 	
-	save "$CLEANDATA/`level'_stacked", replace
-	
+	save "$CLEANDATA/`level'_stacked`outsamptab'", replace
+	}
 }
 
 

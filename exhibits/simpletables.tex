@@ -9,6 +9,8 @@
 \usepackage{pdflscape}
 \usepackage{tikz}
 \usepackage{threeparttable}
+\usepackage{algorithmic}
+
 
 \title{Simple Tables for Municipality Proliferation}
 
@@ -20,325 +22,176 @@
 \listoftables}
 \clearpage
 
-\section{Pooled, Urban Populations}
+\foreach \inst in {main}{
+	
+
+	
+	\def \main {main}
+	\def \mainsouth {mainsouth}
+	\def \rm {rm}
+	\def \nt {nt}
+	\def \rmnt {rmnt}
+	\def \scnt {scnt}
+	\def \rmsc {rmsc}
+	\def \rmscnt {rmscnt}
+
+	\ifx \inst\main \section{Original Instrument design, Urban Populations} \fi
+	\ifx \inst\mainsouth \section{Original Instrument design, full southern sample, Urban Populations}\fi
+	\ifx \inst\rm \section{Rural southern counties to northern cities, southern texas, Urban Populations}\fi
+	\ifx \inst\nt \section{Southern counties to northern cities, northern texas, Urban Populations}\fi
+	\ifx \inst\rmnt \section{Rural southern counties to northern cities, northern texas, Urban Populations}\fi
+	\ifx \inst\rmsc \section{Rural southern counties to all cities, southern texas, Urban Populations}\fi
+	\ifx \inst\scnt \section{Southern counties to all cities, northern texas, Urban Populations}\fi
+	\ifx \inst\rmscnt \section{Rural southern counties to all cities, northern texas, Urban Populations}\fi
+	
 
 
-\subsection{CGoodman Full, Per Capita}
-\input{tables/simpletables/pooled_cgoodman_pc_C3_urban}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_cgoodman_pc_C3_urban_fs.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_cgoodman_pc_C3_urban_ols.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_cgoodman_pc_C3_urban_rf.pdf}
-\end{figure}
-\clearpage
-
-\subsection{Subcounty Governments, Per Capita}
-\input{tables/simpletables/pooled_gen_subcounty_pc_C3_urban}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_gen_subcounty_pc_C3_urban_fs.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_gen_subcounty_pc_C3_urban_ols.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_gen_subcounty_pc_C3_urban_rf.pdf}
-\end{figure}
-\clearpage
-
-\subsection{Municipal Governments, Per Capita}
-\input{tables/simpletables/pooled_gen_muni_pc_C3}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_gen_muni_pc_C3_urban_fs.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_gen_muni_pc_C3_urban_ols.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_gen_muni_pc_C3_urban_rf.pdf}
-\end{figure}
-\clearpage
-\subsection{School Districts, Per Capita}
-\input{tables/simpletables/pooled_schdist_ind_pc_C3_urban}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_schdist_ind_pc_C3_urban_fs.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_schdist_ind_pc_C3_urban_ols.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_schdist_ind_pc_C3_urban_rf.pdf}
-\end{figure}
-\clearpage
+	\subsection{CGoodman Full, Per Capita, Pooled}
+	\input{tables/simpletables/pooled_cgoodman_pc_C3_urban_\inst}
+	\input{tables/simpletables/pooled_cgoodman_pc_C3_urban_above_\inst}
+	\clearpage
+	\input{tables/simpletables/pooled_cgoodman_pc_C3_urban_below_\inst}
+	\clearpage
+	
+	
+	\subsection{Subcounty Governments, Per Capita, Pooled}
+	\input{tables/simpletables/pooled_gen_subcounty_pc_C3_urban_\inst}
+	\input{tables/simpletables/pooled_gen_subcounty_pc_C3_urban_above_\inst}
+	\clearpage
+	\input{tables/simpletables/pooled_gen_subcounty_pc_C3_urban_below_\inst}
+	\clearpage
+	
+	
+	\subsection{Municipal Governments, Per Capita, Pooled}
+	\input{tables/simpletables/pooled_gen_muni_pc_C3_urban_\inst}
+	\input{tables/simpletables/pooled_gen_muni_pc_C3_urban_above_\inst}
+	\clearpage
+	\input{tables/simpletables/pooled_gen_muni_pc_C3_urban_below_\inst}
+	
+	\subsection{School Districts, Per Capita, Pooled}
+	\input{tables/simpletables/pooled_schdist_ind_pc_C3_urban_\inst}
+	\input{tables/simpletables/pooled_schdist_ind_pc_C3_urban_above_\inst}
+	\clearpage
+	\input{tables/simpletables/pooled_schdist_ind_pc_C3_urban_below_\inst}
+	\clearpage
+	
+	
+	\subsection{CGoodman Full, Per Capita, Stacked Tables}
+	\input{tables/simpletables/stacked_cgoodman_pc_C3_urban_\inst}
+	\input{tables/simpletables/stacked_cgoodman_pc_C3_urban_above_\inst}
+	\clearpage
+	\input{tables/simpletables/stacked_cgoodman_pc_C3_urban_below_\inst}
+	\clearpage
 
 
-\section{Stacked Tables, Urban Populations}
+	
+	\subsection{Subcounty Governments, Per Capita, Stacked Tables}
+	\input{tables/simpletables/stacked_gen_subcounty_pc_C3_urban_\inst}
+	\input{tables/simpletables/stacked_gen_subcounty_pc_C3_urban_above_\inst}
+	\clearpage
+	\input{tables/simpletables/stacked_gen_subcounty_pc_C3_urban_below_\inst}
+	\clearpage
+	
+	
+	\subsection{Municipal Governments, Per Capita, Stacked Tables}
+	\input{tables/simpletables/stacked_gen_muni_pc_C3_urban_\inst}
+	\input{tables/simpletables/stacked_gen_muni_pc_C3_urban_above_\inst}
+	\clearpage
+	\input{tables/simpletables/stacked_gen_muni_pc_C3_urban_below_\inst}
+	
+	\subsection{School Districts, Per Capita, Stacked Tables}
+	\input{tables/simpletables/stacked_schdist_ind_pc_C3_urban_\inst}
+	\input{tables/simpletables/stacked_schdist_ind_pc_C3_urban_above_\inst}
+	\clearpage
+	\input{tables/simpletables/stacked_schdist_ind_pc_C3_urban_below_\inst}
+	
+	
+	
+}
 
 
-\subsection{CGoodman Full, Per Capita}
-\input{tables/simpletables/stacked_cgoodman_pc_C3_urban}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_cgoodman_pc_C3_urban_fs.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_cgoodman_pc_C3_urban_ols.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_cgoodman_pc_C3_urban_rf.pdf}
-\end{figure}
-\clearpage
+\foreach \inst in {main}{
+	
+
+	
+	\def \main {main}
+	\def \mainsouth {mainsouth}
+	\def \rm {rm}
+	\def \nt {nt}
+	\def \rmnt {rmnt}
 
 
-\subsection{Subcounty Governments, Per Capita}
-\input{tables/simpletables/stacked_gen_subcounty_pc_C3_urban}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_gen_subcounty_pc_C3_urban_fs.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_gen_subcounty_pc_C3_urban_ols.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_gen_subcounty_pc_C3_urban_rf.pdf}
-\end{figure}
-\clearpage
+	\ifx \inst\main \section{Original Instrument design, Total Populations} \fi
+	\ifx \inst\mainsouth \section{Original Instrument design, full southern sample, Total Populations}\fi
+	\ifx \inst\rm \section{Rural southern counties to northern cities, southern texas, Total Populations}\fi
+	\ifx \inst\nt \section{Southern counties to northern cities, northern texas, Total Populations}\fi
+	\ifx \inst\rmnt \section{Rural southern counties to northern cities, northern texas, Total Populations}\fi
+	
 
-\subsection{Municipal Governments, Per Capita}
-\input{tables/simpletables/stacked_gen_muni_pc_C3_urban}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_gen_muni_pc_C3_urban_fs.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_gen_muni_pc_C3_urban_ols.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_gen_muni_pc_C3_urban_rf.pdf}
-\end{figure}
-\clearpage
+	
+	
+	\subsection{CGoodman Full, Per Capita, Pooled}
+	\input{tables/simpletables/pooled_cgoodman_pc_C3_total_\inst}
+	\input{tables/simpletables/pooled_cgoodman_pc_C3_total_above_\inst}
+	\clearpage
+	\input{tables/simpletables/pooled_cgoodman_pc_C3_total_below_\inst}
+	\clearpage
+	
+	
+	\subsection{Subcounty Governments, Per Capita, Pooled}
+	\input{tables/simpletables/pooled_gen_subcounty_pc_C3_total_\inst}
+	\input{tables/simpletables/pooled_gen_subcounty_pc_C3_total_above_\inst}
+	\clearpage
+	\input{tables/simpletables/pooled_gen_subcounty_pc_C3_total_below_\inst}
+	\clearpage
+	
+	
+	\subsection{Municipal Governments, Per Capita, Pooled}
+	\input{tables/simpletables/pooled_gen_muni_pc_C3_total_\inst}
+	\input{tables/simpletables/pooled_gen_muni_pc_C3_total_above_\inst}
+	\clearpage
+	\input{tables/simpletables/pooled_gen_muni_pc_C3_total_below_\inst}
+	\clearpage
+	
+	\subsection{School Districts, Per Capita, Pooled}
+	\input{tables/simpletables/pooled_schdist_ind_pc_C3_total_\inst}
+	\input{tables/simpletables/pooled_schdist_ind_pc_C3_total_above_\inst}
+	\clearpage
+	\input{tables/simpletables/pooled_schdist_ind_pc_C3_total_below_\inst}
+	\clearpage
 
-\subsection{School Districts, Per Capita}
-\input{tables/simpletables/stacked_schdist_ind_pc_C3_urban}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_schdist_ind_pc_C3_urban_fs.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_schdist_ind_pc_C3_urban_ols.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_schdist_ind_pc_C3_urban_rf.pdf}
-\end{figure}
-\clearpage
-
-
-
-\section{Pooled, Total Populations}
-
-
-\subsection{CGoodman Full, Per Capita}
-\input{tables/simpletables/pooled_cgoodman_pc_C3_total}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_cgoodman_pc_C3_total_fs.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_cgoodman_pc_C3_total_ols.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_cgoodman_pc_C3_total_rf.pdf}
-\end{figure}
-\clearpage
-
-\subsection{Subcounty Governments, Per Capita}
-\input{tables/simpletables/pooled_gen_subcounty_pc_C3_total}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_gen_subcounty_pc_C3_total_fs.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_gen_subcounty_pc_C3_total_ols.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_gen_subcounty_pc_C3_total_rf.pdf}
-\end{figure}
-\clearpage
-
-\subsection{Municipal Governments, Per Capita}
-\input{tables/simpletables/pooled_gen_muni_pc_C3}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_gen_muni_pc_C3_total_fs.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_gen_muni_pc_C3_total_ols.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_gen_muni_pc_C3_total_rf.pdf}
-\end{figure}
-\clearpage
-\subsection{School Districts, Per Capita}
-\input{tables/simpletables/pooled_schdist_ind_pc_C3_total}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_schdist_ind_pc_C3_total_fs.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_schdist_ind_pc_C3_total_ols.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/pooled_schdist_ind_pc_C3_total_rf.pdf}
-\end{figure}
-\clearpage
-
-
-\section{Stacked Tables, Total Populations}
-
-
-\subsection{CGoodman Full, Per Capita}
-\input{tables/simpletables/stacked_cgoodman_pc_C3_total}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_cgoodman_pc_C3_total_fs.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_cgoodman_pc_C3_total_ols.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_cgoodman_pc_C3_total_rf.pdf}
-\end{figure}
-\clearpage
-
-
-\subsection{Subcounty Governments, Per Capita}
-\input{tables/simpletables/stacked_gen_subcounty_pc_C3_total}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_gen_subcounty_pc_C3_total_fs.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_gen_subcounty_pc_C3_total_ols.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_gen_subcounty_pc_C3_total_rf.pdf}
-\end{figure}
-\clearpage
-
-\subsection{Municipal Governments, Per Capita}
-\input{tables/simpletables/stacked_gen_muni_pc_C3_total}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_gen_muni_pc_C3_total_fs.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_gen_muni_pc_C3_total_ols.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_gen_muni_pc_C3_total_rf.pdf}
-\end{figure}
-\clearpage
-
-\subsection{School Districts, Per Capita}
-\input{tables/simpletables/stacked_schdist_ind_pc_C3_total}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_schdist_ind_pc_C3_total_fs.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_schdist_ind_pc_C3_total_ols.pdf}
-\end{figure}
-\clearpage
-\begin{figure}
-\centering
-\includegraphics{figures/simplefigs/stacked_schdist_ind_pc_C3_total_rf.pdf}
-\end{figure}
-\clearpage
-
+	
+	
+	\subsection{CGoodman Full, Per Capita, Stacked Tables}
+	\input{tables/simpletables/stacked_cgoodman_pc_C3_total_\inst}
+	\input{tables/simpletables/stacked_cgoodman_pc_C3_total_above_\inst}
+	\clearpage
+	\input{tables/simpletables/stacked_cgoodman_pc_C3_total_below_\inst}
+	\clearpage
+	
+	
+	
+	\subsection{Subcounty Governments, Per Capita, Stacked Tables}
+	\input{tables/simpletables/stacked_gen_subcounty_pc_C3_total_\inst}
+	\input{tables/simpletables/stacked_gen_subcounty_pc_C3_total_above_\inst}
+	\clearpage
+	\input{tables/simpletables/stacked_gen_subcounty_pc_C3_total_below_\inst}
+	\clearpage
+	
+	
+	\subsection{Municipal Governments, Per Capita, Stacked Tables}
+	\input{tables/simpletables/stacked_gen_muni_pc_C3_total_\inst}
+	\input{tables/simpletables/stacked_gen_muni_pc_C3_total_above_\inst}
+	\clearpage
+	\input{tables/simpletables/stacked_gen_muni_pc_C3_total_below_\inst}
+	\clearpage
+	
+	
+	\subsection{School Districts, Per Capita, Stacked Tables}
+	\input{tables/simpletables/stacked_schdist_ind_pc_C3_total_\inst}
+	\input{tables/simpletables/stacked_schdist_ind_pc_C3_total_above_\inst}
+	\clearpage
+	\input{tables/simpletables/stacked_schdist_ind_pc_C3_total_below_\inst}
+}
 
 \end{document}

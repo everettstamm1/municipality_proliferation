@@ -1,0 +1,39 @@
+ \begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi} \begin{threeparttable} \caption{Outcome variable schdist\_ind} \begin{tabular}{l*{11}{c}} \toprule
+          &\multicolumn{5}{c}{Basic controls}                                   &\multicolumn{5}{c}{Robust controls}                                  \\\cmidrule(lr){2-6}\cmidrule(lr){7-11}
+          &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}&\multicolumn{1}{c}{(7)}&\multicolumn{1}{c}{(8)}&\multicolumn{1}{c}{(9)}&\multicolumn{1}{c}{(10)}\\
+          &\multicolumn{1}{c}{1940-1970 Pooled}&\multicolumn{1}{c}{1940-1950}&\multicolumn{1}{c}{1950-1960}&\multicolumn{1}{c}{1960-1970}&\multicolumn{1}{c}{Stacked}&\multicolumn{1}{c}{1940-1970 Pooled}&\multicolumn{1}{c}{1940-1950}&\multicolumn{1}{c}{1950-1960}&\multicolumn{1}{c}{1960-1970}&\multicolumn{1}{c}{Stacked}\\
+\cmidrule(lr){1-11}
+\multicolumn{10}{l}{Panel A: First Stage}\\
+\cmidrule(lr){1-11}
+GM\_hat\_raw\_pp&      3.04***&      3.24***&     10.28***&     13.38***&      4.88***&      2.96***&      1.53***&      9.63***&      5.07** &      0.49   \\
+          &    (0.31)   &    (0.52)   &    (0.86)   &    (1.56)   &    (0.92)   &    (0.49)   &    (0.29)   &    (2.13)   &    (2.17)   &    (0.69)   \\
+\midrule
+F-Stat    &     62.54   &    111.30   &    190.68   &     27.88   &     15.39   &     51.63   &     63.37   &    173.54   &    119.36   &     51.00   \\
+Observations&    130.00   &    130.00   &    130.00   &    130.00   &    390.00   &    130.00   &    130.00   &    130.00   &    130.00   &    390.00   \\
+\cmidrule[\heavyrulewidth](lr){1-11} \\ \cmidrule[\heavyrulewidth](lr){1-11}
+\multicolumn{10}{l}{Panel B: OLS}\\
+\cmidrule(lr){1-11}
+GM\_raw\_pp &      1.22***&      0.79***&      0.51***&      0.16***&      0.33***&      0.02   &     -0.16   &      0.09** &      0.06** &     -0.09** \\
+          &    (0.23)   &    (0.23)   &    (0.13)   &    (0.04)   &    (0.05)   &    (0.01)   &    (0.12)   &    (0.04)   &    (0.03)   &    (0.04)   \\
+\midrule
+Observations&    130.00   &    130.00   &    130.00   &    130.00   &    390.00   &    130.00   &    130.00   &    130.00   &    130.00   &    390.00   \\
+\cmidrule[\heavyrulewidth](lr){1-11} \\ \cmidrule[\heavyrulewidth](lr){1-11}
+\multicolumn{10}{l}{Panel C: Reduced Form}\\
+\cmidrule(lr){1-11}
+GM\_hat\_raw\_pp&      4.56***&      3.36***&      6.19***&      2.29***&      3.08***&      0.12** &     -0.52   &      1.27   &      0.44   &      0.47   \\
+          &    (0.97)   &    (0.96)   &    (1.29)   &    (0.59)   &    (0.64)   &    (0.05)   &    (0.32)   &    (1.07)   &    (0.54)   &    (0.32)   \\
+\midrule
+Observations&    130.00   &    130.00   &    130.00   &    130.00   &    390.00   &    130.00   &    130.00   &    130.00   &    130.00   &    390.00   \\
+\cmidrule[\heavyrulewidth](lr){1-11} \\ \cmidrule[\heavyrulewidth](lr){1-11}
+\multicolumn{10}{l}{Panel D: 2SLS}\\
+\cmidrule(lr){1-11}
+GM\_raw\_pp &      1.50***&      1.04***&      0.60***&      0.17***&      0.63***&      0.04** &     -0.34*  &      0.13   &      0.09   &      0.95   \\
+          &    (0.30)   &    (0.31)   &    (0.12)   &    (0.04)   &    (0.11)   &    (0.02)   &    (0.20)   &    (0.10)   &    (0.10)   &    (1.53)   \\
+\midrule
+Observations&    130.00   &    130.00   &    130.00   &    130.00   &    390.00   &    130.00   &    130.00   &    130.00   &    130.00   &    390.00   \\
+\hline\hline
+\end{tabular}{\caption*{\begin{scriptsize}
+Columns 1-4 include region fixed effects, column 5 includes region and decade fixed effects. Columns 6-7 include region fixed effects and all significant covariates from the corresponding balance table. Column 10 includes region and decade fixed effects and all significant covariates from the corresponding balance table. \(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)
+\end{scriptsize}}}
+\end{threeparttable}
+\end{table}

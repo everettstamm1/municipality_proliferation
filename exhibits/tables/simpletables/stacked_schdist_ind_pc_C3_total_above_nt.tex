@@ -1,0 +1,21 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y=New Govs, Number of Independent School Districts Per Capita (100,000) Pooled, Census Region and Decade FEs controls, Total Population}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}   &\multicolumn{1}{c}{(2)}   &\multicolumn{1}{c}{(3)}   &\multicolumn{1}{c}{(4)}   \\
+\midrule
+GM\_nt\_hat\_raw\_pp\_totpop&     -0.0357   &               &       5.497** &               \\
+                    &    (0.0747)   &               &     (2.370)   &               \\
+\addlinespace
+Percentage Point Change in Total Black Population&               &       12.80***&               &       64.62   \\
+                    &               &     (2.283)   &               &     (50.53)   \\
+\midrule
+F-Stat              &        .229   &               &               &               \\
+Observations        &         375   &         375   &         375   &         375   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

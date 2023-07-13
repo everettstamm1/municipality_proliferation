@@ -34,7 +34,7 @@ counties <- counties()  %>%
   mutate(county_total = county_land+county_water,
          cty_fips = as.numeric(paste0(STATEFP,COUNTYFP))) %>% 
   merge(county_cz_xwalk, by="cty_fips")
-  
+
 
 
 places <- places(cb=TRUE)  %>% 

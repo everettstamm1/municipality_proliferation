@@ -1,0 +1,21 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y=New Govs, Earliest Year of Municipal Incorporation Per Capita (100,000) Pooled, Urban Population, Census Region controls.}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}   &\multicolumn{1}{c}{(2)}   &\multicolumn{1}{c}{(3)}   &\multicolumn{1}{c}{(4)}   \\
+\midrule
+GM\_rmsc\_hat\_raw\_pp  &      -0.143***&               &       0.145   &               \\
+                    &    (0.0378)   &               &     (0.188)   &               \\
+\addlinespace
+Percentage Point Change in Urban Black Population&               &       0.752** &               &      -2.533   \\
+                    &               &     (0.315)   &               &     (4.127)   \\
+\midrule
+F-Stat              &      14.285   &               &               &               \\
+Observations        &         103   &         103   &         103   &         103   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

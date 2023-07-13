@@ -1,0 +1,21 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y=New Govs, Number of Subcounty Govts (town, twp, muni) Per Capita (100,000) Pooled, Census Region and Decade FEs controls, Total Population}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}   &\multicolumn{1}{c}{(2)}   &\multicolumn{1}{c}{(3)}   &\multicolumn{1}{c}{(4)}   \\
+\midrule
+GM\_rmnt\_hat\_raw\_pp\_totpop&     -0.0398   &               &     -0.0742   &               \\
+                    &    (0.0808)   &               &     (0.193)   &               \\
+\addlinespace
+Percentage Point Change in Total Black Population&               &      -0.815** &               &       7.922   \\
+                    &               &     (0.379)   &               &     (71.47)   \\
+\midrule
+F-Stat              &        .243   &               &               &               \\
+Observations        &         135   &         135   &         135   &         135   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}
