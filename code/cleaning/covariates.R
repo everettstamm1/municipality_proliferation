@@ -23,6 +23,8 @@ crs <- st_crs(counties)
 
 
 #### Ports ----
+
+
 ports <- read_sf(paste0(RAWDATA,"covariates/ports/ports_x010g.shp")) %>% 
   st_set_crs(crs) %>% 
   mutate(has_port = 1) 
@@ -200,5 +202,6 @@ output <- counties %>%
 
 write_dta(output,path=paste0(INTDATA,"covariates/covariates.dta"))
 
-  
+old <- read_dta(paste0(INTDATA,"covariates/covariates.dta"))
+
 

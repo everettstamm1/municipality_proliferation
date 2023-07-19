@@ -59,24 +59,35 @@ foreach level in cz {
 			g n_muni_`level'60_70 = n1972 - n1962
 			g n_muni_`level'70_80 = n1982 - n1972
 			g n_muni_`level'80_90 = n1992 - n1982
-			
+			g n_muni_`level'90_00 = n2002 - n1992
+			g n_muni_`level'00_10 = n2012 - n2002
+
 			ren n1942 b_muni_`level'1940
 			ren n1952 b_muni_`level'1950
 			ren n1962 b_muni_`level'1960
 			ren n1972 b_muni_`level'1970
 			ren n1982 b_muni_`level'1980
-			
+			ren n1992 b_muni_`level'1990
+			ren n2002 b_muni_`level'2000
+			ren n2012 b_muni_`level'2010
+
 			label var b_muni_`level'1940 "Base `lab' 1940"
 			label var b_muni_`level'1950 "Base `lab' 1950"
 			label var b_muni_`level'1960 "Base `lab' 1960"
 			label var b_muni_`level'1970 "Base `lab' 1970"
 			label var b_muni_`level'1980 "Base `lab' 1980"
+			label var b_muni_`level'1990 "Base `lab' 1990"
+			label var b_muni_`level'2000 "Base `lab' 2000"
+			label var b_muni_`level'2010 "Base `lab' 2010"
 
 			label var n_muni_`level'40_50 "`lab'"
 			label var n_muni_`level'50_60 "`lab'"
 			label var n_muni_`level'60_70 "`lab'"
 			label var n_muni_`level'70_80 "`lab'"
 			label var n_muni_`level'80_90 "`lab'"
+			label var n_muni_`level'90_00 "`lab'"
+			label var n_muni_`level'00_10 "`lab'"
+
 			label var n_muni_`level' "`lab'"
 			
 			ren *muni* *`var'*
@@ -239,7 +250,7 @@ foreach level in cz {
 	local lab: variable label yr_incorp
 	
 	g n = yr_incorp>=1940 & yr_incorp<=1970
-	forv d=1900(10)1980{
+	forv d=1900(10)2010{
 		local step = `d'+10
 		
 		g n`d' = yr_incorp<`d'
@@ -261,12 +272,18 @@ foreach level in cz {
 	label var b_muni_`level'1960 "Base `lab' 1960"
 	label var b_muni_`level'1970 "Base `lab' 1970"
 	label var b_muni_`level'1980 "Base `lab' 1980"
+	label var b_muni_`level'1990 "Base `lab' 1990"
+	label var b_muni_`level'2000 "Base `lab' 2000"
+	label var b_muni_`level'2010 "Base `lab' 2010"
 
 	label var n_muni_`level'40_50 "`lab'"
 	label var n_muni_`level'50_60 "`lab'"
 	label var n_muni_`level'60_70 "`lab'"
 	label var n_muni_`level'70_80 "`lab'"
 	label var n_muni_`level'80_90 "`lab'"
+	label var n_muni_`level'90_00 "`lab'"
+	label var n_muni_`level'00_10 "`lab'"
+
 	label var n_muni_`level' "`lab'"
 
 	
@@ -274,7 +291,7 @@ foreach level in cz {
 	save "$INTDATA/counts/cgoodman_`level'", replace
 	
 
-	foreach samp in  dcourt south{
+	foreach samp in south dcourt {
 		if "`samp'" == "dcourt" {
 			local samptab = ""
 			local outsamptab = ""
@@ -287,13 +304,31 @@ foreach level in cz {
 		// Pooled
 		
 		use "$DCOURT/data/GM_`level'_final_dataset`samptab'.dta", clear
-		keep `levelvar' GM GM_hat2 GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg* frac_all_upm1940  GM_hat_raw_r*
-		ren GM_hat2 GM_hat
+		
+		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg* frac_all_upm1940  GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr eur_mig wt_instmig_avg wt_instmig_avg_pp samp_*
+		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg* frac_all_upm1940  GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr eur_mig wt_instmig_avg wt_instmig_avg_pp 
+
 		if "`samp'"=="south" ren v2*_blackmig3539_share1940 *blackmig3539_share
 		if "`samp'"=="dcourt" ren v2_blackmig3539_share1940 blackmig3539_share
 
 		if "`level'"=="msa"{
 			destring smsa, gen(msapmsa2000) 
+		}
+		
+		
+		// Fixing sample flags
+		if "`samp'"=="south"{
+			
+			merge m:1 cz using "$DCOURT/data/crosswalks/original_130_czs"
+				
+			g dcourt = _merge==3
+			drop _merge
+			lab var dcourt "Derenoncourt Sample of 130 CZs"
+			
+			foreach s in 2 2rm 2nt 2rmnt 2rmsc 2scnt 2rmscnt{
+				replace samp_`s' = (dcourt==1 | samp_`s'==1)
+			}
+
 		}
 		
 		preserve
@@ -312,7 +347,7 @@ foreach level in cz {
 		
 		foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist  cgoodman{
 
-			merge 1:1 `levelvar' using "$INTDATA/counts/`ds'_`level'", keep(1 3) nogen keepusing(n_`ds'_`level' b_`ds'_`level'1970 b_`ds'_`level'1940)
+			merge 1:1 `levelvar' using "$INTDATA/counts/`ds'_`level'", keep(1 3) nogen keepusing(n_`ds'_`level' b_`ds'_`level'1970 b_`ds'_`level'1940 b_`ds'_`level'2010)
 		}
 		
 		//merge 1:1 `levelvar' using "$INTDATA/cog_populations/`level'pop", keep(3) nogen
@@ -350,11 +385,6 @@ foreach level in cz {
 		}
 		
 		if "`level'" == "cz"{
-			merge 1:1 cz using "$DCOURT/data/crosswalks/original_130_czs"
-			
-			g dcourt = _merge==3
-			drop _merge
-			lab var dcourt "Derenoncourt Sample of 130 CZs"
 			
 			merge 1:1 cz using "$INTDATA/covariates/covariates.dta", keep(1 3) nogen
 			merge 1:1 cz using "$INTDATA/census/maxcitypop", keep(1 3) nogen
@@ -365,9 +395,14 @@ foreach level in cz {
 			g `var'_m = `var'==.
 			replace `var' = 0 if `var'==.
 		}
+		
+		
 		replace n_cgoodman_cz = 0 if n_cgoodman_cz==.
 		replace b_cgoodman_cz1940 = 0 if b_cgoodman_cz1940==.
 		replace b_cgoodman_cz1970 = 0 if b_cgoodman_cz1970==.
+		replace b_cgoodman_cz2010 = 0 if b_cgoodman_cz2010==.
+
+		
 		// Adding labels
 
 		foreach ds in  gen_muni schdist_ind all_local ngov3 gen_subcounty spdist   cgoodman  {
@@ -520,6 +555,11 @@ foreach level in cz {
 			
 		qui reshape long `stubs' frac_all_upm totpop_GM_ GM_ GM_hat_ totpop_GM_hat totpop_GM_raw_ totpop_GM_raw_pp_ totpop_GM_hat_raw_ totpop_GM_hat_raw_pp_ GM_raw_pp_ GM_hat_raw_pp_  mfg_lfshare totpop_blackmig3539_share blackmig3539_share bpop pop bpopc popc, i(`levelvar') j(decade)
 		
+		
+		
+		// Bringing in 1900-30 total and urban populations
+		merge 1:1 decade `levelvar' using "$INTDATA/census/`level'_urbanization_1900_1930", update nogen 
+		
 		replace n_cgoodman_cz = 0 if n_cgoodman_cz==.
 		replace b_cgoodman_cz = 0 if b_cgoodman_cz==.
 
@@ -558,8 +598,6 @@ foreach level in cz {
 		ren b_*_`level' b_*_`level'_L0
 		
 		
-		// Bringing in 1900-30 total and urban populations
-		merge 1:1 decade `levelvar' using "$INTDATA/census/`level'_urbanization_1900_1930", update nogen 
 		
 		
 		foreach var of varlist pop popc bpop bpopc{
