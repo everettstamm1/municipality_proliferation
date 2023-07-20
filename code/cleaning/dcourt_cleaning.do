@@ -993,17 +993,188 @@ keep origin_fips year proutmig actoutmig netbmig_pred
 
 save "$INTDATA/dcourt/2_lasso_boustan_predict_mig.dta", replace
 
+// State resid instrument
+use "$INTDATA/dcourt/clean_south_county.dta", clear
+
+
+	/* Predict county-level net migration rate within state, decade by decade. */
+	reg netbmig  if year==1950, absorb(stateicp)
+	predict netbmig_resid if year==1950, resid
+	reg netbmig  if year==1960, absorb(stateicp)
+	predict netbmig_resid01 if year==1960, resid
+	reg netbmig  if year==1970, absorb(stateicp)
+	predict netbmig_resid02 if year==1970, resid
+
+	replace netbmig_resid=netbmig_resid01 if year==1960
+	replace netbmig_resid=netbmig_resid02 if year==1970
+	drop netbmig_resid01 netbmig_resid02
+	
+	/* Boustan (2016): Total number leaving/coming to county: actual and predicted. Note 
+	that netbmig is a migration rate (per 100 residents). So, the range is -100 to 
+	+whatever. -100 because it is impossible for more than all of the residents to 
+	leave. But, on the positive side, the rate is unrestricted, because the growth 
+	could be quite high (for a county with 100 blacks in 1940, could have 100,000 
+	blacks in 1950 which would be a rate of 1000. */ 
+	
+	gen totbmig=((bpop_l/100)*netbmig)
+	gen totbmig_resid=((bpop_l/100)*netbmig_resid)
+	gen weight=netbmig_resid*bpop_l
+	
+	/* One observation per county, year. */
+	
+	//drop if year==year[_n-1]
+	sort countyfips year
+	drop if countyfips==.
+	rename totbmig actoutmig
+	rename totbmig_resid residoutmig
+	label var residoutmig "migration, by county-year, south, residualized on state"
+	drop _merge
+	
+	/* Merge with 1940 crosswalks data file. */
+	
+	cd "$xwalks"
+	merge m:1 stateicp countyicp using "$XWALKS/county1940_crosswalks.dta", keepusing(fips state_name county_name) keep(1 3)
+
+	drop if _merge==2 
+	g origin_fips=fips
+	rename state_name origin_state_name
+	rename county_name origin_county_name 
+	
+	/* Hand correct counties that didn't match using crosswalk file and internet search. */
+	
+	replace origin_fips = 51067 if countyfips==51620 & _merge==1
+	replace origin_fips = 48203 if countyfips==48203 & _merge==1
+	replace origin_fips = 51037 if countyfips==54039 & _merge==1
+	replace origin_fips = 54041 if countyfips==54041 & _merge==1
+	replace origin_fips = 51189 if countyfips==189 & _merge==1
+	drop _merge
+	
+	tostring origin_fips, replace
+	keep origin_fips year residoutmig actoutmig netbmig_resid
+	
+	drop if netbmig_resid==. | residoutmig==.
+	
+	bysort origin_fips year: gen dup= cond(_N==1,0,_n)
+	tab dup
+	drop if dup>1
+	
+	drop dup
+	save "$INTDATA/dcourt/3_residstate_act_mig.dta", replace
+
+	
+	collapse (sum) netbmig_resid actoutmig residoutmig, by(origin_fips year)
+	save "$INTDATA/dcourt/3_residstate_act_mig_collapsed.dta", replace	
+// Dropping urban counties
+
+/* Load full clean data. */
+	use "$INTDATA/dcourt/clean_south_county.dta", clear
+	
+	/* Predict county-level net migration rate, decade by decade with southern 
+	variables chosen by LASSO. Predict net migration rate ("netbmig_pred") based on 
+	these vars alone. */
+	reg netbmig percot perten perag peragtob tob warfac_pc permin perminot ot if year==1950
+	predict netbmig_pred if year==1950
+	reg netbmig percot perten perag peragtob tob warfac_pc permin perminot ot if year==1960
+	predict netbmig_pred01 if year==1960
+	reg netbmig percot perten perag peragtob tob warfac_pc permin perminot ot if year==1970
+	predict netbmig_pred02 if year==1970	
+	
+	replace netbmig_pred=netbmig_pred01 if year==1960
+	replace netbmig_pred=netbmig_pred02 if year==1970
+	drop netbmig_pred01 netbmig_pred02
+	
+	/* Boustan (2016): Total number leaving/coming to county: actual and predicted. Note 
+	that netbmig is a migration rate (per 100 residents). So, the range is -100 to 
+	+whatever. -100 because it is impossible for more than all of the residents to 
+	leave. But, on the positive side, the rate is unrestricted, because the growth 
+	could be quite high (for a county with 100 blacks in 1940, could have 100,000 
+	blacks in 1950 which would be a rate of 1000. */ 
+	
+	gen totbmig=((bpop_l/100)*netbmig)
+	gen totbmig_pred=((bpop_l/100)*netbmig_pred)
+	gen weight=netbmig_pred*bpop_l
+	
+	/* One observation per county, year. */
+	
+	drop if year==year[_n-1]
+	sort countyfips year
+	drop if countyfips==.
+	rename totbmig actoutmig
+	rename totbmig_pred proutmig
+	label var proutmig "predicted out migration, by county-year, south"
+	drop _merge
+	
+	/* Merge with 1940 crosswalks data file. */
+	
+	merge m:1 stateicp countyicp using "$XWALKS/county1940_crosswalks.dta", keepusing(fips state_name county_name ur_code_1990)
+	drop if _merge==2 
+	
+	/* Alternative method dropping top 1% percent urban counties */
+	*qui bys state: sum perurb, d
+	*drop if perurb > `r(p99)'
+	
+	/* Drops counties that are NCHS-defined as "central" counties of MSAs of 1 million or more population as of 1990. 
+	See replication/data/crosswalks/documentation/urban_rural_county_classification/NCHS_Urbrural_File_Documentation.pdf */
+	drop if ur_code_1990==1 
+	g origin_fips=fips
+	rename state_name origin_state_name
+	rename county_name origin_county_name 
+	
+	/* Hand correct counties that didn't match using crosswalk file and internet search. */
+	
+	replace origin_fips = 51067 if countyfips==51620 & _merge==1
+	replace origin_fips = 48203 if countyfips==48203 & _merge==1
+	replace origin_fips = 51037 if countyfips==54039 & _merge==1
+	replace origin_fips = 54041 if countyfips==54041 & _merge==1
+	replace origin_fips = 51189 if countyfips==189 & _merge==1
+	drop _merge
+	
+	tostring origin_fips, replace
+	keep origin_fips year proutmig actoutmig netbmig_pred
+	
+	drop if netbmig_pred==. | proutmig==.
+	
+	bysort origin_fips year: gen dup= cond(_N==1,0,_n)
+	tab dup
+	
+	drop dup
+	
+	save "$INTDATA/dcourt/rur_boustan_predict_mig.dta", replace
+	
+	collapse (sum) netbmig_pred actoutmig proutmig, by(origin_fips year)
+	save "$INTDATA/dcourt/rur_boustan_predict_mig_collapsed.dta", replace
+
 // Instrument creation
-foreach inst in full fullrm fullnt fullrmnt{
+foreach inst in full fullrm fullnt fullrmnt 7r r {
+	if "`inst'"=="7r" local ds_var = "dest_sample"
+	if "`inst'"=="r" local ds_var = "dest_sample"
 	if "`inst'"=="full" local ds_var = "dest_sample"
 	if "`inst'"=="fullrm" local ds_var = "dest_sample"
 	if "`inst'"=="fullnt" local ds_var = "dest_sample_tx"
 	if "`inst'"=="fullrmnt" local ds_var = "dest_sample_tx"
-
+	
+	if "`inst'"=="7r" local os_var = "origin_sample"
+	if "`inst'"=="r" local os_var = "origin_sample"
 	if "`inst'"=="full" local os_var = "origin_sample"
 	if "`inst'"=="fullrm" local os_var = "origin_sample_rural"
 	if "`inst'"=="fullnt" local os_var = "origin_sample_notx"
 	if "`inst'"=="fullrmnt" local os_var = "origin_sample_rural_notx"
+	
+	if "`inst'"=="7r" local w_data = "$INTDATA/dcourt/3_residstate_act_mig.dta"
+	if "`inst'"=="r" local w_data = "$INTDATA/dcourt/rur_boustan_predict_mig.dta"
+	if "`inst'"=="full" local w_data = "$INTDATA/dcourt/2_lasso_boustan_predict_mig.dta"
+	if "`inst'"=="fullrm" local w_data = "$INTDATA/dcourt/2_lasso_boustan_predict_mig.dta"
+	if "`inst'"=="fullnt" local w_data = "$INTDATA/dcourt/2_lasso_boustan_predict_mig.dta"
+	if "`inst'"=="fullrmnt" local w_data = "$INTDATA/dcourt/2_lasso_boustan_predict_mig.dta"
+
+	if "`inst'"=="7r" local w_type = resid
+	if "`inst'"=="r" local w_type = pr
+	if "`inst'"=="full" local w_type = pr
+	if "`inst'"=="fullrm" local w_type = pr
+	if "`inst'"=="fullnt" local w_type = pr
+	if "`inst'"=="fullrmnt" local w_type = pr
+	
+	
 	clear all
 		
 	global groups black // took out white
@@ -1013,9 +1184,9 @@ foreach inst in full fullrm fullnt fullrmnt{
 	global destination_id dest_fips
 	global destination_id_code dest_fips_code
 	global dest_sample `ds_var'
-	global weights_data "$INTDATA/dcourt/2_lasso_boustan_predict_mig.dta"
+	global weights_data `w_data'
 	global version `inst'
-	global weight_types pr
+	global weight_types `w_type'
 	global weight_var outmig
 	global start_year 1940
 	global panel_length 3
@@ -1036,7 +1207,7 @@ foreach inst in full fullrm fullnt fullrmnt{
 	tempfile dest_fips_blackmigshare3539
 	save `dest_fips_blackmigshare3539'
 
-	foreach w in pr {
+	foreach w in `w_type' {
 		use "$INTDATA/bartik/`inst'_black_`w'outmigorigin_fips19401970_collapsed_wide.dta", clear
 		merge 1:1 dest_fips using `dest_fips_blackmigshare3539', keep(3) nogenerate
 
@@ -1044,7 +1215,7 @@ foreach inst in full fullrm fullnt fullrmnt{
 	}
 }
 
-
+// Alternative 
 
 
 /*
@@ -1606,8 +1777,8 @@ foreach samp in full dcourt{
 		
 		if "`samp'"=="dcourt" drop if texas==1
 		
-		if "`samp'"=="full" local insts "full fullrm fullnt fullrmnt"
-		if "`samp'"=="dcourt" local insts "full"
+		if "`samp'"=="full" local insts "full fullrm fullnt fullrmnt 7r r"
+		if "`samp'"=="dcourt" local insts "full 7r r"
 
 		foreach inst in full fullrm fullnt fullrmnt{
 			merge 1:1 dest_fips using "$INTDATA/dcourt/`inst'_black_prmig_1940_1970_wide_xw_dest_fips.dta", keep(1 3) nogen

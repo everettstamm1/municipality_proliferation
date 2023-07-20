@@ -36,7 +36,7 @@ set maxvar 30000
 if `run_dcourt'==1{
 	// Derenoncourt Macros
 	
-	global XXX  "$DCOURT"
+	global XXX  "~\Dropbox\municipality_proliferation\derenoncourt_opportunity\replication_AER\"
 	global code "${XXX}/code_replication"
 	global lasso "$code/lasso"
 	global bartik "$code/bartik"

@@ -1,0 +1,21 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Outcome: gen\_subcounty, Top Urban Dropped Instrument}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}   &\multicolumn{1}{c}{(2)}   &\multicolumn{1}{c}{(3)}   &\multicolumn{1}{c}{(4)}   \\
+\midrule
+Top Urban Dropped Instrument&       3.268***&               &       0.342***&               \\
+                    &     (0.349)   &               &    (0.0954)   &               \\
+\addlinespace
+Percentage Point Change in Urban Black Population&               &      0.0850***&               &       0.105***\\
+                    &               &    (0.0219)   &               &    (0.0287)   \\
+\midrule
+F-Stat              &87.68300000000001   &               &               &               \\
+Observations        &         130   &         130   &         130   &         130   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

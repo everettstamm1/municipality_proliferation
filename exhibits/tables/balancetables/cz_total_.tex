@@ -1,0 +1,53 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{}
+\begin{tabular}{l*{5}{c}}
+\toprule
+                &\multicolumn{1}{c}{1940-1970 Pooled}&\multicolumn{1}{c}{1940-1950}&\multicolumn{1}{c}{1950-1960}&\multicolumn{1}{c}{1960-1970}&\multicolumn{1}{c}{Stacked}\\
+\midrule
+mfg\_lfshare on GM\_hat&     2.67         &     3.27\sym{**} &     4.58         &     1.68         &     2.91\sym{***}\\
+                &   (1.58)         &   (1.16)         &   (2.40)         &   (1.58)         &   (0.88)         \\
+\addlinespace
+blackmig3539 on GM\_hat&     0.14\sym{***}&     0.04         &     0.17\sym{***}&     0.14\sym{***}&     0.09\sym{***}\\
+                &   (0.01)         &   (0.03)         &   (0.01)         &   (0.01)         &   (0.02)         \\
+\addlinespace
+frac\_land on GM\_hat&     0.09         &     0.06         &     0.18\sym{*}  &     0.12         &     0.10\sym{**} \\
+                &   (0.05)         &   (0.03)         &   (0.09)         &   (0.08)         &   (0.03)         \\
+\addlinespace
+transpo\_cost\_1920 on GM\_hat&    -0.24\sym{*}  &    -0.12         &    -0.38\sym{***}&    -0.35\sym{**} &    -0.20\sym{**} \\
+                &   (0.09)         &   (0.10)         &   (0.10)         &   (0.12)         &   (0.07)         \\
+\addlinespace
+coastal on GM\_hat&     0.07         &     0.03         &     0.13         &     0.07         &     0.06\sym{*}  \\
+                &   (0.05)         &   (0.03)         &   (0.07)         &   (0.07)         &   (0.03)         \\
+\addlinespace
+avg\_precip on GM\_hat&     0.17         &     0.83         &     2.96         &     0.17         &     0.96         \\
+                &   (1.10)         &   (0.82)         &   (1.99)         &   (1.26)         &   (0.73)         \\
+\addlinespace
+avg\_temp on GM\_hat&    -3.12         &    -1.24         &    -1.11         &    -2.95         &    -1.71         \\
+                &   (2.87)         &   (2.08)         &   (3.36)         &   (3.20)         &   (1.72)         \\
+\addlinespace
+n\_wells on GM\_hat&   -12.51         &   -27.29         &   -11.95         &   -19.48         &   -20.27         \\
+                &  (17.27)         &  (16.36)         &  (19.27)         &  (24.64)         &  (11.44)         \\
+\addlinespace
+totfrac\_in\_main\_city on GM\_hat&     0.15\sym{*}  &     0.11\sym{**} &     0.26\sym{**} &     0.16         &     0.14\sym{***}\\
+                &   (0.06)         &   (0.04)         &   (0.08)         &   (0.09)         &   (0.03)         \\
+\addlinespace
+urbfrac\_in\_main\_city on GM\_hat&  -440.98         &   218.04         &  -257.68         &  -564.09         &   -78.67         \\
+                & (491.09)         & (232.03)         & (277.43)         & (640.93)         & (185.11)         \\
+\addlinespace
+m\_rr on GM\_hat  &  4.7e+05\sym{*}  &  2.0e+05\sym{*}  &  4.8e+05\sym{*}  &  5.1e+05         &  3.1e+05\sym{**} \\
+                &(2.0e+05)         &(99445.93)         &(2.2e+05)         &(2.8e+05)         &(1.1e+05)         \\
+\addlinespace
+m\_rr\_sqm2 on GM\_hat&     0.00\sym{*}  &     0.00\sym{**} &     0.00\sym{**} &     0.00         &     0.00\sym{***}\\
+                &   (0.00)         &   (0.00)         &   (0.00)         &   (0.00)         &   (0.00)         \\
+\addlinespace
+popc1940 on GM\_hat&  2.1e+06\sym{**} &  1.0e+06\sym{*}  &  2.8e+06\sym{**} &  3.3e+06\sym{*}  &  1.6e+06\sym{***}\\
+                &(7.9e+05)         &(4.8e+05)         &(1.0e+06)         &(1.3e+06)         &(4.6e+05)         \\
+\addlinespace
+pop1940 on GM\_hat&  1.4e+06\sym{*}  &  8.2e+05\sym{*}  &  2.2e+06\sym{**} &  1.6e+06         &  1.2e+06\sym{***}\\
+                &(5.7e+05)         &(3.4e+05)         &(8.1e+05)         &(8.4e+05)         &(3.2e+05)         \\
+\bottomrule
+\multicolumn{6}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{6}{l}{\footnotesize \sym{*} \(p<0.05\), \sym{**} \(p<0.01\), \sym{***} \(p<0.001\)}\\
+\end{tabular}
+\end{table}

@@ -23,8 +23,13 @@
 \clearpage
 
 \section{Urban Populations}
+\subsection{GM\_hat on all covariates}
+\input{tables/balancetables/cz_urban_combined.tex}
+\clearpage
+\subsection{Individual covariates on GM\_hat}
 \input{tables/balancetables/cz_urban.tex}
 \clearpage
+\subsection{Regressions}
 \begin{landscape}
 \input{tables/balancetables/reg_cgoodman_urban.tex}
 \clearpage
@@ -36,10 +41,127 @@
 \input{tables/balancetables/reg_spdist_urban.tex}
 \clearpage
 \end{landscape}
+\subsection{Alternative Instrument Figures}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D16_alt_inst_pooled_cgoodman_urban.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D16_alt_inst_pooled_schdist_ind_urban.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D16_alt_inst_pooled_gen_subcounty_urban.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D16_alt_inst_pooled_spdist_urban.png}
+\end{figure}
+\clearpage
+
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D14_cgoodman.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D14_schdist_ind.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D14_gen_subcounty.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D14_spdist.png}
+\end{figure}
+\clearpage
+
+
+\subsection{Baseline Instrument}
+\input{tables/exogeneity_tests/GM_hat_raw_pp_cgoodman_table.tex}
+
+\input{tables/exogeneity_tests/GM_hat_raw_pp_schdist_ind_table.tex}
+\clearpage
+\input{tables/exogeneity_tests/GM_hat_raw_pp_gen_subcounty_table.tex}
+
+\input{tables/exogeneity_tests/GM_hat_raw_pp_spdist_table.tex}
+\clearpage
+
+\subsection{Resid State FEs Instrument}
+\input{tables/exogeneity_tests/GM_7r_hat_raw_pp_cgoodman_table.tex}
+
+\input{tables/exogeneity_tests/GM_7r_hat_raw_pp_schdist_ind_table.tex}
+\clearpage
+\input{tables/exogeneity_tests/GM_7r_hat_raw_pp_gen_subcounty_table.tex}
+
+\input{tables/exogeneity_tests/GM_7r_hat_raw_pp_spdist_table.tex}
+\clearpage
+
+
+\subsection{Top Urban Dropped Instrument}
+\input{tables/exogeneity_tests/GM_r_hat_raw_pp_cgoodman_table.tex}
+
+\input{tables/exogeneity_tests/GM_r_hat_raw_pp_schdist_ind_table.tex}
+\clearpage
+\input{tables/exogeneity_tests/GM_r_hat_raw_pp_gen_subcounty_table.tex}
+
+\input{tables/exogeneity_tests/GM_r_hat_raw_pp_spdist_table.tex}
+\clearpage
+
+
+\subsection{1940 Southern State of Birth Instrument}
+\input{tables/exogeneity_tests/GM_1940_hat_raw_pp_cgoodman_table.tex}
+
+\input{tables/exogeneity_tests/GM_1940_hat_raw_pp_schdist_ind_table.tex}
+\clearpage
+\input{tables/exogeneity_tests/GM_1940_hat_raw_pp_gen_subcounty_table.tex}
+
+\input{tables/exogeneity_tests/GM_1940_hat_raw_pp_spdist_table.tex}
+
+\clearpage
+
+
+\subsection{European Migrant Instrument as Control}
+\input{tables/exogeneity_tests/wt_instmig_avg_pp_cgoodman_table.tex}
+
+\input{tables/exogeneity_tests/wt_instmig_avg_pp_schdist_ind_table.tex}
+\clearpage
+\input{tables/exogeneity_tests/wt_instmig_avg_pp_gen_subcounty_table.tex}
+
+\input{tables/exogeneity_tests/wt_instmig_avg_pp_spdist_table.tex}
+
+\clearpage
+
+
+\subsection{Southern White Migration Instrument as Control}
+\input{tables/exogeneity_tests/GM_8_hat_raw_pp_cgoodman_table.tex}
+
+\input{tables/exogeneity_tests/GM_8_hat_raw_pp_schdist_ind_table.tex}
+\clearpage
+\input{tables/exogeneity_tests/GM_8_hat_raw_pp_gen_subcounty_table.tex}
+
+\input{tables/exogeneity_tests/GM_8_hat_raw_pp_spdist_table.tex}
+
+\clearpage
 
 \section{Total Populations}
+\subsection{GM\_hat on all covariates}
+\input{tables/balancetables/cz_total_combined.tex}
+\clearpage
+\subsection{Individual covariates on GM\_hat}
 \input{tables/balancetables/cz_total.tex}
 \clearpage
+\subsection{Regressions}
 \begin{landscape}
 \input{tables/balancetables/reg_cgoodman_total.tex}
 \clearpage
@@ -52,8 +174,13 @@
 \end{landscape}
 
 \section{Total Populations, Dcourt sample}
+\subsection{GM\_hat on all covariates}
+\input{tables/balancetables/cz_td_combined.tex}
+\clearpage
+\subsection{Individual covariates on GM\_hat}
 \input{tables/balancetables/cz_td.tex}
 \clearpage
+\subsection{Regressions}
 \begin{landscape}
 \input{tables/balancetables/reg_cgoodman_td.tex}
 \clearpage

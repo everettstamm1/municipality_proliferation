@@ -18,19 +18,22 @@ STEPS:
 *1. Select sample of cities using complete count 1940 census and CCDB 1944-1977.
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 	/* Load city population data constructed from complete count 1940 census */
-	foreach samp in full dcourt {
+	foreach samp in full  {
 		if "`samp'" == "dcourt" {
 			local samptab = ""
 			local varstubs = ""
-			local varstubs2 = "2"
+			local varstubs2 = "2 1940 r"
 		}
 		if "`samp'" == "full" {
 			local samptab = "_full"
 			local varstubs = "rm nt rmnt rmsc rmscnt scnt"
-			local varstubs2 = "2 2rm 2nt 2rmnt 2rmsc 2rmscnt 2scnt"
+			local varstubs2 = "2 2rm 2nt 2rmnt 2rmsc 2rmscnt 2scnt 1940 r"
 		}
-		use $population/clean_city_population_census_1940`samptab'.dta, clear 
-		merge 1:1 city using $population/clean_city_population_ccdb_1944_1977.dta, keepusing(bpop1970 pop1940 pop1970 state_name) 
+		use $population/clean_city_population_census_1940`samptab'.dta, clear // 711 cities in non-South
+		merge 1:1 citycode using $population/clean_city_population_census_1940_full.dta, keepusing(wpopc1940)  // add in white urban pop
+		keep if _merge==3 | citycode == 910 /*butte, MT, correction later */ | citycode == 170 /* Amsterdam, NY,  correction later */
+		drop _merge
+		merge 1:1 city using $population/clean_city_population_ccdb_1944_1977.dta, keepusing(bpop1970 pop1940 pop1970 state_name)
 		
 		/*
 		* Analysis of non-matches
@@ -139,7 +142,8 @@ STEPS:
 
 		foreach v in `varstubs2'{
 		merge 1:1 city using  ${instrument}/city_crosswalked/`v'_black_prmig_1940_1970_wide_xw.dta
-		
+		g samp_`v' = _merge==3
+
 		/* Drop cities for which there's no hope of getting predictions for black pop in 
 		1970 data for these cities. This set of cities will change depending on the 
 		migration matrix used.*/
@@ -149,13 +153,14 @@ STEPS:
 		/* Assume zero change in black pop for cities that black migrants did not move 
 		to between 1935 and 1940. Results are robust to changing this criterion. 
 		Uncomment "keep if _merge==3" and run again. */
+
 		foreach var of varlist black_proutmigpr*{
-			if "`samp'"=="dcourt" replace `var'=0 if `var'==.
+			replace `var'=0 if `var'==.
 			rename `var' v`v'_`var'
 		}
 		rename totblackmigcity3539 v`v'_totblackmigcity3539
 		}
-		
+	
 		* Version 7r of the instrument: 
 		*	1935-1940 black southern migrant location choice X total observed 1940-1970 net-migration for southern counties,
 		*	residualized on southern state fixed effects.
@@ -259,13 +264,14 @@ STEPS:
 		}
 		}	
 		
-		keep *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc1940 bpopc1940 popc1970 bpopc1970 *migcity3539 statefip citycode city city_original cz cz_name
+		keep *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc1940 bpopc1940 popc1970 bpopc1970 *migcity3539 statefip citycode city city_original cz cz_name wpopc1940 samp_*
 		drop if popc1970==.
 		save $city_sample/GM_city_final_dataset`samptab'.dta, replace
 		
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 	*3. Construct measure of black urban pop change and instrument for black urban in-migration at CZ level.
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
+		
 		
 		
 		foreach level in cz county{
@@ -285,19 +291,9 @@ STEPS:
 				local levelvar smsa
 			}
 			
-				collapse (sum) *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc* bpopc*  *migcity3539 , by(`levelvar')
-				
-			if "`samp'"=="full"{
-				// Ensuring the different samples are treated as such, and not just zeros
-				foreach v in `varstubs2' {
-					replace v`v'_black_proutmigpr = . if v`v'_black_proutmigpr ==0
-					replace v`v'_black_proutmigpr1950 = . if v`v'_black_proutmigpr1950 ==0
-					replace v`v'_black_proutmigpr1960 = . if v`v'_black_proutmigpr1960 ==0
-					replace v`v'_black_proutmigpr1970 = . if v`v'_black_proutmigpr1970 ==0
-
-					replace v`v'_totblackmigcity3539 = . if v`v'_totblackmigcity3539 ==0
-				}
-			}
+			collapse (sum) *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc* bpopc*  *migcity3539 wpopc1940 (max) samp_*, by(`levelvar')
+			
+			
 
 			* Actual black pop change in city
 			g bc1940_1970=100*(bpopc1970-bpopc1940)/popc1940
@@ -329,19 +325,24 @@ STEPS:
 			g v`v'_bc_resid1940_1970=100*v`v'_black_residoutmigresid/popc1940
 			
 			g v`v'_blackmig3539_share1940=100*v`v'_totblackmigcity3539/popc1940
+			g v`v'_bcpp_pred1940_1970=100*((v`v'_black_residoutmigresid+bpopc1940)/(v`v'_black_residoutmigresid+ popc1940) - bpopc1940/popc1940)
+
 			}
 			
 			* Versions 8
 			foreach v in "8"{
 
-			g v`v'_wpopchange_pred1940_1970=100*v`v'_white_actoutmigact/popc1940
-			
+			g v`v'_wc_pred1940_1970=100*v`v'_white_actoutmigact/popc1940
+						g v`v'_wcpp_pred1940_1970=100*((v`v'_white_actoutmigact+wpopc1940)/(v`v'_white_actoutmigact + popc1940) - wpopc1940/popc1940)
+
 			g v`v'_whitemig3539_share1940=100*v`v'_totwhitemigcity3539/popc1940
 			}
 				
 		
 			* Placebo shocks
 			forval i=1(1)1000{
+				g vr`i'_bc_pred1940_1970 = 100*vr`i'_black_proutmigpr/popc1940
+
 			g vr`i'_bcpp_pred1940_1970=100* ((vr`i'_black_proutmigpr+bpopc1940)/(vr`i'_black_proutmigpr + popc1940) - bpopc1940/popc1940)
 
 			}
@@ -454,32 +455,32 @@ STEPS:
 			* Instrument by version
 			* Version 0
 			foreach v in "0"{	
-			xtile GM_hat`v' = v`v'_bc_pred1940_1970, nq(100) 
+			xtile GM_`v'_hat = v`v'_bc_pred1940_1970, nq(100) 
 			}
 			
 			* Versions 1, 2, 1940
 			foreach v in `varstubs2'{	
-			xtile GM_hat`v' = v`v'_bc_pred1940_1970, nq(100) 
+			xtile GM_`v'_hat = v`v'_bc_pred1940_1970, nq(100) 
 			}
 		
 			
 			* Versions 7r
 			foreach v in "7r"{	
-			xtile GM_hat`v' = v`v'_bc_resid1940_1970, nq(100) 
+			xtile GM_`v'_hat = v`v'_bc_resid1940_1970, nq(100) 
 			}	
 			
 			* Versions 8
 			foreach v in "8" {	
-			xtile GM_hat`v' = v`v'_wpopchange_pred1940_1970, nq(100) 
+			xtile GM_`v'_hat = v`v'_wc_pred1940_1970, nq(100) 
 			}
 			
-		/*
+		
 			* Placebo shocks
 			forval i=1(1)1000{	
-			xtile GM_hatr`i' = vr`i'_bc_pred1940_1970, nq(100) 
+			xtile GM_r`i'_hat = vr`i'_bc_pred1940_1970, nq(100) 
 			}	
-
-			*/
+			
+			
 		*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 		*6. Finalize mechanism variables 
 		*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
@@ -677,22 +678,32 @@ STEPS:
 			la var reg3 "South"
 			la var reg4 "West"	
 			
-			la var GM_hat2 "$\hat{GM}$"
+		
+			la var GM_2_hat "$\hat{GM}$"
 			la var GM "GM"
 			
+			ren GM_2_hat GM_hat
 			ren bc1940_1970 GM_raw
 			ren bcpp1940_1970 GM_raw_pp
 
 			ren v2_bc_pred1940_1970 GM_hat_raw
 			ren v2_bcpp_pred1940_1970 GM_hat_raw_pp
 			
+			ren v8_wc_pred1940_1970 GM_8_hat_raw
+			ren v8_wcpp_pred1940_1970 GM_8_hat_raw_pp
+			
+			
 			forv i=1(1)1000{	
 			ren vr`i'_bcpp_pred1940_1970 GM_hat_raw_r`i'
 			}	
 			
+			foreach v in 1940 r 7r{
+				ren v`v'_bcpp_pred1940_1970 GM_`v'_hat_raw_pp
+			}
+			
+			
 			if "`samp'"=="full"{
 				foreach v in rm nt rmnt rmsc rmscnt scnt {
-					di "HERE"
 					ren v2`v'_bcpp_pred1940_1970 GM_`v'_hat_raw_pp
 					ren v2`v'_bc_pred1940_1970 GM_`v'_hat_raw
 				}

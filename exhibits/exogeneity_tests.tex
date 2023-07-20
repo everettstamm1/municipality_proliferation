@@ -1,0 +1,505 @@
+\documentclass{article}
+\usepackage{blindtext}
+\usepackage{booktabs}
+\usepackage[margin=0.25in]{geometry}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage{tikz}
+\usepackage{threeparttable}
+\usepackage{algorithmic}
+
+
+\title{Simple Tables for Municipality Proliferation}
+
+\begin{document}
+\maketitle
+\tableofcontents
+{\footnotesize 
+\listoffigures
+\listoftables}
+\clearpage
+
+\section{Urban Populations}
+\subsection{GM\_hat on all covariates}
+\input{tables/balancetables/cz_urban_combined.tex}
+\clearpage
+\subsection{Balance Table}
+\input{tables/balancetables/cz_urban.tex}
+\clearpage
+\input{tables/balancetables/cz_urban_reg1.tex}
+\clearpage
+\input{tables/balancetables/cz_urban_reg2.tex}
+\clearpage
+\input{tables/balancetables/cz_urban_reg3.tex}
+\clearpage
+\subsection{Regressions Robust to Balance Table Covariates}
+\begin{landscape}
+\input{tables/balancetables/reg_cgoodman_urban.tex}
+\clearpage
+\input{tables/balancetables/reg_cgoodman_urban_reg1.tex}
+\clearpage
+\input{tables/balancetables/reg_cgoodman_urban_reg2.tex}
+\clearpage
+\input{tables/balancetables/reg_cgoodman_urban_reg4.tex}
+\clearpage
+\input{tables/balancetables/reg_schdist_ind_urban.tex}
+\clearpage
+\input{tables/balancetables/reg_schdist_ind_urban_reg1.tex}
+\clearpage
+\input{tables/balancetables/reg_schdist_ind_urban_reg2.tex}
+\clearpage
+\input{tables/balancetables/reg_schdist_ind_urban_reg4.tex}
+\clearpage
+\input{tables/balancetables/reg_gen_subcounty_urban.tex}
+\clearpage
+\input{tables/balancetables/reg_gen_subcounty_urban_reg1.tex}
+\clearpage
+\input{tables/balancetables/reg_gen_subcounty_urban_reg2.tex}
+\clearpage
+\input{tables/balancetables/reg_gen_subcounty_urban_reg4.tex}
+\clearpage
+\input{tables/balancetables/reg_spdist_urban.tex}
+\clearpage
+\input{tables/balancetables/reg_spdist_urban_reg1.tex}
+\clearpage
+\input{tables/balancetables/reg_spdist_urban_reg2.tex}
+\clearpage
+\input{tables/balancetables/reg_spdist_urban_reg4.tex}
+\clearpage
+\end{landscape}
+\subsection{Alternative Instrument Figures}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D16_alt_inst_pooled_cgoodman_urban.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D16_alt_inst_pooled_schdist_ind_urban.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D16_alt_inst_pooled_gen_subcounty_urban.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D16_alt_inst_pooled_spdist_urban.png}
+\end{figure}
+\clearpage
+
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D14_cgoodman.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D14_schdist_ind.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D14_gen_subcounty.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D14_spdist.png}
+\end{figure}
+\clearpage
+
+
+\subsection{Baseline Instrument}
+\input{tables/exogeneity_tests/GM_hat_raw_pp_cgoodman_table.tex}
+
+\input{tables/exogeneity_tests/GM_hat_raw_pp_schdist_ind_table.tex}
+\clearpage
+\input{tables/exogeneity_tests/GM_hat_raw_pp_gen_subcounty_table.tex}
+
+\input{tables/exogeneity_tests/GM_hat_raw_pp_spdist_table.tex}
+\clearpage
+
+
+\subsection{Baseline Instrument, Total Population Outcome}
+\input{tables/exogeneity_tests/GM_hat_raw_pp_cgoodman_table_tp.tex}
+
+\input{tables/exogeneity_tests/GM_hat_raw_pp_schdist_ind_table_tp.tex}
+\clearpage
+\input{tables/exogeneity_tests/GM_hat_raw_pp_gen_subcounty_table_tp.tex}
+
+\input{tables/exogeneity_tests/GM_hat_raw_pp_spdist_table_tp.tex}
+\clearpage
+
+\subsection{Resid State FEs Instrument}
+\input{tables/exogeneity_tests/GM_7r_hat_raw_pp_cgoodman_table.tex}
+
+\input{tables/exogeneity_tests/GM_7r_hat_raw_pp_schdist_ind_table.tex}
+\clearpage
+\input{tables/exogeneity_tests/GM_7r_hat_raw_pp_gen_subcounty_table.tex}
+
+\input{tables/exogeneity_tests/GM_7r_hat_raw_pp_spdist_table.tex}
+\clearpage
+
+
+\subsection{Top Urban Dropped Instrument}
+\input{tables/exogeneity_tests/GM_r_hat_raw_pp_cgoodman_table.tex}
+
+\input{tables/exogeneity_tests/GM_r_hat_raw_pp_schdist_ind_table.tex}
+\clearpage
+\input{tables/exogeneity_tests/GM_r_hat_raw_pp_gen_subcounty_table.tex}
+
+\input{tables/exogeneity_tests/GM_r_hat_raw_pp_spdist_table.tex}
+\clearpage
+
+
+\subsection{1940 Southern State of Birth Instrument}
+\input{tables/exogeneity_tests/GM_1940_hat_raw_pp_cgoodman_table.tex}
+
+\input{tables/exogeneity_tests/GM_1940_hat_raw_pp_schdist_ind_table.tex}
+\clearpage
+\input{tables/exogeneity_tests/GM_1940_hat_raw_pp_gen_subcounty_table.tex}
+
+\input{tables/exogeneity_tests/GM_1940_hat_raw_pp_spdist_table.tex}
+
+\clearpage
+
+
+\subsection{European Migrant Instrument as Control}
+\input{tables/exogeneity_tests/wt_instmig_avg_pp_cgoodman_table.tex}
+
+\input{tables/exogeneity_tests/wt_instmig_avg_pp_schdist_ind_table.tex}
+\clearpage
+\input{tables/exogeneity_tests/wt_instmig_avg_pp_gen_subcounty_table.tex}
+
+\input{tables/exogeneity_tests/wt_instmig_avg_pp_spdist_table.tex}
+
+\clearpage
+
+
+\subsection{Southern White Migration Instrument as Control}
+\input{tables/exogeneity_tests/GM_8_hat_raw_pp_cgoodman_table.tex}
+
+\input{tables/exogeneity_tests/GM_8_hat_raw_pp_schdist_ind_table.tex}
+\clearpage
+\input{tables/exogeneity_tests/GM_8_hat_raw_pp_gen_subcounty_table.tex}
+
+\input{tables/exogeneity_tests/GM_8_hat_raw_pp_spdist_table.tex}
+
+\clearpage
+
+\subsection{Placebo Tests}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D17_placebo_cgoodman_urban.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D17_placebo_schdist_ind_urban.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D17_placebo_gen_subcounty_urban.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/D17_placebo_spdist_urban.png}
+\end{figure}
+\clearpage
+
+\subsection{PP Binscatters}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_fs.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_cgoodman_rf.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_schdist_ind_rf.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_gen_subcounty_rf.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_spdist_rf.pdf}
+\end{figure}
+\clearpage
+
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_cgoodman_ols.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_schdist_ind_ols.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_gen_subcounty_ols.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_spdist_ols.pdf}
+\end{figure}
+\clearpage
+\subsection{Percent Binscatters}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_fs_percent.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_cgoodman_rf_percent.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_schdist_ind_rf_percent.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_gen_subcounty_rf_percent.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_spdist_rf_percent.pdf}
+\end{figure}
+\clearpage
+
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_cgoodman_ols_percent.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_schdist_ind_ols_percent.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_gen_subcounty_ols_percent.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_spdist_ols_percent.pdf}
+\end{figure}
+\clearpage
+
+\subsection{Percentile Binscatters}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_fs_percentile.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_cgoodman_rf_percentile.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_schdist_ind_rf_percentile.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_gen_subcounty_rf_percentile.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_spdist_rf_percentile.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_cgoodman_ols_percentile.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_schdist_ind_ols_percentile.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_gen_subcounty_ols_percentile.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/binscatter/pooled_spdist_ols_percentile.pdf}
+\end{figure}
+\clearpage
+\subsection{LOO Tests Reduced Form}
+\clearpage
+
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/loo_rf_cgoodman.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/loo_rf_schdist_ind.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/loo_rf_gen_subcounty.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/loo_rf_spdist.png}
+\end{figure}
+\clearpage
+\subsection{LOO Tests 2SLS}
+\clearpage
+
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/loo_iv_cgoodman.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/loo_iv_schdist_ind.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/loo_iv_gen_subcounty.png}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=.8\textwidth]{figures/exogeneity_tests/loo_iv_spdist.png}
+\end{figure}
+\clearpage
+
+
+\subsection{Stacked Tables with Lagged Instrument Control}
+\input{tables/simpletables/stacked_cgoodman_urban_lagctrl_2.tex}
+\input{tables/simpletables/stacked_schdist_ind_urban_lagctrl_2.tex}
+\clearpage
+\input{tables/simpletables/stacked_gen_subcounty_urban_lagctrl_2.tex}
+\input{tables/simpletables/stacked_spdist_urban_lagctrl_2.tex}
+\clearpage
+
+\subsection{Stacked Tables without Lagged Instrument Control}
+\input{tables/simpletables/stacked_cgoodman_urban_lagctrl_1.tex}
+\input{tables/simpletables/stacked_schdist_ind_urban_lagctrl_1.tex}
+\clearpage
+\input{tables/simpletables/stacked_gen_subcounty_urban_lagctrl_1.tex}
+\input{tables/simpletables/stacked_spdist_urban_lagctrl_1.tex}
+\clearpage
+
+\subsection{Stacked Tables without Lagged Instrument Control, 1950-1970 only}
+\input{tables/simpletables/stacked_cgoodman_urban_lagctrl_3.tex}
+\input{tables/simpletables/stacked_schdist_ind_urban_lagctrl_3.tex}
+\clearpage
+\input{tables/simpletables/stacked_gen_subcounty_urban_lagctrl_3.tex}
+\input{tables/simpletables/stacked_spdist_urban_lagctrl_3.tex}
+\clearpage
+
+\section{Total Populations}
+\subsection{GM\_hat on all covariates}
+\input{tables/balancetables/cz_total_combined.tex}
+\clearpage
+\subsection{Balance Table}
+\input{tables/balancetables/cz_total.tex}
+\clearpage
+\subsection{Regressions Robust to Balance Table Covariates}
+\begin{landscape}
+\input{tables/balancetables/reg_cgoodman_total.tex}
+\clearpage
+\input{tables/balancetables/reg_schdist_ind_total.tex}
+\clearpage
+\input{tables/balancetables/reg_gen_subcounty_total.tex}
+\clearpage
+\input{tables/balancetables/reg_spdist_total.tex}
+\clearpage
+\end{landscape}
+
+
+
+\subsection{Stacked Tables with Lagged Instrument Control}
+
+\input{tables/simpletables/stacked_cgoodman_total_lagctrl_2.tex}
+\input{tables/simpletables/stacked_schdist_ind_total_lagctrl_2.tex}
+\clearpage
+\input{tables/simpletables/stacked_gen_subcounty_total_lagctrl_2.tex}
+\input{tables/simpletables/stacked_spdist_total_lagctrl_2.tex}
+\clearpage
+
+\subsection{Stacked Tables without Lagged Instrument Control}
+\input{tables/simpletables/stacked_cgoodman_total_lagctrl_1.tex}
+\input{tables/simpletables/stacked_schdist_ind_total_lagctrl_1.tex}
+\clearpage
+\input{tables/simpletables/stacked_gen_subcounty_total_lagctrl_1.tex}
+\input{tables/simpletables/stacked_spdist_total_lagctrl_1.tex}
+\clearpage
+
+\subsection{Stacked Tables without Lagged Instrument Control, 1950-1970 only}
+\input{tables/simpletables/stacked_cgoodman_total_lagctrl_3.tex}
+\input{tables/simpletables/stacked_schdist_ind_total_lagctrl_3.tex}
+\clearpage
+\input{tables/simpletables/stacked_gen_subcounty_total_lagctrl_3.tex}
+\input{tables/simpletables/stacked_spdist_total_lagctrl_3.tex}
+\clearpage
+
+
+\section{Total Populations, Dcourt sample}
+\subsection{GM\_hat on all covariates}
+\input{tables/balancetables/cz_td_combined.tex}
+\clearpage
+\subsection{Balance Table}
+\input{tables/balancetables/cz_td.tex}
+\clearpage
+\subsection{Regressions Robust to Balance Table Covariates}
+\begin{landscape}
+\input{tables/balancetables/reg_cgoodman_td.tex}
+\clearpage
+\input{tables/balancetables/reg_schdist_ind_td.tex}
+\clearpage
+\input{tables/balancetables/reg_gen_subcounty_td.tex}
+\clearpage
+\input{tables/balancetables/reg_spdist_td.tex}
+\clearpage
+\end{landscape}
+
+
+
+\end{document}
