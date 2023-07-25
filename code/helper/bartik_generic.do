@@ -46,7 +46,7 @@ outmigration rates. */
 		gen `group'$origin_id=`group'/total_`group'$origin_id
 		
 		/***** Save the origin-destination matrix as an intermediate dataset. *****/	
-		save "$INTDATA/bartik/${version}_od_matrix_`group'_$start_year.dta", replace
+		save "$INTDATA/dcourt/bartik/${version}_od_matrix_`group'_$start_year.dta", replace
 
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 *1. Construct destination-origin county transition matrix. Save long at o-d level, wide at destination level to analyze shares, and wide at origin levels to create mig figures.
@@ -55,7 +55,7 @@ outmigration rates. */
 		/* Construct predicted in-migration using the actual mig weights and the 
 		predicted mig weights. */
 		
-		use "$INTDATA/bartik/${version}_od_matrix_`group'_$start_year.dta", clear
+		use "$INTDATA/dcourt/bartik/${version}_od_matrix_`group'_$start_year.dta", clear
 		
 		/* Keep only necessary 
 		vars for construction of matrix */
@@ -78,7 +78,7 @@ outmigration rates. */
 		
 		/***** Save wide version at destination level as dta file. *****/
 
-		save "$INTDATA/bartik/${version}_`group'$origin_id$start_year.dta", replace
+		save "$INTDATA/dcourt/bartik/${version}_`group'$origin_id$start_year.dta", replace
 
 		drop total_`group'$destination_id*
 
@@ -88,7 +88,7 @@ outmigration rates. */
 			
 		reshape wide `group'$origin_id, i($origin_id) j( $destination_id) 
 		
-		save "$INTDATA/bartik/${version}_wide_`group'$origin_id$start_year.dta", replace
+		save "$INTDATA/dcourt/bartik/${version}_wide_`group'$origin_id$start_year.dta", replace
 
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 *3. Create two wide datasets at city level: one with all share X weight X year vars and the total for each year and overall total and one with the total for each year and overall total.
@@ -96,7 +96,7 @@ outmigration rates. */
 	
 		foreach weight_type in $weight_types{ // Actual migration and predicted migration ("act" and "pr")
 			
-			use "$INTDATA/bartik/${version}_wide_`group'$origin_id$start_year.dta", clear
+			use "$INTDATA/dcourt/bartik/${version}_wide_`group'$origin_id$start_year.dta", clear
 			merge 1:m $origin_id using  "$weights_data", keep (3) nogenerate
 			
 			foreach var of varlist `group'$origin_id*{
@@ -135,9 +135,9 @@ outmigration rates. */
 			
 			/***** Save one dataset with ALL vars and one with just the yearly totals and overall total, all wide at the city level. *****/
 			
-			save "$INTDATA/bartik/${version}_`group'_`weight_type'$weight_var$origin_id$start_year`end_year'_all_wide.dta", replace
+			save "$INTDATA/dcourt/bartik/${version}_`group'_`weight_type'$weight_var$origin_id$start_year`end_year'_all_wide.dta", replace
 			keep $destination_id totshX`weight_type'*
 			rename totshX* `group'_`weight_type'$weight_var*
-			save "$INTDATA/bartik/${version}_`group'_`weight_type'$weight_var$origin_id$start_year`end_year'_collapsed_wide.dta", replace
+			save "$INTDATA/dcourt/bartik/${version}_`group'_`weight_type'$weight_var$origin_id$start_year`end_year'_collapsed_wide.dta", replace
 		}
 	}

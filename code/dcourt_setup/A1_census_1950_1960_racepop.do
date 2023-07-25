@@ -1,5 +1,5 @@
 
-use "$data/new_data/usa_00047.dta", clear
+gz7, filepath("$RAWDATA/dcourt") filename("usa_00047.dta.gz")
 
 rename perwt pop
 g bpop = pop if race == 2
@@ -69,7 +69,7 @@ ren *196002 *1960
 
 preserve
 	*Merge with State Crosswalks
-	merge m:1 city using "$xwalks/US_place_point_2010_crosswalks.dta", keepusing(cz cz_name)
+	merge m:1 city using "$RAWDATA/dcourt/US_place_point_2010_crosswalks.dta", keepusing(cz cz_name)
 	replace cz = 19600 if city=="Belleville, NJ"
 	replace cz_name = "Newark, NJ" if city=="Belleville, NJ"
 	*Resolve Unmerged Cities
@@ -79,22 +79,22 @@ preserve
 	drop if _merge==2
 	drop _merge
 
-	save "$data/new_data/census_1950_1960_racepop_cz", replace
+	save "$INTDATA/dcourt/census_1950_1960_racepop_cz", replace
 restore
 
 preserve
 	*Merge with State Crosswalks
-	merge 1:1 city using "$xwalks/US_place_point_2010_crosswalks.dta", keepusing(countyfip state_fips)
+	merge 1:1 city using "$RAWDATA/dcourt/US_place_point_2010_crosswalks.dta", keepusing(countyfip state_fips)
 
 	drop if _merge==2
 	drop _merge
 
-	save "$data/new_data/census_1950_1960_racepop_county", replace
+	save "$INTDATA/dcourt/census_1950_1960_racepop_county", replace
 restore
 
-merge 1:1 city using "$xwalks/US_place_point_2010_crosswalks.dta", keepusing(smsa) keep(1 3) nogen
+merge 1:1 city using "$RAWDATA/dcourt/US_place_point_2010_crosswalks.dta", keepusing(smsa) keep(1 3) nogen
 
-save "$data/new_data/census_1950_1960_racepop_msa", replace
+save "$INTDATA/dcourt/census_1950_1960_racepop_msa", replace
 
 
 

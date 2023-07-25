@@ -19,7 +19,7 @@ foreach inst in rm main mainsouth nt rmnt rmsc scnt rmscnt{
 	use "$CLEANDATA/cz_pooled`datatab'.dta", clear
 
 	// Loop 0: over urban/total populations
-	foreach samp in urban total{
+	foreach samp in urban {
 		if "`samp'"=="urban" local poptab ""
 		if "`samp'"=="total" local poptab "_totpop"
 		
@@ -30,15 +30,11 @@ foreach inst in rm main mainsouth nt rmnt rmsc scnt rmscnt{
 		if "`samp'"=="total" local poplab "Total Population"
 		if !("`samp'" == "total" & inlist("`inst'","scnt","rmsc","rmscnt")){
 		// Loop 1: over outcomes
-			foreach y in schdist_ind cgoodman gen_subcounty gen_muni{
+			foreach y in schdist_ind cgoodman gen_subcounty spdist{
 				
 				local ylab: variable label n_`y'_cz
-				preserve
 
 
-					// Create PC outcome
-					cap drop n_`y'_cz_pc
-					g n_`y'_cz_pc = b_`y'_cz1970/(pop`popname'1970/100000) - b_`y'_cz1940/(pop`popname'1940/100000)
 					
 					// Loop 2: over with/without controls
 					forv ctrls=3/3{
@@ -50,23 +46,15 @@ foreach inst in rm main mainsouth nt rmnt rmsc scnt rmscnt{
 						if "`ctrls'"=="4" local controls mfg_lfshare1940 `inst'blackmig3539_share`poptab' reg2 reg3 reg4
 						if "`ctrls'"=="4" local ctrllab "Census Region and Mfg+Blackmig Shares"
 
-						// Loop 3: over raw/per capita
-						foreach pop in raw pc{ 
 							
 							// Set dependent variable and create per capita label
-							if "`pop'"=="pc" {
-								local yvar n_`y'_cz_pc
-								local pclab "Per Capita (100,000)"
-							}
-							else{
-								local yvar n_`y'_cz
-								local pclab ""
-							}
+							local yvar n_`y'_cz_pc`popname'
+							
 							
 							eststo clear	
 							
 							// first stage
-							eststo fs: reg GM_raw_pp`poptab' GM`gmtab'_hat_raw_pp`poptab', r
+							eststo fs: reg GM_raw_pp`poptab' GM`gmtab'_hat_raw_pp`poptab' `controls' [aw=pop`popname'1940], r
 							test GM`gmtab'_hat_raw_pp`poptab'=0
 							local F : di %6.3f `r(F)'
 							estadd local Fstat = `F'
@@ -76,56 +64,58 @@ foreach inst in rm main mainsouth nt rmnt rmsc scnt rmscnt{
 							local ycord = `r(mean)'*0.5
 							qui su GM`gmtab'_hat_raw_pp`poptab',d
 							local xcord = `r(mean)'*2
-							binscatter GM_raw_pp`poptab' GM`gmtab'_hat_raw_pp`poptab', controls(`controls') ///
+							binscatter GM_raw_pp`poptab' GM`gmtab'_hat_raw_pp`poptab' [aw=pop`popname'1940], controls(`controls') ///
 															xtitle("Predicted PP Black Migrant ") ytitle("Actual PP Black Migrant") ///
 															title("First Stage, Pooled, `poplab'") ///
 															note("Data at CZ level, 1940-70 sample, with `ctrllab' controls.") ///
 															text(`ycord' `xcord' "Slope: `coef'(`se)')" "First-Stage F-stat: `F'") ///
-															savegraph("$FIGS/simplefigs/pooled_`y'_`pop'_C`ctrls'_`samp'_fs_`inst'.pdf") replace
+															savegraph("$FIGS/simplefigs/pooled_`y'_C`ctrls'_`samp'_fs_`inst'.pdf") replace
 							// OLS
-							eststo ols : reg `yvar' GM_raw_pp`poptab' `controls', r
+							di "`yvar'"
+							eststo ols : reg `yvar' GM_raw_pp`poptab' `controls' [aw=pop`popname'1940], r
+
 							local coef : di %6.3f _b[GM_raw_pp`poptab']
 							local se : di %6.3f _se[GM_raw_pp`poptab']
 							qui su `yvar',d
 							local ycord = `r(mean)'*0.5
 							qui su GM_raw_pp`poptab',d
 							local xcord = `r(mean)'*2
-							binscatter `yvar' GM_raw_pp`poptab', controls(`controls') ///
+							binscatter `yvar' GM_raw_pp`poptab' [aw=pop`popname'1940], controls(`controls') ///
 															xtitle("Actual PP Black Migrant") ytitle("`ylab' `pclab'") ///
 															title("OLS, Pooled, `poplab'") ///
 															note("Data at CZ level, 1940-70 sample, with `ctrllab' controls.") ///
 															text(`ycord' `xcord' "Slope: `coef'(`se)')") ///
-															savegraph("$FIGS/simplefigs/pooled_`y'_`pop'_C`ctrls'_`samp'_ols_`inst'.pdf") replace
+															savegraph("$FIGS/simplefigs/pooled_`y'_C`ctrls'_`samp'_ols_`inst'.pdf") replace
 							// RF
-							eststo rf : reg `yvar' GM`gmtab'_hat_raw_pp`poptab' `controls', r
+							eststo rf : reg `yvar' GM`gmtab'_hat_raw_pp`poptab' `controls' [aw=pop`popname'1940], r
 							local coef : di %6.3f _b[GM`gmtab'_hat_raw_pp`poptab']
 							local se : di %6.3f _se[GM`gmtab'_hat_raw_pp`poptab']
 							qui su `yvar',d
 							local ycord = `r(mean)'*0.5
 							qui su GM`gmtab'_hat_raw_pp`poptab',d
 							local xcord = `r(mean)'*2
-							binscatter `yvar' GM`gmtab'_hat_raw_pp`poptab', controls(`controls') ///
+							binscatter `yvar' GM`gmtab'_hat_raw_pp`poptab' [aw=pop`popname'1940], controls(`controls') ///
 															xtitle("Predicted PP Black Migrant") ytitle("`ylab' `pclab'") ///
 															title("Reduced Form, Pooled, `poplab'") ///
 															note("Data at CZ level, 1940-70 sample, with `ctrllab' controls.") ///
 															text(`ycord' `xcord' "Slope: `coef'(`se)')") ///
-															savegraph("$FIGS/simplefigs/pooled_`y'_`pop'_C`ctrls'_`samp'_rf_`inst'.pdf") replace
+															savegraph("$FIGS/simplefigs/pooled_`y'_C`ctrls'_`samp'_rf_`inst'.pdf") replace
 							// IV
-							eststo tsls : ivreg2 `yvar' (GM_raw_pp`poptab' = GM`gmtab'_hat_raw_pp`poptab') `controls', r
+							eststo tsls : ivreg2 `yvar' (GM_raw_pp`poptab' = GM`gmtab'_hat_raw_pp`poptab') `controls' [aw=pop`popname'1940], r
 
 							// Export to tables
 							esttab 	fs ///
 											ols ///
 											rf	///
 											tsls ///
-											using "$TABS/simpletables/pooled_`y'_`pop'_C`ctrls'_`samp'_`inst'", ///
+											using "$TABS/simpletables/pooled_`y'_C`ctrls'_`samp'_`inst'", ///
 											replace label nomtitles se booktabs num noconstant ///
 											starlevels( * 0.10 ** 0.05 *** 0.01) ///
 											stats(Fstat N, labels( ///
 											"F-Stat"	///
 											"Observations" ///
 											)) ///
-											title("Dererencourt Table Two with y=`ylab' `pclab' Pooled, `poplab', `ctrllab' controls.") ///
+											title("Dererencourt Table Two with y=`ylab' Pooled, `poplab', `ctrllab' controls.") ///
 											keep(GM_raw_pp`poptab' GM`gmtab'_hat_raw_pp`poptab') ///
 											mgroups("First Stage" "OLS" "Reduced Form" "2SLS", pattern(1 1 1 1))
 											
@@ -134,7 +124,7 @@ foreach inst in rm main mainsouth nt rmnt rmsc scnt rmscnt{
 						
 						}
 					}
-				restore
+
 			}
 		}
 	}
