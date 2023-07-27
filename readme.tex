@@ -43,7 +43,71 @@ You will need the following R packages. Please install them before running the c
 \end{itemize}
 
 \subsection{Derenoncourt setup}
-The entirety of the Derenoncourt "Can You Move to Opportunity? Evidence from the Great Migration." replication package is in the dropbox in "/municipality\_proliferation/derenoncourt\_opportunity/replication\_AER\". Within this, the folder "code" is her original replication code and the folder "code\_replication" replicates it to our specifications. To make things easier, I've copied the files with major changes into the repository. All of the do-files starting with A are new and used to create new data for the decades stacked sample. 4\_final\_dataset.do and 4\_final\_dataset\_split.do are modified versions of Derenoncourt's similarly named file that only includes variables we need and modifies it in some other ways for our analysis (e.g. raw instruments instead of rank).
+The entirety of the Derenoncourt "Can You Move to Opportunity? Evidence from the Great Migration." replication package is in the dropbox in "/municipality\_proliferation/derenoncourt\_opportunity/replication\_AER\". Within this, the folder "code" is her original replication code and the folder "code\_replication" replicates it to our specifications. To make things easier, I've copied the files with major changes into the repository. All of the do-files starting with A are new and used to create new data for the decades stacked sample. 4\_final\_dataset.do and 4\_final\_dataset\_split.do are modified versions of Derenoncourt's similarly named file that only includes variables we need and modifies it in some other ways for our analysis (e.g. raw instruments instead of rank). To slim things down, I've copied the raw derenoncourt data that we need into the dropbox folder "/municipality\_proliferation/raw/dcourt/" and the modified code we need in the Github as "code/dcourt\_setup/". 
+
+The changes to the pooled sample are minimal, only dropping unused data and adding some new data. The stacked sample requires adding 1950 and 1960 data, but largely follows the same logic. The system of copying data from the Derenoncourt replication package and cleaning/analyzing it with a modified version of her code feels a bit ad-hoc to me, I would consider rethinking that bit of architecture. Or just say that if it ain't broke, don't fix it. Your choice.
+
+The code also creates cz\_pooled\_south.dta and cz\_stacked\_south.dta. These are similar versions of cz\_pooled.dta and cz\_stacked.dta, with the addition of several new versions of the instrument: using rural migrants only (rm), considering texas as a northern state (nt), and allowing southern cities to be destinations (sc). The original Derenoncourt data was created on a proprietary sample from the 1940 full count census (municipality\_proliferation/derenoncourt\_opportunity/replication\_AER/population/raw/170515\_popc1940.dta) to create 1940 city population values that, for some reason or another, I have not been able to exactly replicate from the 1940 full count census that's on IPUMS. We needed to include Texan and southern cities for these versions of the instrument, so I had to use what was on IPUMS, thus you'll see the original version of the instrument that's in the \_south datasets is slightly different than the original datasets.
+
+\subsection{Code overview}
+\begin{itemize}
+	\item code/ado/
+
+		\begin{description}
+		\item[appendmodels.ado] Ben Jann's appendmodels function to create nice tables stacking models in rows, from https://www.stata.com/statalist/archive/2009-11/msg01289.html
+		\item[cityfix\_ccdb.ado] Wrapper for all the city name string cleaning to harmonize city names in CCDB data.
+		\item[cityfix\_census.ado] Wrapper for all the city name string cleaning to harmonize city names in Census data.
+		\item[gz7.ado] Proprietary function to unzip GZIP files, since evidently the SSC package gzuse no longer works on Windows. Wouldn't be surprised if they update gzuse to fix it eventually and make this irrelevant.
+		\end{description}
+
+	\item code/analysis/
+
+		\begin{description}
+		\item[alt\_inst\_tables.do] Creates tables of first stage, OLS, reduced form, and 2SLS using the baseline, Residualized state FE, top urban dropped, 1940 southern state of birth, european migrant, and southern white migrant instruments, as well as the baseline instrument with outcomes expressed in per capita of total population (as opposed to urban population).
+		\item[alt\_inst\_tests.do] Creates our version of figure D16 from the Derenoncourt online appendix, the Hansen J-tes. Also creates figure D14, binscatters of the reduced form for the european and southern white instruments.
+		\item[balancetables.do] Creates balance tables, regressing 1940 baseline characteristics on the instrument, and then creates tables comparing the first stage, OLS, reduced form, and 2SLS with and without the baseline controls deemed significant. Also creates combined balance tables, regressing the instrument on all the baseline variables at once.
+		\item[binscatter.do] Creates various binscatter graphs of the instrument.
+		\item[loo\_text.do] Performs the leave-one-out tests.
+		\item[origin\_shocks\_dest\_chars.do] Creates dataset of origin county shocks and the characteristics of their primary destination city. Not currently used for anything, just informative.
+		\item[placebo\_test.do] Performs placebo tests.
+		\item[rmscnt\_inst\_tables.do] Creates tables of first stage, OLS, reduced form, and 2SLS using the baseline instrument and the instruments created using rural migrants only (rm), considering texas as a northern state (nt), allowing southern cities to be destinations (sc), and all permutations of them.
+		\end{description}
+
+	\item code/cleaning/
+	
+		\begin{description}
+		\item[census\_race\_cleaning.do] Creates measures of total population by race for each decade from 1910-2020.
+		\item[census\_urban\_populations.do] Creates measures of urban population by race for each decade from 1900-1930 and measures of the fraction of population in the main city in a CZ.
+		\item[cgoodman\_place\_county\_geog.R] Creates measures of fraction land incorporated from the Chris Goodman data.
+		\item[cog\_cleaning.do] Cleans the census of governments data.
+		\item[covariates.R] Creates 1940 Baseline covariates.
+		\item[cz\_court\_orders.do] Links Chris Reardon school desegregation court orders to CZs.
+		\item[dataprep.do] Merges all data and creates  cz\_pooled.dta, cz\_stacked.dta, cz\_pooled\_south.dta, and cz\_stacked\_south.dta
+		\item[dcourt\_cleaning] Creates total population versions of Derenoncourt instruments/data. NOTE: this needs to be either updated or removed, we don't seem as interested in total population instruments and this needs to be updated to reflect that we moved the Derenoncourt data from it's own folder to be part of our code structure.
+		\item[geogs.do] Finalizes fraction incorporated and fraction unusabe from cgoodman\_place\_county\_geog.R and lutz\_sand\_cleaning.do.
+		\item[lutz\_sand\_cleaning.do] Cleans the Lutz and Sand measures of buildable land.
+		\end{description}
+	\item code/dcourt\_setup/
+		
+		\begin{description}
+		\item[2\_lasso.do] Performs lasso variable selection.
+		\item[3\_instrument.do] Creates all our shift-share instruments.
+		\item[4\_final\_dataset.do] Creates final pooled dataset from Derenoncourt (modified) with all instruments and variables sourced from her data.
+		\item[4\_final\_dataset.do] Creates final stacked dataset from Derenoncourt (modified) with all instruments and variables sourced from her data.
+		\item[A1\_census\_1950\_1960\_racepop.do] Creates urban race population data for 1950 and 1960 from IPUMS samples.
+		\item[A2\_clean\_cz\_mobility\_1900\_2015.do] Creates mobility dataset.
+		\item[A4\_clean\_city\_population\_census\_1940\_full.do] Creates urban race population data for 1940 from IPUMS full count census.
+		\item[A5\_clean\_cz\_snq\_european\_immigration\_instrument.do] Creates urban race population data for 1940 from IPUMS full count census.
+		\end{description}
+	\item code/helper/
+	
+		\begin{description}
+		\item[bartik\_generic.do] Code to create Bartik Shift-Share instrument. Adopted from Derenoncourt code.
+		\end{description}
+\end{itemize}
+
+
+
 
 \section{Data Sources (INCOMPLETE)}
 \subsection{Derenoncourt 2022}

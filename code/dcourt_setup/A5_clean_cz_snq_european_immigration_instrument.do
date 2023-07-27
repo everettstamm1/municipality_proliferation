@@ -18,7 +18,7 @@ STEPS:
 	g fips_str=FIPSTATE+ FIPSCNTY // Create county fips identifier for merging with other geographies
 	
 	* Merge in harmonized geo identifiers.
-	merge 1:1 fips_str using $RAWDATA/dcourt/county1940_crosswalks.dta, keepusing(cz)
+	merge 1:1 fips_str using "$RAWDATA/dcourt/county1940_crosswalks.dta", keepusing(cz)
 	tab _merge // Check and see what counties are matching and not matching. Create a comment in the code detailing non-matching counties.
 	keep if _merge==3 
 	drop _merge
@@ -50,7 +50,7 @@ STEPS:
 
 	rename fips_code fips
 	
-	merge 1:1 fips using $RAWDATA/dcourt/county1940_crosswalks.dta, nogenerate keep (3)
+	merge 1:1 fips using "$RAWDATA/dcourt/county1940_crosswalks.dta", nogenerate keep (3)
 
 	merge 1:1 fips_str using `pop1940', keepusing(pop1940 wpop1940) keep (3) /// Ste. Genevieve, MO county drops but it is located in Farmington, MO CZ which is not in the sample.
 
@@ -69,5 +69,5 @@ STEPS:
 	g wt_instmig_avg_pp= (instmig_avg_pop+wpop1940)/(pop1940+instmig_avg_pop) - wpop1940/pop1940
 	keep wt_instmig_avg wt_instmig_avg_pp cz
 
-	save $INTDATA/dcourt/clean_cz_snq_european_immigration_instrument.dta, replace
+	save "$INTDATA/dcourt/clean_cz_snq_european_immigration_instrument.dta", replace
 

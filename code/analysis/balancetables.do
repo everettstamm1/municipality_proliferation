@@ -1,7 +1,7 @@
 
 
 local b_controls reg2 reg3 reg4 blackmig3539
-
+local balance_cutoff = 0.05
 
 foreach geog in full 1 2 4{
 	if "`geog'"=="full" local samplab ""
@@ -51,7 +51,7 @@ foreach geog in full 1 2 4{
 
 			eststo `covar': reg `covar' GM`covar' `b_controls' d1 d2 d3 d4 d5 d6 d7 d8 d9 [aw=pop`popname'1940], r
 			local p =2*ttail(e(df_r),abs(_b[GM`covar']/_se[GM`covar']))
-			if `p'<=0.05{
+			if `p'<=`balance_cutoff'{
 				if (!inlist("`covar'","mfg_lfshare", "blackmig3539", "popc1940","pop1940") & !regexm("`covar'","cz1940_pc")) local pooled_covars_`samp'  "`pooled_covars_`samp'' `covar' `covar'_m"
 				if (inlist("`covar'","mfg_lfshare", "blackmig3539", "popc1940","pop1940") | regexm("`covar'","cz1940_pc")) local pooled_covars_`samp'  "`pooled_covars_`samp'' `covar'"
 			}
@@ -84,7 +84,7 @@ foreach geog in full 1 2 4{
 				label var GM_hat_raw_pp`poptab' "`label' on GM_hat"
 				eststo `covar': reg `covar' GM`covar' `b_controls' d1 d2 d3 d4 d5 d6 d7 d8 d9 [aw=pop`popname'] if decade==`decade', r
 				local p =2*ttail(e(df_r),abs(_b[GM`covar']/_se[GM`covar']))
-				if `p'<=0.05{
+				if `p'<=`balance_cutoff'{
 				if (!inlist("`covar'","mfg_lfshare", "blackmig3539", "popc1940","pop1940") & !regexm("`covar'","cz1940_pc")) local stacked_covars_`decade'  "`stacked_covars_`decade'' `covar' `covar'_m"
 				if (inlist("`covar'","mfg_lfshare", "blackmig3539", "popc1940","pop1940") | regexm("`covar'","cz1940_pc")) local stacked_covars_`decade'  "`stacked_covars_`decade'' `covar'"
 				}
@@ -110,7 +110,7 @@ if "`geog'"!="full" & "`geog'"!="1" keep if reg`geog'==1
 			label var GM`covar' "`covar' on GM_hat"
 			eststo `covar': reg `covar' GM`covar' `b_controls' d1 d2 d3 d4 d5 d6 d7 d8 d9 [aw=pop`popname'], r
 			local p =2*ttail(e(df_r),abs(_b[GM`covar']/_se[GM`covar']))
-			if `p'<=0.1{
+			if `p'<=`balance_cutoff'{
 				if (!inlist("`covar'","mfg_lfshare", "blackmig3539", "popc1940","pop1940") & !regexm("`covar'","cz1940_pc")) local stacked_covars  "`stacked_covars' `covar' `covar'_m"
 				if (inlist("`covar'","mfg_lfshare", "blackmig3539", "popc1940","pop1940") | regexm("`covar'","cz1940_pc")) local stacked_covars  "`stacked_covars' `covar'"
 			}
