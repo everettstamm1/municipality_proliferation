@@ -34,6 +34,7 @@ foreach level in cz {
 	
 	replace year = year+2
 	
+	/*
 	// preclean ccdb urbanpop data (from dcourt)
 	preserve
 		use "$DCOURT/data/GM_`level'_final_dataset_split.dta", clear
@@ -41,9 +42,9 @@ foreach level in cz {
 		ren popc* `level'pop*
 		save "$INTDATA/dcourt_populations/`level'pop", replace
 	restore
+	*/
 	
-	
-	foreach var of varlist gen_muni schdist_ind all_local gen_subcounty spdist all_local_nosch{
+	foreach var of varlist gen_town gen_muni schdist_ind all_local gen_subcounty spdist all_local_nosch{
 		preserve
 			local lab: variable label `var'
 
@@ -250,7 +251,7 @@ foreach level in cz {
 	local lab: variable label yr_incorp
 	
 	g n = yr_incorp>=1940 & yr_incorp<=1970
-	forv d=1900(10)2010{
+	forv d=1900(10)1990{
 		local step = `d'+10
 		
 		g n`d' = yr_incorp<`d'
@@ -273,16 +274,16 @@ foreach level in cz {
 	label var b_muni_`level'1970 "Base `lab' 1970"
 	label var b_muni_`level'1980 "Base `lab' 1980"
 	label var b_muni_`level'1990 "Base `lab' 1990"
-	label var b_muni_`level'2000 "Base `lab' 2000"
-	label var b_muni_`level'2010 "Base `lab' 2010"
+	//label var b_muni_`level'2000 "Base `lab' 2000"
+	//label var b_muni_`level'2010 "Base `lab' 2010"
 
 	label var n_muni_`level'40_50 "`lab'"
 	label var n_muni_`level'50_60 "`lab'"
 	label var n_muni_`level'60_70 "`lab'"
 	label var n_muni_`level'70_80 "`lab'"
 	label var n_muni_`level'80_90 "`lab'"
-	label var n_muni_`level'90_00 "`lab'"
-	label var n_muni_`level'00_10 "`lab'"
+	//label var n_muni_`level'90_00 "`lab'"
+	//label var n_muni_`level'00_10 "`lab'"
 
 	label var n_muni_`level' "`lab'"
 
@@ -303,10 +304,10 @@ foreach level in cz {
 		}
 		// Pooled
 		
-		use "$DCOURT/data/GM_`level'_final_dataset`samptab'.dta", clear
+		use "$CLEANDATA/dcourt/GM_`level'_final_dataset`samptab'.dta", clear
 		
-		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg* frac_all_upm1940  GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr eur_mig wt_instmig_avg wt_instmig_avg_pp samp_*
-		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg* frac_all_upm1940  GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr eur_mig wt_instmig_avg wt_instmig_avg_pp 
+		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*   GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_*
+		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*   GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp 
 
 		if "`samp'"=="south" ren v2*_blackmig3539_share1940 *blackmig3539_share
 		if "`samp'"=="dcourt" ren v2_blackmig3539_share1940 blackmig3539_share
@@ -316,23 +317,20 @@ foreach level in cz {
 		}
 		
 		
+		merge m:1 cz using "$INTDATA/dcourt/original_130_czs"
+			
+		g dcourt = _merge==3
+		drop _merge
+		lab var dcourt "Derenoncourt Sample of 130 CZs"
 		// Fixing sample flags
 		if "`samp'"=="south"{
-			
-			merge m:1 cz using "$DCOURT/data/crosswalks/original_130_czs"
-				
-			g dcourt = _merge==3
-			drop _merge
-			lab var dcourt "Derenoncourt Sample of 130 CZs"
-			
 			foreach s in 2 2rm 2nt 2rmnt 2rmsc 2scnt 2rmscnt{
 				replace samp_`s' = (dcourt==1 | samp_`s'==1)
 			}
-
 		}
 		
 		preserve
-			use "$CLEANDATA/dcourt/GM_`level'_final_dataset_split`samptab'", clear
+			use "$CLEANDATA/dcourt/GM_`level'_final_dataset_split`samptab'_totalpop", clear
 			keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v*_blackmig3539_share reg* pop1940 bpop1940 mfg_lfshare1940 pop1970 bpop1970 mfg_lfshare1970
 			ren vfull*_blackmig3539_share *blackmig3539_share
 			foreach var of varlist GM* *blackmig3539_share mfg_lfshare1940{
@@ -345,16 +343,16 @@ foreach level in cz {
 		
 		merge 1:1 `levelvar' using `totpop_insts', update nogen
 		
-		foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist  cgoodman{
+		foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist gen_town cgoodman{
 
-			merge 1:1 `levelvar' using "$INTDATA/counts/`ds'_`level'", keep(1 3) nogen keepusing(n_`ds'_`level' b_`ds'_`level'1970 b_`ds'_`level'1940 b_`ds'_`level'2010)
+			merge 1:1 `levelvar' using "$INTDATA/counts/`ds'_`level'", keep(1 3) nogen keepusing(n_`ds'_`level' b_`ds'_`level'1970 b_`ds'_`level'1940)
 		}
 		
 		//merge 1:1 `levelvar' using "$INTDATA/cog_populations/`level'pop", keep(3) nogen
 		
 		if "`level'"=="cz"{
 			preserve
-				use "$XWALKS/US_place_point_2010_crosswalks.dta", clear
+				use "$RAWDATA/dcourt/US_place_point_2010_crosswalks.dta", clear
 				keep cz cz_name
 				duplicates drop
 				tempfile cznames
@@ -400,19 +398,21 @@ foreach level in cz {
 		replace n_cgoodman_cz = 0 if n_cgoodman_cz==.
 		replace b_cgoodman_cz1940 = 0 if b_cgoodman_cz1940==.
 		replace b_cgoodman_cz1970 = 0 if b_cgoodman_cz1970==.
-		replace b_cgoodman_cz2010 = 0 if b_cgoodman_cz2010==.
+		//replace b_cgoodman_cz2010 = 0 if b_cgoodman_cz2010==.
 
 		
 		// Adding labels
 
-		foreach ds in  gen_muni schdist_ind all_local ngov3 gen_subcounty spdist   cgoodman  {
+		foreach ds in  gen_muni schdist_ind all_local ngov3 gen_subcounty spdist  gen_town cgoodman  {
 				local label : variable label n_`ds'_`level'
 				lab var n_`ds'_`level' "New Govs, `label'"
 				lab var b_`ds'_`level'1940 "Base Govs 1940, `label'"
 				lab var b_`ds'_`level'1970 "Base Govs 1970, `label'"
 				
 				g b_`ds'_`level'1940_pc = b_`ds'_`level'1940/(pop1940/10000) 
-				g b_`ds'_`level'1940_pcc = b_`ds'_`level'1940/(popc1940/10000) 
+				g b_`ds'_`level'1940_pcc = b_`ds'_`level'1940/(popc1940/10000)
+				g b_`ds'_`level'1970_pcc = b_`ds'_`level'1970/(popc1970/10000) 
+
 				g n_`ds'_`level'_pc = b_`ds'_`level'1970/(pop1970/10000) - b_`ds'_`level'1940/(pop1940/10000) 
 				g n_`ds'_`level'_pcc = b_`ds'_`level'1970/(popc1970/10000) - b_`ds'_`level'1940/(popc1940/10000) 
 				lab var n_`ds'_`level'_pc "New `label', P.C. (total)"
@@ -467,8 +467,9 @@ foreach level in cz {
 
 		save "$CLEANDATA/`level'_pooled`outsamptab'", replace
 		
+		
 		// Creating stacked version of data
-		use "$CLEANDATA/dcourt/GM_`level'_final_dataset_split`samptab'",clear
+		use "$CLEANDATA/dcourt/GM_`level'_final_dataset_split`samptab'_totalpop",clear
 		
 		rename *1940_1950 *1940
 		rename *1950_1960 *1950
@@ -488,9 +489,9 @@ foreach level in cz {
 		drop totpop_GM_raw totpop_GM_raw_pp totpop_GM_hat_raw totpop_GM_hat_raw_pp totpop_GM totpop_GM_hat
 
 		preserve
-			use "$DCOURT/data/GM_`level'_final_dataset_split`samptab'.dta", clear
-
-			keep `levelvar' GM* popc???? bpopc???? mfg_lfshare* v2*blackmig3539_share* reg2 reg3 reg4  frac_all_upm*
+			use "$CLEANDATA/dcourt/GM_`level'_final_dataset_split`samptab'", clear
+	di "here"
+			keep `levelvar' GM* popc???? bpopc???? mfg_lfshare* v2*blackmig3539_share* reg2 reg3 reg4  
 			drop GM_hat0* GM_hat7r* GM_hat8*
 			ren GM_hat2_* GM_hat_*
 			ren v2_blackmig3539_share* blackmig3539_share*
@@ -509,7 +510,7 @@ foreach level in cz {
 		}
 		
 
-		foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist   cgoodman{
+		foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist gen_town cgoodman{
 			merge 1:1 `levelvar' using "$INTDATA/counts/`ds'_`level'", keep(1 3) nogen
 			 
 		}
@@ -534,11 +535,11 @@ foreach level in cz {
 		rename *70_80 *1970
 		rename *80_90 *1980
 
-		keep totpop_* GM_* frac_all_upm* mfg_lfshare* blackmig3539_share* `levelvar' reg2 reg3 reg4  n_*_`level'???? b_*_`level'????  bpop* pop*
+		keep totpop_* GM_*  mfg_lfshare* blackmig3539_share* `levelvar' reg2 reg3 reg4  n_*_`level'???? b_*_`level'????  bpop* pop*
 		cap drop GM_hat0* GM_hat2* GM_hat1*  GM_hatr* GM_hat7r* GM_hat8* 
 		cap drop totpop_blackmig3539_share
 		local stubs 
-		foreach ds in  gen_muni schdist_ind all_local ngov3 gen_subcounty spdist   cgoodman  {
+		foreach ds in  gen_muni schdist_ind all_local ngov3 gen_subcounty spdist gen_town  cgoodman  {
 			local lab`ds' : variable label n_`ds'_`level'1940
 			local stubs `stubs' n_`ds'_`level' b_`ds'_`level'
 
@@ -553,7 +554,7 @@ foreach level in cz {
 			}
 		}
 			
-		qui reshape long `stubs' frac_all_upm totpop_GM_ GM_ GM_hat_ totpop_GM_hat totpop_GM_raw_ totpop_GM_raw_pp_ totpop_GM_hat_raw_ totpop_GM_hat_raw_pp_ GM_raw_pp_ GM_hat_raw_pp_  mfg_lfshare totpop_blackmig3539_share blackmig3539_share bpop pop bpopc popc, i(`levelvar') j(decade)
+		qui reshape long `stubs' totpop_GM_ GM_ GM_hat_ totpop_GM_hat totpop_GM_raw_ totpop_GM_raw_pp_ totpop_GM_hat_raw_ totpop_GM_hat_raw_pp_ GM_raw_pp_ GM_hat_raw_pp_  mfg_lfshare totpop_blackmig3539_share blackmig3539_share bpop pop bpopc popc, i(`levelvar') j(decade)
 		
 		
 		
@@ -563,7 +564,7 @@ foreach level in cz {
 		replace n_cgoodman_cz = 0 if n_cgoodman_cz==.
 		replace b_cgoodman_cz = 0 if b_cgoodman_cz==.
 
-		foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist cgoodman {
+		foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist cgoodman gen_town {
 			label var n_`ds'_`level' "`lab`ds''"
 
 			g frac = b_`ds'_`level'/(pop/10000)
@@ -630,7 +631,7 @@ foreach level in cz {
 	
 	if "`level'"=="cz"{
 		
-		merge m:1 cz using "$DCOURT/data/crosswalks/original_130_czs"
+		merge m:1 cz using "$INTDATA/dcourt/original_130_czs"
 			
 		g dcourt = _merge==3
 		drop _merge
@@ -638,7 +639,7 @@ foreach level in cz {
 		
 		
 		preserve
-			use "$XWALKS/US_place_point_2010_crosswalks.dta", clear
+			use "$RAWDATA/dcourt/US_place_point_2010_crosswalks.dta", clear
 			keep cz cz_name
 			duplicates drop
 			replace cz_name="Louisville, KY" if cz==13101 // Fill in Louisville, KY name, which was missing.
@@ -711,6 +712,7 @@ foreach level in cz {
 	lab var m_rr_sqm2 "Meters of Railroad per Square Meter of Land, 1940"
 	
 	save "$CLEANDATA/`level'_stacked`outsamptab'", replace
+	*/
 	}
 }
 

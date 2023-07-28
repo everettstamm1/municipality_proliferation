@@ -25,50 +25,28 @@ gl FIGS "$REPO/exhibits/figures"
 gl TABS "$REPO/exhibits/tables"
 gl MAPS "$REPO/exhibits/maps"
 
-// Path to Derenoncourt Repo
-gl DCOURT "$DROPBOX/derenoncourt_opportunity/replication_AER"
-
 adopath ++ "$CODE/ado"
 
 // Settings
 set maxvar 30000
 
 if `run_dcourt'==1{
-	// Derenoncourt Macros
 	
-	global XXX  "~\Dropbox\municipality_proliferation\derenoncourt_opportunity\replication_AER\"
-	global code "${XXX}/code_replication"
-	global lasso "$code/lasso"
-	global bartik "$code/bartik"
-	global data "$XXX/data"
-	global xwalks "$data/crosswalks"
-	global urbrural "$xwalks/documentation/urban_rural_county_classification"
-	global msanecma "$xwalks/documentation/msanecma_1999_codes_names"
-	global city_sample "$data/city_sample"
-	global mobdata "$data/mobility"
-	global instrument "$data/instrument"
-	global migshares "$instrument/shares"
-	global migdata "$instrument/migration"
-	global mechanisms "$data/mechanisms"
-	global jobs "$mechanisms/jobs"
-	global pf "$mechanisms/public_finance"
-	global political "$mechanisms/political"
-	global nbhds "$mechanisms/neighborhoods"
-	global incarceration "$mechanisms/incarceration"
-	global schools "$mechanisms/schools"
-	global population "$mechanisms/population"
-	global ri "$data/randomization_inference"
-	global paper "$XXX/paper"
-	global figtab "$XXX/figures_tables"
 	
 	// Files I made to create data necessary for stacked derenoncourt
-	do "$CODE/cleaning/A1_census_1950_1960_racepop.do"
-	do "$CODE/cleaning/A2_clean_cz_mobility_1900_2015.do"
-	do "$CODE/cleaning/A4_clean_city_population_census_1940_full"
-	do "$CODE/cleaning/4_final_dataset_split.do"
+	do "$CODE/dcourt_setup/A1_census_1950_1960_racepop.do"
+	do "$CODE/dcourt_setup/A2_clean_cz_mobility_1900_2015.do"
+	do "$CODE/dcourt_setup/A4_clean_city_population_census_1940_full.do"
+	do "$CODE/dcourt_setup/A5_clean_cz_snq_european_immigration_instrument.do"
+
+	do "$CODE/dcourt_setup/4_final_dataset_split.do"
 
 	// Original derenoncourt final dataset, modified to drop data we don't need and reformat variables to what we need (e.g. percentage point instead of percentile instruments)
 	do "$CODE/cleaning/4_final_dataset.do"
+	
+	// 1940-70 decades stacked dataset
+	do "$CODE/dcourt_setup/4_final_dataset_split.do"
+
 }
 
 

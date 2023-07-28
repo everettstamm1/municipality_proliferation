@@ -1,18 +1,18 @@
 \begin{table}[htbp]\centering
 \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
-\caption{Dererencourt Table Two with y=New Govs, Earliest Year of Municipal Incorporation Pooled, Urban Population, Census Region controls.}
+\caption{Dererencourt Table Two with y=New Govs, Earliest Year of Municipal Incorporation Pooled, Urban Population, Census Region and Black Mig Share controls.}
 \begin{tabular}{l*{4}{c}}
 \toprule
                     & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
                     &\multicolumn{1}{c}{(1)}   &\multicolumn{1}{c}{(2)}   &\multicolumn{1}{c}{(3)}   &\multicolumn{1}{c}{(4)}   \\
 \midrule
-GM\_rmnt\_hat\_raw\_pp  &       2.414***&               &      0.0700** &               \\
-                    &     (0.576)   &               &    (0.0323)   &               \\
+GM\_rmnt\_hat\_raw\_pp  &       1.448** &               &      0.0750** &               \\
+                    &     (0.625)   &               &    (0.0334)   &               \\
 \addlinespace
-Percentage Point Change in Urban Black Population&               &      0.0233***&               &      0.0290** \\
-                    &               &   (0.00762)   &               &    (0.0136)   \\
+Percentage Point Change in Urban Black Population&               &      0.0288***&               &      0.0518** \\
+                    &               &   (0.00801)   &               &    (0.0205)   \\
 \midrule
-F-Stat              &      17.575   &               &               &               \\
+F-Stat              &       5.367   &               &               &               \\
 Observations        &         145   &         145   &         145   &         145   \\
 \bottomrule
 \multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\

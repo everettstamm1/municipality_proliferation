@@ -1890,7 +1890,7 @@ foreach samp in full dcourt{
 		xtile GM = GM_raw, nq(100) 
 		xtile GM_hat = GM_hat_raw, nq(100) 
 
-		save "$CLEANDATA/dcourt/GM_`level'_final_dataset_split`samptab'", replace
+		save "$CLEANDATA/dcourt/GM_`level'_final_dataset_split`samptab'_totalpop", replace
 
 	}
 }

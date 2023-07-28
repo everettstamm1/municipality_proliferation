@@ -1,4 +1,7 @@
 // Alt Inst tests
+
+local b_controls reg2 reg3 reg4 blackmig3539_share
+
 foreach samp in urban  {
 	if "`samp'"=="urban" local poptab ""
 	if "`samp'"=="total" local poptab "_totpop"
@@ -16,9 +19,9 @@ foreach samp in urban  {
 	use "$CLEANDATA/cz_pooled", clear
 	if "`samp'"=="td" keep if dcourt==1
 	
-	foreach outcome in cgoodman schdist_ind spdist gen_subcounty{
+	foreach outcome in cgoodman schdist_ind spdist gen_subcounty gen_town{
 		preserve
-			ivreg2 n_`outcome'_cz_pc`popname' (GM_raw_pp = GM_1940_hat_raw_pp GM_7r_hat_raw_pp GM_r_hat_raw_pp GM_hat_raw_pp) reg2 reg3 reg4 [aw = pop`popname'1940], r
+			ivreg2 n_`outcome'_cz_pc`popname' (GM_raw_pp = GM_1940_hat_raw_pp GM_7r_hat_raw_pp GM_r_hat_raw_pp GM_hat_raw_pp) `b_controls' [aw = pop`popname'1940], r
 			local hansenj : di %4.2f e(jp)
 			
 			global spec1 (GM_raw_pp = GM_hat_raw_pp)  reg2 reg3 reg4
@@ -61,15 +64,12 @@ foreach samp in urban  {
 eststo clear
 use "$CLEANDATA/cz_pooled", clear
 
-foreach outcome in cgoodman schdist_ind gen_subcounty spdist{
-	qui: reg n_`outcome'_cz_pcc GM_8_hat_raw_pp reg2 reg3 reg4 [aw=popc1940], r 
+foreach outcome in cgoodman schdist_ind gen_subcounty spdist gen_town{
+	qui: reg n_`outcome'_cz_pcc GM_8_hat_raw_pp `b_controls' [aw=popc1940], r 
 	local coeff : di %4.3f _b[GM_8_hat_raw_pp]
 	local coeff_se : di %4.3f _se[GM_8_hat_raw_pp]
 
-	* Paper version
-	
-	* Slides version
-	binscatter n_`outcome'_cz_pcc GM_8_hat_raw_pp [aw=popc1940], controls( reg2 reg3 reg4 ) ///
+	binscatter n_`outcome'_cz_pcc GM_8_hat_raw_pp [aw=popc1940], controls( `b_controls') ///
 	reportreg lcolor(myslate*1.5) ylabel(,nogrid) mcolor(jmpgreen) xtitle("Percentile of predicted white s pop change 40-70") ytitle("Black M Inc Rank in 2015, Parents 25p") ///
 	note("Slope = `coeff' (`coeff_se')") title("White instrument, outcome: `outcome'")
 	graph export "$FIGS/exogeneity_tests/D14_`outcome'.png", replace 

@@ -1,5 +1,4 @@
-	cd "$migdata"
-	use clean_south_county.dta, clear
+	use "$INTDATA/dcourt/clean_south_county.dta", clear
 	
 	/* Predict county-level net migration rate, decade by decade with southern 
 	variables chosen by LASSO. Predict net migration rate ("netbmig_pred") based on 
@@ -86,8 +85,7 @@
 	
 	*/
 
-	cd "$xwalks"
-	merge m:1 stateicp countyicp using county1940_crosswalks.dta, keepusing(fips state_name county_name)
+	merge m:1 stateicp countyicp using "$RAWDATA/dcourt/county1940_crosswalks.dta", keepusing(fips state_name county_name)
 	drop if _merge==2 
 	g origin_fips=fips
 	rename state_name origin_state_name
@@ -108,7 +106,7 @@
 	tempfile shocks
 	save `shocks'
 
-	use $migshares/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta, clear
+	use "$RAWDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
 	
 	keep if black==1 & dest_sample==1 & city!=9999
 	bys origin_fips city: egen largestcitypop = total(perwt)
@@ -120,7 +118,7 @@
 	drop x
 	ren city citycode
 	decod citycode, gen(city)
-	merge m:1 city using "$data/crosswalks/US_place_point_2010_crosswalks.dta", keepusing(cz cz_name) keep(3) nogen
+	merge m:1 city using "$RAWDATA/dcourt/US_place_point_2010_crosswalks.dta", keepusing(cz cz_name) keep(3) nogen
 	merge m:1 cz using "$INTDATA/covariates/covariates", keep(3) nogen
 	merge m:1 cz using "$INTDATA/census/maxcitypop", keep(1 3) nogen
 	merge 1:1 origin_fips using `shocks', keep(3) nogen
@@ -149,9 +147,9 @@
 		lab var perag`d' "Origin County Percent labour force in agriculture"
 		lab var percot`d' "Origin County Percent of planted acres in cotton"
 		lab var peragtob`d' "Origin County Percent labour force in agriculture interacted with tobacco growing states"
-		lab var tob`d' "Origin County Tobacco growing state"
+		cap lab var tob`d' "Origin County Tobacco growing state"
 		lab var ot`d' "Origin County Mineral states (OK, TX)"
-		lab var permin`d' "Origin County Percent labour force in mining"
+		cap lab var permin`d' "Origin County Percent labour force in mining"
 		lab var perminot`d' "Origin County Percent labour force in mining interacted with mineral states"
 		lab var warfac_pc`d' "Origin County $ war industry 1940-45, per capita"
 
