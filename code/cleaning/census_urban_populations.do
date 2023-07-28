@@ -8,7 +8,7 @@ cd "`working_directory'"
 
 // 1900-30 include way more cities than 1940, so crosswalk to the cities we actually use
 ren city citycode
-merge m:1 citycode using "$DCOURT/data/city_sample/GM_city_final_dataset_split.dta",  keep(1 3) keepusing(citycode)
+merge m:1 citycode using "$INTDATA/dcourt/GM_city_final_dataset_split.dta",  keep(1 3) keepusing(citycode)
 ren citycode city
 
 g pop = hhwt

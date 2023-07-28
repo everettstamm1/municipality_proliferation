@@ -1,0 +1,28 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Outcome: gen\_town, }
+\begin{tabular}{l*{11}{c}}
+\toprule
+            &\multicolumn{1}{c}{(1)}   &\multicolumn{1}{c}{(2)}   &\multicolumn{1}{c}{(3)}   &\multicolumn{1}{c}{(4)}   &\multicolumn{1}{c}{(5)}   &\multicolumn{1}{c}{(6)}   &\multicolumn{1}{c}{(7)}   &\multicolumn{1}{c}{(8)}   &\multicolumn{1}{c}{(9)}   &\multicolumn{1}{c}{(10)}   &\multicolumn{1}{c}{(11)}   \\
+\midrule
+GM\_raw\_pp   &   0.0817***&   0.0816** &   0.0817***&   0.0850***&   0.0781***&   0.0730***&    0.330   &   0.0765***&   0.0758***&   0.0714***&   0.0708***\\
+            & (0.0208)   & (0.0373)   & (0.0208)   & (0.0230)   & (0.0208)   & (0.0195)   &  (0.437)   & (0.0217)   & (0.0208)   & (0.0208)   & (0.0198)   \\
+\midrule
+First stage F-Stat&   68.633   &   33.802   &   68.633   &    32.38   &   50.233   &   69.879   &     .467   &75.34099999999999   &    6.482   &   33.981   &    5.516   \\
+GM (OLS)    &     .052   &     .021   &     .016   &     .052   &     .052   &     .052   &     .052   &     .037   &     .037   &     .037   &     .037   \\
+R2 (OLS)    &     .161   &     .199   &     .302   &     .161   &     .161   &     .161   &     .161   &     .133   &     .133   &     .133   &     .133   \\
+Observations&      130   &      130   &      130   &      130   &      130   &      130   &      130   &      206   &      206   &      206   &      206   \\
+Baseline Controls&        N   &        Y   &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        N   \\
+Tot. pop. outcome&        N   &        N   &        Y   &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        N   \\
+State FE Inst.&        N   &        N   &        N   &        Y   &        N   &        N   &        N   &        N   &        N   &        N   &        N   \\
+Top Urban Dropped Inst.&        N   &        N   &        N   &        N   &        Y   &        N   &        N   &        N   &        N   &        N   &        N   \\
+State of Birth Inst.&        N   &        N   &        N   &        N   &        N   &        Y   &        N   &        N   &        N   &        N   &        N   \\
+Southern White Inst.&        N   &        N   &        N   &        N   &        N   &        N   &        Y   &        N   &        N   &        N   &        N   \\
+Southern Sample&        N   &        N   &        N   &        N   &        N   &        N   &        N   &        Y   &        Y   &        Y   &        Y   \\
+Northern Texas&        N   &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        Y   &        N   &        Y   \\
+Rural Migrants Only&        N   &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        Y   &        Y   \\
+\bottomrule
+\multicolumn{12}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{12}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}
