@@ -78,8 +78,8 @@ STEPS:
 
 		}
 		
-		merge 1:1 city using "$RAWDATA/dcourt/clean_city_population_ccdb_1944_1977.dta", keepusing(bpop1970 pop1940 pop1970 state_name)
-		
+		merge 1:1 city using "$RAWDATA/dcourt/clean_city_population_ccdb_1944_1977.dta", keepusing(bpop1970 whtpop1970 pop1940 pop1970 state_name)
+		ren whtpop1970 wpopc1970
 		/*
 		* Analysis of non-matches
 		not matched                           789
@@ -310,7 +310,7 @@ STEPS:
 		}	
 		*/
 		
-		keep *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc1940 bpopc1940 popc1970 pop1940 bpopc1970 *migcity3539 statefip citycode city city_original cz cz_name wpopc1940 samp_*
+		keep *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc1940 bpopc1940 popc1970 pop1940 bpopc1970 *migcity3539 statefip citycode city city_original cz cz_name wpopc1940 wpopc1970 samp_*
 		drop if popc1970==.
 		save "$INTDATA/dcourt/GM_city_final_dataset`samptab'.dta", replace
 		
@@ -336,13 +336,15 @@ STEPS:
 				local levelvar smsa
 			}
 			
-			collapse (sum) *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc* bpopc* pop1940 *migcity3539 wpopc1940 (max) samp_*, by(`levelvar')
+			collapse (sum) *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc* bpopc* pop1940 *migcity3539 wpopc1940 wpopc1970 (max) samp_*, by(`levelvar')
 			
 			
 
 			* Actual black pop change in city
 			g bc1940_1970=100*(bpopc1970-bpopc1940)/popc1940
 			g bcpp1940_1970=100*((bpopc1970/popc1970)-(bpopc1940/popc1940))
+			
+			g wcpp1940_1970=100*((wpopc1970/popc1970)-(wpopc1940/popc1940))
 
 			* Instrument by version
 			* Version 0
@@ -649,7 +651,8 @@ STEPS:
 			ren GM_2_hat GM_hat
 			ren bc1940_1970 GM_raw
 			ren bcpp1940_1970 GM_raw_pp
-
+			ren wcpp1940_1970 WM_raw_pp
+			
 			ren v2_bc_pred1940_1970 GM_hat_raw
 			ren v2_bcpp_pred1940_1970 GM_hat_raw_pp
 			

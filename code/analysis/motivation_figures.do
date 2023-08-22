@@ -41,6 +41,7 @@ foreach var of varlist share_ b_cgoodman_cz_pcc_ b_schdist_ind_cz_pcc_ b_gen_sub
 	graph export "$FIGS/motivation/`var'1940_1970.png", as(png) replace
 }
 
+// TS split
 use "$CLEANDATA/cz_stacked.dta", clear 
 keep if dcourt == 1 & inlist(decade,1940,1950,1960, 1970)
 su GM_raw_pp if decade == 1940, d
@@ -52,9 +53,54 @@ collapse (mean) b_cgoodman_cz_L0 b_schdist_ind_cz_L0 b_gen_subcounty_cz_L0 b_gen
 foreach var in cgoodman schdist_ind gen_subcounty gen_town spdist{
     graph twoway (connected b_`var'_cz_L0 decade if above == 1, lpattern(dash)) ///
 				 (connected b_`var'_cz_L0 decade if above == 0), ///
-				legend(order(1 "Above median exposure" 2 "Below median exposure")) ytitle("Mean number `var' per 10,000 Urban Residents") xtitle("Decade")
+				legend(order(1 "Above median exposure" 2 "Below median exposure")) ytitle("Mean number `var' per 10,000 urban residents") xtitle("Decade")
 	graph export "$FIGS/motivation/`var'_ts.png", as(png) replace
 
 }
 
+// TS not split
+use "$CLEANDATA/cz_stacked.dta", clear 
+keep if dcourt == 1 & inlist(decade,1940,1950,1960,1970)
 
+collapse (mean) b_cgoodman_cz_L0 b_schdist_ind_cz_L0 b_gen_subcounty_cz_L0 b_gen_town_cz_L0 b_spdist_cz_L0, by(decade)
+
+foreach var in cgoodman schdist_ind  gen_town spdist{
+    graph twoway (connected b_`var'_cz_L0 decade) ///
+				 , ///
+				 ytitle("Mean number `var' per 10,000 Urban Residents") xtitle("Decade")
+	graph export "$FIGS/motivation/`var'_ts_pooled.png", as(png) replace
+
+}
+
+graph twoway (connected b_cgoodman_cz_L0 decade) ///
+			(connected b_schdist_ind_cz_L0 decade) ///
+			(connected b_gen_town_cz_L0 decade) ///
+			(connected b_spdist_cz_L0 decade), ///
+			legend(order(1 "Municipalities" 2 "School districts" 3 "Townships" 4 "Special districts")) ///
+			ytitle("Mean local gov'ts per 10,000 urban residents")
+	graph export "$FIGS/motivation/ts_pooled.png", as(png) replace
+	
+
+// TS not split, normalized
+use "$CLEANDATA/cz_stacked.dta", clear 
+keep if dcourt == 1 & inlist(decade,1940,1950,1960,1970)
+
+collapse (mean) b_cgoodman_cz_L0 b_schdist_ind_cz_L0 b_gen_subcounty_cz_L0 b_gen_town_cz_L0 b_spdist_cz_L0, by(decade)
+foreach var in cgoodman schdist_ind  gen_town spdist{
+    su b_`var'_cz_L0 if decade == 1940
+	bys decade : replace b_`var'_cz_L0 = 100*b_`var'_cz_L0/`r(mean)'
+	
+    graph twoway (connected b_`var'_cz_L0 decade) ///
+				 , ///
+				 ytitle("Mean number `var' per 10,000 Urban Residents") xtitle("Decade")
+	graph export "$FIGS/motivation/`var'_ts_pooled_norm.png", as(png) replace
+
+}
+
+graph twoway (connected b_cgoodman_cz_L0 decade) ///
+			(connected b_schdist_ind_cz_L0 decade) ///
+			(connected b_gen_town_cz_L0 decade) ///
+			(connected b_spdist_cz_L0 decade), ///
+			legend(order(1 "Municipalities" 2 "School districts" 3 "Townships" 4 "Special districts")) ///
+			ytitle("Mean local gov'ts per 10,000 urban residents")
+graph export "$FIGS/motivation/ts_pooled_norm.png", as(png) replace

@@ -1,0 +1,14 @@
+label by data source, call cgoodman "municipalities"
+drop subcounty govts
+add note in subcounty govts saying what it is
+add column numbers
+\bottomrule instead of doubleline at bottom
+
+Tie together two motivation figs better with colors (get creative)
+
+normalize time series to 100
+
+attainment: mean effect across all people, by race, by census region
+look for attainment in dcourt data
+
+number of municipalities in diff countries

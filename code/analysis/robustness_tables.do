@@ -313,7 +313,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town{
 	estadd local nt = "N"
 	estadd local rm = "N"
 
-	// Column 3: Census Region and blackmig3539_share controls, Resid State FEs instrument
+	// Column 4: Census Region and blackmig3539_share controls, Resid State FEs instrument
 	local controls  reg2 reg3 reg4 blackmig3539_share
 	qui reg GM_raw_pp GM_7r_hat_raw_pp `controls' [aw=popc1940], r
 	test GM_7r_hat_raw_pp=0
@@ -336,7 +336,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town{
 	estadd local nt = "N"
 	estadd local rm = "N"
 
-	// Column 4: Census Region and blackmig3539_share controls, Top Urban Dropped instrument
+	// Column 5: Census Region and blackmig3539_share controls, Top Urban Dropped instrument
 	local controls  reg2 reg3 reg4 blackmig3539_share
 	qui reg GM_raw_pp GM_r_hat_raw_pp `controls' [aw=popc1940], r
 	test GM_r_hat_raw_pp=0
@@ -359,7 +359,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town{
 	estadd local nt = "N"
 	estadd local rm = "N"
 	
-	// Column 5: Census Region and blackmig3539_share controls, Southern State of Birth Instrument
+	// Column 6: Census Region and blackmig3539_share controls, Southern State of Birth Instrument
 	local controls  reg2 reg3 reg4 blackmig3539_share 
 	qui reg GM_raw_pp GM_1940_hat_raw_pp `controls' [aw=popc1940], r
 	test GM_1940_hat_raw_pp=0
@@ -382,7 +382,9 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town{
 	estadd local nt = "N"
 	estadd local rm = "N"
 
-	// Column 6: Census Region and blackmig3539_share controls, Southern White Instrument
+	// Column 7: Census Region and blackmig3539_share controls, Southern White Instrument
+	drop GM_raw_pp
+	ren WM_raw_pp GM_raw_pp
 	local controls  reg2 reg3 reg4 blackmig3539_share
 	qui reg GM_raw_pp GM_8_hat_raw_pp `controls' [aw=popc1940], r
 	test GM_8_hat_raw_pp=0
@@ -404,10 +406,10 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town{
 	estadd local ssamp = "N"
 	estadd local nt = "N"
 	estadd local rm = "N"
-	
+
 	use "$CLEANDATA/cz_pooled_south", clear
 	
-	// Column 7: Census Region and blackmig3539_share controls, Full Southern Sample
+	// Column 8: Census Region and blackmig3539_share controls, Full Southern Sample
 	local controls  reg2 reg3 reg4 blackmig3539_share
 	qui reg GM_raw_pp GM_hat_raw_pp `controls' [aw=popc1940], r
 	test GM_hat_raw_pp=0
@@ -430,7 +432,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town{
 	estadd local nt = "N"
 	estadd local rm = "N"
 	
-	// Column 8: Census Region and blackmig3539_share controls, Full Southern Sample, Northern Texas
+	// Column 9: Census Region and blackmig3539_share controls, Full Southern Sample, Northern Texas
 	local controls  reg2 reg3 reg4 blackmig3539_share
 	qui reg GM_raw_pp GM_nt_hat_raw_pp `controls' [aw=popc1940], r
 	test GM_nt_hat_raw_pp=0
@@ -453,7 +455,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town{
 	estadd local nt = "Y"
 	estadd local rm = "N"
 	
-	// Column 9: Census Region and blackmig3539_share controls, Full Southern Sample, Rural Migrants Only
+	// Column 10: Census Region and blackmig3539_share controls, Full Southern Sample, Rural Migrants Only
 	local controls  reg2 reg3 reg4 blackmig3539_share
 	qui reg GM_raw_pp GM_rm_hat_raw_pp `controls' [aw=popc1940], r
 	test GM_rm_hat_raw_pp=0
@@ -528,7 +530,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town{
 							"Northern Texas" ///
 							"Rural Migrants Only" ///
 							)) ///
-							title("Outcome: `outcome', `title'") ///
+							title("Alt Inst Tests Outcome: `outcome'") ///
 							keep(GM_raw_pp)
 }
 
