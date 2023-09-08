@@ -1,28 +1,20 @@
-\begin{table}[htbp]\centering
-\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
-\caption{Alt Inst Tests Outcome: schdist\_ind}
-\begin{tabular}{l*{11}{c}}
-\toprule
-            &\multicolumn{1}{c}{(1)}   &\multicolumn{1}{c}{(2)}   &\multicolumn{1}{c}{(3)}   &\multicolumn{1}{c}{(4)}   &\multicolumn{1}{c}{(5)}   &\multicolumn{1}{c}{(6)}   &\multicolumn{1}{c}{(7)}   &\multicolumn{1}{c}{(8)}   &\multicolumn{1}{c}{(9)}   &\multicolumn{1}{c}{(10)}   &\multicolumn{1}{c}{(11)}   \\
+ \begin{tabular}{l*{11}{c}} \toprule
+                    &\multicolumn{1}{c}{(1)}   &\multicolumn{1}{c}{(2)}   &\multicolumn{1}{c}{(3)}   &\multicolumn{1}{c}{(4)}   &\multicolumn{1}{c}{(5)}   &\multicolumn{1}{c}{(6)}   &\multicolumn{1}{c}{(7)}   &\multicolumn{1}{c}{(8)}   &\multicolumn{1}{c}{(9)}   &\multicolumn{1}{c}{(10)}   &\multicolumn{1}{c}{(11)}   \\
 \midrule
-GM\_raw\_pp   &    1.296***&   -0.322   &    1.296***&    1.742***&    1.198***&    1.422***&   -11.94   &    1.203***&    1.202***&    1.015***&    1.057***\\
-            &  (0.326)   &  (0.542)   &  (0.326)   &  (0.439)   &  (0.312)   &  (0.342)   &  (20.25)   &  (0.330)   &  (0.334)   &  (0.339)   &  (0.346)   \\
+Percentage Point Change in Urban Black Population&     0.42***&     0.07   &     0.42***&     0.53***&     0.39***&     0.44***&    -3.76   &     0.41***&     0.56***&     0.35***&     0.52***\\
+                    &   (0.12)   &   (0.13)   &   (0.12)   &   (0.14)   &   (0.11)   &   (0.11)   &   (6.46)   &   (0.11)   &   (0.18)   &   (0.12)   &   (0.20)   \\
 \midrule
-First stage F-Stat&   68.633   &   33.802   &   68.633   &    32.38   &   50.233   &   69.879   &     .311   &75.34099999999999   &    6.482   &   33.981   &    5.516   \\
-GM (OLS)    &    1.047   &     -.28   &     .288   &    1.047   &    1.047   &    1.047   &    -.746   &      .76   &      .76   &      .76   &      .76   \\
-R2 (OLS)    &     .239   &     .445   &     .365   &     .239   &     .239   &     .239   &     .219   &     .175   &     .175   &     .175   &     .175   \\
-Observations&      130   &      130   &      130   &      130   &      130   &      130   &      130   &      206   &      206   &      206   &      206   \\
-Baseline Controls&        N   &        Y   &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        N   \\
-Tot. pop. outcome&        N   &        N   &        Y   &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        N   \\
-State FE Inst.&        N   &        N   &        N   &        Y   &        N   &        N   &        N   &        N   &        N   &        N   &        N   \\
+First stage F-Stat  &    68.63   &    33.80   &    68.63   &    32.38   &    50.23   &    69.88   &     0.31   &    75.73   &     6.64   &    33.53   &     5.37   \\
+GM (OLS)            &     0.29   &    -0.09   &     0.29   &     0.29   &     0.29   &     0.29   &    -0.20   &     0.29   &     0.27   &     0.29   &     0.27   \\
+R2 (OLS)            &     0.36   &     0.60   &     0.36   &     0.36   &     0.36   &     0.36   &     0.34   &     0.37   &     0.35   &     0.37   &     0.35   \\
+Observations        &      130   &      130   &      130   &      130   &      130   &      130   &      130   &      130   &      145   &      130   &      145   \\
+Baseline Controls   &        N   &        Y   &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        N   \\
+Urban population outcome&        N   &        N   &        Y   &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        N   \\
+State FE Inst.      &        N   &        N   &        N   &        Y   &        N   &        N   &        N   &        N   &        N   &        N   &        N   \\
 Top Urban Dropped Inst.&        N   &        N   &        N   &        N   &        Y   &        N   &        N   &        N   &        N   &        N   &        N   \\
 State of Birth Inst.&        N   &        N   &        N   &        N   &        N   &        Y   &        N   &        N   &        N   &        N   &        N   \\
 Southern White Inst.&        N   &        N   &        N   &        N   &        N   &        N   &        Y   &        N   &        N   &        N   &        N   \\
-Southern Sample&        N   &        N   &        N   &        N   &        N   &        N   &        N   &        Y   &        Y   &        Y   &        Y   \\
-Northern Texas&        N   &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        Y   &        N   &        Y   \\
-Rural Migrants Only&        N   &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        Y   &        Y   \\
-\bottomrule
-\multicolumn{12}{l}{\footnotesize Standard errors in parentheses}\\
-\multicolumn{12}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
-\end{tabular}
-\end{table}
+IPUMS Sample        &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        Y   &        Y   &        Y   &        Y   \\
+Northern Texas      &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        Y   &        N   &        Y   \\
+Rural Migrants Only &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        N   &        Y   &        Y   \\
+\bottomrule \end{tabular}

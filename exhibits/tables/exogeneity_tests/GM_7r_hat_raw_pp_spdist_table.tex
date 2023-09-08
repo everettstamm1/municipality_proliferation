@@ -1,16 +1,12 @@
-\begin{table}[htbp]\centering
-\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
-\caption{Outcome: spdist, Resid State FE Instrument}
-\begin{tabular}{l*{4}{c}}
-\toprule
+ \begin{tabular}{l*{4}{c}} \toprule
                     & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
                     &\multicolumn{1}{c}{(1)}   &\multicolumn{1}{c}{(2)}   &\multicolumn{1}{c}{(3)}   &\multicolumn{1}{c}{(4)}   \\
-\midrule
-Resid State FE Instrument&       5.180***&               &      -0.269   &               \\
-                    &     (0.910)   &               &     (0.221)   &               \\
+\end{tabular}
+Resid State FE Instrument&       5.180***&               &      -0.104*  &               \\
+                    &     (0.910)   &               &    (0.0586)   &               \\
 \addlinespace
-Percentage Point Change in Urban Black Population&               &     -0.0651***&               &     -0.0520   \\
-                    &               &    (0.0231)   &               &    (0.0421)   \\
+Percentage Point Change in Urban Black Population&               &     -0.0268***&               &     -0.0200*  \\
+                    &               &   (0.00814)   &               &    (0.0108)   \\
 \midrule
 F-Stat              &       32.38   &               &               &               \\
 Observations        &         130   &         130   &         130   &         130   \\

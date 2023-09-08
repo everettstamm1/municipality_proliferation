@@ -164,7 +164,6 @@ foreach var of varlist *{
 		destring `var', replace
 	}
 }
-egen schdist = rowtotal(schdist_ind schdist_dep)
 
 g ID_state = substr(ID,1,2)
 g ID_county = substr(ID,3,3)
@@ -189,6 +188,25 @@ merge m:1 cty_fips using "$XWALKS/cw_cty_czone.dta", nogen keep(1 3)
 merge m:1 cty_fips using "$XWALKS/county_pmsa_xwalk.dta", nogen keep(1 3)
 drop cty_fips
 
+g fips = fips_state+fips_county_2002
+destring fips, replace
+		
+// Township reclassification 1952 IOWA
+replace all_local = all_local - gen_town if year==1942 & fips_state=="19"
+replace gen_subcounty = gen_subcounty - gen_town if year==1942 & fips_state=="19"
+replace gen_town = 0  if year==1942 & fips_state=="19"
+
+// School district reclassification 1952 Mississippi and South Carolina
+bys fips (year) : g schdist_ind_impute = schdist_ind[_n+1] if year==1942 & inlist(fips_state,"28","45")
+replace all_local = all_local - schdist_ind + schdist_ind_impute if year==1942 & inlist(fips_state,"28","45")
+replace schdist_ind = schdist_ind_impute if year==1942 & inlist(fips_state,"28","45")
+
+
+egen schdist = rowtotal(schdist_ind schdist_dep)
+
+g all_local_nosch = all_local - schdist_ind
+lab var all_local_nosch "Number of Local Govts (no school districts)"
+
 lab var name "Name"
 lab var year "CoG Year"
 lab var year_pop "Census Population Year"
@@ -210,23 +228,6 @@ lab var int_schdis_else "Number of School Districts Centered Elsewhere, Serve He
 lab var schdist_dep "Number of Dependent School Districts"
 lab var subcty_tax "Number of Subordinate County Taxing Areas"
 lab var schdist "Number of Dependent and Independent School Districts"
-
-g fips = fips_state+fips_county_2002
-destring fips, replace
-		
-// Township reclassification 1952 IOWA
-replace all_local = all_local - gen_town if year==1942 & fips_state=="19"
-replace gen_subcounty = gen_subcounty - gen_town if year==1942 & fips_state=="19"
-replace gen_town = 0  if year==1942 & fips_state=="19"
-
-// School district reclassification 1952 Mississippi and South Carolina
-bys fips (year) : g schdist_ind_impute = schdist_ind[_n+1] if year==1942 & inlist(fips_state,"28","45")
-replace all_local = all_local - schdist_ind + schdist_ind_impute if year==1942 & inlist(fips_state,"28","45")
-replace schdist_ind = schdist_ind_impute if year==1942 & inlist(fips_state,"28","45")
-
-g all_local_nosch = all_local - schdist_ind
-lab var all_local_nosch "Number of Local Govts (no school districts)"
-
 
 save "$INTDATA/cog/2_county_counts.dta", replace
 

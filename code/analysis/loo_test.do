@@ -1,26 +1,26 @@
 local b_controls reg2 reg3 reg4 blackmig3539_share
 
 
-foreach outcome in cgoodman schdist_ind gen_subcounty spdist gen_town{
+foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni{
 	use "$CLEANDATA/cz_pooled", clear
 	labmask cz, values(cz_name)
 	keep if dcourt == 1
 
 	// Getting full sample values
 	// RF
-	reg n_`outcome'_cz_pcc GM_hat_raw_pp `b_controls' [aw=popc1940], r
+	reg n_`outcome'_cz_pc GM_hat_raw_pp `b_controls' [aw=popc1940], r
 	local b_rf = _b[GM_hat_raw_pp]
 	local se_rf = _se[GM_hat_raw_pp]
 	
-	ivreg2 n_`outcome'_cz_pcc (GM_raw_pp = GM_hat_raw_pp) `b_controls' [aw=popc1940], r
+	ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls' [aw=popc1940], r
 	local b_iv = _b[GM_raw_pp]
 	local se_iv = _se[GM_raw_pp]
 	levelsof cz, local(czs)
 	
 	foreach cz in `czs'{
-		qui parmby "reg n_`outcome'_cz_pcc GM_hat_raw_pp `b_controls' [aw=popc1940] if cz!=`cz', r", lab saving(`"rf`cz'`outcome'"', replace) idn(`cz') ids(vr) ylabel rename(idn vrsn) level(95 99)
+		qui parmby "reg n_`outcome'_cz_pc GM_hat_raw_pp `b_controls' [aw=popc1940] if cz!=`cz', r", lab saving(`"rf`cz'`outcome'"', replace) idn(`cz') ids(vr) ylabel rename(idn vrsn) level(95 99)
 		
-		qui parmby "ivreg2 n_`outcome'_cz_pcc (GM_raw_pp = GM_hat_raw_pp) `b_controls' [aw=popc1940] if cz!=`cz', r", lab saving(`"iv`cz'`outcome'"', replace) idn(`cz') ids(vr) ylabel rename(idn vrsn) level(95 99)
+		qui parmby "ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls' [aw=popc1940] if cz!=`cz', r", lab saving(`"iv`cz'`outcome'"', replace) idn(`cz') ids(vr) ylabel rename(idn vrsn) level(95 99)
 		
 	}
 	clear
@@ -39,7 +39,7 @@ foreach outcome in cgoodman schdist_ind gen_subcounty spdist gen_town{
 	|| rcap min95 max95 x, lcolor(jmpgreen%50)  ///
 	 yline(0, lcolor(black)) ///
 	xsc(range(1(10)131)) xla(none) xtitle("") graphregion(color(white)) plotregion(ilcolor(white)) ylabel(,nogrid ) legend(rows(2)) ///
-	yline(`b_rf', lcolor(red) lstyle(dash)) title("Reduced form LOO, outcome `outcome'") ///
+	yline(`b_rf', lcolor(red) lstyle(dash))  ///
 		caption( "`n' out of 130 significant at the 0.05 level" "Red line indicates full sample point estimate")
 		
 	graph export "$FIGS/exogeneity_tests/loo_rf_`outcome'.png", replace 	
@@ -60,7 +60,7 @@ foreach outcome in cgoodman schdist_ind gen_subcounty spdist gen_town{
 	|| rcap min95 max95 x, lcolor(jmpgreen%50)  ///
 	 yline(0, lcolor(black)) ///
 	xsc(range(1(10)131)) xla(none) xtitle("") graphregion(color(white)) plotregion(ilcolor(white)) ylabel(,nogrid ) legend(rows(2)) ///
-	yline(`b_iv', lcolor(red) lstyle(dash)) title("2SLS LOO, outcome `outcome'") ///
+	yline(`b_iv', lcolor(red) lstyle(dash)) ///
 		caption( "`n' out of 130 significant at the 0.05 level" "Red line indicates full sample point estimate")
 		graph export "$FIGS/exogeneity_tests/loo_iv_`outcome'.png", replace 	
 

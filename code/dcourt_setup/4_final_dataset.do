@@ -17,13 +17,14 @@ STEPS:
 	use "$RAWDATA/dcourt/clean_city_population_census_1940.dta", clear // 711 cities in non-South
 	
 
-	merge 1:1 city using "$RAWDATA/dcourt/clean_city_population_ccdb_1944_1977.dta", keepusing(bpop1970 pop1940 pop1970 state_name)
+	merge 1:1 city using "$RAWDATA/dcourt/clean_city_population_ccdb_1944_1977.dta", keepusing(bpop1970 pop1940 pop1970 pop1950 state_name)
 
 	/* Keep cities large enough (25k+) to appear in CCDB in 1940 and 1970. Results are 
 		robust to changing this criterion.*/
 		rename bpop1970 bpopc1970 // rename so it is clear these numbers correspond to city populations
 		rename pop1970 popc1970 // rename so it is clear these numbers correspond to city populations
-		
+		rename pop1950 popc1950 // rename so it is clear these numbers correspond to city populations
+
 		/* Butte, MT and Amsterdam, NY received southern black migrants between 1935 and 1940, but are just below pop cutoff for CCDB. 
 		Keep them in sample by retrieving 1970 black pop info from Census for these cities */
 		replace bpopc1970=38 if city=="Butte, MT" // see Table 27 of published 1970 Census: https://www.census.gov/content/dam/Census/library/working-papers/2005/demo/POP-twps0076.pdf
@@ -78,8 +79,9 @@ STEPS:
 
 		}
 		
-		merge 1:1 city using "$RAWDATA/dcourt/clean_city_population_ccdb_1944_1977.dta", keepusing(bpop1970 whtpop1970 pop1940 pop1970 state_name)
+		merge 1:1 city using "$RAWDATA/dcourt/clean_city_population_ccdb_1944_1977.dta", keepusing(bpop1970 whtpop1970 pop1950 pop1940 pop1970 state_name)
 		ren whtpop1970 wpopc1970
+		ren pop1950 popc1950
 		/*
 		* Analysis of non-matches
 		not matched                           789
@@ -264,17 +266,17 @@ STEPS:
 		/* Drop cities for which there's no hope of getting predictions for black pop in 
 		1970 data for these cities. This set of cities will change depending on the 
 		migration matrix used.*/
-		drop if _merge==2 
-		drop _merge
+		qui drop if _merge==2 
+		qui drop _merge
 		
 		/* Assume zero change in black pop for cities that black migrants did not move 
 		to between 1935 and 1940. Results are robust to changing this criterion. 
 		Uncomment "keep if _merge==3" and run again. */
 		foreach var of varlist black_proutmigpr*{
-		replace `var'=0 if `var'==.
-		rename `var' vr`i'_`var'
+		qui replace `var'=0 if `var'==.
+		qui rename `var' vr`i'_`var'
 		}
-		rename totblackmigcity3539 vr`i'_totblackmigcity3539
+		qui rename totblackmigcity3539 vr`i'_totblackmigcity3539
 		}
 		
 		/*
@@ -310,7 +312,7 @@ STEPS:
 		}	
 		*/
 		
-		keep *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc1940 bpopc1940 popc1970 pop1940 bpopc1970 *migcity3539 statefip citycode city city_original cz cz_name wpopc1940 wpopc1970 samp_*
+		keep *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc1940 bpopc1940 popc1970 popc1950 pop1940 bpopc1970 *migcity3539 statefip citycode city city_original cz cz_name wpopc1940 wpopc1970 samp_*
 		drop if popc1970==.
 		save "$INTDATA/dcourt/GM_city_final_dataset`samptab'.dta", replace
 		

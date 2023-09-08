@@ -41,7 +41,7 @@ STEPS:
 	global shares_dir "$INTDATA/dcourt/shares" 
 	global sharesXweights_dir "$INTDATA/dcourt/instrument" 
 	
-	use "$RAWDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
 		
 	do "$CODE/helper/bartik_generic.do"
 	
@@ -68,7 +68,7 @@ STEPS:
 	global shares_dir "$INTDATA/dcourt/shares" 
 	global sharesXweights_dir "$INTDATA/dcourt/instrument" 
 	
-	use "$RAWDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
 		
 	do "$CODE/helper/bartik_generic.do"
 	
@@ -95,7 +95,7 @@ STEPS:
 	global shares_dir "$INTDATA/dcourt/shares" 
 	global sharesXweights_dir "$INTDATA/dcourt/instrument" 
 	
-	use "$RAWDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
 		
 	do "$CODE/helper/bartik_generic.do"
 		
@@ -152,7 +152,7 @@ STEPS:
 	global shares_dir "$INTDATA/dcourt/shares" 
 	global sharesXweights_dir "$INTDATA/dcourt/instrument" 
 	
-	use "$RAWDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
 		
 	do "$CODE/helper/bartik_generic.do"
 	
@@ -179,7 +179,7 @@ STEPS:
 	global shares_dir "$INTDATA/dcourt/shares" 
 	global sharesXweights_dir "$INTDATA/dcourt/instrument" 
 	
-	use "$RAWDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
 		
 	do "$CODE/helper/bartik_generic.do"
 		
@@ -206,7 +206,7 @@ STEPS:
 	global shares_dir "$INTDATA/dcourt/shares" 
 	global sharesXweights_dir "$INTDATA/dcourt/instrument" 
 	
-	use "$RAWDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
 		
 	do "$CODE/helper/bartik_generic.do"
 
@@ -290,7 +290,7 @@ STEPS:
 	global shares_dir "$data/instrument/shares" 
 	global sharesXweights_dir "$data/instrument" 
 	
-	use "$RAWDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
 		
 	do "$bartik/bartik_sum_to_one.do"
 
@@ -320,7 +320,7 @@ STEPS:
 	global shares_dir "$INTDATA/dcourt/shares" 
 	global sharesXweights_dir "$INTDATA/dcourt/instrument" 
 	
-	use "$RAWDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
 		
 	do "$CODE/helper/bartik_generic.do"
 	
@@ -348,7 +348,7 @@ STEPS:
 	global shares_dir "$INTDATA/dcourt/shares" 
 	global sharesXweights_dir "$INTDATA/dcourt/instrument" 
 	
-	use "$RAWDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
 		
 	do "$CODE/helper/bartik_generic.do"
 	
@@ -376,7 +376,7 @@ STEPS:
 	global shares_dir "$INTDATA/dcourt/shares" 
 	global sharesXweights_dir "$INTDATA/dcourt/instrument" 
 	
-	use "$RAWDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
 		
 	do "$CODE/helper/bartik_generic.do"
 	
@@ -404,7 +404,7 @@ STEPS:
 	global shares_dir "$INTDATA/dcourt/shares" 
 	global sharesXweights_dir "$INTDATA/dcourt/instrument" 
 	
-	use "$RAWDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
 		
 	do "$CODE/helper/bartik_generic.do"
 	
@@ -432,7 +432,7 @@ STEPS:
 	global shares_dir "$INTDATA/dcourt/shares" 
 	global sharesXweights_dir "$INTDATA/dcourt/instrument" 
 	
-	use "$RAWDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
 		
 	do "$CODE/helper/bartik_generic.do"
 	
@@ -460,7 +460,7 @@ STEPS:
 	global shares_dir "$INTDATA/dcourt/shares" 
 	global sharesXweights_dir "$INTDATA/dcourt/instrument" 
 	
-	use "$RAWDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
 		
 	do "$CODE/helper/bartik_generic.do"
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	

@@ -1,16 +1,12 @@
-\begin{table}[htbp]\centering
-\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
-\caption{Outcome: spdist, Baseline Instrument}
-\begin{tabular}{l*{4}{c}}
-\toprule
+ \begin{tabular}{l*{4}{c}} \toprule
                     & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
                     &\multicolumn{1}{c}{(1)}   &\multicolumn{1}{c}{(2)}   &\multicolumn{1}{c}{(3)}   &\multicolumn{1}{c}{(4)}   \\
-\midrule
-Baseline Instrument &       3.464***&               &     -0.0966   &               \\
-                    &     (0.418)   &               &    (0.0989)   &               \\
+\end{tabular}
+Baseline Instrument &       3.464***&               &     -0.0756** &               \\
+                    &     (0.418)   &               &    (0.0319)   &               \\
 \addlinespace
-Percentage Point Change in Urban Black Population&               &     -0.0651***&               &     -0.0279   \\
-                    &               &    (0.0231)   &               &    (0.0268)   \\
+Percentage Point Change in Urban Black Population&               &     -0.0268***&               &     -0.0218** \\
+                    &               &   (0.00814)   &               &   (0.00866)   \\
 \midrule
 F-Stat              &      68.633   &               &               &               \\
 Observations        &         130   &         130   &         130   &         130   \\

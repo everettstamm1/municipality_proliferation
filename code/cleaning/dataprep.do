@@ -44,7 +44,7 @@ foreach level in cz {
 	restore
 	*/
 	
-	foreach var of varlist gen_town gen_muni schdist_ind all_local gen_subcounty spdist all_local_nosch{
+	foreach var of varlist gen_town gen_muni schdist_ind all_local gen_subcounty spdist all_local_nosch schdist {
 		preserve
 			local lab: variable label `var'
 
@@ -246,7 +246,7 @@ foreach level in cz {
 	merge m:1 cty_fips using "$XWALKS/county_pmsa_xwalk.dta", nogen keep(1 3)
 	ren czone cz 
 	ren cty_fips fips
-	
+	replace yr_incorp = yr_incorp-2
 	keep `levelvar' yr_incorp muniname
 	local lab: variable label yr_incorp
 	
@@ -305,9 +305,9 @@ foreach level in cz {
 		// Pooled
 		
 		use "$CLEANDATA/dcourt/GM_`level'_final_dataset`samptab'.dta", clear
-		
-		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*   GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_* WM_raw_pp
-		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*   GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp
+		g ne_ut = state_id == 31 | state_id == 49
+		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*   GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_* WM_raw_pp ne_ut
+		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*   GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut
 
 		if "`samp'"=="south" ren v2*_blackmig3539_share1940 *blackmig3539_share
 		if "`samp'"=="dcourt" ren v2_blackmig3539_share1940 blackmig3539_share
@@ -331,7 +331,7 @@ foreach level in cz {
 		
 		preserve
 			use "$CLEANDATA/dcourt/GM_`level'_final_dataset_split`samptab'_totalpop", clear
-			keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v*_blackmig3539_share reg* pop1940 bpop1940 mfg_lfshare1940 pop1970 bpop1970 mfg_lfshare1970
+			keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v*_blackmig3539_share reg* pop1940 bpop1940 mfg_lfshare1940 pop1970 bpop1970 mfg_lfshare1970 pop1950
 			ren vfull*_blackmig3539_share *blackmig3539_share
 			foreach var of varlist GM* *blackmig3539_share mfg_lfshare1940{
 				ren `var' `var'_totpop
@@ -343,9 +343,9 @@ foreach level in cz {
 		
 		merge 1:1 `levelvar' using `totpop_insts', update nogen
 		
-		foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist gen_town cgoodman{
+		foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist gen_town cgoodman schdist{
 
-			merge 1:1 `levelvar' using "$INTDATA/counts/`ds'_`level'", keep(1 3) nogen keepusing(n_`ds'_`level' b_`ds'_`level'1970 b_`ds'_`level'1940)
+			merge 1:1 `levelvar' using "$INTDATA/counts/`ds'_`level'", keep(1 3) nogen keepusing(n_`ds'_`level' b_`ds'_`level'1970 b_`ds'_`level'1940 b_`ds'_`level'1950)
 		}
 		
 		//merge 1:1 `levelvar' using "$INTDATA/cog_populations/`level'pop", keep(3) nogen
@@ -398,12 +398,16 @@ foreach level in cz {
 		replace n_cgoodman_cz = 0 if n_cgoodman_cz==.
 		replace b_cgoodman_cz1940 = 0 if b_cgoodman_cz1940==.
 		replace b_cgoodman_cz1970 = 0 if b_cgoodman_cz1970==.
+		replace b_cgoodman_cz1950 = 0 if b_cgoodman_cz1950==.
+		
+		merge 1:1 cz using "$RAWDATA/dcourt/clean_cz_population_density_1940.dta", keepusing(pop_density1940) keep(1 3) nogen
 		//replace b_cgoodman_cz2010 = 0 if b_cgoodman_cz2010==.
-
+		g urban_share1940 = popc1940/pop1940
+		gen ln_pop_dens1940= log(pop_density1940)
 		
 		// Adding labels
 
-		foreach ds in  gen_muni schdist_ind all_local ngov3 gen_subcounty spdist  gen_town cgoodman  {
+		foreach ds in  gen_muni schdist_ind all_local ngov3 gen_subcounty spdist  gen_town cgoodman schdist {
 				local label : variable label n_`ds'_`level'
 				lab var n_`ds'_`level' "New Govs, `label'"
 				lab var b_`ds'_`level'1940 "Base Govs 1940, `label'"
@@ -413,10 +417,19 @@ foreach level in cz {
 				g b_`ds'_`level'1940_pcc = b_`ds'_`level'1940/(popc1940/10000)
 				g b_`ds'_`level'1970_pcc = b_`ds'_`level'1970/(popc1970/10000) 
 
+				
+				g n1_`ds'_`level'_pc = (pop1970/10000)/b_`ds'_`level'1970 - (pop1940/10000)/b_`ds'_`level'1940
+
 				g n_`ds'_`level'_pc = b_`ds'_`level'1970/(pop1970/10000) - b_`ds'_`level'1940/(pop1940/10000) 
+				g n2_`ds'_`level'_pc = b_`ds'_`level'1970/(pop1970/10000) - b_`ds'_`level'1950/(pop1950/10000) 
+
 				g n_`ds'_`level'_pcc = b_`ds'_`level'1970/(popc1970/10000) - b_`ds'_`level'1940/(popc1940/10000) 
+				g n2_`ds'_`level'_pcc = b_`ds'_`level'1970/(popc1970/10000) - b_`ds'_`level'1950/(popc1950/10000) 
+				
+				//g n3_`ds'_`level'_pc = (b_`ds'_`level'- b_`ds'_`level'1940)/(pop1940/10000) 
 				lab var n_`ds'_`level'_pc "New `label', P.C. (total)"
 				lab var n_`ds'_`level'_pcc "New `label', P.C. (urban)"
+				lab var n2_`ds'_`level'_pcc "New `label', P.C. (urban) 1950-70"
 
 		}
 		
@@ -490,7 +503,6 @@ foreach level in cz {
 
 		preserve
 			use "$CLEANDATA/dcourt/GM_`level'_final_dataset_split`samptab'", clear
-	di "here"
 			keep `levelvar' GM* popc???? bpopc???? mfg_lfshare* v2*blackmig3539_share* reg2 reg3 reg4  
 			drop GM_hat0* GM_hat7r* GM_hat8*
 			ren GM_hat2_* GM_hat_*
@@ -711,6 +723,11 @@ foreach level in cz {
 	lab var m_rr "Meters of Railroad, 1940"
 	lab var m_rr_sqm2 "Meters of Railroad per Square Meter of Land, 1940"
 	
+	
+	merge m:1 cz using "$RAWDATA/dcourt/clean_cz_population_density_1940.dta", keepusing(pop_density1940) keep(1 3) nogen
+	//replace b_cgoodman_cz2010 = 0 if b_cgoodman_cz2010==.
+	g urban_share1940 = popc1940/pop1940
+	gen ln_pop_dens1940= log(pop_density1940)
 	save "$CLEANDATA/`level'_stacked`outsamptab'", replace
 	*/
 	}

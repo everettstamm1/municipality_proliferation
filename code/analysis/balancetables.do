@@ -2,94 +2,80 @@
 
 local b_controls reg2 reg3 reg4 blackmig3539
 local balance_cutoff = 0.05
-
-foreach geog in full 1 2 4{
+local samp = "urban"
+foreach geog in full{
 	if "`geog'"=="full" local samplab ""
 	if "`geog'"=="1" local samplab "Northeast Region"
 	if "`geog'"=="2" local samplab "Midwest Region"
 	if "`geog'"=="3" local samplab "South Region"
 	if "`geog'"=="4" local samplab "West Region"
 
-	foreach samp in urban total tp  {
+	if "`geog'"=="full" local geoglab ""
+	if "`geog'"!="full" local geoglab "_reg`geog'"
 		
+
+	use "$CLEANDATA/cz_pooled", clear
+
+	if "`geog'"!="full" keep if region==`geog'
+
+
+
+	// Deeply silly thing that must be done for formatting reasons
+	forv i=1/9{
+		g d`i'=1
+	}
+	ren mfg_lfshare1940 mfg_lfshare
+	ren blackmig3539_share blackmig3539
+
+	local covars ln_pop_dens1940 urban_share1940 mfg_lfshare b_gen_muni_cz1940_pc b_schdist_ind_cz1940_pc  b_spdist_cz1940_pc b_gen_town_cz1940_pc b_cgoodman_cz1940_pc frac_land transpo_cost_1920 coastal avg_precip avg_temp n_wells totfrac_in_main_city urbfrac_in_main_city m_rr m_rr_sqm2 popc1940 pop1940
 	
-		use "$CLEANDATA/cz_pooled", clear
-
-		if "`samp'"=="td" keep if dcourt==1
-		if "`geog'"!="full" keep if region==`geog'
+	local pooled_covars_`samp'  ""
+	foreach covar in `covars' {
 		
-		if "`geog'"=="full" local geoglab ""
-		if "`geog'"!="full" local geoglab "_reg`geog'"
-		
-		if "`samp'"=="urban" local poptab ""
-		if "`samp'"=="total" local poptab "_totpop"
-		if "`samp'"=="td" local poptab "_totpop"
+		g GM`covar' = GM_hat_raw_pp
+		label var GM`covar' "`covar' on GM_hat"
 
-		if "`samp'"=="urban" local popname "c"
-		if "`samp'"=="total" local popname ""
-		if "`samp'"=="td" local popname ""
+		eststo `covar': reg `covar' GM`covar' `b_controls' d1 d2 d3 d4 d5 d6 d7 d8 d9 [aw=popc1940], r
+		local p =2*ttail(e(df_r),abs(_b[GM`covar']/_se[GM`covar']))
+		if `p'<=`balance_cutoff'{
+			if (!inlist("`covar'","mfg_lfshare", "blackmig3539", "popc1940","pop1940") & !regexm("`covar'","cz1940_pc")) local pooled_covars_`samp'  "`pooled_covars_`samp'' `covar' `covar'_m"
+			if (inlist("`covar'","mfg_lfshare", "blackmig3539", "popc1940","pop1940") | regexm("`covar'","cz1940_pc")) local pooled_covars_`samp'  "`pooled_covars_`samp'' `covar'"
+		}
+	}
 
-		if "`samp'"=="urban" local poplab "Urban Population"
-		if "`samp'"=="total" local poplab "Total Population"		
-		if "`samp'"=="td" local poplab "Total Population"		
+	eststo pooled_`samp' : appendmodels `covars'
 
 	
+	
+	
+	foreach decade in 1940 1950 1960{
+		use "$CLEANDATA/cz_stacked", clear
+			if "`samp'"=="td" keep if dcourt==1
+	if "`geog'"!="full" & "`geog'"!="1" keep if reg`geog'==1
+	if "`geog'"=="1" drop if reg2==1 | reg3 == 1 | reg4 == 1
+
+		ren blackmig3539_share blackmig3539
+
 		// Deeply silly thing that must be done for formatting reasons
 		forv i=1/9{
 			g d`i'=1
 		}
-		ren mfg_lfshare1940`poptab' mfg_lfshare
-		ren blackmig3539_share`poptab' blackmig3539
-
-		local covars mfg_lfshare frac_land transpo_cost_1920 coastal avg_precip avg_temp n_wells totfrac_in_main_city urbfrac_in_main_city m_rr m_rr_sqm2 popc1940 pop1940
+		local stacked_covars_`decade' ""
 		
-		local pooled_covars_`samp'  ""
 		foreach covar in `covars' {
-			
-			g GM`covar' = GM_hat_raw_pp`poptab'
+			g GM`covar' = GM_hat_raw_pp
 			label var GM`covar' "`covar' on GM_hat"
 
-			eststo `covar': reg `covar' GM`covar' `b_controls' d1 d2 d3 d4 d5 d6 d7 d8 d9 [aw=pop`popname'1940], r
+			local label : variable label `covar'
+			label var GM_hat_raw_pp "`label' on GM_hat"
+			eststo `covar': reg `covar' GM`covar' `b_controls' d1 d2 d3 d4 d5 d6 d7 d8 d9 [aw=popc] if decade==`decade', r
 			local p =2*ttail(e(df_r),abs(_b[GM`covar']/_se[GM`covar']))
 			if `p'<=`balance_cutoff'{
-				if (!inlist("`covar'","mfg_lfshare", "blackmig3539", "popc1940","pop1940") & !regexm("`covar'","cz1940_pc")) local pooled_covars_`samp'  "`pooled_covars_`samp'' `covar' `covar'_m"
-				if (inlist("`covar'","mfg_lfshare", "blackmig3539", "popc1940","pop1940") | regexm("`covar'","cz1940_pc")) local pooled_covars_`samp'  "`pooled_covars_`samp'' `covar'"
+			if (!inlist("`covar'","mfg_lfshare", "blackmig3539", "popc1940","pop1940") & !regexm("`covar'","cz1940_pc")) local stacked_covars_`decade'  "`stacked_covars_`decade'' `covar' `covar'_m"
+			if (inlist("`covar'","mfg_lfshare", "blackmig3539", "popc1940","pop1940") | regexm("`covar'","cz1940_pc")) local stacked_covars_`decade'  "`stacked_covars_`decade'' `covar'"
 			}
 		}
-
-		eststo pooled_`samp' : appendmodels `covars'
-
-		
-		
-		
-		foreach decade in 1940 1950 1960{
-			use "$CLEANDATA/cz_stacked", clear
-				if "`samp'"=="td" keep if dcourt==1
-		if "`geog'"!="full" & "`geog'"!="1" keep if reg`geog'==1
-		if "`geog'"=="1" drop if reg2==1 | reg3 == 1 | reg4 == 1
-
-			ren blackmig3539_share`poptab' blackmig3539
-
-			// Deeply silly thing that must be done for formatting reasons
-			forv i=1/9{
-				g d`i'=1
-			}
-			local stacked_covars_`decade' ""
-			
-			foreach covar in `covars' {
-				g GM`covar' = GM_hat_raw_pp`poptab'
-				label var GM`covar' "`covar' on GM_hat"
-
-				local label : variable label `covar'
-				label var GM_hat_raw_pp`poptab' "`label' on GM_hat"
-				eststo `covar': reg `covar' GM`covar' `b_controls' d1 d2 d3 d4 d5 d6 d7 d8 d9 [aw=pop`popname'] if decade==`decade', r
-				local p =2*ttail(e(df_r),abs(_b[GM`covar']/_se[GM`covar']))
-				if `p'<=`balance_cutoff'{
-				if (!inlist("`covar'","mfg_lfshare", "blackmig3539", "popc1940","pop1940") & !regexm("`covar'","cz1940_pc")) local stacked_covars_`decade'  "`stacked_covars_`decade'' `covar' `covar'_m"
-				if (inlist("`covar'","mfg_lfshare", "blackmig3539", "popc1940","pop1940") | regexm("`covar'","cz1940_pc")) local stacked_covars_`decade'  "`stacked_covars_`decade'' `covar'"
-				}
-			}
-			eststo stacked_`decade'_`samp' : appendmodels `covars'
+		eststo stacked_`decade'_`samp' : appendmodels `covars'
 			
 		}
 		
@@ -98,17 +84,17 @@ foreach geog in full 1 2 4{
 if "`geog'"!="full" & "`geog'"!="1" keep if reg`geog'==1
 		if "`geog'"=="1" drop if reg2==1 | reg3 == 1 | reg4 == 1
 		
-		ren blackmig3539_share`poptab' blackmig3539
+		ren blackmig3539_share blackmig3539
 
 		tab decade, gen(d)
 
 		local stacked_covars ""
 		
 		foreach covar in `covars' {
-					g GM`covar' = GM_hat_raw_pp`poptab'
+					g GM`covar' = GM_hat_raw_pp
 
 			label var GM`covar' "`covar' on GM_hat"
-			eststo `covar': reg `covar' GM`covar' `b_controls' d1 d2 d3 d4 d5 d6 d7 d8 d9 [aw=pop`popname'], r
+			eststo `covar': reg `covar' GM`covar' `b_controls' d1 d2 d3 d4 d5 d6 d7 d8 d9 [aw=popc], r
 			local p =2*ttail(e(df_r),abs(_b[GM`covar']/_se[GM`covar']))
 			if `p'<=`balance_cutoff'{
 				if (!inlist("`covar'","mfg_lfshare", "blackmig3539", "popc1940","pop1940") & !regexm("`covar'","cz1940_pc")) local stacked_covars  "`stacked_covars' `covar' `covar'_m"
@@ -136,60 +122,60 @@ if "`geog'"!="full" & "`geog'"!="1" keep if reg`geog'==1
 				if "`samp'"=="td" keep if dcourt==1
 		if "`geog'"!="full" keep if region==`geog'
 
-			ren blackmig3539_share`poptab' blackmig3539
+			ren blackmig3539_share blackmig3539
 
 			// FS
-			eststo pooled_fs_nc_`samp' : reg GM_raw_pp`poptab' GM_hat_raw_pp`poptab' `controls' [aw=pop`popname'1940], r
-			test GM_hat_raw_pp`poptab'=0
+			eststo pooled_fs_nc_`samp' : reg GM_raw_pp GM_hat_raw_pp `controls' [aw=popc1940], r
+			test GM_hat_raw_pp=0
 			local F : di %6.2f r(F)
 			estadd local Fs = `F'
 			
 			// OLS
-			eststo pooled_ols_nc_`samp' : reg n_`outcome'_cz_pc`popname' GM_raw_pp`poptab' `controls' [aw=pop`popname'1940], r
+			eststo pooled_ols_nc_`samp' : reg n_`outcome'_cz_pc GM_raw_pp `controls' [aw=popc1940], r
 			
 			// RF
-			eststo pooled_rf_nc_`samp' : reg n_`outcome'_cz_pc`popname' GM_hat_raw_pp`poptab' `controls' [aw=pop`popname'1940], r
+			eststo pooled_rf_nc_`samp' : reg n_`outcome'_cz_pc GM_hat_raw_pp `controls' [aw=popc1940], r
 			
 			// IV
-			eststo pooled_iv_nc_`samp' : ivreg2 n_`outcome'_cz_pc`popname' (GM_raw_pp`poptab' = GM_hat_raw_pp`poptab') `controls' [aw=pop`popname'1940], r
+			eststo pooled_iv_nc_`samp' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `controls' [aw=popc1940], r
 			
 			use "$CLEANDATA/cz_stacked", clear
 				if "`samp'"=="td" keep if dcourt==1
 		if "`geog'"!="full" & "`geog'"!="1" keep if reg`geog'==1
 				if "`geog'"=="1" drop if reg2==1 | reg3 == 1 | reg4 == 1
-			ren blackmig3539_share`poptab' blackmig3539
+			ren blackmig3539_share blackmig3539
 
 			foreach decade in 1940 1950 1960{
 				// FS
-				eststo stacked`decade'_fs_nc_`samp' : reg GM_raw_pp`poptab' GM_hat_raw_pp`poptab' `controls' [aw=pop`popname'1940] if decade==`decade', r
-				test GM_hat_raw_pp`poptab'=0
+				eststo stacked`decade'_fs_nc_`samp' : reg GM_raw_pp GM_hat_raw_pp `controls' [aw=popc1940] if decade==`decade', r
+				test GM_hat_raw_pp=0
 				local F : di %6.2f r(F)
 				estadd local Fs = `F'
 				
 				// OLS
-				eststo stacked`decade'_ols_nc_`samp' : reg n_`outcome'_cz_L0_pc`popname' GM_raw_pp`poptab' `controls' [aw=pop`popname'1940] if decade==`decade', r
+				eststo stacked`decade'_ols_nc_`samp' : reg n_`outcome'_cz_L0_pc GM_raw_pp `controls' [aw=popc1940] if decade==`decade', r
 				
 				// RF
-				eststo stacked`decade'_rf_nc_`samp' : reg n_`outcome'_cz_L0_pc`popname' GM_hat_raw_pp`poptab' `controls' [aw=pop`popname'1940] if decade==`decade', r
+				eststo stacked`decade'_rf_nc_`samp' : reg n_`outcome'_cz_L0_pc GM_hat_raw_pp `controls' [aw=popc1940] if decade==`decade', r
 				
 				// IV
-				eststo stacked`decade'_iv_nc_`samp' : ivreg2 n_`outcome'_cz_L0_pc`popname' (GM_raw_pp`poptab' = GM_hat_raw_pp`poptab') `controls' [aw=pop`popname'1940] if decade==`decade', r
+				eststo stacked`decade'_iv_nc_`samp' : ivreg2 n_`outcome'_cz_L0_pc (GM_raw_pp = GM_hat_raw_pp) `controls' [aw=popc1940] if decade==`decade', r
 			}
 			
 			// FS
-			eststo stacked_fs_nc_`samp' : reg GM_raw_pp`poptab' GM_hat_raw_pp`poptab' `controls' i.decade [aw=pop`popname'1940], r
-			test GM_hat_raw_pp`poptab'=0
+			eststo stacked_fs_nc_`samp' : reg GM_raw_pp GM_hat_raw_pp `controls' i.decade [aw=popc1940], r
+			test GM_hat_raw_pp=0
 			local F : di %6.2f r(F)
 			estadd local Fs = `F'
 			
 			// OLS
-			eststo stacked_ols_nc_`samp' : reg n_`outcome'_cz_L0_pc`popname' GM_raw_pp`poptab' `controls' i.decade [aw=pop`popname'1940], r
+			eststo stacked_ols_nc_`samp' : reg n_`outcome'_cz_L0_pc GM_raw_pp `controls' i.decade [aw=popc1940], r
 			
 			// RF
-			eststo stacked_rf_nc_`samp' : reg n_`outcome'_cz_L0_pc`popname' GM_hat_raw_pp`poptab' `controls' i.decade [aw=pop`popname'1940], r
+			eststo stacked_rf_nc_`samp' : reg n_`outcome'_cz_L0_pc GM_hat_raw_pp `controls' i.decade [aw=popc1940], r
 			
 			// IV
-			eststo stacked_iv_nc_`samp' : ivreg2 n_`outcome'_cz_L0_pc`popname' (GM_raw_pp`poptab' = GM_hat_raw_pp`poptab') `controls' i.decade [aw=pop`popname'1940], r
+			eststo stacked_iv_nc_`samp' : ivreg2 n_`outcome'_cz_L0_pc (GM_raw_pp = GM_hat_raw_pp) `controls' i.decade [aw=popc1940], r
 			
 			// With controls
 			local controls `b_controls' 
@@ -205,28 +191,28 @@ if "`geog'"!="full" & "`geog'"!="1" keep if reg`geog'==1
 				if "`samp'"=="td" keep if dcourt==1
 		if "`geog'"!="full" keep if region==`geog'
 
-			ren mfg_lfshare1940`poptab' mfg_lfshare
-			ren blackmig3539_share`poptab' blackmig3539
+			ren mfg_lfshare1940 mfg_lfshare
+			ren blackmig3539_share blackmig3539
 			// FS
-			eststo pooled_fs_c_`samp' : reg GM_raw_pp`poptab' GM_hat_raw_pp`poptab' `controls' [aw=pop`popname'1940], r
-			test GM_hat_raw_pp`poptab'=0
+			eststo pooled_fs_c_`samp' : reg GM_raw_pp GM_hat_raw_pp `controls' [aw=popc1940], r
+			test GM_hat_raw_pp=0
 			local F : di %6.2f r(F)
 			estadd local Fs = `F'
 			
 			// OLS
-			eststo pooled_ols_c_`samp' : reg n_`outcome'_cz_pc`popname' GM_raw_pp`poptab' `controls' [aw=pop`popname'1940], r
+			eststo pooled_ols_c_`samp' : reg n_`outcome'_cz_pc GM_raw_pp `controls' [aw=popc1940], r
 			
 			// RF
-			eststo pooled_rf_c_`samp' : reg n_`outcome'_cz_pc`popname' GM_hat_raw_pp`poptab' `controls' [aw=pop`popname'1940], r
+			eststo pooled_rf_c_`samp' : reg n_`outcome'_cz_pc GM_hat_raw_pp `controls' [aw=popc1940], r
 			
 			// IV
-			eststo pooled_iv_c_`samp' : ivreg2 n_`outcome'_cz_pc`popname' (GM_raw_pp`poptab' = GM_hat_raw_pp`poptab') `controls' [aw=pop`popname'1940], r
+			eststo pooled_iv_c_`samp' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `controls' [aw=popc1940], r
 			
 			use "$CLEANDATA/cz_stacked", clear
 				if "`samp'"=="td" keep if dcourt==1
 			if "`geog'"!="full" & "`geog'"!="1" keep if reg`geog'==1
 			if "`geog'"=="1" drop if reg2==1 | reg3 == 1 | reg4 == 1
-			ren blackmig3539_share`poptab' blackmig3539
+			ren blackmig3539_share blackmig3539
 
 			foreach decade in 1940 1950 1960{
 				local controls `b_controls' 
@@ -238,19 +224,19 @@ if "`geog'"!="full" & "`geog'"!="1" keep if reg`geog'==1
 					}
 				}
 				// FS
-				eststo stacked`decade'_fs_c_`samp' : reg GM_raw_pp`poptab' GM_hat_raw_pp`poptab' `controls' [aw=pop`popname'1940] if decade==`decade', r
-				test GM_hat_raw_pp`poptab'=0
+				eststo stacked`decade'_fs_c_`samp' : reg GM_raw_pp GM_hat_raw_pp `controls' [aw=popc1940] if decade==`decade', r
+				test GM_hat_raw_pp=0
 				local F : di %6.2f r(F)
 				estadd local Fs = `F'
 				
 				// OLS
-				eststo stacked`decade'_ols_c_`samp' : reg n_`outcome'_cz_L0_pc`popname' GM_raw_pp`poptab' `controls' [aw=pop`popname'1940] if decade==`decade', r
+				eststo stacked`decade'_ols_c_`samp' : reg n_`outcome'_cz_L0_pc GM_raw_pp `controls' [aw=popc1940] if decade==`decade', r
 				
 				// RF
-				eststo stacked`decade'_rf_c_`samp' : reg n_`outcome'_cz_L0_pc`popname' GM_hat_raw_pp`poptab' `controls' [aw=pop`popname'1940] if decade==`decade', r
+				eststo stacked`decade'_rf_c_`samp' : reg n_`outcome'_cz_L0_pc GM_hat_raw_pp `controls' [aw=popc1940] if decade==`decade', r
 				
 				// IV
-				eststo stacked`decade'_iv_c_`samp' : ivreg2 n_`outcome'_cz_L0_pc`popname' (GM_raw_pp`poptab' = GM_hat_raw_pp`poptab') `controls' [aw=pop`popname'1940] if decade==`decade', r
+				eststo stacked`decade'_iv_c_`samp' : ivreg2 n_`outcome'_cz_L0_pc (GM_raw_pp = GM_hat_raw_pp) `controls' [aw=popc1940] if decade==`decade', r
 			}
 			
 			local controls `b_controls' 
@@ -262,20 +248,20 @@ if "`geog'"!="full" & "`geog'"!="1" keep if reg`geog'==1
 			}
 		
 			// FS
-			eststo stacked_fs_c_`samp' : reg GM_raw_pp`poptab' GM_hat_raw_pp`poptab' `controls' i.decade [aw=pop`popname'1940], r
+			eststo stacked_fs_c_`samp' : reg GM_raw_pp GM_hat_raw_pp `controls' i.decade [aw=popc1940], r
 
-			test GM_hat_raw_pp`poptab'=0
+			test GM_hat_raw_pp=0
 			local F : di %6.2f r(F)
 			estadd local Fs = `F'
 			
 			// OLS
-			eststo stacked_ols_c_`samp' : reg n_`outcome'_cz_L0_pc`popname' GM_raw_pp`poptab' `controls' i.decade [aw=pop`popname'1940], r
+			eststo stacked_ols_c_`samp' : reg n_`outcome'_cz_L0_pc GM_raw_pp `controls' i.decade [aw=popc1940], r
 			
 			// RF
-			eststo stacked_rf_c_`samp' : reg n_`outcome'_cz_L0_pc`popname' GM_hat_raw_pp`poptab' `controls' i.decade [aw=pop`popname'1940], r
+			eststo stacked_rf_c_`samp' : reg n_`outcome'_cz_L0_pc GM_hat_raw_pp `controls' i.decade [aw=popc1940], r
 			
 			// IV
-			eststo stacked_iv_c_`samp' : ivreg2 n_`outcome'_cz_L0_pc`popname' (GM_raw_pp`poptab' = GM_hat_raw_pp`poptab') `controls' i.decade [aw=pop`popname'1940], r
+			eststo stacked_iv_c_`samp' : ivreg2 n_`outcome'_cz_L0_pc (GM_raw_pp = GM_hat_raw_pp) `controls' i.decade [aw=popc1940], r
 			
 			// Panel A: First stage
 			esttab 	pooled_fs_nc_`samp' ///
@@ -299,7 +285,7 @@ if "`geog'"!="full" & "`geog'"!="1" keep if reg`geog'==1
 							mgroups("Basic controls" "Robust controls", pattern(1 0 0 0 0 1 0 0 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) ///
 							prehead( \begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Outcome variable `outcome' `samplab'}  \begin{tabular}{l*{11}{c}} \toprule) ///
 							stats(Fs N, labels("F-Stat" "Observations")) ///
-							keep(GM_hat_raw_pp`poptab')
+							keep(GM_hat_raw_pp)
 							
 		// Panel B: OLS
 		esttab 	pooled_ols_nc_`samp' ///
@@ -318,7 +304,7 @@ if "`geog'"!="full" & "`geog'"!="1" keep if reg`geog'==1
 						modelwidth(10) ///
 						starlevels( * 0.10 ** 0.05 *** 0.01) ///
 						posthead("\cmidrule[\heavyrulewidth](lr){1-11} \\ \cmidrule[\heavyrulewidth](lr){1-11}" "\multicolumn{10}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-11}" ) ///
-						keep(GM_raw_pp`poptab') stats(N, labels("Observations")) 
+						keep(GM_raw_pp) stats(N, labels("Observations")) 
 
 		
 		// Panel C: Reduced Form
@@ -338,7 +324,7 @@ if "`geog'"!="full" & "`geog'"!="1" keep if reg`geog'==1
 						modelwidth(10) ///
 						starlevels( * 0.10 ** 0.05 *** 0.01) ///
 						posthead("\cmidrule[\heavyrulewidth](lr){1-11} \\ \cmidrule[\heavyrulewidth](lr){1-11}" "\multicolumn{10}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-11}" ) ///
-						keep(GM_hat_raw_pp`poptab') stats(N, labels("Observations")) 
+						keep(GM_hat_raw_pp) stats(N, labels("Observations")) 
 		// Panel D: IV
 		esttab 	pooled_iv_nc_`samp' ///
 						stacked1940_iv_nc_`samp' ///
@@ -356,49 +342,9 @@ if "`geog'"!="full" & "`geog'"!="1" keep if reg`geog'==1
 						modelwidth(10) ///
 						starlevels( * 0.10 ** 0.05 *** 0.01) ///
 						posthead("\cmidrule[\heavyrulewidth](lr){1-11} \\ \cmidrule[\heavyrulewidth](lr){1-11}" "\multicolumn{10}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-11}" ) ///
-						keep(GM_raw_pp`poptab') ///
+						keep(GM_raw_pp) ///
 						postfoot(	\hline\hline \end{tabular}{\caption*{\begin{scriptsize} "Columns 1-4 include region fixed effects, column 5 includes region and decade fixed effects. Columns 6-7 include region fixed effects and all significant covariates from the corresponding balance table. Column 10 includes region and decade fixed effects and all significant covariates from the corresponding balance table. \(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)"\end{scriptsize}}} \end{threeparttable} \end{table}) stats(N, labels("Observations")) 
 
 		}
 	}
-}
 
-
-foreach samp in urban total {
-	if "`samp'"=="urban" local poptab ""
-	if "`samp'"=="total" local poptab "_totpop"
-	if "`samp'"=="td" local poptab "_totpop"
-
-	if "`samp'"=="urban" local popname "c"
-	if "`samp'"=="total" local popname ""
-	if "`samp'"=="td" local popname ""
-
-	if "`samp'"=="urban" local poplab "Urban Population"
-	if "`samp'"=="total" local poplab "Total Population"		
-	if "`samp'"=="td" local poplab "Total Population"		
-
-	use "$CLEANDATA/cz_pooled", clear
-	if "`samp'"=="td" keep if dcourt==1
-	ren mfg_lfshare1940`poptab' mfg_lfshare
-	ren blackmig3539_share`poptab' blackmig3539
-	eststo clear
-	local covars mfg_lfshare blackmig3539 frac_land transpo_cost_1920 coastal avg_precip avg_temp n_wells totfrac_in_main_city urbfrac_in_main_city m_rr m_rr_sqm2
-		
-	eststo pooled : reg GM_hat_raw_pp`poptab' `covars' reg2 reg3 reg4 [aw=pop`popname'1940], r
-	
-	use "$CLEANDATA/cz_stacked", clear
-	if "`samp'"=="td" keep if dcourt==1
-	ren blackmig3539_share`poptab' blackmig3539
-	
-	eststo stacked1940 : reg GM_hat_raw_pp`poptab' `covars' reg2 reg3 reg4 [aw=pop`popname'1940] if decade == 1940, r
-	eststo stacked1950 : reg GM_hat_raw_pp`poptab' `covars' reg2 reg3 reg4 [aw=pop`popname'1940] if decade == 1950, r
-	eststo stacked1960 : reg GM_hat_raw_pp`poptab' `covars' reg2 reg3 reg4 [aw=pop`popname'1940] if decade == 1960, r
-	eststo stacked : reg GM_hat_raw_pp`poptab' `covars' reg2 reg3 reg4 i.decade [aw=pop`popname'1940], r
-
-	
-	esttab pooled stacked1940 stacked1950 stacked1960 stacked ///
-					using "$TABS/balancetables/cz_`samp'_combined.tex", ///
-					replace nolabel se booktabs noconstant noobs compress nonumber ///
-										b(%03.2f) se(%03.2f) ///
-					mtitles("1940-1970 Pooled" "1940-1950" "1950-1960" "1960-1970" "Stacked") 
-}

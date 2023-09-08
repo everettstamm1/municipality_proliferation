@@ -1,27 +1,22 @@
-\begin{table}[htbp]\centering
-\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
-\caption{Outcome: cgoodman, }
-\begin{tabular}{l*{10}{c}}
-\toprule
-            &\multicolumn{1}{c}{(1)}   &\multicolumn{1}{c}{(2)}   &\multicolumn{1}{c}{(3)}   &\multicolumn{1}{c}{(4)}   &\multicolumn{1}{c}{(5)}   &\multicolumn{1}{c}{(6)}   &\multicolumn{1}{c}{(7)}   &\multicolumn{1}{c}{(8)}   &\multicolumn{1}{c}{(9)}   &\multicolumn{1}{c}{(10)}   \\
+ \begin{tabular}{l*{15}{c}} \toprule
+                    &\multicolumn{1}{c}{(1)}   &\multicolumn{1}{c}{(2)}   &\multicolumn{1}{c}{(3)}   &\multicolumn{1}{c}{(4)}   &\multicolumn{1}{c}{(5)}   &\multicolumn{1}{c}{(6)}   &\multicolumn{1}{c}{(7)}   &\multicolumn{1}{c}{(8)}   &\multicolumn{1}{c}{(9)}   &\multicolumn{1}{c}{(10)}   &\multicolumn{1}{c}{(11)}   &\multicolumn{1}{c}{(12)}   &\multicolumn{1}{c}{(13)}   \\
 \midrule
-GM\_raw\_pp   &    0.0191** &    0.0297** &    0.0448***&    0.0423***&    0.0500***&    0.0497***&    0.0563***&    0.0531***&    0.0536***&    0.0660***\\
-            & (0.00917)   &  (0.0133)   &  (0.0137)   &  (0.0152)   &  (0.0150)   &  (0.0165)   &  (0.0176)   &  (0.0159)   &  (0.0165)   &  (0.0240)   \\
+Percentage Point Change in Urban Black Population& -0.01   & -0.01   &  0.01*  &  0.01   &  0.00   &  0.01   &  0.01   &  0.00   &  0.01   & -0.00   &  0.00   &  0.02** &  0.01   \\
+                    &(0.01)   &(0.01)   &(0.01)   &(0.01)   &(0.01)   &(0.01)   &(0.01)   &(0.01)   &(0.01)   &(0.01)   &(0.01)   &(0.01)   &(0.01)   \\
 \midrule
-First stage F-Stat&    117.57   &96.38800000000001   &    68.633   &    56.256   &    57.904   &    49.437   &    36.905   &     56.28   &    56.768   &    33.802   \\
-GM (OLS)    &       .02   &      .024   &      .027   &       .02   &      .028   &      .028   &       .03   &       .03   &       .03   &      .018   \\
-R2 (OLS)    &      .051   &       .09   &      .092   &      .105   &      .102   &      .093   &      .095   &      .102   &      .099   &      .153   \\
-Observations&       130   &       130   &       130   &       130   &       130   &       130   &       130   &       130   &       130   &       130   \\
-Census Regions&         N   &         Y   &         Y   &         Y   &         Y   &         Y   &         Y   &         Y   &         Y   &         Y   \\
-blackmig3539\_share&         N   &         N   &         Y   &         Y   &         Y   &         Y   &         Y   &         Y   &         Y   &         Y   \\
-mfg\_lfshare &         N   &         N   &         N   &         Y   &         N   &         N   &         N   &         N   &         N   &         Y   \\
-frac\_land   &         N   &         N   &         N   &         N   &         Y   &         N   &         N   &         N   &         N   &         Y   \\
-totfrac\_in\_main\_city&         N   &         N   &         N   &         N   &         N   &         Y   &         N   &         N   &         N   &         Y   \\
-m\_rr\_sqm2   &         N   &         N   &         N   &         N   &         N   &         N   &         Y   &         N   &         N   &         Y   \\
-popc1940    &         N   &         N   &         N   &         N   &         N   &         N   &         N   &         Y   &         N   &         Y   \\
-pop1940     &         N   &         N   &         N   &         N   &         N   &         N   &         N   &         N   &         Y   &         Y   \\
-\bottomrule
-\multicolumn{11}{l}{\footnotesize Standard errors in parentheses}\\
-\multicolumn{11}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
-\end{tabular}
-\end{table}
+First stage F-Stat  &117.57   & 96.39   & 68.63   & 57.90   & 49.44   & 36.91   & 56.28   & 56.77   & 56.26   & 55.21   & 40.50   & 55.55   & 24.20   \\
+GM (OLS)            & -0.01   & -0.00   &  0.01   &  0.01   &  0.00   &  0.00   &  0.00   &  0.00   &  0.00   & -0.01   & -0.00   &  0.01   & -0.01   \\
+R2 (OLS)            &  0.06   &  0.25   &  0.36   &  0.40   &  0.43   &  0.38   &  0.42   &  0.44   &  0.37   &  0.62   &  0.46   &  0.39   &  0.76   \\
+Observations        &   130   &   130   &   130   &   130   &   130   &   130   &   130   &   130   &   130   &   130   &   130   &   130   &   130   \\
+Census region FEs   &     N   &     Y   &     Y   &     Y   &     Y   &     Y   &     Y   &     Y   &     Y   &     Y   &     Y   &     Y   &     Y   \\
+Fraction of recent southern Black migrants&     N   &     N   &     Y   &     Y   &     Y   &     Y   &     Y   &     Y   &     Y   &     Y   &     Y   &     Y   &     Y   \\
+Fraction of land incorporated, 1940&     N   &     N   &     N   &     Y   &     N   &     N   &     N   &     N   &     N   &     N   &     N   &     N   &     Y   \\
+Fraction of CZ population in largest city&     N   &     N   &     N   &     N   &     Y   &     N   &     N   &     N   &     N   &     N   &     N   &     N   &     Y   \\
+Meters of railroad per square meter of land&     N   &     N   &     N   &     N   &     N   &     Y   &     N   &     N   &     N   &     N   &     N   &     N   &     Y   \\
+1940 urban population&     N   &     N   &     N   &     N   &     N   &     N   &     Y   &     N   &     N   &     N   &     N   &     N   &     Y   \\
+1940 total population&     N   &     N   &     N   &     N   &     N   &     N   &     N   &     Y   &     N   &     N   &     N   &     N   &     Y   \\
+1940 manufacturing share&     N   &     N   &     N   &     N   &     N   &     N   &     N   &     N   &     Y   &     N   &     N   &     N   &     Y   \\
+1940 baseline outcome&     N   &     N   &     N   &     N   &     N   &     N   &     N   &     N   &     N   &     Y   &     N   &     N   &     Y   \\
+Log 1940 population density&     N   &     N   &     N   &     N   &     N   &     N   &     N   &     N   &     N   &     N   &     Y   &     N   &     Y   \\
+1940 urban fraction &     N   &     N   &     N   &     N   &     N   &     N   &     N   &     N   &     N   &     N   &     N   &     Y   &     Y   \\
+\bottomrule \end{tabular}
