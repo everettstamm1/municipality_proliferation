@@ -1,0 +1,44 @@
+to do
+exposure robust inference for balance tables (6.2.3 of Borusyak, application of 5.2)
+clean up balance tables
+pre trends test
+what is the "shock" being tested in t3 (make this format the main table)
+pre trend should be decadal difference, or 1910-40
+three decimals
+choose set of balance controls more better
+
+1950-70 and dcourt instrument first
+drop (1) and (2) from balance table
+create balance table, recreate main table with those that fail
+hist_fin: how important state is: state spending p.c., ratio of local to state spending
+
+*** Shocks are exogeneous so shares can be exogeneous***
+
+add 10% to LOO tests in red, footer about how we pass at 10% level
+
+NOTES
+all pretrends look good
+frac_total instead of frac_land -> 
+
+Balance
+drop:
+ln_pop_dens1940, breaks everything
+pop1940, what's the big deal? We're already expressing outcome PC terms 
+popc1940, what's the big deal? We're already expressing X+inst in PC terms and weighting by this
+
+change:
+frac_land -> frac_total, fraction of land incorporated vs fraction of area (land+water) incorporated. p value 0.0504 on the balance test so we don't need to check robustness
+totfrac_in_main_city -> urbfrac_in_main_city, similar enough and urbfrac is balanced. Could even argue it's a preferable interpretation as we're researching an urban phenomenon
+m_rr_sqm_land -> m_rr_sqm_total, will take awhile to run but hoping for something similar to the frac_land -> frac_total change
+
+keep
+mfg_lfshare1940, cgoodman munis isn't robust to it (though everything else is) but we probably need to include bc it's one of ellora's main controls.
+urban_share1940, looks good! special districts aren't robust but cgoodman actually gets stronger.
+transpo_cost_1920, coastal, n_wells, m_rr, avg_precip, avg_temp, all balanced
+
+Cutoff note: switching to a 0.10 cutoff from a 0.05 cutoff means we need to check robustness to transpo_cost_1920, n_wells, and frac_total. We are robust to transpo_cost_1920 and n_wells, but munis and special districts fail for frac_total. Not sure if that's a better or worse look.
+
+urban_share1940 coastal avg_precip avg_temp urbfrac_in_main_city
+
+
+make pretrends table

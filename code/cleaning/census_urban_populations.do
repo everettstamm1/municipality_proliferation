@@ -142,3 +142,45 @@ replace urbfrac_in_main_city = 0 if popc==0
 drop popc pop 
 
 save "$INTDATA/census/maxcitypop", replace
+
+
+
+use "$RAWDATA/census/usa_00054.dta", clear
+	
+	g pop = perwt 
+	g bpop = perwt if race == 2
+	g popc = perwt if city!=0
+	g bpopc = perwt if city!=0 & race == 2
+
+	ren city citycode
+	
+	collapse (sum) popc pop bpop bpopc, by(stateicp countyicp year)
+
+	ren stateicp icpsrst
+	ren countyicp icpsrcty
+	replace year = year - 10
+	merge 1:m year icpsrst icpsrcty using "$XWALKS/consistent_1990", keepusing(weight nhgisst_1990 nhgiscty_1990) keep(3) nogen
+	replace year = year+10
+	
+	foreach var of varlist popc pop bpop bpopc{
+		replace `var' = `var'*weight
+	}
+	
+		
+	ren nhgisst_1990 statefip
+	ren nhgiscty_1990 countyfip
+
+	g cty_fips = statefip*100+countyfip/10
+
+	merge m:1 cty_fips using "$XWALKS/cw_cty_czone", keep(1 3) nogen
+	ren cty_fips fips
+	ren czone cz
+	ren year decade
+	
+	collapse (sum) popc pop bpop bpopc, by(cz decade)
+	
+	foreach var of varlist popc pop bpop bpopc{
+		ren `var' `var'2010
+	}
+	drop decade
+	save "$INTDATA/census/race_pop_2010.dta", replace

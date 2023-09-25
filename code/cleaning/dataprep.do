@@ -237,6 +237,8 @@ foreach level in cz {
 		save "$INTDATA/counts/n_muni_`level'.dta", replace
 	restore
 	
+	local level = "cz"
+	local levelvar = "cz"
 	// Preclean cgoodman data
 	use "$RAWDATA/cbgoodman/muni_incorporation_date.dta", clear
 	destring statefips countyfips, replace
@@ -251,11 +253,10 @@ foreach level in cz {
 	local lab: variable label yr_incorp
 	
 	g n = yr_incorp>=1940 & yr_incorp<=1970
-	forv d=1900(10)1990{
+	forv d=1900(10)2010{
 		local step = `d'+10
 		
 		g n`d' = yr_incorp<`d'
-		g n`d'_`step' = yr_incorp>=`d' & yr_incorp<`step'
 
 	}
 
@@ -264,26 +265,18 @@ foreach level in cz {
 	rename n n_muni_`level'
 	
 	rename n19?? b_muni_`level'19??
+	rename n20?? b_muni_`level'20??
+
 	
-	ren n19* n_muni_`level'*
-	ren *_19?? *_??
-	
+
 	label var b_muni_`level'1940 "Base `lab' 1940"
 	label var b_muni_`level'1950 "Base `lab' 1950"
 	label var b_muni_`level'1960 "Base `lab' 1960"
 	label var b_muni_`level'1970 "Base `lab' 1970"
 	label var b_muni_`level'1980 "Base `lab' 1980"
 	label var b_muni_`level'1990 "Base `lab' 1990"
-	//label var b_muni_`level'2000 "Base `lab' 2000"
-	//label var b_muni_`level'2010 "Base `lab' 2010"
-
-	label var n_muni_`level'40_50 "`lab'"
-	label var n_muni_`level'50_60 "`lab'"
-	label var n_muni_`level'60_70 "`lab'"
-	label var n_muni_`level'70_80 "`lab'"
-	label var n_muni_`level'80_90 "`lab'"
-	//label var n_muni_`level'90_00 "`lab'"
-	//label var n_muni_`level'00_10 "`lab'"
+	label var b_muni_`level'2000 "Base `lab' 2000"
+	label var b_muni_`level'2010 "Base `lab' 2010"
 
 	label var n_muni_`level' "`lab'"
 
@@ -343,11 +336,12 @@ foreach level in cz {
 		
 		merge 1:1 `levelvar' using `totpop_insts', update nogen
 		
-		foreach ds in gen_muni schdist_ind all_local ngov3 gen_subcounty spdist gen_town cgoodman schdist{
+		foreach ds in gen_muni schdist_ind all_local gen_subcounty spdist gen_town schdist{
 
-			merge 1:1 `levelvar' using "$INTDATA/counts/`ds'_`level'", keep(1 3) nogen keepusing(n_`ds'_`level' b_`ds'_`level'1970 b_`ds'_`level'1940 b_`ds'_`level'1950)
+			merge 1:1 `levelvar' using "$INTDATA/counts/`ds'_`level'", keep(1 3) nogen keepusing(n_`ds'_`level' b_`ds'_`level'1970 b_`ds'_`level'1940 b_`ds'_`level'1950 b_`ds'_`level'2010)
 		}
-		
+		merge 1:1 `levelvar' using "$INTDATA/counts/cgoodman_`level'", keep(1 3) nogen keepusing(n_cgoodman_`level' b_cgoodman_`level'*)
+
 		//merge 1:1 `levelvar' using "$INTDATA/cog_populations/`level'pop", keep(3) nogen
 		
 		if "`level'"=="cz"{
@@ -389,7 +383,7 @@ foreach level in cz {
 
 		}
 		// Missing dummies
-		foreach var of varlist frac_land transpo_cost_1920 coastal has_port avg_precip avg_temp n_wells totfrac_in_main_city urbfrac_in_main_city m_rr m_rr_sqm2{
+		foreach var of varlist frac_land transpo_cost_1920 coastal has_port avg_precip avg_temp n_wells totfrac_in_main_city urbfrac_in_main_city m_rr m_rr_sqm_land m_rr_sqm_total{
 			g `var'_m = `var'==.
 			replace `var' = 0 if `var'==.
 		}
@@ -399,15 +393,27 @@ foreach level in cz {
 		replace b_cgoodman_cz1940 = 0 if b_cgoodman_cz1940==.
 		replace b_cgoodman_cz1970 = 0 if b_cgoodman_cz1970==.
 		replace b_cgoodman_cz1950 = 0 if b_cgoodman_cz1950==.
-		
+		replace b_cgoodman_cz2010 = 0 if b_cgoodman_cz2010==.
+
+		merge 1:1 cz using "$INTDATA/census/race_pop_2010.dta", keep(1 3) nogen keepusing(pop2010)
 		merge 1:1 cz using "$RAWDATA/dcourt/clean_cz_population_density_1940.dta", keepusing(pop_density1940) keep(1 3) nogen
 		//replace b_cgoodman_cz2010 = 0 if b_cgoodman_cz2010==.
 		g urban_share1940 = popc1940/pop1940
 		gen ln_pop_dens1940= log(pop_density1940)
 		
+		preserve
+			use "$INTDATA/census/cz_urbanization_1900_1930", clear
+			keep pop cz decade
+			reshape wide pop, i(cz) j(decade)
+			tempfile oldpops
+			save `oldpops'
+		restore
+		
+		merge 1:1 cz using `oldpops', keep(1 3) nogen
+		
 		// Adding labels
 
-		foreach ds in  gen_muni schdist_ind all_local ngov3 gen_subcounty spdist  gen_town cgoodman schdist {
+		foreach ds in  gen_muni schdist_ind all_local gen_subcounty spdist  gen_town cgoodman schdist {
 				local label : variable label n_`ds'_`level'
 				lab var n_`ds'_`level' "New Govs, `label'"
 				lab var b_`ds'_`level'1940 "Base Govs 1940, `label'"
@@ -422,16 +428,26 @@ foreach level in cz {
 
 				g n_`ds'_`level'_pc = b_`ds'_`level'1970/(pop1970/10000) - b_`ds'_`level'1940/(pop1940/10000) 
 				g n2_`ds'_`level'_pc = b_`ds'_`level'1970/(pop1970/10000) - b_`ds'_`level'1950/(pop1950/10000) 
+				g ld_`ds'_`level'_pc = b_`ds'_`level'2010/(pop2010/10000) - b_`ds'_`level'1940/(pop1940/10000) 
 
 				g n_`ds'_`level'_pcc = b_`ds'_`level'1970/(popc1970/10000) - b_`ds'_`level'1940/(popc1940/10000) 
 				g n2_`ds'_`level'_pcc = b_`ds'_`level'1970/(popc1970/10000) - b_`ds'_`level'1950/(popc1950/10000) 
+				
 				
 				//g n3_`ds'_`level'_pc = (b_`ds'_`level'- b_`ds'_`level'1940)/(pop1940/10000) 
 				lab var n_`ds'_`level'_pc "New `label', P.C. (total)"
 				lab var n_`ds'_`level'_pcc "New `label', P.C. (urban)"
 				lab var n2_`ds'_`level'_pcc "New `label', P.C. (urban) 1950-70"
+				lab var ld_`ds'_`level'_pc "New `label', P.C. (urban) 1940-2010"
 
 		}
+		
+		// Pretrends, cgoodman only
+		g n10_cgoodman_`level'_pc = b_cgoodman_cz1910/(pop1910/10000) -  b_cgoodman_cz1900/(pop1900/10000)
+		g n20_cgoodman_`level'_pc = b_cgoodman_cz1920/(pop1920/10000) -  b_cgoodman_cz1910/(pop1910/10000)
+		g n30_cgoodman_`level'_pc = b_cgoodman_cz1930/(pop1930/10000) -  b_cgoodman_cz1920/(pop1920/10000)
+		g n40_cgoodman_`level'_pc = b_cgoodman_cz1940/(pop1940/10000) -  b_cgoodman_cz1930/(pop1930/10000)
+		g pre_cgoodman_`level'_pc = b_cgoodman_cz1940/(pop1940/10000) -  b_cgoodman_cz1910/(pop1910/10000)
 		
 		lab var GM_raw_totpop "Percentage Change in Total Black Population"
 		lab var GM_hat_raw_totpop "Predicted Percentage Change in Total Black Population"
@@ -476,11 +492,25 @@ foreach level in cz {
 		lab var coastal "Coastal"
 		lab var transpo_cost_1920 "Average Transport Cost out of CZ, 1920 (Donaldson and Hornbeck)"
 		lab var m_rr "Meters of Railroad, 1940"
-		lab var m_rr_sqm2 "Meters of Railroad per Square Meter of Land, 1940"
-
+		lab var m_rr_sqm_land "Meters of Railroad per Square Meter of Land, 1940"
+		lab var m_rr_sqm_total "Meters of Railroad per Square Meter, 1940"
+		lab var urban_share1940 "Share population urban"
+		lab var frac_total "Fraction of area incorporated"
+		lab var transpo_cost_1920 "1920 transportation cost"
+		lab var coastal "Coastal CZ" 
+		lab var urbfrac_in_main_city "Fraction of urban population living in largest city" 
+		lab var avg_precip "Average precipitation" 
+		lab var avg_temp "Average temperature"
+		
+		
+		lab var n10_cgoodman_cz_pc  "New municipalities per capita, 1900-10"
+		lab var n20_cgoodman_cz_pc  "New municipalities per capita, 1910-20"
+		lab var n30_cgoodman_cz_pc  "New municipalities per capita, 1920-30"
+		lab var n40_cgoodman_cz_pc  "New municipalities per capita, 1930-40"
+		lab var pre_cgoodman_cz_pc "New municipalities per capita, 1910-40"
 		save "$CLEANDATA/`level'_pooled`outsamptab'", replace
 		
-		
+		/*
 		// Creating stacked version of data
 		use "$CLEANDATA/dcourt/GM_`level'_final_dataset_split`samptab'_totalpop",clear
 		
@@ -537,15 +567,6 @@ foreach level in cz {
 		rename *1950_1960 *1950
 		rename *1960_1970 *1960
 		
-		rename *00_10 *1900
-		rename *10_20 *1910
-		rename *20_30 *1920
-		rename *30_40 *1930
-		rename *40_50 *1940
-		rename *50_60 *1950
-		rename *60_70 *1960
-		rename *70_80 *1970
-		rename *80_90 *1980
 
 		keep totpop_* GM_*  mfg_lfshare* blackmig3539_share* `levelvar' reg2 reg3 reg4  n_*_`level'???? b_*_`level'????  bpop* pop*
 		cap drop GM_hat0* GM_hat2* GM_hat1*  GM_hatr* GM_hat7r* GM_hat8* 

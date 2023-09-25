@@ -194,7 +194,8 @@ output <- counties %>%
             has_port = max(has_port, na.rm = T),
             coastal = max(coastal, na.rm = T),
             m_rr = sum(km_railroad, na.rm = T),
-            m_rr_sqm2 = sum(km_railroad, na.rm = T)/(sum(county_land,na.rm = T))) %>%
+            m_rr_sqm_total = sum(km_railroad, na.rm = T)/(sum(county_total,na.rm = T)),
+            m_rr_sqm_land = sum(km_railroad, na.rm = T)/(sum(county_land,na.rm = T))) %>%
   merge(cost_matrix,by.x = 'czone', by.y = 'cz_origin', all.x=T) %>% 
   st_drop_geometry() %>% 
   rename(cz = czone)
