@@ -366,7 +366,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "N"
 	estadd local state = "N"
 	estadd local urbdrp = "N"
@@ -378,7 +378,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	estadd local rm = "N"
 
 	// Column 2: Census Region Controls, blackmig3539_share, and all significant baseline controls
-	local controls  reg2 reg3 reg4 blackmig3539_share mfg_lfshare1940 frac_land totfrac_in_main_city m_rr_sqm_total popc1940 pop1940
+	local controls  reg2 reg3 reg4 blackmig3539_share
 	qui reg GM_raw_pp GM_hat_raw_pp `controls' [aw=popc1940], r
 	test GM_hat_raw_pp=0
 	local F : di %6.3f `r(F)'
@@ -405,14 +405,14 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	qui reg GM_raw_pp GM_hat_raw_pp `controls' [aw=popc1940], r
 	test GM_hat_raw_pp=0
 	local F : di %6.3f `r(F)'
-	qui reg n_`outcome'_cz_pc GM_raw_pp `controls' [aw=popc1940], r
+	qui reg n_`outcome'_cz_pcc GM_raw_pp `controls' [aw=popc1940], r
 	local ols_b : di %6.3f _b[GM_raw_pp]
 	local ols_r2 : di %6.3f e(r2)
-	eststo : ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `controls' [aw=popc1940], r
+	eststo : ivreg2 n_`outcome'_cz_pcc (GM_raw_pp = GM_hat_raw_pp) `controls' [aw=popc1940], r
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "Y"
 	estadd local state = "N"
 	estadd local urbdrp = "N"
@@ -435,7 +435,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "N"
 	estadd local state = "Y"
 	estadd local urbdrp = "N"
@@ -458,7 +458,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "N"
 	estadd local state = "N"
 	estadd local urbdrp = "Y"
@@ -481,7 +481,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "N"
 	estadd local state = "N"
 	estadd local urbdrp = "N"
@@ -506,7 +506,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "N"
 	estadd local state = "N"
 	estadd local urbdrp = "N"
@@ -531,7 +531,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "N"
 	estadd local state = "N"
 	estadd local urbdrp = "N"
@@ -557,7 +557,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "N"
 	estadd local state = "N"
 	estadd local urbdrp = "N"
@@ -582,7 +582,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "N"
 	estadd local state = "N"
 	estadd local urbdrp = "N"
@@ -607,7 +607,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "N"
 	estadd local state = "N"
 	estadd local urbdrp = "N"
@@ -674,7 +674,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "N"
 	estadd local state = "N"
 	estadd local urbdrp = "N"
@@ -711,14 +711,14 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	qui reg GM_raw_pp GM_hat_raw_pp `controls' [aw=popc1940], r
 	test GM_hat_raw_pp=0
 	local F : di %6.3f `r(F)'
-	qui reg n_`outcome'_cz_pc GM_raw_pp `controls' [aw=popc1940], r
+	qui reg n_`outcome'_cz_pcc GM_raw_pp `controls' [aw=popc1940], r
 	local ols_b : di %6.3f _b[GM_raw_pp]
 	local ols_r2 : di %6.3f e(r2)
-	eststo : ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `controls' [aw=popc1940], r
+	eststo : ivreg2 n_`outcome'_cz_pcc (GM_raw_pp = GM_hat_raw_pp) `controls' [aw=popc1940], r
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "Y"
 	estadd local state = "N"
 	estadd local urbdrp = "N"
@@ -740,7 +740,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "N"
 	estadd local state = "Y"
 	estadd local urbdrp = "N"
@@ -762,7 +762,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "N"
 	estadd local state = "N"
 	estadd local urbdrp = "Y"
@@ -784,7 +784,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "N"
 	estadd local state = "N"
 	estadd local urbdrp = "N"
@@ -808,7 +808,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "N"
 	estadd local state = "N"
 	estadd local urbdrp = "N"
@@ -832,7 +832,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "N"
 	estadd local state = "N"
 	estadd local urbdrp = "N"
@@ -857,7 +857,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "N"
 	estadd local state = "N"
 	estadd local urbdrp = "N"
@@ -881,7 +881,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "N"
 	estadd local state = "N"
 	estadd local urbdrp = "N"
@@ -905,7 +905,7 @@ foreach outcome in cgoodman schdist_ind  gen_subcounty spdist gen_town gen_muni{
 	estadd scalar Fstat = `F'
 	estadd scalar ols_b = `ols_b'
 	estadd scalar ols_r2 = `ols_r2'
-	estadd local baseline = "N"
+	estadd local baseline = "Y"
 	estadd local tpy = "N"
 	estadd local state = "N"
 	estadd local urbdrp = "N"

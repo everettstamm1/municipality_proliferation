@@ -1,0 +1,33 @@
+By 1950, certain states had adopted a model law that bans discrimination by race in public
+schools. I exploit these policy changes that desegregated access to a crucial local public good.
+Lot size controls for a neighborhood could circumvent de jure limits on school segregation,
+raising the neighborhood’s amenity value for a type of household. Consistent with the theory, I
+find the highest causal effects of Black demographic change on lot size outcomes in states that
+adopted these laws early.
+
+seems like they have a harmonization proceedure for 1950 and 1960
+
+instrument only looks at central city in a cbsa, while outcome looks at all other cities in the CBSA (i.e. the suburbs of the central city)
+
+they seem to aggregate blackmig3539_share to the sending state level, and turn it into a control for share from each state: "state exposure shares as described in Borusyak, Hull and Jaravel (2022). 
+
+Balance tables
+Native white share, black share, central city manufacturing share, distance from CBD, homeownership rate
+
+I reweigh jurisdictions by the units of pre-1950 housing development in their borders, as a share of total extant pre-1950 development in CBSA borders (SAME MOVIVATION AS SHARE DEVELOPED AREA)
+
+adds a CBSA-decade level control of suburban population growth, reflecting the relative attractiveness of a city’s suburban amenities to central city ones
+
+quadratic OLS X variable to account for nonlinearity of effects (First pct of black migrants matters more than next pct)
+
+drop random shares of data (alternative to Leave one out test?) Broderick, Giordano and Meager (2021) (hey I suggested this)
+An Automatic Finite-Sample Robustness Metric: When Can Dropping a Little Data Make a Big Difference?
+
+
+long differences...95 obs???
+
+make table for 10 cbus cle sending with blackmig3539_share, GM, and GM_hat
+
+add "placebo" to southern white inst, or just make a main table of it
+
+use long differences to argue why today's school gini's are related today

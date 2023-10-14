@@ -237,8 +237,7 @@ foreach level in cz {
 		save "$INTDATA/counts/n_muni_`level'.dta", replace
 	restore
 	
-	local level = "cz"
-	local levelvar = "cz"
+
 	// Preclean cgoodman data
 	use "$RAWDATA/cbgoodman/muni_incorporation_date.dta", clear
 	destring statefips countyfips, replace
@@ -299,8 +298,8 @@ foreach level in cz {
 		
 		use "$CLEANDATA/dcourt/GM_`level'_final_dataset`samptab'.dta", clear
 		g ne_ut = state_id == 31 | state_id == 49
-		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*   GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_* WM_raw_pp ne_ut
-		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*   GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut
+		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*   GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_* WM_raw_pp ne_ut v8_whitemig3539_share1940
+		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*   GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut v8_whitemig3539_share1940
 
 		if "`samp'"=="south" ren v2*_blackmig3539_share1940 *blackmig3539_share
 		if "`samp'"=="dcourt" ren v2_blackmig3539_share1940 blackmig3539_share
@@ -395,7 +394,7 @@ foreach level in cz {
 		replace b_cgoodman_cz1950 = 0 if b_cgoodman_cz1950==.
 		replace b_cgoodman_cz2010 = 0 if b_cgoodman_cz2010==.
 
-		merge 1:1 cz using "$INTDATA/census/race_pop_2010.dta", keep(1 3) nogen keepusing(pop2010)
+		merge 1:1 cz using "$INTDATA/census/urb_pop_2010.dta", keep(1 3) nogen keepusing(pop2010)
 		merge 1:1 cz using "$RAWDATA/dcourt/clean_cz_population_density_1940.dta", keepusing(pop_density1940) keep(1 3) nogen
 		//replace b_cgoodman_cz2010 = 0 if b_cgoodman_cz2010==.
 		g urban_share1940 = popc1940/pop1940
@@ -508,6 +507,12 @@ foreach level in cz {
 		lab var n30_cgoodman_cz_pc  "New municipalities per capita, 1920-30"
 		lab var n40_cgoodman_cz_pc  "New municipalities per capita, 1930-40"
 		lab var pre_cgoodman_cz_pc "New municipalities per capita, 1910-40"
+		
+		forv i=2/5{
+			g pop1940_`i' = pop1940^`i'
+			g popc1940_`i' = popc1940^`i'
+
+		}
 		save "$CLEANDATA/`level'_pooled`outsamptab'", replace
 		
 		/*
