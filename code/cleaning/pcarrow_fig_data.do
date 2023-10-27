@@ -83,3 +83,5 @@ duplicates drop
 
 merge 1:1 cz using `cz_pops', keep(3) nogen
 keep if cz_new_prop_white != .
+
+save "$CLEANDATA/pcarrow_fig_data", replace
