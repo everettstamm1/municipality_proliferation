@@ -15,10 +15,10 @@ program define gz7
 			exit _rc
 		}
 		else if _rc==199{
-			di "You have not installed gzsave, please do so by running "ssc install gzsave" and completing any additional setup."
+			di "You have not installed gzsave, please do so by running ssc install gzsave and completing any additional setup."
 		}
 		else if _rc>0{
-			di "Something went wrong running gzuse. Review your installation of gzsave.
+			di "Something went wrong running gzuse. Review your installation of gzsave."
 		}
 	}
 	else{
@@ -26,7 +26,7 @@ program define gz7
 		local working_directory : pwd
 		cd "`filepath'"
 
-		!7z.exe x "`filename'" -so > "uncompressed.dta"
+		!"7z.exe" x "`filename'" -so > "uncompressed.dta"
 		
 		cap use uncompressed.dta, clear
 		
