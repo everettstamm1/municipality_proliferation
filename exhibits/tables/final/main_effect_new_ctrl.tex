@@ -1,29 +1,29 @@
- \begin{tabular}{l*{7}{c}} \toprule
-&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}
-&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}
-&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\
-\cmidrule(lr){1-6}
-\multicolumn{5}{l}{Panel A: First Stage}\\
-\cmidrule(lr){1-6}
-$\widehat{GM}$  &    3.260***&    3.260***&    3.260***&    3.260***&    3.260***\\
-                &  (0.464)   &  (0.464)   &  (0.464)   &  (0.464)   &  (0.464)   \\
-\cmidrule(lr){1-6}
-\multicolumn{5}{l}{Panel B: OLS}\\
-\cmidrule(lr){1-6}
-GM              &    0.011***&    0.014***&    0.272***&    0.012** &   -0.026***\\
-                &  (0.004)   &  (0.004)   &  (0.081)   &  (0.005)   &  (0.007)   \\
-\cmidrule(lr){1-6}
-\multicolumn{5}{l}{Panel C: Reduced Form}\\
-\cmidrule(lr){1-6}
-$\widehat{GM}$  &    0.056***&    0.069***&    1.364***&    0.081***&   -0.063*  \\
-                &  (0.019)   &  (0.020)   &  (0.425)   &  (0.030)   &  (0.034)   \\
-\cmidrule(lr){1-6}
-\multicolumn{5}{l}{Panel D: 2SLS}\\
-\cmidrule(lr){1-6}
-GM              &    0.017***&    0.021***&    0.418***&    0.025***&   -0.019*  \\
-                &  (0.005)   &  (0.005)   &  (0.127)   &  (0.009)   &  (0.010)   \\
+ \begin{tabular}{l*{8}{c}} \toprule
+&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}
+&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}
+&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\
+\cmidrule(lr){1-7}
+\multicolumn{6}{l}{Panel A: First Stage}\\
+\cmidrule(lr){1-7}
+$\widehat{GM}$  &    3.260***&    3.260***&    3.260***&    3.260***&    3.260***&    3.260***\\
+                &  (0.464)   &  (0.464)   &  (0.464)   &  (0.464)   &  (0.464)   &  (0.464)   \\
+\cmidrule(lr){1-7}
+\multicolumn{6}{l}{Panel B: OLS}\\
+\cmidrule(lr){1-7}
+GM              &    0.011***&    0.014***&    0.272***&    0.012** &   -0.026***&   -0.234   \\
+                &  (0.004)   &  (0.004)   &  (0.081)   &  (0.005)   &  (0.007)   &  (0.144)   \\
+\cmidrule(lr){1-7}
+\multicolumn{6}{l}{Panel C: Reduced Form}\\
+\cmidrule(lr){1-7}
+$\widehat{GM}$  &    0.056***&    0.069***&    1.364***&    0.081***&   -0.063*  &   -1.837***\\
+                &  (0.019)   &  (0.020)   &  (0.425)   &  (0.030)   &  (0.034)   &  (0.697)   \\
+\cmidrule(lr){1-7}
+\multicolumn{6}{l}{Panel D: 2SLS}\\
+\cmidrule(lr){1-7}
+GM              &    0.017***&    0.021***&    0.418***&    0.025***&   -0.019*  &   -0.563***\\
+                &  (0.005)   &  (0.005)   &  (0.127)   &  (0.009)   &  (0.010)   &  (0.217)   \\
 \midrule
-First Stage F-Stat&    49.36   &    49.36   &    49.36   &    49.36   &    49.36   \\
-Dependent Variable Mean&     -.17   &      -.2   &    -3.58   &     -.25   &      .26   \\
-Observations    &      130   &      130   &      130   &      130   &      130   \\
+First Stage F-Stat&    49.36   &    49.36   &    49.36   &    49.36   &    49.36   &    49.36   \\
+Dependent Variable Mean&     -.17   &      -.2   &    -3.58   &     -.25   &      .26   &   -17.07   \\
+Observations    &      130   &      130   &      130   &      130   &      130   &      130   \\
        \bottomrule \end{tabular}

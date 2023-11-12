@@ -26,7 +26,7 @@ program define gz7
 		local working_directory : pwd
 		cd "`filepath'"
 
-		!"7z.exe" x "`filename'" -so > "uncompressed.dta"
+		!7z.exe x "`filename'" -so > "uncompressed.dta"
 		
 		cap use uncompressed.dta, clear
 		

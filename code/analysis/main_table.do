@@ -10,7 +10,7 @@ lab var GM_hat_raw_pp "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
 
 	eststo clear
-	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni{
+	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 		su n_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
 		
@@ -33,51 +33,51 @@ lab var GM_raw_pp "GM"
 	}
 
 	// Panel A: First Stage
-	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist  ///
+	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist fs_totfrac      ///
 		using "$TABS/final/main_effect.tex", ///
 		replace se booktabs noconstant noobs compress frag label nomtitles nonum ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}" ///
-				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\" ///
-				"\cmidrule(lr){1-6}" ///
-				"\multicolumn{5}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-6}" ) ///
-		prehead( \begin{tabular}{l*{7}{c}} \toprule) ///
+		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
+				"\cmidrule(lr){1-7}" ///
+				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
+		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
 	 keep(GM_hat_raw_pp) 
 
 	// Panel B: OLS
-	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ///
+	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
 		using "$TABS/final/main_effect.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp)
 
 
 	// Panel C: RF
-	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist ///
+	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist rf_totfrac  ///
 		using "$TABS/final/main_effect.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_hat_raw_pp)
 
 		
 	// Panel D: 2SLS
-	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist ///
+	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist iv_totfrac  ///
 		using "$TABS/final/main_effect.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp) ///
 		postfoot(	\bottomrule \end{tabular}) ///
 		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
 
-	
+	eststo clear
 
 use "$CLEANDATA/cz_pooled", clear
 keep if dcourt == 1
@@ -86,7 +86,7 @@ lab var GM_hat_raw_pp "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
 
 	eststo clear
-	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni{
+	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su n_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
 		
@@ -109,51 +109,50 @@ lab var GM_raw_pp "GM"
 	}
 
 	// Panel A: First Stage
-	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist  ///
+	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist fs_totfrac      ///
 		using "$TABS/final/main_effect_new_ctrl.tex", ///
 		replace se booktabs noconstant noobs compress frag label nomtitles nonum ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}" ///
-				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\" ///
-				"\cmidrule(lr){1-6}" ///
-				"\multicolumn{5}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-6}" ) ///
-		prehead( \begin{tabular}{l*{7}{c}} \toprule) ///
+		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
+				"\cmidrule(lr){1-7}" ///
+				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
+		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
 	 keep(GM_hat_raw_pp) 
 
 	// Panel B: OLS
-	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ///
+	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
 		using "$TABS/final/main_effect_new_ctrl.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp)
 
 
 	// Panel C: RF
-	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist ///
+	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist rf_totfrac  ///
 		using "$TABS/final/main_effect_new_ctrl.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_hat_raw_pp)
 
 		
 	// Panel D: 2SLS
-	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist ///
+	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist iv_totfrac  ///
 		using "$TABS/final/main_effect_new_ctrl.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp) ///
 		postfoot(	\bottomrule \end{tabular}) ///
 		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
-
-	
+	eststo clear
 
 //1950-70
 use "$CLEANDATA/cz_pooled", clear
@@ -163,7 +162,7 @@ lab var GM_hat_raw_pp "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
 
 	eststo clear
-	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni{
+	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su n2_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
 		
@@ -186,52 +185,50 @@ lab var GM_raw_pp "GM"
 	}
 
 	// Panel A: First Stage
-	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist ///
+	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist fs_totfrac      ///
 		using "$TABS/final/main_effect_1950_1970.tex", ///
-		replace se booktabs noconstant noobs compress frag label nomtitles nonum  ///
+		replace se booktabs noconstant noobs compress frag label nomtitles nonum ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}" ///
-				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\" ///
-				"\cmidrule(lr){1-6}" ///
-				"\multicolumn{5}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-6}" ) ///
-		prehead(   \begin{tabular}{l*{7}{c}} \toprule) ///
-	 keep(GM_hat_raw_pp)
-	
+		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
+				"\cmidrule(lr){1-7}" ///
+				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
+		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
+	 keep(GM_hat_raw_pp) 
 
 	// Panel B: OLS
-	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ///
+	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
 		using "$TABS/final/main_effect_1950_1970.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp)
 
 
 	// Panel C: RF
-	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist ///
+	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist rf_totfrac  ///
 		using "$TABS/final/main_effect_1950_1970.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_hat_raw_pp)
 
 		
 	// Panel D: 2SLS
-	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist ///
+	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist iv_totfrac  ///
 		using "$TABS/final/main_effect_1950_1970.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp) ///
 		postfoot(	\bottomrule \end{tabular}) ///
 		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
-
-		eststo clear
+	eststo clear
 
 use "$CLEANDATA/cz_pooled", clear
 keep if dcourt == 1
@@ -240,7 +237,7 @@ lab var GM_hat_raw_pp "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
 
 	eststo clear
-	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni{
+	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su n2_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
 		
@@ -263,45 +260,44 @@ lab var GM_raw_pp "GM"
 	}
 
 	// Panel A: First Stage
-	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist ///
+	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist fs_totfrac      ///
 		using "$TABS/final/main_effect_1950_1970_new_ctrl.tex", ///
-		replace se booktabs noconstant noobs compress frag label nomtitles nonum  ///
+		replace se booktabs noconstant noobs compress frag label nomtitles nonum ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}" ///
-				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\" ///
-				"\cmidrule(lr){1-6}" ///
-				"\multicolumn{5}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-6}" ) ///
-		prehead(   \begin{tabular}{l*{7}{c}} \toprule) ///
-	 keep(GM_hat_raw_pp)
-	
+		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
+				"\cmidrule(lr){1-7}" ///
+				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
+		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
+	 keep(GM_hat_raw_pp) 
 
 	// Panel B: OLS
-	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ///
+	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
 		using "$TABS/final/main_effect_1950_1970_new_ctrl.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp)
 
 
 	// Panel C: RF
-	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist ///
+	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist rf_totfrac  ///
 		using "$TABS/final/main_effect_1950_1970_new_ctrl.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_hat_raw_pp)
 
 		
 	// Panel D: 2SLS
-	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist ///
+	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist iv_totfrac  ///
 		using "$TABS/final/main_effect_1950_1970_new_ctrl.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp) ///
@@ -318,7 +314,7 @@ lab var GM_hat_raw_pp "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
 
 	eststo clear
-	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni{
+	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su ld_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
 		
@@ -341,52 +337,50 @@ lab var GM_raw_pp "GM"
 	}
 
 	// Panel A: First Stage
-	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist ///
+	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist fs_totfrac      ///
 		using "$TABS/final/main_effect_ld.tex", ///
-		replace se booktabs noconstant noobs compress frag label nomtitles nonum  ///
+		replace se booktabs noconstant noobs compress frag label nomtitles nonum ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}" ///
-				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\" ///
-				"\cmidrule(lr){1-6}" ///
-				"\multicolumn{5}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-6}" ) ///
-		prehead(   \begin{tabular}{l*{7}{c}} \toprule) ///
-	 keep(GM_hat_raw_pp)
-	
+		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
+				"\cmidrule(lr){1-7}" ///
+				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
+		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
+	 keep(GM_hat_raw_pp) 
 
 	// Panel B: OLS
-	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ///
+	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
 		using "$TABS/final/main_effect_ld.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp)
 
 
 	// Panel C: RF
-	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist ///
+	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist rf_totfrac  ///
 		using "$TABS/final/main_effect_ld.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_hat_raw_pp)
 
 		
 	// Panel D: 2SLS
-	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist ///
+	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist iv_totfrac  ///
 		using "$TABS/final/main_effect_ld.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp) ///
 		postfoot(	\bottomrule \end{tabular}) ///
 		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
-
-		eststo clear
+ eststo clear
 		
 
 
@@ -398,7 +392,7 @@ lab var GM_hat_raw_pp "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
 
 	eststo clear
-	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni{
+	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su ld_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
 		
@@ -421,53 +415,50 @@ lab var GM_raw_pp "GM"
 	}
 
 	// Panel A: First Stage
-	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist ///
+	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist fs_totfrac      ///
 		using "$TABS/final/main_effect_ld_new_ctrl.tex", ///
-		replace se booktabs noconstant noobs compress frag label nomtitles nonum  ///
+		replace se booktabs noconstant noobs compress frag label nomtitles nonum ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}" ///
-				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\" ///
-				"\cmidrule(lr){1-6}" ///
-				"\multicolumn{5}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-6}" ) ///
-		prehead(   \begin{tabular}{l*{7}{c}} \toprule) ///
-	 keep(GM_hat_raw_pp)
-	
+		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
+				"\cmidrule(lr){1-7}" ///
+				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
+		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
+	 keep(GM_hat_raw_pp) 
 
 	// Panel B: OLS
-	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ///
+	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
 		using "$TABS/final/main_effect_ld_new_ctrl.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp)
 
 
 	// Panel C: RF
-	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist ///
+	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist rf_totfrac  ///
 		using "$TABS/final/main_effect_ld_new_ctrl.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_hat_raw_pp)
 
 		
 	// Panel D: 2SLS
-	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist ///
+	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist iv_totfrac  ///
 		using "$TABS/final/main_effect_ld_new_ctrl.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp) ///
 		postfoot(	\bottomrule \end{tabular}) ///
 		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
-
-		eststo clear
-		
+eststo clear
 
 
 		
@@ -479,7 +470,7 @@ lab var GM_hat "$\widehat{GM}$ Percentile"
 lab var GM "GM Percentile"
 
 	eststo clear
-	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni{
+	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su n_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
 		
@@ -500,47 +491,45 @@ lab var GM "GM Percentile"
 			estadd local dep_var = `dv'
 
 	}
-
-	// Panel A: First Stage
-	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist ///
+// Panel A: First Stage
+	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist fs_totfrac      ///
 		using "$TABS/final/main_effect_pctile.tex", ///
-		replace se booktabs noconstant noobs compress frag label nomtitles nonum  ///
+		replace se booktabs noconstant noobs compress frag label nomtitles nonum ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}" ///
-				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\" ///
-				"\cmidrule(lr){1-6}" ///
-				"\multicolumn{5}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-6}" ) ///
-		prehead(   \begin{tabular}{l*{7}{c}} \toprule) ///
-	 keep(GM_hat)
-	
+		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
+				"\cmidrule(lr){1-7}" ///
+				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
+		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
+	 keep(GM_hat) 
 
 	// Panel B: OLS
-	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ///
+	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
 		using "$TABS/final/main_effect_pctile.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM)
 
 
 	// Panel C: RF
-	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist ///
+	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist rf_totfrac  ///
 		using "$TABS/final/main_effect_pctile.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_hat)
 
 		
 	// Panel D: 2SLS
-	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist ///
+	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist iv_totfrac  ///
 		using "$TABS/final/main_effect_pctile.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM) ///
@@ -556,7 +545,7 @@ lab var GM_hat "$\widehat{GM}$ Percentile"
 lab var GM "GM Percentile"
 
 	eststo clear
-	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni{
+	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su n_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
 		
@@ -579,45 +568,44 @@ lab var GM "GM Percentile"
 	}
 
 	// Panel A: First Stage
-	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist ///
+	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist fs_totfrac      ///
 		using "$TABS/final/main_effect_pctile_new_ctrl.tex", ///
-		replace se booktabs noconstant noobs compress frag label nomtitles nonum  ///
+		replace se booktabs noconstant noobs compress frag label nomtitles nonum ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}" ///
-				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\" ///
-				"\cmidrule(lr){1-6}" ///
-				"\multicolumn{5}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-6}" ) ///
-		prehead(   \begin{tabular}{l*{7}{c}} \toprule) ///
-	 keep(GM_hat)
-	
+		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
+				"\cmidrule(lr){1-7}" ///
+				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
+		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
+	 keep(GM_hat) 
 
 	// Panel B: OLS
-	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ///
+	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
 		using "$TABS/final/main_effect_pctile_new_ctrl.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM)
 
 
 	// Panel C: RF
-	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist ///
+	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist rf_totfrac  ///
 		using "$TABS/final/main_effect_pctile_new_ctrl.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_hat)
 
 		
 	// Panel D: 2SLS
-	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist ///
+	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist iv_totfrac  ///
 		using "$TABS/final/main_effect_pctile_new_ctrl.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM) ///
@@ -637,7 +625,7 @@ lab var GM_hat_raw_pp "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
 
 	eststo clear
-	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni{
+	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su n_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
 		
@@ -660,51 +648,52 @@ lab var GM_raw_pp "GM"
 	}
 
 	// Panel A: First Stage
-	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist  ///
+	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist fs_totfrac      ///
 		using "$TABS/final/white_effect.tex", ///
 		replace se booktabs noconstant noobs compress frag label nomtitles nonum ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}" ///
-				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\" ///
-				"\cmidrule(lr){1-6}" ///
-				"\multicolumn{5}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-6}" ) ///
-		prehead( \begin{tabular}{l*{7}{c}} \toprule) ///
+		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
+				"\cmidrule(lr){1-7}" ///
+				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
+		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
 	 keep(GM_8_hat_raw_pp) 
 
 	// Panel B: OLS
-	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ///
+	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
 		using "$TABS/final/white_effect.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(WM_raw_pp)
 
 
 	// Panel C: RF
-	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist ///
+	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist rf_totfrac  ///
 		using "$TABS/final/white_effect.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_8_hat_raw_pp)
 
 		
 	// Panel D: 2SLS
-	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist ///
+	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist iv_totfrac  ///
 		using "$TABS/final/white_effect.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(WM_raw_pp) ///
 		postfoot(	\bottomrule \end{tabular}) ///
 		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
+eststo clear
 
-	
+
 
 use "$CLEANDATA/cz_pooled", clear
 keep if dcourt == 1
@@ -713,7 +702,7 @@ lab var GM_8_hat_raw_pp "$\widehat{WM}$"
 lab var WM_raw_pp "WM"
 
 	eststo clear
-	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni{
+	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su n_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
 		
@@ -736,48 +725,47 @@ lab var WM_raw_pp "WM"
 	}
 
 	// Panel A: First Stage
-	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist  ///
+	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist fs_totfrac      ///
 		using "$TABS/final/white_effect_new_ctrl.tex", ///
 		replace se booktabs noconstant noobs compress frag label nomtitles nonum ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}" ///
-				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\" ///
-				"\cmidrule(lr){1-6}" ///
-				"\multicolumn{5}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-6}" ) ///
-		prehead( \begin{tabular}{l*{7}{c}} \toprule) ///
+		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
+				"\cmidrule(lr){1-7}" ///
+				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
+		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
 	 keep(GM_8_hat_raw_pp) 
 
 	// Panel B: OLS
-	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ///
+	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
 		using "$TABS/final/white_effect_new_ctrl.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(WM_raw_pp)
 
 
 	// Panel C: RF
-	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist ///
+	esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist rf_totfrac  ///
 		using "$TABS/final/white_effect_new_ctrl.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_8_hat_raw_pp)
 
 		
 	// Panel D: 2SLS
-	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist ///
+	esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist iv_totfrac  ///
 		using "$TABS/final/white_effect_new_ctrl.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(WM_raw_pp) ///
 		postfoot(	\bottomrule \end{tabular}) ///
 		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
-
-	
+eststo clear

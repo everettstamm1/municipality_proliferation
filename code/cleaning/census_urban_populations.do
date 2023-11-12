@@ -151,10 +151,11 @@ use "$RAWDATA/census/usa_00054.dta", clear
 	g bpop = perwt if race == 2
 	g popc = perwt if city!=0
 	g bpopc = perwt if city!=0 & race == 2
+	bys city : egen maxcitypop_2010 = sum(popc)
 
 	ren city citycode
 	
-	collapse (sum) popc pop bpop bpopc, by(stateicp countyicp year)
+	collapse (max) maxcitypop_2010 (sum) popc pop bpop bpopc, by(stateicp countyicp year)
 
 	ren stateicp icpsrst
 	ren countyicp icpsrcty
@@ -177,10 +178,80 @@ use "$RAWDATA/census/usa_00054.dta", clear
 	ren czone cz
 	ren year decade
 	
-	collapse (sum) popc pop bpop bpopc, by(cz decade)
+	collapse (max) maxcitypop_2010 (sum) popc pop bpop bpopc, by(cz decade)
 	
 	foreach var of varlist popc pop bpop bpopc{
 		ren `var' `var'2010
 	}
 	drop decade
 	save "$INTDATA/census/race_pop_2010.dta", replace
+	
+
+
+// 2010 populations
+local working_directory : pwd
+cd "$RAWDATA/census/nhgis0020_fixed/nhgis0020_fixed"
+do nhgis0020_ds172_2010_county.do
+cd "`working_directory'"
+
+ren h7v001 pop2010
+ren h7w002 popc2010
+
+destring statea countya, replace
+g cty_fips = statea*1000 + countya
+merge m:1 cty_fips using "$XWALKS/cw_cty_czone", keep(1 3) nogen
+ren czone cz
+
+collapse (sum) pop2010 popc2010, by(cz)
+
+save "$INTDATA/census/urb_pop_2010.dta", replace
+//
+// // Census Urban Populations
+// local working_directory : pwd
+// cd "$RAWDATA/census/nhgis0023_fixed"
+// do nhgis0023_ds172_2010_place.do
+// cd "`working_directory'"
+//
+// ren h7v001 pop2010
+// ren h7w002 popc2010
+//
+// destring placea statea, replace
+//
+// ren placea placefp
+// ren statea statefp
+// merge 1:m placefp statefp using "$XWALKS/place_county_xwalk", keep(1 3) nogen
+// g cty_fips = statefp*1000 + countyfp
+// merge m:1 cty_fips using "$XWALKS/cw_cty_czone", keep(1 3) nogen
+// ren czone cz
+//
+// collapse (sum) pop2010 popc2010, by(cz)
+
+// 2010 max city pop
+use "$RAWDATA/census/usa_00054.dta", clear
+drop if city==0
+bys city : egen maxcitypop2010 = sum(perwt)
+
+collapse (max) maxcitypop2010 , by(stateicp countyicp year)
+
+ren stateicp icpsrst
+ren countyicp icpsrcty
+replace year = year - 10
+merge 1:m year icpsrst icpsrcty using "$XWALKS/consistent_1990", keepusing(weight nhgisst_1990 nhgiscty_1990) keep(3) nogen
+replace year = year+10
+
+	
+ren nhgisst_1990 statefip
+ren nhgiscty_1990 countyfip
+
+g cty_fips = statefip*100+countyfip/10
+
+merge m:1 cty_fips using "$XWALKS/cw_cty_czone", keep(1 3) nogen
+ren cty_fips fips
+ren czone cz
+ren year decade
+
+collapse (max) maxcitypop2010, by(cz)
+
+
+save "$INTDATA/census/maxcitypop_2010.dta", replace
+
