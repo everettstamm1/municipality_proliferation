@@ -1,0 +1,6 @@
+notes 11-30
+overlay new munis with zoning...wharton land use regulatory index
+shapefile of new munis
+names on the pcarrow graph, stretch Y axis
+write robustness check section
+find evocative examples from sundown town dataset

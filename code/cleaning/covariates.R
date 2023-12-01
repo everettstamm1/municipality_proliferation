@@ -203,6 +203,4 @@ output <- counties %>%
 
 write_dta(output,path=paste0(INTDATA,"covariates/covariates.dta"))
 
-old <- read_dta(paste0(INTDATA,"covariates/covariates.dta"))
-
 
