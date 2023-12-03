@@ -38,7 +38,7 @@ WRLURI <- read_stata(paste0(RAWDATA,"other/WHARTONLANDREGULATIONDATA_1_15_2020/W
 places <- data.frame()
 
 for(s in unique(munis$STATEFP)){
-  place_s <- places(state = s) %>% 
+  place_s <- places(state = s, year = 2018) %>% 
     left_join(munis, by = c('STATEFP', 'PLACEFP'))
   places <- rbind(places,place_s)
 }

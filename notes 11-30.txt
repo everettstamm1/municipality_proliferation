@@ -4,3 +4,8 @@ shapefile of new munis
 names on the pcarrow graph, stretch Y axis
 write robustness check section
 find evocative examples from sundown town dataset
+
+Wharton notes
+Wharton data does something kinda funny where their unit of observation is defined as "locality", which includes Census Designated Places, County Subdivisions, consolidated municipality county governments, and independent municipalities. Their master list seems to come from this: https://www.census.gov/geographies/reference-files/2018/demo/popest/2018-fips.html, which doesn't have all the places our dataset does, for some reason. 
+
+For now, I'm dropping all observations that aren't a census designated place or independent municipality. The shapefile will contain ALL places in the US, including those not found in the Chris Good
