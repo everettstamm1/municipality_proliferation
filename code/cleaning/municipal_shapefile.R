@@ -26,26 +26,54 @@ munis <- read_stata(paste0(RAWDATA,'/cbgoodman/muni_incorporation_date.dta')) %>
   rename(STATEFP = statefips, PLACEFP = placefips, COUNTYFP = countyfips) 
   
 WRLURI <- read_stata(paste0(RAWDATA,"other/WHARTONLANDREGULATIONDATA_1_15_2020/WRLURI_01_15_2020.dta")) %>% 
-  mutate(PLACEFP = as.character(fipsplacecode18), STATEFP = as.character(statecode)) %>% 
+  filter(str_length(GEOID)==7) %>% # Keeping only census designated places
+  mutate(PLACEFP = fipsplacecode18, STATEFP = statecode) %>% 
   select(PLACEFP, STATEFP,LPPI18,SPII18,LPAI18,LZAI18,SRI18,DRI18,
        EI18,AHI18,ADI18,WRLURI18,weight_full,weight_metro,
-       totinitiatives18,appr_rate18)
+       totinitiatives18,appr_rate18, communityname18) %>% 
+  mutate(PLACEFP = case_when((PLACEFP == 11390) ~ 11397, # Butte-Silver Bow to Butte-Silver Bow (balance)
+                             (PLACEFP == 60915 ~ 60900), # Princeton to Princeton
+                             TRUE ~ PLACEFP)) 
 
 places <- data.frame()
 
 for(s in unique(munis$STATEFP)){
   place_s <- places(state = s) %>% 
-    merge(munis, by = c('STATEFP', 'PLACEFP'), all.x = TRUE)
+    left_join(munis, by = c('STATEFP', 'PLACEFP'))
   places <- rbind(places,place_s)
 }
 
 places <- places %>% 
-  mutate(cty_fips = as.numeric(str_c(STATEFP,COUNTYFP))) %>% 
+  mutate(cty_fips = as.numeric(str_c(STATEFP,COUNTYFP)),
+         STATEFP = as.numeric(STATEFP),
+         PLACEFP = as.numeric(PLACEFP)) %>% 
   merge(county_cz_xwalk, by = 'cty_fips', all.x = TRUE) %>% 
   rename(cz = czone) %>% 
   left_join(sample_czs, by = 'cz') %>% 
   mutate(sample_130_czs = if_else(is.na(sample_130_czs),  FALSE, TRUE)) %>% 
-  left_join(WRLURI, by = c('STATEFP', 'PLACEFP'))
+  left_join(WRLURI, by = c('STATEFP', 'PLACEFP')) %>% 
+  mutate(ALAND = ALAND/1000,AWATER = AWATER/1000)
 
 st_write(places,paste0(CLEANDATA,"other/municipal_shapefile.shp"), layer = "munis")
+# TROUBLESHOOTING THE MERGE
+# test <- places %>% 
+#   st_drop_geometry() %>% 
+#   select(cty_fips,PLACEFP,STATEFP,NAME,muniname, yr_incorp,LSAD) %>% 
+#   full_join(WRLURI, by = c('STATEFP','PLACEFP')) %>% 
+#   mutate(merge = if_else(!is.na(LSAD),
+#                          if_else(!is.na(WRLURI18),
+#                                  3,1),2))
+# 
+# test <- test[c(22,21,1:20)]
+# test <- test[order(test$STATEFP,test$PLACEFP),]
+# flags <- test %>% 
+#   filter(merge==2 & STATEFP %in% unique(places$STATEFP)) %>% 
+#   select(c(STATEFP,PLACEFP))
+# 
+# 
+# check3 <- read_excel("C:/Users/Everett Stamm/Downloads/all-geocodes-v2018.xlsx",skip=4)
+# check3 <- check3[str_detect(check3$`Area Name (including legal/statistical area description)`,"Cheshire") == TRUE,]
+# %>% 
+#   filter(str_detect(`Ar`)
+
 
