@@ -1,12 +1,24 @@
 \begin{table}[htbp]\centering
 \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
 \caption{samp\_nonsouthern\_pre \label{tab1}}
-\begin{tabular}{l*{2}{c}}
+\begin{tabular}{l*{3}{cccc}}
 \toprule
-                    &\multicolumn{1}{c}{Munis Incorporated 1940-70}&\multicolumn{1}{c}{Else}\\
-                    &        mean&        mean\\
+                    &\multicolumn{2}{c}{Munis Incorporated 1940-70}&\multicolumn{2}{c}{Else} &\multicolumn{2}{c}{Test for difference}\\
+                    &        mean&          sd&        mean&          sd&           b         &           t\\
 \midrule
+Local Political Pressure Index, 2018&        8.37&        1.99&        8.26&        2.05&        0.12         &      (0.64)\\
+State Political Involvement Index, 2018&        2.26&        1.13&        2.05&        1.02&        0.20\sym{*}  &      (2.11)\\
+Local Project Approval Index, 2018&        2.19&        1.38&        2.29&        1.50&       -0.10         &     (-0.79)\\
+Local Zoning Approval Index, 2018&        2.61&        1.34&        2.86&        1.43&       -0.25\sym{*}  &     (-2.10)\\
+Supply Restrictions Index, 2018&        0.15&        0.81&        0.17&        0.83&       -0.02         &     (-0.28)\\
+Density Restriction Index, 2018&        1.73&        1.18&        1.64&        1.10&        0.09         &      (0.90)\\
+Exactions Index, 2018&        0.58&        0.49&        0.51&        0.50&        0.07         &      (1.58)\\
+Affordable Housing Index, 2018&        0.15&        0.36&        0.11&        0.32&        0.03         &      (1.13)\\
+Approval Delay Index, 2018&        5.82&        3.74&        4.70&        3.84&        1.12\sym{***}&      (3.44)\\
+WRLURI 2018         &       -0.04&        0.94&       -0.15&        0.95&        0.11         &      (1.25)\\
+\midrule
+Observations        &         186&            &         726&            &                     &            \\
 \bottomrule
-\multicolumn{3}{l}{\footnotesize Weight, full sample}\\
+\multicolumn{7}{l}{\footnotesize Weight, full sample}\\
 \end{tabular}
 \end{table}
