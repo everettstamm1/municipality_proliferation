@@ -52,9 +52,19 @@ places <- places %>%
   left_join(sample_czs, by = 'cz') %>% 
   mutate(sample_130_czs = if_else(is.na(sample_130_czs),  FALSE, TRUE)) %>% 
   left_join(WRLURI, by = c('STATEFP', 'PLACEFP')) %>% 
-  mutate(ALAND = ALAND/1000,AWATER = AWATER/1000)
+  mutate(ALAND = ALAND/1000,AWATER = AWATER/1000,
+         south = STATEFP %in% c(01,05,12,13,21,22,28,37,40,45,47,48,51,54),
+         ak_hi = STATEFP %in% c(2,15))
+  
+
 
 st_write(places,paste0(CLEANDATA,"other/municipal_shapefile.shp"), layer = "munis")
+
+# Also save attributes without shapefile for ease of use
+places %>% 
+  st_drop_geometry() %>% 
+  write_dta(paste0(CLEANDATA,"other/municipal_shapefile_attributes.dta"))
+
 # TROUBLESHOOTING THE MERGE
 # test <- places %>% 
 #   st_drop_geometry() %>% 
