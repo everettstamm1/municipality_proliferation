@@ -33,35 +33,41 @@ WRLURI <- read_stata(paste0(RAWDATA,"other/WHARTONLANDREGULATIONDATA_1_15_2020/W
        totinitiatives18,appr_rate18, communityname18) %>% 
   mutate(PLACEFP = case_when((PLACEFP == 11390) ~ 11397, # Butte-Silver Bow to Butte-Silver Bow (balance)
                              (PLACEFP == 60915 ~ 60900), # Princeton to Princeton
-                             TRUE ~ PLACEFP)) 
+                             TRUE ~ PLACEFP))
 
+
+corelogic <- read.csv(paste0(CLEANDATA,"corelogic/censusplace_clogic_chars.csv")) %>% 
+  rename(NAME_corelogic = NAME)
 places <- data.frame()
 
 for(s in unique(munis$STATEFP)){
-  place_s <- places(state = s, year = 2018) %>% 
+  place_s <- places(state = s) %>% 
     left_join(munis, by = c('STATEFP', 'PLACEFP'))
   places <- rbind(places,place_s)
 }
 
-places <- places %>% 
+out <- places %>% 
   mutate(cty_fips = as.numeric(str_c(STATEFP,COUNTYFP)),
          STATEFP = as.numeric(STATEFP),
          PLACEFP = as.numeric(PLACEFP)) %>% 
-  merge(county_cz_xwalk, by = 'cty_fips', all.x = TRUE) %>% 
+  left_join(county_cz_xwalk, by = 'cty_fips') %>% 
   rename(cz = czone) %>% 
   left_join(sample_czs, by = 'cz') %>% 
   mutate(sample_130_czs = if_else(is.na(sample_130_czs),  FALSE, TRUE)) %>% 
   left_join(WRLURI, by = c('STATEFP', 'PLACEFP')) %>% 
   mutate(ALAND = ALAND/1000,AWATER = AWATER/1000,
          south = STATEFP %in% c(01,05,12,13,21,22,28,37,40,45,47,48,51,54),
-         ak_hi = STATEFP %in% c(2,15))
-  
+         ak_hi = STATEFP %in% c(2,15),
+         GEOID = as.numeric(GEOID)) %>% 
+  full_join(corelogic, by = 'GEOID')  %>% 
+  mutate(STATEFP = if_else(is.na(STATEFP),floor(GEOID/100000),STATEFP))
 
 
-st_write(places,paste0(CLEANDATA,"other/municipal_shapefile.shp"), layer = "munis")
+out %>% 
+  st_write(paste0(CLEANDATA,"other/municipal_shapefile.shp"), layer = "munis")
 
 # Also save attributes without shapefile for ease of use
-places %>% 
+out %>% 
   st_drop_geometry() %>% 
   write_dta(paste0(CLEANDATA,"other/municipal_shapefile_attributes.dta"))
 

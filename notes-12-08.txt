@@ -1,0 +1,24 @@
+bring up
+will format shit over weekend
+how to frame white munis result? Generally do we wanna committ to extra covars?
+
+notes
+wharton: CZ Fixed effects
+else: just principal city
+
+corelogic stuff
+weight by population?
+share apartment buildings?
+lot size
+
+
+synthetic controls of 1940-70 munis?
+
+new table:
+split on median of instrument
+
+number of cities?
+
+include balance table as main table.
+
+allisson shertzer is excited

@@ -619,7 +619,7 @@ lab var GM "GM Percentile"
 use "$CLEANDATA/cz_pooled", clear
 keep if dcourt == 1
 local b_controls reg2 reg3 reg4 v8_whitemig3539_share1940
-local extra_controls urban_share1940 frac_total transpo_cost_1920 m_rr_sqm_total
+local extra_controls urban_share1940 frac_total transpo_cost_1920
 
 lab var GM_hat_raw_pp "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
