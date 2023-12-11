@@ -81,15 +81,11 @@ foreach w in none full metro{
 
 // Corelogic vars
 
-g weight_land = ALAND
 g weight_pop = population
-g weight_dens = weight_pop/weight_land
 
-lab var weight_land "Weighted by land area"
 lab var weight_pop "Weighted by population"
-lab var weight_dens "Weighted by population density"
  
-foreach w in none land pop dens{ 
+foreach w in none pop{ 
     local wlab: variable label weight_`w'  
 	eststo clear
 	forv s=1/4 {
@@ -159,7 +155,7 @@ foreach w in none full metro{
 // Corelogic vars
 
 
-foreach w in none land pop dens{ 
+foreach w in none pop{ 
     local wlab: variable label weight_`w'  
 	eststo clear
 	forv s=1/4 {
