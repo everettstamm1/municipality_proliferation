@@ -17,9 +17,10 @@ county_cz_xwalk <- read_dta(paste0(XWALKS,"cw_cty_czone.dta"))
 sample_czs <- read_dta(paste0(INTDATA,"dcourt/original_130_czs.dta")) %>% 
   mutate(sample_130_czs = TRUE)
 
-fips_place_xwalk <- read_dta(paste0(XWALKS,"cog_ID_fips_place_xwalk_02.dta")) %>% 
-  select(fips_state, fips_county_2002, fips_place_2002) %>% 
-  rename(STATEFP = fips_state, COUNTYFP = fips_county_2002, PLACEFP = fips_place_2002)
+fips_place_xwalk <- read_dta(paste0(XWALKS,"place_county_xwalk.dta")) %>% 
+  rename(STATEFP = statefp, PLACEFP = placefp, COUNTYFP_xwalk = countyfp) %>% 
+  select(STATEFP, PLACEFP, COUNTYFP_xwalk)
+
 
 munis <- read_stata(paste0(RAWDATA,'/cbgoodman/muni_incorporation_date.dta')) %>% 
   select(muniname,statefips,placefips,countyfips,yr_incorp) %>% 
@@ -38,6 +39,11 @@ WRLURI <- read_stata(paste0(RAWDATA,"other/WHARTONLANDREGULATIONDATA_1_15_2020/W
 
 corelogic <- read.csv(paste0(CLEANDATA,"corelogic/censusplace_clogic_chars.csv")) %>% 
   rename(NAME_corelogic = NAME)
+
+population <- read.csv(paste0(RAWDATA,"census/nhgis0025_csv/nhgis0025_csv/nhgis0025_ds258_2020_place.csv")) %>% 
+  select(STATEA, PLACEA, U7H001) %>% 
+  rename(STATEFP = STATEA, PLACEFP = PLACEA, population = U7H001)
+
 places <- data.frame()
 
 for(s in unique(munis$STATEFP)){
@@ -47,20 +53,25 @@ for(s in unique(munis$STATEFP)){
 }
 
 out <- places %>% 
-  mutate(cty_fips = as.numeric(str_c(STATEFP,COUNTYFP)),
-         STATEFP = as.numeric(STATEFP),
-         PLACEFP = as.numeric(PLACEFP)) %>% 
-  left_join(county_cz_xwalk, by = 'cty_fips') %>% 
-  rename(cz = czone) %>% 
-  left_join(sample_czs, by = 'cz') %>% 
-  mutate(sample_130_czs = if_else(is.na(sample_130_czs),  FALSE, TRUE)) %>% 
+  mutate(STATEFP = as.numeric(STATEFP),
+         PLACEFP = as.numeric(PLACEFP),
+         COUNTYFP = as.numeric(COUNTYFP)) %>% 
   left_join(WRLURI, by = c('STATEFP', 'PLACEFP')) %>% 
   mutate(ALAND = ALAND/1000,AWATER = AWATER/1000,
          south = STATEFP %in% c(01,05,12,13,21,22,28,37,40,45,47,48,51,54),
          ak_hi = STATEFP %in% c(2,15),
          GEOID = as.numeric(GEOID)) %>% 
-  full_join(corelogic, by = 'GEOID')  %>% 
-  mutate(STATEFP = if_else(is.na(STATEFP),floor(GEOID/100000),STATEFP))
+  left_join(corelogic, by = 'GEOID')  %>% 
+  mutate(STATEFP = if_else(is.na(STATEFP),floor(GEOID/100000),STATEFP)) %>% 
+  left_join(fips_place_xwalk, by = c('STATEFP','PLACEFP')) %>% 
+  mutate(COUNTYFP = if_else(is.na(COUNTYFP),COUNTYFP_xwalk,COUNTYFP)) %>% 
+  mutate(cty_fips = 1000*STATEFP+COUNTYFP) %>% 
+  select(-COUNTYFP_xwalk) %>% 
+  left_join(county_cz_xwalk, by = 'cty_fips') %>% 
+  rename(cz = czone) %>% 
+  left_join(sample_czs, by = 'cz') %>% 
+  mutate(sample_130_czs = if_else(is.na(sample_130_czs),  FALSE, TRUE)) %>% 
+  left_join(population, by = c('STATEFP','PLACEFP'))
 
 
 out %>% 
@@ -91,5 +102,3 @@ out %>%
 # check3 <- check3[str_detect(check3$`Area Name (including legal/statistical area description)`,"Cheshire") == TRUE,]
 # %>% 
 #   filter(str_detect(`Ar`)
-
-
