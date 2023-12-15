@@ -1,0 +1,21 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y=New Govs, Number of Municipal Govts  Pooled, Census Region and Decade FEs controls, Urban Population}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}   &\multicolumn{1}{c}{(2)}   &\multicolumn{1}{c}{(3)}   &\multicolumn{1}{c}{(4)}   \\
+\midrule
+GM\_rm\_hat\_raw\_pp    &       1.071***&               &     -0.0623   &               \\
+                    &    (0.0316)   &               &     (0.116)   &               \\
+\addlinespace
+Percentage Point Change in Urban Black Population&               &     -0.0153   &               &     -0.0537   \\
+                    &               &    (0.0920)   &               &    (0.0960)   \\
+\midrule
+F-Stat              &    1151.768   &               &               &               \\
+Observations        &         309   &         237   &         237   &         237   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

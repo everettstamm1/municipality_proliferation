@@ -1,0 +1,24 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y=Number of Special Purpose Districts, Per Capita (1,000) by decade in County 1940-70, with baseline y and division FEs}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{GM  (raw)}&\multicolumn{1}{c}{y\_L0}&\multicolumn{1}{c}{y\_L0}&\multicolumn{1}{c}{y\_L0}\\
+\midrule
+$\hat{GM}$ (raw)    &       0.976***&               &    0.000207   &               \\
+                    &     (0.298)   &               &   (0.00280)   &               \\
+\addlinespace
+GM  (raw)           &               &   -0.000831   &               &    0.000212   \\
+                    &               &  (0.000588)   &               &   (0.00287)   \\
+\midrule
+F-Stat              &      10.055   &               &               &               \\
+R-squared           &               &        .034   &        .031   &               \\
+Dep Var Mean        &        2.69   &        .088   &        .088   &        .088   \\
+Observations        &         714   &         714   &         714   &         714   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

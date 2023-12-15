@@ -1,0 +1,23 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y=Number of Municipal Govts by decade in MSA 1940-70, with baseline y and division FEs}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{GM}&\multicolumn{1}{c}{y\_L1}&\multicolumn{1}{c}{y\_L1}&\multicolumn{1}{c}{y\_L1}\\
+\midrule
+$\hat{GM}$          &       0.544***&               &    -0.00605   &               \\
+                    &    (0.0584)   &               &    (0.0111)   &               \\
+\addlinespace
+GM                  &               &     0.00232   &               &     -0.0111   \\
+                    &               &    (0.0106)   &               &    (0.0202)   \\
+\midrule
+F-Stat              &      18.491   &               &               &               \\
+R-squared           &               &        .431   &        .431   &               \\
+Observations        &         246   &         246   &         246   &         246   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

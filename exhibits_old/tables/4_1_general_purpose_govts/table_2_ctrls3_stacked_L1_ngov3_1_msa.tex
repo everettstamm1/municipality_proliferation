@@ -1,0 +1,23 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y=Incorporations or Home Rule Adoptions, Per Capita (1940) by decade in MSA 1940-70, with baseline y and division FEs}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{GM}&\multicolumn{1}{c}{y\_L1}&\multicolumn{1}{c}{y\_L1}&\multicolumn{1}{c}{y\_L1}\\
+\midrule
+$\hat{GM}$          &       0.530***&               &-0.000000377   &               \\
+                    &    (0.0569)   &               &(0.000000273)   &               \\
+\addlinespace
+GM                  &               & 0.000000185   &               &-0.000000711   \\
+                    &               &(0.000000268)   &               &(0.000000522)   \\
+\midrule
+F-Stat              &       17.34   &               &               &               \\
+R-squared           &               &        .157   &        .162   &               \\
+Observations        &         244   &         244   &         244   &         244   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

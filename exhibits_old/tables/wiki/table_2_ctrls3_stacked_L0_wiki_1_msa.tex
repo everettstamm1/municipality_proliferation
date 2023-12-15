@@ -1,0 +1,23 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y=n\_muni\_msa, Per Capita (1940) by decade in MSA 1940-70, with baseline y and division FEs}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{GM}&\multicolumn{1}{c}{y\_L0}&\multicolumn{1}{c}{y\_L0}&\multicolumn{1}{c}{y\_L0}\\
+\midrule
+$\hat{GM}$          &       0.578***&               &-0.000000295** &               \\
+                    &    (0.0467)   &               &(0.000000148)   &               \\
+\addlinespace
+GM                  &               &-0.000000185   &               &-0.000000510** \\
+                    &               &(0.000000147)   &               &(0.000000255)   \\
+\midrule
+F-Stat              &      27.159   &               &               &               \\
+R-squared           &               &        .133   &         .14   &               \\
+Observations        &         321   &         321   &         321   &         321   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

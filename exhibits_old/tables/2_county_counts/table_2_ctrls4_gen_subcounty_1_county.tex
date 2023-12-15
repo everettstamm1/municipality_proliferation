@@ -1,0 +1,23 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y=Number of Subcounty Govts (town, twp, muni), Per Capita (1940) by County 1940-70, with baseline y, division FEs, and mfg and black mig share}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{GM}&\multicolumn{1}{c}{y}&\multicolumn{1}{c}{y}&\multicolumn{1}{c}{y}\\
+\midrule
+$\hat{GM}$          &       0.428***&               &  0.00000187   &               \\
+                    &    (0.0674)   &               &(0.00000193)   &               \\
+\addlinespace
+GM                  &               &  0.00000834***&               &  0.00000437   \\
+                    &               &(0.00000302)   &               &(0.00000436)   \\
+\midrule
+F-Stat              &      37.166   &               &               &               \\
+R-squared           &               &        .105   &         .07   &               \\
+Dep Var Mean        &         209   &         209   &         209   &         209   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

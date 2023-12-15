@@ -1,0 +1,23 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y=n\_muni\_county1960, Per Capita (1940) by County 1960-70, with baseline y, division FEs, and mfg share}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{GM}&\multicolumn{1}{c}{y}&\multicolumn{1}{c}{y}&\multicolumn{1}{c}{y}\\
+\midrule
+$\hat{GM}$          &       0.464***&               &-0.000000198   &               \\
+                    &    (0.0609)   &               &(0.000000178)   &               \\
+\addlinespace
+GM                  &               &   -5.33e-08   &               &-0.000000427   \\
+                    &               &(0.000000187)   &               &(0.000000382)   \\
+\midrule
+F-Stat              &      14.751   &               &               &               \\
+R-squared           &               &        .068   &        .074   &               \\
+Observations        &         195   &         195   &         195   &         195   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

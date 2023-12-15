@@ -1,0 +1,23 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y=Number of Dependent and Independent School Districts, Per Capita (1940) by decade in CZ 1940-70, with decade FEs and baseline y controls}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{GM}&\multicolumn{1}{c}{y\_L2}&\multicolumn{1}{c}{y\_L2}&\multicolumn{1}{c}{y\_L2}\\
+\midrule
+$\hat{GM}$          &       0.543***&               &   0.0000302   &               \\
+                    &    (0.0675)   &               & (0.0000270)   &               \\
+\addlinespace
+GM                  &               &   0.0000496*  &               &   0.0000557   \\
+                    &               & (0.0000276)   &               & (0.0000489)   \\
+\midrule
+F-Stat              &      36.599   &               &               &               \\
+R-squared           &               &        .199   &        .188   &               \\
+Observations        &         146   &         146   &         146   &         146   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

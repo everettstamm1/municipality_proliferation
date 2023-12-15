@@ -1,0 +1,24 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Dererencourt Table Two with y=Incorporations or Home Rule Adoptions, Per Capita (1,000) by decade in County 1950-70, with baseline y, division FEs, and black mig share}
+\begin{tabular}{l*{4}{c}}
+\toprule
+                    & First Stage   &         OLS   &Reduced Form   &        2SLS   \\
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{GM  (rank)}&\multicolumn{1}{c}{y\_L0}&\multicolumn{1}{c}{y\_L0}&\multicolumn{1}{c}{y\_L0}\\
+\midrule
+$\hat{GM}$ (rank)   &       0.421***&               &  -0.0000119   &               \\
+                    &    (0.0485)   &               & (0.0000141)   &               \\
+\addlinespace
+GM  (rank)          &               & -0.00000500   &               &  -0.0000282   \\
+                    &               & (0.0000144)   &               & (0.0000335)   \\
+\midrule
+F-Stat              &      42.852   &               &               &               \\
+R-squared           &               &        .114   &        .115   &               \\
+Dep Var Mean        &      50.282   &        .011   &        .011   &        .011   \\
+Observations        &         476   &         476   &         476   &         476   \\
+\bottomrule
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}
