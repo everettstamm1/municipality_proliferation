@@ -196,9 +196,8 @@ esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist ///
 
 
 local b_controls reg2 reg3 reg4 blackmig3539_share
-local extra_controls urban_share1940 frac_total transpo_cost_1920 m_rr_sqm_total
+local extra_controls urban_share1940 frac_total transpo_cost_1920
  
-local samp = "urban"
 
 use "$CLEANDATA/cz_pooled", clear
 local vars n10_cgoodman_cz_pc n20_cgoodman_cz_pc n30_cgoodman_cz_pc n40_cgoodman_cz_pc pre_cgoodman_cz_pc
@@ -243,8 +242,6 @@ esttab tsls_`samp' rf_`samp' ///
 local b_controls reg2 reg3 reg4 blackmig3539_share
 local extra_controls urban_share1940 frac_total transpo_cost_1920 m_rr_sqm_total
  
-local samp = "urban"
-
 use "$CLEANDATA/cz_pooled", clear
 local vars n10_cgoodman_cz_pc n20_cgoodman_cz_pc n30_cgoodman_cz_pc n40_cgoodman_cz_pc pre_cgoodman_cz_pc
 	

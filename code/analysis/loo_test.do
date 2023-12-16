@@ -2,26 +2,26 @@ local b_controls reg2 reg3 reg4 blackmig3539_share
 local extra_controls urban_share1940 frac_total transpo_cost_1920
 
 
-foreach outcome in cgoodman {
+foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 	use "$CLEANDATA/cz_pooled", clear
 	labmask cz, values(cz_name)
 	keep if dcourt == 1
 
 	// Getting full sample values
 	// RF
-	reg n_`outcome'_cz_pc GM_hat_raw_pp `b_controls'  `extra_controls' [aw=popc1940], r
+	reg n_`outcome'_cz_pc GM_hat_raw_pp `b_controls'  [aw=popc1940], r
 	local b_rf = _b[GM_hat_raw_pp]
 	local se_rf = _se[GM_hat_raw_pp]
 	
-	ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls'  `extra_controls' [aw=popc1940], r
+	ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls'  [aw=popc1940], r
 	local b_iv = _b[GM_raw_pp]
 	local se_iv = _se[GM_raw_pp]
 	levelsof cz, local(czs)
 	
 	foreach cz in `czs'{
-		qui parmby "reg n_`outcome'_cz_pc GM_hat_raw_pp `b_controls'  `extra_controls' [aw=popc1940] if cz!=`cz', r", lab saving(`"rf`cz'`outcome'"', replace) idn(`cz') ids(vr) ylabel rename(idn vrsn) level(95 99)
+		qui parmby "reg n_`outcome'_cz_pc GM_hat_raw_pp `b_controls'  [aw=popc1940] if cz!=`cz', r", lab saving(`"rf`cz'`outcome'"', replace) idn(`cz') ids(vr) ylabel rename(idn vrsn) level(95 99)
 		
-		qui parmby "ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls'  `extra_controls' [aw=popc1940] if cz!=`cz', r", lab saving(`"iv`cz'`outcome'"', replace) idn(`cz') ids(vr) ylabel rename(idn vrsn) level(95 99)
+		qui parmby "ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls'  [aw=popc1940] if cz!=`cz', r", lab saving(`"iv`cz'`outcome'"', replace) idn(`cz') ids(vr) ylabel rename(idn vrsn) level(95 99)
 		
 	}
 	clear

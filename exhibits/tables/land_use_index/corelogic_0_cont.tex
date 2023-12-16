@@ -1,0 +1,29 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{OLS Estimates, Region FEs, weighted by population}
+\begin{tabular}{l*{3}{c}}
+\toprule
+                    &\multicolumn{1}{c}{Single Family}&\multicolumn{1}{c}{Non-Single Family}&\multicolumn{1}{c}{Apartments}\\
+\midrule
+Destination CZ sample&      0.0404** &     -0.0225   &    -0.00680***\\
+                    &    (0.0188)   &    (0.0244)   &   (0.00145)   \\
+\addlinespace
+Predicted Percentage Point Change in Urban Black Population&     -0.0120   &      0.0157** &     0.00187***\\
+                    &   (0.00826)   &   (0.00703)   &  (0.000652)   \\
+\addlinespace
+samp\_destXGM\_hat    &      0.0105** &     -0.0108** &   -0.000756   \\
+                    &   (0.00445)   &   (0.00446)   &  (0.000594)   \\
+\addlinespace
+Urban Population Share of 1935-39 Black Migrants&      0.0168   &    -0.00219   &    0.000742   \\
+                    &    (0.0301)   &    (0.0299)   &   (0.00363)   \\
+\addlinespace
+Constant            &       0.718***&       0.208***&      0.0148***\\
+                    &    (0.0173)   &    (0.0163)   &   (0.00137)   \\
+\midrule
+Observations        &        7711   &        7711   &        7711   \\
+\bottomrule
+\multicolumn{4}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{4}{l}{\footnotesize Non-Single Family land uses include apartments, multifamily, triplexes, duplexes, townhomes, condos, and mobile homes.}\\
+\multicolumn{4}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

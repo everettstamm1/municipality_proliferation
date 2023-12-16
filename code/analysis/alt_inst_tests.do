@@ -4,19 +4,19 @@ local b_controls reg2 reg3 reg4 blackmig3539_share
 
 use "$CLEANDATA/cz_pooled", clear
 
-foreach outcome in cgoodman schdist_ind spdist gen_subcounty gen_town gen_muni{
+foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 	preserve
-		ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_1940_hat_raw_pp GM_7r_hat_raw_pp GM_r_hat_raw_pp GM_hat_raw_pp) `b_controls' [aw = pop`c'1940], r
+		ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_1940_hat_raw_pp GM_7r_hat_raw_pp GM_r_hat_raw_pp GM_hat_raw_pp) `b_controls' [aw = popc1940], r
 		local hansenj : di %4.2f e(jp)
 		
-		global spec1 (GM_raw_pp = GM_hat_raw_pp)  reg2 reg3 reg4
-		global spec2 (GM_raw_pp = GM_7r_hat_raw_pp)  reg2 reg3 reg4
-		global spec3 (GM_raw_pp = GM_r_hat_raw_pp) reg2 reg3 reg4
-		global spec4 (GM_raw_pp = GM_1940_hat_raw_pp)  reg2 reg3 reg4
+		global spec1 (GM_raw_pp = GM_hat_raw_pp)  `b_controls'
+		global spec2 (GM_raw_pp = GM_7r_hat_raw_pp)  `b_controls'
+		global spec3 (GM_raw_pp = GM_r_hat_raw_pp) `b_controls'
+		global spec4 (GM_raw_pp = GM_1940_hat_raw_pp)  `b_controls'
 		
 		forval spec=1(1)4{
 			tempfile spec`spec'
-			parmby "ivreg2 n_`outcome'_cz_pc ${spec`spec'} [aw = pop`c'1940]", lab saving(`"spec`spec'"', replace) idn(`l') ids(spec) ylabel 
+			parmby "ivreg2 n_`outcome'_cz_pc ${spec`spec'} [aw = popc1940]", lab saving(`"spec`spec'"', replace) idn(`l') ids(spec) ylabel 
 		}
 			
 		drop _all

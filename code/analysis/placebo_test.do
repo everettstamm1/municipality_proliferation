@@ -1,6 +1,6 @@
 local b_controls reg2 reg3 reg4 blackmig3539_share
 
-foreach outcome in cgoodman schdist_ind gen_subcounty spdist gen_town gen_muni{
+foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 	use "$CLEANDATA/cz_pooled", clear
 
 	forval i = 1/1000{

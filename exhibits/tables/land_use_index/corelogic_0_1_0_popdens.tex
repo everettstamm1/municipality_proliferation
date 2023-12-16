@@ -1,0 +1,28 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Pre only: 0, IV: 1, CZ FEs: 0, Weight: popdens}
+\begin{tabular}{l*{9}{c}}
+\toprule
+                    &\multicolumn{1}{c}{sfr}&\multicolumn{1}{c}{townhouse}&\multicolumn{1}{c}{residentialnec}&\multicolumn{1}{c}{duplex}&\multicolumn{1}{c}{apartment}&\multicolumn{1}{c}{condo}&\multicolumn{1}{c}{multifam}&\multicolumn{1}{c}{mobilehome}&\multicolumn{1}{c}{triplex}\\
+\midrule
+above\_x\_med         &      0.0257   &    0.000696   &     -0.0451   &    0.000499   &     0.00462   &      0.0494   &    -0.00798*  &    -0.00973** &    -0.00185   \\
+                    &      (0.48)   &      (0.03)   &     (-0.99)   &      (0.02)   &      (0.54)   &      (1.04)   &     (-1.84)   &     (-2.06)   &     (-0.20)   \\
+\addlinespace
+samp\_destXabove\_x\_med&     -0.0828   &     -0.0356   &      0.0573*  &      0.0326   &     0.00864   &     -0.0190   &     0.00580   &     0.00295   &      0.0117   \\
+                    &     (-1.09)   &     (-1.07)   &      (1.65)   &      (1.08)   &      (1.02)   &     (-0.54)   &      (1.48)   &      (0.71)   &      (1.11)   \\
+\addlinespace
+Destination CZ sample&       0.101*  &      0.0204   &     -0.0737***&     -0.0419*  &    -0.00842   &      0.0345   &    -0.00605*  &    -0.00525   &     -0.0103   \\
+                    &      (1.67)   &      (0.84)   &     (-3.28)   &     (-1.85)   &     (-1.33)   &      (1.47)   &     (-1.92)   &     (-1.46)   &     (-1.18)   \\
+\addlinespace
+Urban Population Share of 1935-39 Black Migrants&      0.0684*  &      0.0546*  &     -0.0630** &     -0.0364***&    -0.00655   &     -0.0144   &    -0.00250   &    -0.00175   &    -0.00619*  \\
+                    &      (1.74)   &      (1.81)   &     (-2.14)   &     (-2.65)   &     (-1.22)   &     (-0.37)   &     (-1.12)   &     (-0.71)   &     (-1.95)   \\
+\addlinespace
+Constant            &       0.717***&      0.0139   &       0.121***&      0.0441** &      0.0123*  &      0.0342   &      0.0120***&      0.0142***&     0.00996   \\
+                    &     (16.64)   &      (1.12)   &      (4.31)   &      (2.04)   &      (1.91)   &      (1.40)   &      (3.43)   &      (3.56)   &      (1.21)   \\
+\midrule
+Observations        &        7566   &        7566   &        7566   &        7566   &        7566   &        7566   &        7566   &        7566   &        7566   \\
+\bottomrule
+\multicolumn{10}{l}{\footnotesize \textit{t} statistics in parentheses}\\
+\multicolumn{10}{l}{\footnotesize * p<0.10, ** p<0.05, *** p<0.01}\\
+\end{tabular}
+\end{table}

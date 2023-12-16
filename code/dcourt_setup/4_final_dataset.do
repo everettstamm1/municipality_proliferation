@@ -145,7 +145,6 @@ STEPS:
 		
 		drop if _merge==2 // Dropping cities in CCDB that do not appear in the 1940 Census list of non-southern cities, see analysis of non-matches above. 
 		drop _merge
-		
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 	*2. Merge in data for instrument.
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
@@ -258,7 +257,7 @@ STEPS:
 		*	1935-1940 white southern migrant location choice X normally distributed random shocks,
 		*	with mean 0 and variance 5, iterated 1000 times.
 
-		
+		/*
 		forval i=1(1)1000{
 		qui merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/rndmig/r`i'_black_prmig_1940_1940_wide_xw.dta" 
 		*keep if _merge==3
@@ -278,7 +277,7 @@ STEPS:
 		}
 		qui rename totblackmigcity3539 vr`i'_totblackmigcity3539
 		}
-		
+		*/
 		/*
 		* Northern CZ measure of 1940 southern county upward mobility: 
 		*	1935-1940 black southern migrant location choice X total observed 1940-1970 net-migration for southern counties,
@@ -312,9 +311,9 @@ STEPS:
 		}	
 		*/
 		
-		keep *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc1940 bpopc1940 popc1970 popc1950 pop1940 bpopc1970 *migcity3539 statefip citycode city city_original cz cz_name wpopc1940 wpopc1970 samp_*
+		keep *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc1940 bpopc1940 popc1970 popc1950 bpopc1970 *migcity3539 statefip citycode city city_original cz cz_name wpopc1940 wpopc1970 samp_*
 		drop if popc1970==.
-		save "$INTDATA/dcourt/GM_city_final_dataset`samptab'.dta", replace
+		//save "$INTDATA/dcourt/GM_city_final_dataset`samptab'.dta", replace
 		
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 	*3. Construct measure of black urban pop change and instrument for black urban in-migration at CZ level.
@@ -338,7 +337,7 @@ STEPS:
 				local levelvar smsa
 			}
 			
-			collapse (sum) *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc* bpopc* pop1940 *migcity3539 wpopc1940 wpopc1970 (max) samp_*, by(`levelvar')
+			collapse (sum) *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc* bpopc* *migcity3539 wpopc1940 wpopc1970 (max) samp_*, by(`levelvar')
 			
 			
 
@@ -382,7 +381,7 @@ STEPS:
 			foreach v in "8"{
 
 			g v`v'_wc_pred1940_1970=100*v`v'_white_actoutmigact/popc1940
-						g v`v'_wcpp_pred1940_1970=100*((v`v'_white_actoutmigact+wpopc1940)/(v`v'_white_actoutmigact + popc1940) - wpopc1940/popc1940)
+			g v`v'_wcpp_pred1940_1970=100*((v`v'_white_actoutmigact+wpopc1940)/(v`v'_white_actoutmigact + popc1940) - wpopc1940/popc1940)
 
 			g v`v'_whitemig3539_share1940=100*v`v'_totwhitemigcity3539/popc1940
 			}
@@ -633,7 +632,12 @@ STEPS:
 		*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 		*7. Create additional 1940 controls. 
 		*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
-			//gen urban_share1940 = popc1940/pop1940
+			
+			merge 1:1 cz using "$RAWDATA/dcourt/clean_cz_population_1940_1970", keep(1 3) keepusing(pop1940 pop1950 pop1960 pop1970) nogen
+			merge 1:1 cz using "$RAWDATA/dcourt/clean_cz_population_density_1940.dta", keepusing(pop_density1940) keep(1 3) nogen
+			di "here"
+			g urban_share1940 = popc1940/pop1940
+			g ln_pop_dens1940= log(pop_density1940)			
 				
 				*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 			*8. Label key variables and save final dataset. 

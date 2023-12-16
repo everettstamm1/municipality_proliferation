@@ -1,43 +1,43 @@
 \begin{table}[htbp]\centering
 \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
 \caption{ \label{tab1}}
-\begin{tabular}{l*{4}{c}}
+\begin{tabular}{l*{6}{c}}
 \toprule
-                    &\multicolumn{1}{c}{Full Sample}&\multicolumn{1}{c}{Northern Sample}&\multicolumn{1}{c}{Full Sample, pre-1940}&\multicolumn{1}{c}{Northern Sample, pre-1940}\\
+                    &\multicolumn{1}{c}{Full Sample}&\multicolumn{1}{c}{Northern Sample}&\multicolumn{1}{c}{Full Sample, pre-1970}&\multicolumn{1}{c}{Northern Sample, pre-1970}&\multicolumn{1}{c}{Dest Sample}&\multicolumn{1}{c}{Dest Sample, pre-1970}\\
 \midrule
-landuse\_sfr         &      0.0504\sym{*}  &      0.0922\sym{**} &      0.0621\sym{*}  &       0.114\sym{**} \\
-                    &      (2.36)         &      (2.93)         &      (2.28)         &      (3.00)         \\
+landuse\_sfr         &      0.0539\sym{*}  &       0.104\sym{**} &      0.0606\sym{*}  &       0.113\sym{**} &       0.104\sym{**} &       0.113\sym{**} \\
+                    &      (2.17)         &      (2.86)         &      (2.21)         &      (2.92)         &      (2.86)         &      (2.92)         \\
 \addlinespace
-landuse\_townhouse   &    -0.00575         &     -0.0106         &    -0.00385         &    -0.00686         \\
-                    &     (-0.89)         &     (-1.08)         &     (-0.48)         &     (-0.56)         \\
+landuse\_townhouse   &    -0.00130         &    -0.00350         &    -0.00295         &    -0.00541         &    -0.00350         &    -0.00541         \\
+                    &     (-0.18)         &     (-0.31)         &     (-0.36)         &     (-0.44)         &     (-0.31)         &     (-0.44)         \\
 \addlinespace
-landuse\_residentialnec&     -0.0164\sym{**} &    -0.00959         &     -0.0188\sym{**} &     -0.0118         \\
-                    &     (-3.04)         &     (-1.54)         &     (-3.11)         &     (-1.63)         \\
+landuse\_residentialnec&     -0.0178\sym{**} &     -0.0113         &     -0.0190\sym{**} &     -0.0121         &     -0.0113         &     -0.0121         \\
+                    &     (-3.09)         &     (-1.63)         &     (-3.12)         &     (-1.66)         &     (-1.63)         &     (-1.66)         \\
 \addlinespace
-landuse\_duplex      &     -0.0202\sym{*}  &     -0.0360\sym{**} &     -0.0275\sym{**} &     -0.0452\sym{**} \\
-                    &     (-2.55)         &     (-2.88)         &     (-2.66)         &     (-2.94)         \\
+landuse\_duplex      &     -0.0240\sym{*}  &     -0.0420\sym{**} &     -0.0278\sym{**} &     -0.0459\sym{**} &     -0.0420\sym{**} &     -0.0459\sym{**} \\
+                    &     (-2.55)         &     (-2.86)         &     (-2.66)         &     (-2.96)         &     (-2.86)         &     (-2.96)         \\
 \addlinespace
-landuse\_apartment   &    -0.00542\sym{**} &     -0.0108\sym{***}&    -0.00815\sym{***}&     -0.0142\sym{***}\\
-                    &     (-2.93)         &     (-4.03)         &     (-3.54)         &     (-4.53)         \\
+landuse\_apartment   &    -0.00688\sym{**} &     -0.0131\sym{***}&    -0.00823\sym{***}&     -0.0144\sym{***}&     -0.0131\sym{***}&     -0.0144\sym{***}\\
+                    &     (-3.23)         &     (-4.35)         &     (-3.54)         &     (-4.56)         &     (-4.35)         &     (-4.56)         \\
 \addlinespace
-landuse\_condo       &      0.0154         &    -0.00121         &      0.0144         &    -0.00773         \\
-                    &      (1.73)         &     (-0.11)         &      (1.42)         &     (-0.63)         \\
+landuse\_condo       &      0.0133         &    -0.00701         &      0.0156         &    -0.00621         &    -0.00701         &    -0.00621         \\
+                    &      (1.38)         &     (-0.60)         &      (1.52)         &     (-0.50)         &     (-0.60)         &     (-0.50)         \\
 \addlinespace
-landuse\_multifam    &    -0.00110         &    -0.00155         &    -0.00217         &    -0.00252         \\
-                    &     (-1.03)         &     (-1.22)         &     (-1.84)         &     (-1.71)         \\
+landuse\_multifam    &    -0.00141         &    -0.00173         &    -0.00184         &    -0.00198         &    -0.00173         &    -0.00198         \\
+                    &     (-1.29)         &     (-1.33)         &     (-1.62)         &     (-1.45)         &     (-1.33)         &     (-1.45)         \\
 \addlinespace
-landuse\_mobilehome  &    -0.00661\sym{***}&    -0.00197\sym{***}&    -0.00262\sym{***}&  -0.0000739         \\
-                    &    (-10.24)         &     (-3.33)         &     (-4.65)         &     (-0.14)         \\
+landuse\_mobilehome  &    -0.00346\sym{***}&   -0.000446         &    -0.00263\sym{***}&  -0.0000961         &   -0.000446         &  -0.0000961         \\
+                    &     (-6.06)         &     (-0.81)         &     (-4.64)         &     (-0.18)         &     (-0.81)         &     (-0.18)         \\
 \addlinespace
-landuse\_triplex     &    -0.00401         &    -0.00892\sym{*}  &    -0.00614\sym{*}  &     -0.0118\sym{**} \\
-                    &     (-1.65)         &     (-2.39)         &     (-1.96)         &     (-2.58)         \\
+landuse\_triplex     &    -0.00518         &     -0.0109\sym{*}  &    -0.00623\sym{*}  &     -0.0120\sym{**} &     -0.0109\sym{*}  &     -0.0120\sym{**} \\
+                    &     (-1.81)         &     (-2.50)         &     (-1.97)         &     (-2.60)         &     (-2.50)         &     (-2.60)         \\
 \midrule
-Observations        &                     &                     &                     &                     \\
+Observations        &                     &                     &                     &                     &                     &                     \\
 \bottomrule
-\multicolumn{5}{l}{\footnotesize \textit{t} statistics in parentheses}\\
-\multicolumn{5}{l}{\footnotesize Weighted by population}\\
-\multicolumn{5}{l}{\footnotesize Each value is a regression of the share of area zoned for a specific use on a dummy}\\
-\multicolumn{5}{l}{\footnotesize for being a municipality incorporated between 1940-70 in one of the 130 destination CZs}\\
-\multicolumn{5}{l}{\footnotesize \sym{*} \(p<0.05\), \sym{**} \(p<0.01\), \sym{***} \(p<0.001\)}\\
+\multicolumn{7}{l}{\footnotesize \textit{t} statistics in parentheses}\\
+\multicolumn{7}{l}{\footnotesize Weighted by population density}\\
+\multicolumn{7}{l}{\footnotesize Each value is a regression of the share of area zoned for a specific use on a dummy}\\
+\multicolumn{7}{l}{\footnotesize for being a municipality incorporated between 1940-70 in one of the 130 destination CZs}\\
+\multicolumn{7}{l}{\footnotesize \sym{*} \(p<0.05\), \sym{**} \(p<0.01\), \sym{***} \(p<0.001\)}\\
 \end{tabular}
 \end{table}
