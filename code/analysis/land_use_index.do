@@ -68,152 +68,7 @@ lab var weight_pop "Weighted by population"
  
 g weight_popdens = population/ALAND
 lab var weight_pop "Weighted by population density"
-/*
-foreach w in none full metro{ 
-    local wlab: variable label weight_`w'  
-	eststo clear
-	forv s=1/6 {
-	    if "`s'"=="1" local samp samp_full
-		if "`s'"=="2" local samp samp_nonsouthern
-	    if "`s'"=="3" local samp samp_full_pre
-	    if "`s'"=="4" local samp samp_nonsouthern_pre
-		if "`s'"=="5" local samp samp_dest
-		if "`s'"=="6" local samp samp_dest_pre
 
-		preserve
-			local lab: variable label `samp'  
-			foreach covar of varlist LPPI18 SPII18 LPAI18 LZAI18 SRI18 DRI18 EI18 AHI18 ADI18 WRLURI18 {
-				local clab: variable label `covar'  		
-				g `covar'_t = `covar'
-				lab var `covar'_t "`clab'"
-				replace `covar' = `samp'
-				qui eststo `covar'`s': reg `covar'_t `covar' [aw=weight_`w'], r
-
-				
-			}
-
-			eststo tests`s' : appendmodels LPPI18`s' SPII18`s' LPAI18`s' LZAI18`s' SRI18`s' DRI18`s' EI18`s' AHI18`s' ADI18`s' WRLURI18`s'
-			
-		restore
-			
-	}
-	esttab tests1 tests2 tests3 tests4 tests5 tests6 using "$TABS/land_use_index/wharton_weight_`w'.tex", booktabs nonumber label replace lines ///
-				title("`s'"\label{tab1}) ///
-				mtitles("Full Sample" "Northern Sample" "Full Sample, pre-1970" "Northern Sample, pre-1970" "Dest Sample" "Dest Sample, pre-1970") ///
-				note("`wlab'")
-	
-}
-
-
-// Corelogic vars
-
-foreach w in none pop{ 
-    local wlab: variable label weight_`w'  
-	eststo clear
-	forv s=1/6 {
-	    if "`s'"=="1" local samp samp_full
-		if "`s'"=="2" local samp samp_nonsouthern
-	    if "`s'"=="3" local samp samp_full_pre
-	    if "`s'"=="4" local samp samp_nonsouthern_pre
-		if "`s'"=="5" local samp samp_dest
-		if "`s'"=="6" local samp samp_dest_pre
-		
-		preserve
-			local lab: variable label `samp'  
-			foreach covar of varlist landuse_* {
-				local clab: variable label `covar'  		
-				g `covar'_t = `covar'
-				lab var `covar'_t "`clab'"
-				replace `covar' = `samp'
-				qui eststo `covar': reg `covar'_t `covar'  [aw=weight_`w'], r
-				local p = 2*ttail(e(df_r),abs(_b[`covar']/_se[`covar']))
-				di "`covar' p value : `p'"
-				
-			}
-
-			eststo tests`s' : appendmodels landuse_sfr landuse_townhouse landuse_residentialnec landuse_duplex landuse_apartment landuse_condo landuse_multifam landuse_mobilehome landuse_triplex 
-		restore
-			
-	}
-	esttab tests1 tests2 tests3 tests4 tests5 tests6 using "$TABS/land_use_index/corelogic_weight_`w'.tex", booktabs nonumber label replace lines ///
-				title("`s'"\label{tab1}) ///
-				mtitles("Full Sample" "Northern Sample" "Full Sample, pre-1970" "Northern Sample, pre-1970" "Dest Sample" "Dest Sample, pre-1970") ///
-				addnotes("`wlab'" "Each value is a regression of the share of area zoned for a specific use on a dummy" "for being a municipality incorporated between 1940-70 in one of the 130 destination CZs")
-	
-}
-
-foreach w in none full metro{ 
-    local wlab: variable label weight_`w'  
-	eststo clear
-	forv s=1/6 {
-	    if "`s'"=="1" local samp samp_full
-		if "`s'"=="2" local samp samp_nonsouthern
-	    if "`s'"=="3" local samp samp_full_pre
-	    if "`s'"=="4" local samp samp_nonsouthern_pre
-		if "`s'"=="5" local samp samp_dest
-		if "`s'"=="6" local samp samp_dest_pre
-		preserve
-			local lab: variable label `samp'  
-			foreach covar of varlist LPPI18 SPII18 LPAI18 LZAI18 SRI18 DRI18 EI18 AHI18 ADI18 WRLURI18 {
-				local clab: variable label `covar'  		
-				g `covar'_t = `covar'
-				lab var `covar'_t "`clab'"
-				replace `covar' = `samp'
-				qui eststo `covar'`s': reghdfe `covar'_t `covar' [aw=weight_`w'], vce(cl cz) absorb(cz region)
-
-				
-			}
-
-			eststo tests`s' : appendmodels LPPI18`s' SPII18`s' LPAI18`s' LZAI18`s' SRI18`s' DRI18`s' EI18`s' AHI18`s' ADI18`s' WRLURI18`s'
-			
-		restore
-			
-	}
-	esttab tests1 tests2 tests3 tests4 tests5 tests6 using "$TABS/land_use_index/wharton_weight_`w'_czfes.tex", booktabs nonumber label replace lines ///
-				title("`s'"\label{tab1}) ///
-				mtitles("Full Sample" "Northern Sample" "Full Sample, pre-1970" "Northern Sample, pre-1970" "Dest Sample" "Dest Sample, pre-1970") ///
-				note("`wlab'")
-	
-}
-
-
-// Corelogic vars
-
-
-foreach w in none pop{ 
-    local wlab: variable label weight_`w'  
-	eststo clear
-	forv s=1/6 {
-	    if "`s'"=="1" local samp samp_full
-		if "`s'"=="2" local samp samp_nonsouthern
-	    if "`s'"=="3" local samp samp_full_pre
-	    if "`s'"=="4" local samp samp_nonsouthern_pre
-		if "`s'"=="5" local samp samp_dest
-		if "`s'"=="6" local samp samp_dest_pre
-		preserve
-			local lab: variable label `samp'  
-			foreach covar of varlist landuse_* {
-				local clab: variable label `covar'  		
-				g `covar'_t = `covar'
-				lab var `covar'_t "`clab'"
-				replace `covar' = `samp'
-				qui eststo `covar': reghdfe `covar'_t `covar'  [aw=weight_`w'], absorb(cz region) vce(cl cz)
-				local p = 2*ttail(e(df_r),abs(_b[`covar']/_se[`covar']))
-				di "`covar' p value : `p'"
-				
-			}
-
-			eststo tests`s' : appendmodels landuse_sfr landuse_townhouse landuse_residentialnec landuse_duplex landuse_apartment landuse_condo landuse_multifam landuse_mobilehome landuse_triplex
-		restore
-			
-	}
-	esttab tests1 tests2 tests3 tests4 tests5 tests6 using "$TABS/land_use_index/corelogic_weight_`w'_czfes.tex", booktabs nonumber label replace lines ///
-				title("`s'"\label{tab1}) ///
-				mtitles("Full Sample" "Northern Sample" "Full Sample, pre-1970" "Northern Sample, pre-1970" "Dest Sample" "Dest Sample, pre-1970") ///
-				addnotes("`wlab'" "Each value is a regression of the share of area zoned for a specific use on a dummy" "for being a municipality incorporated between 1940-70 in one of the 130 destination CZs" "Includes census region and CZ fixed effects")
-	
-}
-*/
 preserve
 	use "$CLEANDATA/cz_pooled", clear
 	keep if dcourt == 1
@@ -338,111 +193,97 @@ forv iv=0/1{
 }
 
 
-/*
-foreach w in none pop  popdens{ 
-    local wlab: variable label weight_`w'  
-	eststo clear
-		
-	foreach covar of varlist landuse_* {
-		local mname = subinstr("`covar'","landuse_", "",.)
-		lab var `covar' "`mname'"
-		eststo `covar' : reg `covar' samp_dest above_inst_med samp_destXabove_z_med [aw=weight_`w'], r
-	}
+
+ren STATEFP fips_state
+ren PLACEFP fips_place_2002
+merge 1:1 fips_state fips_place_2002 using "$INTDATA/census/IndFin12", keep(1 3) nogen
 
 
-	esttab using "$TABS/land_use_index/corelogic_weight_`w'_reg_int.tex", booktabs nonumber label replace lines ///
-				title("`s'"\label{tab1}) 
-	
+foreach tax of varlist finesandforfeits totchgsandmiscrev specialassessments liquorstoresrevenue{
+    g pct_rev_`tax' = `tax'/totalrevenue
 }
 
-/*
-coefficient interpretation
-dest_samp: effect of being incorporated between 1940-70
-above_inst_med: Difference in intercept between above vs below median GM_hat_raw_pp
-samp_destXabove_z_med: Difference in effect of being incorporated between 1940-70 for above and below median GM_hat_raw_pp
-
-*/
-
-
-foreach w in none pop popdens{ 
-    local wlab: variable label weight_`w'  
-	eststo clear
-		
-	foreach covar of varlist landuse_* {
-		local mname = subinstr("`covar'","landuse_", "",.)
-		lab var `covar' "`mname'"
-		eststo `covar' : ivreg2 `covar' samp_dest (above_x_med samp_destXabove_x_med = above_inst_med samp_destXabove_z_med) [aw=weight_`w'], r
-	}
-
-
-	esttab using "$TABS/land_use_index/corelogic_weight_`w'_ivreg_int.tex", booktabs nonumber label replace lines ///
-				title("`s'"\label{tab1}) 
-	
+foreach spend of varlist correcttotalexp  policeprottotalexp  publicwelftotalexp totalinterestondebt{
+    g pct_spend_`spend' = `spend'/totalexpenditure
 }
 
-
-foreach w in none pop  popdens{ 
-    local wlab: variable label weight_`w'  
+forv iv=0/1{
+	if "`iv'"=="0" local mod "Reduced Form"
+	if "`iv'"=="1" local mod "IV"
 	eststo clear
-		
-	foreach covar of varlist landuse_* {
-		local mname = subinstr("`covar'","landuse_", "",.)
-		lab var `covar' "`mname'"
-		eststo `covar' : reghdfe `covar' samp_dest above_inst_med samp_destXabove_z_med [aw=weight_`w'], absorb(cz region) vce(cl cz)
+	foreach covar of varlist pct_rev_finesandforfeits pct_rev_totchgsandmiscrev pct_rev_specialassessments pct_rev_liquorstoresrevenue pct_spend_correcttotalexp  pct_spend_policeprottotalexp  pct_spend_publicwelftotalexp pct_spend_totalinterestondebt{
+
+		if "`iv'"=="1"{
+			 eststo : ivreghdfe `covar' samp_dest (above_x_med samp_destXabove_x_med = above_inst_med samp_destXabove_z_med) blackmig3539_share [aw=weight_pop], absorb(region) cl(cz)
+
+		}
+		else{
+			 eststo : reghdfe `covar' above_inst_med samp_destXabove_z_med samp_dest blackmig3539_share [aw=weight_pop], vce(cl cz) absorb(region)
+		}
 	}
 
 
-	esttab using "$TABS/land_use_index/corelogic_weight_`w'_reg_int_czfes.tex", booktabs nonumber label replace lines ///
-				title("`s'"\label{tab1}) 
-	
+	esttab using "$TABS/land_use_index/IndFin12_`iv'.tex", label booktabs nonumber replace lines se ///
+				title("`mod' Estimates, Region FEs, weighted by population") starlevels( * 0.10 ** 0.05 *** 0.01) ///
+				keep(above_*_med samp_*) mgroups("Percent of Revenues" "Percent of Expenditures", pattern(1 0 0 0 1 0 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) ///
+				mtitles("Fines/Forfeits" "Charges" "Special Assessments" "Liquor Store" "Correctional" "Police" "Welfare" "Interest on Debt")
 }
 
 
 
-foreach w in none pop popdens{ 
-    local wlab: variable label weight_`w'  
+preserve
+	use "$INTDATA/cog/4_1_general_purpose_govts", clear
+	keep if ID_type == 2 & fips_place_2002<. // Keeping only munis
+	ren hous_com_dev_* hcd_*
+	encode govt_body_employment_status, gen(temp)
+	drop govt_body_employment_status
+	ren temp govt_body_employment_status
+	
+	//drop if home_rule_charter == . & govt_body_employment_status == . & type_govt_body_compensation == . & law_enforce_not_prov == . & hcd_not_prov == . 
+	foreach var of varlist home_rule_charter type_govt_body_compensation govt_body_employment_status law_enforce_* hcd_* {
+	    bys fips_place_2002 fips_state (`var') : replace `var' = `var'[1]
+	}
+	keep fips_place_2002 fips_state home_rule_charter law_enforce_* hcd_* govt_body_employment_status type_govt_body_compensation
+	
+	duplicates drop
+	
+	g salaried = type_govt_body_compensation==1
+	g full_time = govt_body_employment_status==1
+	egen hcd_provided = rowmin(hcd_prov_directly hcd_cont_out hcd_cont_w_priv_sect hcd_cont_w_oth_govt hcd_owned_and_cont hcd_not_owned_but_cont)
+	egen law_enforce_self = rowmin(law_enforce_prov_directly law_enforce_cont_w_priv_sect)
+	
+	keep hcd_provided hcd_not_prov law_enforce_self law_enforce_not_prov law_enforce_prov_directly law_enforce_cont_w_oth_govt full_time salaried home_rule_charter fips_state fips_place_2002
+	
+	foreach var of varlist home_rule_charter law_enforce_not_prov hcd_not_prov law_enforce_not_prov law_enforce_prov_directly law_enforce_cont_w_oth_govt{
+		replace `var' = mod(`var',2)
+	}
+	ren fips_place_2002 PLACEFP 
+	ren fips_state STATEFP
+	
+	tempfile cog_directory
+	save `cog_directory'
+restore
+
+merge 1:1 STATEFP PLACEFP using `cog_directory', keep(1 3) nogen
+
+
+forv iv=0/1{
+	if "`iv'"=="0" local mod "Reduced Form"
+	if "`iv'"=="1" local mod "IV"
 	eststo clear
-		
-	foreach covar of varlist landuse_* {
-		local mname = subinstr("`covar'","landuse_", "",.)
-		lab var `covar' "`mname'"
-		eststo `covar' : ivreghdfe `covar' samp_dest (above_x_med samp_destXabove_x_med = above_inst_med samp_destXabove_z_med) [aw=weight_`w'], absorb(cz region) cl(cz)
+	foreach covar of varlist home_rule_charter hcd_provided hcd_not_prov law_enforce_self law_enforce_not_prov law_enforce_prov_directly law_enforce_cont_w_oth_govt full_time salaried  {
+
+		if "`iv'"=="1"{
+			 eststo `covar' : ivreghdfe `covar' samp_dest (above_x_med samp_destXabove_x_med = above_inst_med samp_destXabove_z_med) blackmig3539_share [aw=weight_pop], absorb(region) cl(cz)
+
+		}
+		else{
+			 eststo `covar' : reghdfe `covar' above_inst_med samp_destXabove_z_med samp_dest blackmig3539_share [aw=weight_pop], vce(cl cz) absorb(region)
+		}
 	}
 
 
-	esttab using "$TABS/land_use_index/corelogic_weight_`w'_ivreg_int_czfes.tex", booktabs nonumber label replace lines ///
-				title("`s'"\label{tab1}) 
-	
+	esttab using "$TABS/land_use_index/directory_surveys_`iv'.tex", booktabs nonumber replace lines se ///
+				title("`mod' Estimates, Region FEs, weighted by population") starlevels( * 0.10 ** 0.05 *** 0.01) ///
+				keep(above_*_med samp_*)
 }
-
-
-
-
-
-// Notes for later:
-basic model: sample of just destination CZs, reg landuse samp_dest above_z_med samp_dest*above_z_med, r cl(cz)
-iv model: sample of just destination CZs, ivreg2 landuse samp_dest (above_z_med samp_dest*above_z_med = above_x_med samp_dest*above_x_med), r cl(cz)
-
-
-drop if yr_incorp>1970
-g time = 1 if yr_incorp <1940
-replace time = 2 if yr_incorp>=1940 & yr_incorp<=1970
-
-g treat = 2*above_inst_med
- 
-
-
-foreach w in none pop{ 
-    local wlab: variable label weight_`w'  
-	eststo clear
-		
-	foreach covar of varlist landuse_sfr landuse_m? {
-		eststo `covar' : csdid `covar' i.region [weight=weight_`w'], time(time) gvar(treat)
-	}
-
-
-	esttab using "$TABS/land_use_index/corelogic_weight_`w'_csdid_int.tex", booktabs nonumber label replace lines ///
-				title("`s'"\label{tab1})   starlevels( * 0.10 ** 0.05 *** 0.01)
-	
-}
-
