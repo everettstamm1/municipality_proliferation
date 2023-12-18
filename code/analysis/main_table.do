@@ -1,11 +1,12 @@
 
 
 local b_controls reg2 reg3 reg4 blackmig3539_share
-local extra_controls urban_share1940 frac_total transpo_cost_1920
+local extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
 
 use "$CLEANDATA/cz_pooled", clear
 keep if dcourt == 1
 
+g order = frac_total^2
 lab var GM_hat_raw_pp "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
 
@@ -287,8 +288,7 @@ eststo clear
 	eststo clear
 	
 // Quadratic Effect
-use "$CLEANDATA/cz_pooled", clear
-keep if dcourt == 1
+
 
 lab var GM_hat_raw_pp "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
@@ -367,14 +367,10 @@ esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist iv_totfrac  
 eststo clear
 
 
-use "$CLEANDATA/cz_pooled", clear
-keep if dcourt == 1
-
 lab var GM_hat_raw_pp "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
 
-g GM_raw_pp_2 = GM_raw_pp^2
-g GM_hat_raw_pp_2 = GM_hat_raw_pp^2
+
 
 eststo clear
 foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
@@ -446,8 +442,7 @@ esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist iv_totfrac  
 
 eststo clear
 	
-use "$CLEANDATA/cz_pooled", clear
-keep if dcourt == 1
+
 
 lab var GM_hat_raw_pp "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
@@ -455,8 +450,7 @@ lab var GM_raw_pp "GM"
 	
 
 //1950-70
-use "$CLEANDATA/cz_pooled", clear
-keep if dcourt == 1
+
 
 lab var GM_hat_raw_pp "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
@@ -530,8 +524,6 @@ lab var GM_raw_pp "GM"
 		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
 	eststo clear
 
-use "$CLEANDATA/cz_pooled", clear
-keep if dcourt == 1
 
 lab var GM_hat_raw_pp "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
@@ -607,8 +599,8 @@ lab var GM_raw_pp "GM"
 		eststo clear
 
 // Long differences
-use "$CLEANDATA/cz_pooled", clear
-keep if dcourt == 1
+
+
 
 lab var GM_hat_raw_pp "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
@@ -685,8 +677,7 @@ lab var GM_raw_pp "GM"
 
 
 
-use "$CLEANDATA/cz_pooled", clear
-keep if dcourt == 1
+
 
 lab var GM_hat_raw_pp "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
@@ -763,8 +754,6 @@ eststo clear
 
 		
 
-use "$CLEANDATA/cz_pooled", clear
-keep if dcourt == 1
 
 lab var GM_hat "$\widehat{GM}$ Percentile"
 lab var GM "GM Percentile"
@@ -838,8 +827,7 @@ lab var GM "GM Percentile"
 
 		eststo clear		
 
-use "$CLEANDATA/cz_pooled", clear
-keep if dcourt == 1
+
 
 lab var GM_hat "$\widehat{GM}$ Percentile"
 lab var GM "GM Percentile"
@@ -918,8 +906,7 @@ lab var GM "GM Percentile"
 		
 		
 // White inst
-use "$CLEANDATA/cz_pooled", clear
-keep if dcourt == 1
+
 local b_controls reg2 reg3 reg4 v8_whitemig3539_share1940
 
 lab var GM_hat_raw_pp "$\widehat{GM}$"
@@ -996,8 +983,6 @@ eststo clear
 
 
 
-use "$CLEANDATA/cz_pooled", clear
-keep if dcourt == 1
 
 lab var GM_8_hat_raw_pp "$\widehat{WM}$"
 lab var WM_raw_pp "WM"

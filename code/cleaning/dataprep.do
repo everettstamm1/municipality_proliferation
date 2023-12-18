@@ -366,12 +366,12 @@ foreach level in cz {
 		
 		
 		foreach geog in land total{
-			qui su frac_`geog' if GM_raw_pp < .,d
-			g above_med_temp = frac_`geog'>=`r(p50)' if  GM_raw_pp < . 
-			bys `levelvar' : egen above_med_`geog' = max(above_med_temp)
-			drop above_med_temp
-			
-			
+			foreach tail in 90 95 {
+				qui su frac_`geog' if GM_raw_pp < .,d
+				g temp = frac_`geog'>=`r(p`tail')' if GM_raw_pp < . 
+				bys `levelvar' : egen p`tail'_`geog' = max(temp)
+				drop temp
+			}
 		}
 		
 		if "`level'" == "cz"{
@@ -466,6 +466,11 @@ foreach level in cz {
 		
 		lab var frac_land "Fraction of CZ land incorporated"
 		lab var frac_total "Fraction of CZ area incorporated"
+		lab var p90_total "Above 90th percentile area incorporated"
+		lab var p95_total "Above 95th percentile area incorporated"
+		lab var p90_land "Above 90th percentile land incorporated"
+		lab var p95_land "Above 95th percentile land incorporated"
+		
 		cap lab var cz "Commuting Zone (1990)"
 		cap lab var fips "County FIPS Code"
 		

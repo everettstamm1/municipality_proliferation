@@ -11,4 +11,4 @@ twoway pcarrow order cz_prop_white order cz_new_prop_white || ///
 		(scatter order namepos, ms(none) mlabel(cz_name) mlabpos(9) mlabsize(2) mlabcol(black)),  ///
 		yla(none) yti("") legend(cols(1) order(1 "1940-1970 Newly Incorporated Municipalities" 2 "CZ Total" )) ///
 		 xtitle("Proportion of Population White, 1970") ysize(9) xscale(range(65 100)) xla(65(5)100) graphregion(color(white))
-graph export "$FIGS/pcarrow_figure.png", replace
+graph export "$FIGS/pcarrow_figure.pdf", replace as(pdf)

@@ -26,25 +26,18 @@
 
 \section{MAIN}
 \input{tables/balancetables/balancetable}
-
-\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effects of Black Migration on Local Government Fragmentation}
-\input{tables/final/region_effect.tex}
-{\caption*{\begin{scriptsize} "\(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)"\end{scriptsize}}} \end{threeparttable} \end{table}
 \clearpage
-
-\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effects of Black Migration on Local Government Fragmentation}
-\input{tables/final/nsf.tex}
-{\caption*{\begin{scriptsize} "\(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)"\end{scriptsize}}} \end{threeparttable} \end{table}
+\input{tables/balancetables/pretrends}
 \clearpage
-
-
+\input{tables/balancetables/pretrends_new_ctrls}
+\clearpage
 \begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effects of change in Black Migration on Municipal Proliferation}
 \input{tables/final/main_effect.tex}
 {\caption*{\begin{scriptsize} "\(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)"\end{scriptsize}}} \end{threeparttable} \end{table}
 \clearpage
 
 
-\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effects of change in Black Migration on Municipal Proliferation, new controls}
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effects of change in Black Migration on Municipal Proliferation, Balanced Controls}
 \input{tables/final/main_effect_new_ctrl.tex}
 {\caption*{\begin{scriptsize} "\(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)"\end{scriptsize}}} \end{threeparttable} \end{table}
 \clearpage
@@ -56,7 +49,7 @@
 \clearpage
 
 
-\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effects of change in Black Migration on Municipal Proliferation, European Migration Control, new controls}
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effects of change in Black Migration on Municipal Proliferation, European Migration Control, Balanced Controls}
 \input{tables/final/main_effect_eurmig_new_ctrl.tex}
 {\caption*{\begin{scriptsize} "\(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)"\end{scriptsize}}} \end{threeparttable} \end{table}
 \clearpage
@@ -67,7 +60,7 @@
 \input{tables/final/main_effect_pctile.tex}
 {\caption*{\begin{scriptsize} "\(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)"\end{scriptsize}}} \end{threeparttable} \end{table}
 
-\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effects of change in Black Migration on Municipal Proliferation, Percentile Rank, new controls}
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effects of change in Black Migration on Municipal Proliferation, Percentile Rank, Balanced Controls}
 \input{tables/final/main_effect_pctile_new_ctrl.tex}
 {\caption*{\begin{scriptsize} "\(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)"\end{scriptsize}}} \end{threeparttable} \end{table}
 
@@ -78,7 +71,7 @@
 
 
 \clearpage
-\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effects of change in Black Migration on Municipal Proliferation, 1950-70, new controls}
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effects of change in Black Migration on Municipal Proliferation, 1950-70, Balanced Controls}
 \input{tables/final/main_effect_1950_1970_new_ctrl.tex}
 {\caption*{\begin{scriptsize} "\(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)"\end{scriptsize}}} \end{threeparttable} \end{table}
 
@@ -91,7 +84,7 @@
 
 
 \clearpage
-\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effects of change in White Migration on Municipal Proliferation, new controls}
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effects of change in White Migration on Municipal Proliferation, Balanced Controls}
 \input{tables/final/white_effect_new_ctrl.tex}
 {\caption*{\begin{scriptsize} "\(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)"\end{scriptsize}}} \end{threeparttable} \end{table}
 
@@ -107,196 +100,16 @@
 \clearpage
 
 
-\begin{table}[ht]
-\centering
-\caption{\textbf{Robustness of Effects on Municipalities to the Inclusion of Baseline Controls}}
-\begin{threeparttable}
-\input{tables/exogeneity_tests/cgoodman_table}
-\begin{tablenotes}\footnotesize
-\item Column (3) of this table replicates Panel D Column (1) of asdfa. The remainder of the columns in the table alter specification choices to test for the stability of the point estimates  to the inclusion of various baseline controls... * \(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)
-\end{tablenotes}
-\end{threeparttable}
-\end{table}
+\clearpage
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effects of change in Black Migration on Municipal Proliferation, Quadratic Term}
+\input{tables/final/main_effect_quad.tex}
+{\caption*{\begin{scriptsize} "\(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)"\end{scriptsize}}} \end{threeparttable} \end{table}
 
 \clearpage
-
-\subsection{Alternative Instrument Tables}
-\begin{landscape}
-\begin{table}[ht]
-\centering
-\caption{\textbf{Robustness of Effects on Municipalities to Alternative Specifications}}
-\begin{threeparttable}
-\input{tables/exogeneity_tests/cgoodman_table_insts}
-\begin{tablenotes}\footnotesize
-\item Column (3) adjusts the outcome variable by total population, rather than urban population. Columns (4), (5), (6), and (7) are th: Column (4) uses an instrument residualized on southern state fixed effects. This accounts for shocks correlated between southern states and non-southern destinations. Column (5) drops the 15 southern counties coded as central in MSAs with a 1990 population over one million before constructing the instrument. This accounts for shocks correlated across both southern and non-southern urban areas. Column (6) constructs the migration links using southern state of birth of recent black migrants. Column (7) uses southern white migrants as the instrument and endogeneous variable to validate that this phenomenon is regarding Black southern migrants, not just any southern migrants. Columns (8), (9), (10), and (11) use the 1940 full count census from IPUMS [cite ipums], rather than the intermediate/cleaned version used in , to construct the destination sample, which allows us to allow us to modify the sample in two important ways. Column (8) validates the use of this sample, the specification is otherwise equivalent to column (1). Column (9) switches Texas from a southern to a non-southern city. Column (10) uses rural migrants only, defined as having reported moving from outside of an incorporated city between 1935-40. Column (11) employs both northern Texas and rural migrants only.  * \(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)
-\end{tablenotes}
-\end{threeparttable}
-\label{tab:cgoodman_insts}
-\end{table}
-\clearpage
-
-\begin{table}[ht]
-\centering
-\caption{\textbf{Robustness of Effects on Municipalities to Alternative Specifications}}
-\begin{threeparttable}
-\input{tables/exogeneity_tests/gen_muni_table_insts}
-\begin{tablenotes}\footnotesize
-\item Column (3) adjusts the outcome variable by total population, rather than urban population. Columns (4), (5), (6), and (7) are th: Column (4) uses an instrument residualized on southern state fixed effects. This accounts for shocks correlated between southern states and non-southern destinations. Column (5) drops the 15 southern counties coded as central in MSAs with a 1990 population over one million before constructing the instrument. This accounts for shocks correlated across both southern and non-southern urban areas. Column (6) constructs the migration links using southern state of birth of recent black migrants. Column (7) uses southern white migrants as the instrument and endogeneous variable to validate that this phenomenon is regarding Black southern migrants, not just any southern migrants. Columns (8), (9), (10), and (11) use the 1940 full count census from IPUMS [cite ipums], rather than the intermediate/cleaned version used in , to construct the destination sample, which allows us to allow us to modify the sample in two important ways. Column (8) validates the use of this sample, the specification is otherwise equivalent to column (1). Column (9) switches Texas from a southern to a non-southern city. Column (10) uses rural migrants only, defined as having reported moving from outside of an incorporated city between 1935-40. Column (11) employs both northern Texas and rural migrants only.  * \(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)
-\end{tablenotes}
-\end{threeparttable}
-\label{tab:gen_muni_insts}
-\end{table}
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effects of change in Black Migration on Municipal Proliferation, Quadratic Term, Balanced Controls}
+\input{tables/final/main_effect_quad_new_ctrl.tex}
+{\caption*{\begin{scriptsize} "\(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)"\end{scriptsize}}} \end{threeparttable} \end{table}
 \clearpage
 
 
-\begin{table}[ht]
-\centering
-\caption{\textbf{Robustness of Effects on School Districts to Alternative Specifications}}
-\begin{threeparttable}
-\input{tables/exogeneity_tests/schdist_ind_table_insts}
-\begin{tablenotes}\footnotesize
-\item Column (3) adjusts the outcome variable by total population, rather than urban population. Columns (4), (5), (6), and (7) are th: Column (4) uses an instrument residualized on southern state fixed effects. This accounts for shocks correlated between southern states and non-southern destinations. Column (5) drops the 15 southern counties coded as central in MSAs with a 1990 population over one million before constructing the instrument. This accounts for shocks correlated across both southern and non-southern urban areas. Column (6) constructs the migration links using southern state of birth of recent black migrants. Column (7) uses southern white migrants as the instrument and endogeneous variable to validate that this phenomenon is regarding Black southern migrants, not just any southern migrants. Columns (8), (9), (10), and (11) use the 1940 full count census from IPUMS [cite ipums], rather than the intermediate/cleaned version used in , to construct the destination sample, which allows us to allow us to modify the sample in two important ways. Column (8) validates the use of this sample, the specification is otherwise equivalent to column (1). Column (9) switches Texas from a southern to a non-southern city. Column (10) uses rural migrants only, defined as having reported moving from outside of an incorporated city between 1935-40. Column (11) employs both northern Texas and rural migrants only.  * \(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)
-\end{tablenotes}
-\end{threeparttable}
-\label{tab:schdist_ind_insts}
-\end{table}
-
-\begin{table}[ht]
-\centering
-\caption{\textbf{Robustness of Effects on Townships to Alternative Specifications}}
-\begin{threeparttable}
-\input{tables/exogeneity_tests/schdist_ind_table_insts}
-\begin{tablenotes}\footnotesize
-\item Column (3) adjusts the outcome variable by total population, rather than urban population. Columns (4), (5), (6), and (7) are th: Column (4) uses an instrument residualized on southern state fixed effects. This accounts for shocks correlated between southern states and non-southern destinations. Column (5) drops the 15 southern counties coded as central in MSAs with a 1990 population over one million before constructing the instrument. This accounts for shocks correlated across both southern and non-southern urban areas. Column (6) constructs the migration links using southern state of birth of recent black migrants. Column (7) uses southern white migrants as the instrument and endogeneous variable to validate that this phenomenon is regarding Black southern migrants, not just any southern migrants. Columns (8), (9), (10), and (11) use the 1940 full count census from IPUMS [cite ipums], rather than the intermediate/cleaned version used in , to construct the destination sample, which allows us to allow us to modify the sample in two important ways. Column (8) validates the use of this sample, the specification is otherwise equivalent to column (1). Column (9) switches Texas from a southern to a non-southern city. Column (10) uses rural migrants only, defined as having reported moving from outside of an incorporated city between 1935-40. Column (11) employs both northern Texas and rural migrants only.  * \(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)
-\end{tablenotes}
-\end{threeparttable}
-\label{tab:gen_town_insts}
-\end{table}
-
-\begin{table}[ht]
-\centering
-\caption{\textbf{Robustness of Effects on Special Districts to Alternative Specifications}}
-\begin{threeparttable}
-\input{tables/exogeneity_tests/spdist_table_insts}
-\begin{tablenotes}\footnotesize
-\item Column (3) adjusts the outcome variable by total population, rather than urban population. Columns (4), (5), (6), and (7) are th: Column (4) uses an instrument residualized on southern state fixed effects. This accounts for shocks correlated between southern states and non-southern destinations. Column (5) drops the 15 southern counties coded as central in MSAs with a 1990 population over one million before constructing the instrument. This accounts for shocks correlated across both southern and non-southern urban areas. Column (6) constructs the migration links using southern state of birth of recent black migrants. Column (7) uses southern white migrants as the instrument and endogeneous variable to validate that this phenomenon is regarding Black southern migrants, not just any southern migrants. Columns (8), (9), (10), and (11) use the 1940 full count census from IPUMS [cite ipums], rather than the intermediate/cleaned version used in , to construct the destination sample, which allows us to allow us to modify the sample in two important ways. Column (8) validates the use of this sample, the specification is otherwise equivalent to column (1). Column (9) switches Texas from a southern to a non-southern city. Column (10) uses rural migrants only, defined as having reported moving from outside of an incorporated city between 1935-40. Column (11) employs both northern Texas and rural migrants only.  * \(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)
-\end{tablenotes}
-\end{threeparttable}
-\label{tab:spdist_insts}
-\end{table}
-\end{landscape}
-\subsection{Balance Table}
-\input{tables/balancetables/cz_urban.tex}
-\clearpage
-\section{PERCENTILE}
-\subsection{Balance Table}
-\input{tables/balancetables/cz_urban_pctile.tex}
-\clearpage
-
-
-\subsection{Alternative Instrument Tables}
-\begin{landscape}
-\begin{table}[ht]
-\centering
-\caption{\textbf{Robustness of Effects on Municipalities to Alternative Specifications}}
-\begin{threeparttable}
-\input{tables/exogeneity_tests/cgoodman_table_pctile}
-\begin{tablenotes}\footnotesize
-\item Column (3) adjusts the outcome variable by total population, rather than urban population. Columns (4), (5), (6), and (7) are th: Column (4) uses an instrument residualized on southern state fixed effects. This accounts for shocks correlated between southern states and non-southern destinations. Column (5) drops the 15 southern counties coded as central in MSAs with a 1990 population over one million before constructing the instrument. This accounts for shocks correlated across both southern and non-southern urban areas. Column (6) constructs the migration links using southern state of birth of recent black migrants. Column (7) uses southern white migrants as the instrument and endogeneous variable to validate that this phenomenon is regarding Black southern migrants, not just any southern migrants. Columns (8), (9), (10), and (11) use the 1940 full count census from IPUMS [cite ipums], rather than the intermediate/cleaned version used in , to construct the destination sample, which allows us to allow us to modify the sample in two important ways. Column (8) validates the use of this sample, the specification is otherwise equivalent to column (1). Column (9) switches Texas from a southern to a non-southern city. Column (10) uses rural migrants only, defined as having reported moving from outside of an incorporated city between 1935-40. Column (11) employs both northern Texas and rural migrants only.  * \(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)
-\end{tablenotes}
-\end{threeparttable}
-\label{tab:cgoodman_insts_pctile}
-\end{table}
-\clearpage
-
-\begin{table}[ht]
-\centering
-\caption{\textbf{Robustness of Effects on Municipalities to Alternative Specifications}}
-\begin{threeparttable}
-\input{tables/exogeneity_tests/gen_muni_table_pctile}
-\begin{tablenotes}\footnotesize
-\item Column (3) adjusts the outcome variable by total population, rather than urban population. Columns (4), (5), (6), and (7) are th: Column (4) uses an instrument residualized on southern state fixed effects. This accounts for shocks correlated between southern states and non-southern destinations. Column (5) drops the 15 southern counties coded as central in MSAs with a 1990 population over one million before constructing the instrument. This accounts for shocks correlated across both southern and non-southern urban areas. Column (6) constructs the migration links using southern state of birth of recent black migrants. Column (7) uses southern white migrants as the instrument and endogeneous variable to validate that this phenomenon is regarding Black southern migrants, not just any southern migrants. Columns (8), (9), (10), and (11) use the 1940 full count census from IPUMS [cite ipums], rather than the intermediate/cleaned version used in , to construct the destination sample, which allows us to allow us to modify the sample in two important ways. Column (8) validates the use of this sample, the specification is otherwise equivalent to column (1). Column (9) switches Texas from a southern to a non-southern city. Column (10) uses rural migrants only, defined as having reported moving from outside of an incorporated city between 1935-40. Column (11) employs both northern Texas and rural migrants only.  * \(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)
-\end{tablenotes}
-\end{threeparttable}
-\label{tab:gen_muni_insts_pctile}
-\end{table}
-\clearpage
-
-
-\begin{table}[ht]
-\centering
-\caption{\textbf{Robustness of Effects on School Districts to Alternative Specifications}}
-\begin{threeparttable}
-\input{tables/exogeneity_tests/schdist_ind_table_pctile}
-\begin{tablenotes}\footnotesize
-\item Column (3) adjusts the outcome variable by total population, rather than urban population. Columns (4), (5), (6), and (7) are th: Column (4) uses an instrument residualized on southern state fixed effects. This accounts for shocks correlated between southern states and non-southern destinations. Column (5) drops the 15 southern counties coded as central in MSAs with a 1990 population over one million before constructing the instrument. This accounts for shocks correlated across both southern and non-southern urban areas. Column (6) constructs the migration links using southern state of birth of recent black migrants. Column (7) uses southern white migrants as the instrument and endogeneous variable to validate that this phenomenon is regarding Black southern migrants, not just any southern migrants. Columns (8), (9), (10), and (11) use the 1940 full count census from IPUMS [cite ipums], rather than the intermediate/cleaned version used in , to construct the destination sample, which allows us to allow us to modify the sample in two important ways. Column (8) validates the use of this sample, the specification is otherwise equivalent to column (1). Column (9) switches Texas from a southern to a non-southern city. Column (10) uses rural migrants only, defined as having reported moving from outside of an incorporated city between 1935-40. Column (11) employs both northern Texas and rural migrants only.  * \(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)
-\end{tablenotes}
-\end{threeparttable}
-\label{tab:schdist_ind_insts_pctile}
-\end{table}
-
-\begin{table}[ht]
-\centering
-\caption{\textbf{Robustness of Effects on Townships to Alternative Specifications}}
-\begin{threeparttable}
-\input{tables/exogeneity_tests/schdist_ind_table_pctile}
-\begin{tablenotes}\footnotesize
-\item Column (3) adjusts the outcome variable by total population, rather than urban population. Columns (4), (5), (6), and (7) are th: Column (4) uses an instrument residualized on southern state fixed effects. This accounts for shocks correlated between southern states and non-southern destinations. Column (5) drops the 15 southern counties coded as central in MSAs with a 1990 population over one million before constructing the instrument. This accounts for shocks correlated across both southern and non-southern urban areas. Column (6) constructs the migration links using southern state of birth of recent black migrants. Column (7) uses southern white migrants as the instrument and endogeneous variable to validate that this phenomenon is regarding Black southern migrants, not just any southern migrants. Columns (8), (9), (10), and (11) use the 1940 full count census from IPUMS [cite ipums], rather than the intermediate/cleaned version used in , to construct the destination sample, which allows us to allow us to modify the sample in two important ways. Column (8) validates the use of this sample, the specification is otherwise equivalent to column (1). Column (9) switches Texas from a southern to a non-southern city. Column (10) uses rural migrants only, defined as having reported moving from outside of an incorporated city between 1935-40. Column (11) employs both northern Texas and rural migrants only.  * \(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)
-\end{tablenotes}
-\end{threeparttable}
-\label{tab:gen_town_insts_pctile}
-\end{table}
-
-\begin{table}[ht]
-\centering
-\caption{\textbf{Robustness of Effects on Special Districts to Alternative Specifications}}
-\begin{threeparttable}
-\input{tables/exogeneity_tests/spdist_table_pctile}
-\begin{tablenotes}\footnotesize
-\item Column (3) adjusts the outcome variable by total population, rather than urban population. Columns (4), (5), (6), and (7) are th: Column (4) uses an instrument residualized on southern state fixed effects. This accounts for shocks correlated between southern states and non-southern destinations. Column (5) drops the 15 southern counties coded as central in MSAs with a 1990 population over one million before constructing the instrument. This accounts for shocks correlated across both southern and non-southern urban areas. Column (6) constructs the migration links using southern state of birth of recent black migrants. Column (7) uses southern white migrants as the instrument and endogeneous variable to validate that this phenomenon is regarding Black southern migrants, not just any southern migrants. Columns (8), (9), (10), and (11) use the 1940 full count census from IPUMS [cite ipums], rather than the intermediate/cleaned version used in , to construct the destination sample, which allows us to allow us to modify the sample in two important ways. Column (8) validates the use of this sample, the specification is otherwise equivalent to column (1). Column (9) switches Texas from a southern to a non-southern city. Column (10) uses rural migrants only, defined as having reported moving from outside of an incorporated city between 1935-40. Column (11) employs both northern Texas and rural migrants only.  * \(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)
-\end{tablenotes}
-\end{threeparttable}
-\label{tab:spdist_insts_pctile}
-\end{table}
-\end{landscape}
-
-
-\section{New Balance}
-\begin{table}[htbp]\centering 
-
-\input{tables/balancetables/balancetable.tex}
-
-\end{table}
-\clearpage
-
-\begin{table}[htbp]\centering 
-
-\input{tables/balancetables/pretrends.tex}
-
-\end{table}
-\clearpage
-
-\begin{table}[htbp]\centering 
-
-\input{tables/balancetables/pretrends_new_ctrls.tex}
-
-\end{table}
-\clearpage
-
-
-\foreach \covar in {urban\_share1940, ln\_pop\_dens1940, mfg\_lfshare1940,  totfrac\_in\_main\_city, m\_rr\_sqm2, popc1940, pop1940, transpo\_cost\_1920, n\_wells, frac\_total, frac\_land}{
-
-	\begin{table}[htbp]\centering 
-	 \begin{threeparttable} \caption{Effects of change in Black Migration on Municipal Proliferation, robust to \covar}
-	\input{tables/final/main_effect_\covar.tex}
-	{\caption*{\begin{scriptsize} "\(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)"\end{scriptsize}}} \end{threeparttable} \end{table}
-	\clearpage
-
-}
-
-\begin{table}[htbp]\centering 
-	 \begin{threeparttable} \caption{Effects of change in Black Migration on Municipal Proliferation, robust to all unbalanced}
-	\input{tables/final/main_effect_all_covars.tex}
-	{\caption*{\begin{scriptsize} "\(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)"\end{scriptsize}}} \end{threeparttable} \end{table}
-	\clearpage
 \end{document}

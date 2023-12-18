@@ -1,6 +1,6 @@
 // Alt Inst tests
 local b_controls reg2 reg3 reg4 blackmig3539_share
-
+local extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
 
 use "$CLEANDATA/cz_pooled", clear
 
@@ -39,24 +39,49 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 		caption("Hansen J Statistic: `hansenj'", ring(0) pos(8)) ///
 		xtitle("") graphregion(color(white)) plotregion(ilcolor(white)) ylabel(,nogrid ) legend(off)
 		
-		graph export "$FIGS/exogeneity_tests/D16_alt_inst_pooled_`outcome'.png", replace as(png)
+		graph export "$FIGS/exogeneity_tests/D16_alt_inst_pooled_`outcome'.pdf", replace as(pdf)
 	restore
 }
 
 
-
-// White instruments
-
-eststo clear
 use "$CLEANDATA/cz_pooled", clear
 
-foreach outcome in cgoodman schdist_ind gen_subcounty spdist gen_town gen_muni{
-	qui: reg n_`outcome'_cz_pc GM_8_hat_raw_pp `b_controls' [aw=popc1940], r 
-	local coeff : di %4.3f _b[GM_8_hat_raw_pp]
-	local coeff_se : di %4.3f _se[GM_8_hat_raw_pp]
-
-	binscatter n_`outcome'_cz_pc GM_8_hat_raw_pp [aw=popc1940], controls( `b_controls') ///
-	reportreg lcolor(myslate*1.5) ylabel(,nogrid) mcolor(jmpgreen) xtitle("Percentile of predicted white s pop change 40-70") ytitle("Black M Inc Rank in 2015, Parents 25p") ///
-	note("Slope = `coeff' (`coeff_se')") title("White instrument, outcome: `outcome'")
-	graph export "$FIGS/exogeneity_tests/D14_`outcome'.png", replace 
+foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
+	preserve
+		ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_1940_hat_raw_pp GM_7r_hat_raw_pp GM_r_hat_raw_pp GM_hat_raw_pp) `b_controls' `extra_controls' [aw = popc1940], r
+		local hansenj : di %4.2f e(jp)
+		
+		global spec1 (GM_raw_pp = GM_hat_raw_pp)  `b_controls'  `extra_controls'
+		global spec2 (GM_raw_pp = GM_7r_hat_raw_pp)  `b_controls' `extra_controls'
+		global spec3 (GM_raw_pp = GM_r_hat_raw_pp) `b_controls' `extra_controls'
+		global spec4 (GM_raw_pp = GM_1940_hat_raw_pp)  `b_controls' `extra_controls'
+		
+		forval spec=1(1)4{
+			tempfile spec`spec'
+			parmby "ivreg2 n_`outcome'_cz_pc ${spec`spec'} [aw = popc1940]", lab saving(`"spec`spec'"', replace) idn(`l') ids(spec) ylabel 
+		}
+			
+		drop _all
+		forval spec=1(1)4{
+			capture append using "spec`spec'"
+			rm "spec`spec'.dta"
+		}
+		
+		tempfile overid_coefplot
+		save `overid_coefplot'
+		
+		use `overid_coefplot', clear 
+		keep if regexm(parm,"GM")==1
+		g x=_n
+		twoway scatter estimate x , mcolor(jmpgreen) ///
+		|| rcap min95 max95 x, lcolor(jmpgreen%20)  ///
+		title("Alternative instrument test, outcome `outcome'")  ///
+		xsc(range(1(1)4)) xla(none, value angle(45))  ///
+		xla(1 "Baseline" 2 "Resid State FEs" 3 "Top Urban Dropped" 4 "1940 Southern State of Birth" , add custom labcolor(jmpblue)) ///
+		caption("Hansen J Statistic: `hansenj'", ring(0) pos(8)) ///
+		xtitle("") graphregion(color(white)) plotregion(ilcolor(white)) ylabel(,nogrid ) legend(off)
+		
+		graph export "$FIGS/exogeneity_tests/D16_alt_inst_pooled_`outcome'_new_ctrls.pdf", replace as(pdf)
+	restore
 }
+
