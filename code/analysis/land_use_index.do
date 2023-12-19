@@ -207,7 +207,7 @@ forv iv=0/1{
 	if "`iv'"=="0" local mod "Reduced Form"
 	if "`iv'"=="1" local mod "IV"
 	eststo clear
-	foreach covar of varlist landuse_sfr landuse_sfr_plus landuse_nonsfr landuse_apartment pct_rev_ff pct_rev_sa {
+	foreach covar of varlist landuse_sfr landuse_apartment pct_rev_ff pct_rev_sa {
 		local mname = subinstr("`covar'","landuse_", "",.)
 		lab var `covar' "`mname'"
 		di "`covar'"
@@ -224,6 +224,6 @@ forv iv=0/1{
 	esttab using "$TABS/land_use_index/muni_outcomes_`iv'_new_ctrls.tex", booktabs nonumber label replace lines se ///
 				title("`mod' Estimates, Region FEs, weighted by population") starlevels( * 0.10 ** 0.05 *** 0.01) ///
 				addnotes("Non-Single Family land uses include apartments, multifamily, triplexes, duplexes, townhomes, condos, and mobile homes.") ///
-				mtitles("Single Family" "Single Family plus N.E.C." "Non-Single Family" "Apartments" "Fines/Forfeits" "Special Assessments") ///
-				mgroups("Fraction of Municipal Land Uses" "Fraction of Municipal Revenues", pattern(1 0 0 0 1 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(above_*_med samp_*)
+				mtitles("Single Family" "Apartments" "Fines/Forfeits" "Special Assessments") ///
+				mgroups("Fraction of Municipal Land Uses" "Fraction of Municipal Revenues", pattern(1 0 1 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(above_*_med samp_*)
 }
