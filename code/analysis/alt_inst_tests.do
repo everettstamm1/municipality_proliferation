@@ -5,6 +5,12 @@ local extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
 use "$CLEANDATA/cz_pooled", clear
 
 foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
+    if "`outcome'"=="cgoodman" local outlab "C. Goodman municipalities" 
+	if "`outcome'"=="gen_muni" local outlab "CoG municipalities" 
+	if "`outcome'"=="schdist_ind" local outlab "School districts" 
+	if "`outcome'"=="gen_town" local outlab "Townships" 
+	if "`outcome'"=="spdist" local outlab "Special districts" 
+	if "`outcome'"=="totfrac" local outlab "Main City Share" 
 	preserve
 		ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_1940_hat_raw_pp GM_7r_hat_raw_pp GM_r_hat_raw_pp GM_hat_raw_pp) `b_controls' [aw = popc1940], r
 		local hansenj : di %4.2f e(jp)
@@ -33,7 +39,7 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 		g x=_n
 		twoway scatter estimate x , mcolor(jmpgreen) ///
 		|| rcap min95 max95 x, lcolor(jmpgreen%20)  ///
-		title("Alternative instrument test, outcome `outcome'")  ///
+		title("`outlab'")  ///
 		xsc(range(1(1)4)) xla(none, value angle(45))  ///
 		xla(1 "Baseline" 2 "Resid State FEs" 3 "Top Urban Dropped" 4 "1940 Southern State of Birth" , add custom labcolor(jmpblue)) ///
 		caption("Hansen J Statistic: `hansenj'", ring(0) pos(8)) ///
@@ -47,6 +53,12 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 use "$CLEANDATA/cz_pooled", clear
 
 foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
+    if "`outcome'"=="cgoodman" local outlab "C. Goodman municipalities" 
+	if "`outcome'"=="gen_muni" local outlab "CoG municipalities" 
+	if "`outcome'"=="schdist_ind" local outlab "School districts" 
+	if "`outcome'"=="gen_town" local outlab "Townships" 
+	if "`outcome'"=="spdist" local outlab "Special districts" 
+	if "`outcome'"=="totfrac" local outlab "Main City Share" 
 	preserve
 		ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_1940_hat_raw_pp GM_7r_hat_raw_pp GM_r_hat_raw_pp GM_hat_raw_pp) `b_controls' `extra_controls' [aw = popc1940], r
 		local hansenj : di %4.2f e(jp)
@@ -75,7 +87,7 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 		g x=_n
 		twoway scatter estimate x , mcolor(jmpgreen) ///
 		|| rcap min95 max95 x, lcolor(jmpgreen%20)  ///
-		title("Alternative instrument test, outcome `outcome'")  ///
+		title("`outlab'")  ///
 		xsc(range(1(1)4)) xla(none, value angle(45))  ///
 		xla(1 "Baseline" 2 "Resid State FEs" 3 "Top Urban Dropped" 4 "1940 Southern State of Birth" , add custom labcolor(jmpblue)) ///
 		caption("Hansen J Statistic: `hansenj'", ring(0) pos(8)) ///

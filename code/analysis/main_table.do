@@ -14,6 +14,8 @@ lab var GM_raw_pp "GM"
 	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 		su n_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
+		su b_`outcome'_cz1940_pc [aw=popc1940]
+		local bv : di %6.2f r(mean)
 		
 		// First Stage
 		eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' [aw=popc1940], r
@@ -28,8 +30,9 @@ lab var GM_raw_pp "GM"
 		
 		// 2SLS 
 		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls' [aw = popc1940], r
-			estadd local Fs = `F'
-			estadd local dep_var = `dv'
+			estadd scalar Fs = `F'
+			estadd scalar dep_var = `dv'
+			estadd scalar b_var = `bv'
 
 	}
 
@@ -40,7 +43,7 @@ lab var GM_raw_pp "GM"
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
 				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
@@ -76,13 +79,15 @@ lab var GM_raw_pp "GM"
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp) ///
 		postfoot(	\bottomrule \end{tabular}) ///
-		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
+		stats(Fs dep_var b_var N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0))
 
 	eststo clear
 
 	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su n_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
+		su b_`outcome'_cz1940_pc [aw=popc1940]
+		local bv : di %6.2f r(mean)		
 		
 		// First Stage
 		eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' `extra_controls' [aw=popc1940], r
@@ -97,8 +102,9 @@ lab var GM_raw_pp "GM"
 		
 		// 2SLS 
 		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls' `extra_controls' [aw = popc1940], r
-			estadd local Fs = `F'
-			estadd local dep_var = `dv'
+			estadd scalar Fs = `F'
+			estadd scalar dep_var = `dv'
+			estadd scalar b_var = `bv'
 
 	}
 
@@ -109,7 +115,7 @@ lab var GM_raw_pp "GM"
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
 				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
@@ -145,14 +151,15 @@ lab var GM_raw_pp "GM"
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp) ///
 		postfoot(	\bottomrule \end{tabular}) ///
-		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
+		stats(Fs dep_var b_var N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0))
 	eststo clear
 
 	eststo clear
 	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 		su n_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
-		
+		su b_`outcome'_cz1940_pc [aw=popc1940]
+		local bv : di %6.2f r(mean)
 		// First Stage
 		eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' wt_instmig_avg_pp [aw=popc1940], r
 		test GM_hat_raw_pp=0
@@ -166,8 +173,9 @@ lab var GM_raw_pp "GM"
 		
 		// 2SLS 
 		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls' wt_instmig_avg_pp [aw = popc1940], r
-			estadd local Fs = `F'
-			estadd local dep_var = `dv'
+			estadd scalar Fs = `F'
+			estadd scalar dep_var = `dv'
+			estadd scalar b_var = `bv'
 
 	}
 
@@ -178,7 +186,7 @@ lab var GM_raw_pp "GM"
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
 				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
@@ -214,7 +222,7 @@ lab var GM_raw_pp "GM"
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp) ///
 		postfoot(	\bottomrule \end{tabular}) ///
-		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
+		stats(Fs dep_var b_var N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0))
 
 	eststo clear
 
@@ -222,7 +230,8 @@ eststo clear
 	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su n_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
-		
+		su b_`outcome'_cz1940_pc [aw=popc1940]
+		local bv : di %6.2f r(mean)
 		// First Stage
 		eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' `extra_controls' wt_instmig_avg_pp [aw=popc1940], r
 		test GM_hat_raw_pp=0
@@ -236,8 +245,9 @@ eststo clear
 		
 		// 2SLS 
 		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls' `extra_controls' wt_instmig_avg_pp [aw = popc1940], r
-			estadd local Fs = `F'
-			estadd local dep_var = `dv'
+			estadd scalar Fs = `F'
+			estadd scalar dep_var = `dv'
+			estadd scalar b_var = `bv'
 
 	}
 
@@ -248,7 +258,7 @@ eststo clear
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
 				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
@@ -284,7 +294,7 @@ eststo clear
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp) ///
 		postfoot(	\bottomrule \end{tabular}) ///
-		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
+		stats(Fs dep_var b_var N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0))
 	eststo clear
 	
 // Quadratic Effect
@@ -300,7 +310,8 @@ eststo clear
 foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 	su n_`outcome'_cz_pc [aw=popc1940]
 	local dv : di %6.2f r(mean)
-	
+	su b_`outcome'_cz1940_pc [aw=popc1940]
+	local bv : di %6.2f r(mean)
 	// First Stage
 	eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' [aw=popc1940], r
 	test GM_hat_raw_pp=0
@@ -314,8 +325,9 @@ foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 	
 	// 2SLS 
 	eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp GM_raw_pp_2 = GM_hat_raw_pp GM_hat_raw_pp_2) `b_controls'  [aw = popc1940], r
-		estadd local Fs = `F'
-		estadd local dep_var = `dv'
+		estadd scalar Fs = `F'
+		estadd scalar dep_var = `dv'
+			estadd scalar b_var = `bv'
 
 }
 
@@ -326,7 +338,7 @@ esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist fs_totfrac  
 	b(%04.3f) se(%04.3f) ///
 	starlevels( * 0.10 ** 0.05 *** 0.01) ///
 	posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
-			"&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+			"&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
 			"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
 			"\cmidrule(lr){1-7}" ///
 			"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
@@ -362,7 +374,7 @@ esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist iv_totfrac  
 	starlevels( * 0.10 ** 0.05 *** 0.01) ///
 	keep(GM_raw_pp GM_raw_pp_2) ///
 	postfoot(	\bottomrule \end{tabular}) ///
-	stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
+	stats(Fs dep_var b_var N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0))
 
 eststo clear
 
@@ -376,7 +388,8 @@ eststo clear
 foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 	su n_`outcome'_cz_pc [aw=popc1940]
 	local dv : di %6.2f r(mean)
-	
+	su b_`outcome'_cz1940_pc [aw=popc1940]
+	local bv : di %6.2f r(mean)
 	// First Stage
 	eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' `extra_controls' [aw=popc1940], r
 	test GM_hat_raw_pp=0
@@ -390,8 +403,9 @@ foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 	
 	// 2SLS 
 	eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp GM_raw_pp_2 = GM_hat_raw_pp GM_hat_raw_pp_2) `b_controls'  `extra_controls' [aw = popc1940], r
-		estadd local Fs = `F'
-		estadd local dep_var = `dv'
+		estadd scalar Fs = `F'
+		estadd scalar dep_var = `dv'
+			estadd scalar b_var = `bv'
 
 }
 
@@ -402,7 +416,7 @@ esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist fs_totfrac  
 	b(%04.3f) se(%04.3f) ///
 	starlevels( * 0.10 ** 0.05 *** 0.01) ///
 	posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
-			"&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+			"&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
 			"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
 			"\cmidrule(lr){1-7}" ///
 			"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
@@ -438,7 +452,7 @@ esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist iv_totfrac  
 	starlevels( * 0.10 ** 0.05 *** 0.01) ///
 	keep(GM_raw_pp GM_raw_pp_2) ///
 	postfoot(	\bottomrule \end{tabular}) ///
-	stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
+	stats(Fs dep_var b_var N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0))
 
 eststo clear
 	
@@ -459,6 +473,8 @@ lab var GM_raw_pp "GM"
 	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su n2_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
+		su b_`outcome'_cz1940_pc [aw=popc1940]
+		local bv : di %6.2f r(mean)
 		
 		// First Stage
 		eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' [aw=popc1940], r
@@ -473,8 +489,9 @@ lab var GM_raw_pp "GM"
 		
 		// 2SLS 
 		eststo iv_`outcome' : ivreg2 n2_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls'  [aw = popc1940], r
-			estadd local Fs = `F'
-			estadd local dep_var = `dv'
+			estadd scalar Fs = `F'
+			estadd scalar dep_var = `dv'
+			estadd scalar b_var = `bv'
 
 	}
 
@@ -485,7 +502,7 @@ lab var GM_raw_pp "GM"
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
 				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
@@ -521,7 +538,7 @@ lab var GM_raw_pp "GM"
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp) ///
 		postfoot(	\bottomrule \end{tabular}) ///
-		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
+		stats(Fs dep_var b_var N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0))
 	eststo clear
 
 
@@ -532,6 +549,8 @@ lab var GM_raw_pp "GM"
 	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su n2_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
+		su b_`outcome'_cz1940_pc [aw=popc1940]
+		local bv : di %6.2f r(mean)
 		
 		// First Stage
 		eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' `extra_controls'[aw=popc1940], r
@@ -546,8 +565,9 @@ lab var GM_raw_pp "GM"
 		
 		// 2SLS 
 		eststo iv_`outcome' : ivreg2 n2_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls' `extra_controls' [aw = popc1940], r
-			estadd local Fs = `F'
-			estadd local dep_var = `dv'
+			estadd scalar Fs = `F'
+			estadd scalar dep_var = `dv'
+			estadd scalar b_var = `bv'
 
 	}
 
@@ -558,7 +578,7 @@ lab var GM_raw_pp "GM"
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
 				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
@@ -594,7 +614,7 @@ lab var GM_raw_pp "GM"
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp) ///
 		postfoot(	\bottomrule \end{tabular}) ///
-		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
+		stats(Fs dep_var b_var N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0))
 
 		eststo clear
 
@@ -609,6 +629,8 @@ lab var GM_raw_pp "GM"
 	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su ld_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
+		su b_`outcome'_cz1940_pc [aw=popc1940]
+		local bv : di %6.2f r(mean)
 		
 		// First Stage
 		eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' [aw=popc1940], r
@@ -623,8 +645,9 @@ lab var GM_raw_pp "GM"
 		
 		// 2SLS 
 		eststo iv_`outcome' : ivreg2 ld_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls'  [aw = popc1940], r
-			estadd local Fs = `F'
-			estadd local dep_var = `dv'
+			estadd scalar Fs = `F'
+			estadd scalar dep_var = `dv'
+			estadd scalar b_var = `bv'
 
 	}
 
@@ -635,7 +658,7 @@ lab var GM_raw_pp "GM"
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
 				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
@@ -671,7 +694,7 @@ lab var GM_raw_pp "GM"
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp) ///
 		postfoot(	\bottomrule \end{tabular}) ///
-		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
+		stats(Fs dep_var b_var N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0))
  eststo clear
 		
 
@@ -686,6 +709,8 @@ lab var GM_raw_pp "GM"
 	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su ld_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
+		su b_`outcome'_cz1940_pc [aw=popc1940]
+		local bv : di %6.2f r(mean)
 		
 		// First Stage
 		eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' `extra_controls'[aw=popc1940], r
@@ -700,8 +725,9 @@ lab var GM_raw_pp "GM"
 		
 		// 2SLS 
 		eststo iv_`outcome' : ivreg2 ld_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls' `extra_controls' [aw = popc1940], r
-			estadd local Fs = `F'
-			estadd local dep_var = `dv'
+			estadd scalar Fs = `F'
+			estadd scalar dep_var = `dv'
+			estadd scalar b_var = `bv'
 
 	}
 
@@ -712,7 +738,7 @@ lab var GM_raw_pp "GM"
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
 				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
@@ -748,7 +774,7 @@ lab var GM_raw_pp "GM"
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM_raw_pp) ///
 		postfoot(	\bottomrule \end{tabular}) ///
-		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
+		stats(Fs dep_var b_var N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0))
 eststo clear
 
 
@@ -762,6 +788,8 @@ lab var GM "GM Percentile"
 	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su n_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
+		su b_`outcome'_cz1940_pc [aw=popc1940]
+		local bv : di %6.2f r(mean)
 		
 		// First Stage
 		eststo fs_`outcome' : reg GM GM_hat `b_controls'  [aw=popc1940], r
@@ -776,8 +804,9 @@ lab var GM "GM Percentile"
 		
 		// 2SLS 
 		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM = GM_hat) `b_controls'   [aw = popc1940], r
-			estadd local Fs = `F'
-			estadd local dep_var = `dv'
+			estadd scalar Fs = `F'
+			estadd scalar dep_var = `dv'
+			estadd scalar b_var = `bv'
 
 	}
 // Panel A: First Stage
@@ -787,7 +816,7 @@ lab var GM "GM Percentile"
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
 				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
@@ -823,7 +852,7 @@ lab var GM "GM Percentile"
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM) ///
 		postfoot(	\bottomrule \end{tabular}) ///
-		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
+		stats(Fs dep_var b_var N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0))
 
 		eststo clear		
 
@@ -836,6 +865,8 @@ lab var GM "GM Percentile"
 	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su n_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
+		su b_`outcome'_cz1940_pc [aw=popc1940]
+		local bv : di %6.2f r(mean)
 		
 		// First Stage
 		eststo fs_`outcome' : reg GM GM_hat `b_controls' `extra_controls'[aw=popc1940], r
@@ -850,8 +881,9 @@ lab var GM "GM Percentile"
 		
 		// 2SLS 
 		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM = GM_hat) `b_controls' `extra_controls' [aw = popc1940], r
-			estadd local Fs = `F'
-			estadd local dep_var = `dv'
+			estadd scalar Fs = `F'
+			estadd scalar dep_var = `dv'
+			estadd scalar b_var = `bv'
 
 	}
 
@@ -862,7 +894,7 @@ lab var GM "GM Percentile"
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
 				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
@@ -898,7 +930,7 @@ lab var GM "GM Percentile"
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(GM) ///
 		postfoot(	\bottomrule \end{tabular}) ///
-		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
+		stats(Fs dep_var b_var N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0))
 
 		eststo clear
 		
@@ -916,6 +948,8 @@ lab var GM_raw_pp "GM"
 	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su n_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
+		su b_`outcome'_cz1940_pc [aw=popc1940]
+		local bv : di %6.2f r(mean)
 		
 		// First Stage
 		eststo fs_`outcome' : reg WM_raw_pp GM_8_hat_raw_pp `b_controls' [aw=popc1940], r
@@ -930,8 +964,9 @@ lab var GM_raw_pp "GM"
 		
 		// 2SLS 
 		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (WM_raw_pp = GM_8_hat_raw_pp) `b_controls' [aw = popc1940], r
-			estadd local Fs = `F'
-			estadd local dep_var = `dv'
+			estadd scalar Fs = `F'
+			estadd scalar dep_var = `dv'
+			estadd scalar b_var = `bv'
 
 	}
 
@@ -942,7 +977,7 @@ lab var GM_raw_pp "GM"
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
 				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
@@ -978,7 +1013,7 @@ lab var GM_raw_pp "GM"
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(WM_raw_pp) ///
 		postfoot(	\bottomrule \end{tabular}) ///
-		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
+		stats(Fs dep_var b_var N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0))
 eststo clear
 
 
@@ -991,6 +1026,8 @@ local b_controls reg2 reg3 reg4 v8_whitemig3539_share1940
 	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su n_`outcome'_cz_pc [aw=popc1940]
 		local dv : di %6.2f r(mean)
+		su b_`outcome'_cz1940_pc [aw=popc1940]
+		local bv : di %6.2f r(mean)
 		
 		// First Stage
 		eststo fs_`outcome' : reg WM_raw_pp GM_8_hat_raw_pp `b_controls' `extra_controls'[aw=popc1940], r
@@ -1005,9 +1042,9 @@ local b_controls reg2 reg3 reg4 v8_whitemig3539_share1940
 		
 		// 2SLS 
 		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (WM_raw_pp = GM_8_hat_raw_pp) `b_controls' `extra_controls'[aw = popc1940], r
-			estadd local Fs = `F'
-			estadd local dep_var = `dv'
-
+			estadd scalar Fs = `F'
+			estadd scalar dep_var = `dv'
+			estadd scalar b_var = `bv'
 	}
 
 	// Panel A: First Stage
@@ -1017,7 +1054,7 @@ local b_controls reg2 reg3 reg4 v8_whitemig3539_share1940
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
-                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Principal City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+                "&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
 				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
@@ -1053,5 +1090,5 @@ local b_controls reg2 reg3 reg4 v8_whitemig3539_share1940
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(WM_raw_pp) ///
 		postfoot(	\bottomrule \end{tabular}) ///
-		stats(Fs dep_var N, labels("First Stage F-Stat" "Dependent Variable Mean" "Observations") fmt(2 2 0))
+		stats(Fs dep_var b_var N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0))
 eststo clear

@@ -513,7 +513,7 @@ foreach level in cz {
 		merge 1:1 `level' using "$INTDATA/census/maxcitypop_2010", keep(1 3) nogen
 
 		// Total Fraction in main city outcomes, giving them unintuitive names so they can be ran properly in the table creation code, ignore the "n" and "pc"
-		
+		g b_totfrac_cz1940_pc = (maxcitypop1940/pop1940)
 		g n_totfrac_cz_pc = 100*((maxcitypop1970/pop1970) - (maxcitypop1940/pop1940))
 		g n2_totfrac_cz_pc = 100*((maxcitypop1970/pop1970) - (maxcitypop1950/pop1950))
 		g ld_totfrac_cz_pc = 100*((maxcitypop2010/pop2010) - (maxcitypop1940/pop1940))

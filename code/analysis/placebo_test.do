@@ -2,6 +2,13 @@ local b_controls reg2 reg3 reg4 blackmig3539_share
 local extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
 
 foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
+	if "`outcome'"=="cgoodman" local outlab "C. Goodman municipalities" 
+	if "`outcome'"=="gen_muni" local outlab "CoG municipalities" 
+	if "`outcome'"=="schdist_ind" local outlab "School districts" 
+	if "`outcome'"=="gen_town" local outlab "Townships" 
+	if "`outcome'"=="spdist" local outlab "Special districts" 
+	if "`outcome'"=="totfrac" local outlab "Main City Share" 
+	
 	use "$CLEANDATA/cz_pooled", clear
 
 	forval i = 1/1000{
@@ -37,7 +44,7 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 			|| rcap min95 max95 vrsn if ids=="vr", lcolor(jmpgreen%20) ///
 			graphregion(color(white)) plotregion(ilcolor(white)) ylabel(,nogrid ) legend(on order(1 2 3) rows(1) ring(0) position(5) ) /// 
 			yline(0, lcolor(black)) xsc(range(1(100)1000)) ///
-			 ytitle("") title("Placebo migration shocks, outcome `outcome'") ///
+			 ytitle("") title("`outlab'") ///
 			caption( "% significant at the 5% level = `psig95'" "% significant at the 1% level = `psig99'")
 			
 	
@@ -47,6 +54,13 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 
 
 foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
+	if "`outcome'"=="cgoodman" local outlab "C. Goodman municipalities" 
+	if "`outcome'"=="gen_muni" local outlab "CoG municipalities" 
+	if "`outcome'"=="schdist_ind" local outlab "School districts" 
+	if "`outcome'"=="gen_town" local outlab "Townships" 
+	if "`outcome'"=="spdist" local outlab "Special districts" 
+	if "`outcome'"=="totfrac" local outlab "Main City Share" 
+	
 	use "$CLEANDATA/cz_pooled", clear
 
 	forval i = 1/1000{
@@ -82,7 +96,7 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 			|| rcap min95 max95 vrsn if ids=="vr", lcolor(jmpgreen%20) ///
 			graphregion(color(white)) plotregion(ilcolor(white)) ylabel(,nogrid ) legend(on order(1 2 3) rows(1) ring(0) position(5) ) /// 
 			yline(0, lcolor(black)) xsc(range(1(100)1000)) ///
-			 ytitle("") title("Placebo migration shocks, outcome `outcome'") ///
+			 ytitle("") title("`outlab'") ///
 			caption( "% significant at the 5% level = `psig95'" "% significant at the 1% level = `psig99'")
 			
 	

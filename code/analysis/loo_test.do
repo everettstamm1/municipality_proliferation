@@ -3,6 +3,15 @@ local extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
 
 
 foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
+	if "`outcome'"=="cgoodman" local outlab "C. Goodman municipalities" 
+	if "`outcome'"=="gen_muni" local outlab "CoG municipalities" 
+	if "`outcome'"=="schdist_ind" local outlab "School districts" 
+	if "`outcome'"=="gen_town" local outlab "Townships" 
+	if "`outcome'"=="spdist" local outlab "Special districts" 
+	if "`outcome'"=="totfrac" local outlab "Main City Share" 
+	
+	
+	
 	use "$CLEANDATA/cz_pooled", clear
 	labmask cz, values(cz_name)
 	keep if dcourt == 1
@@ -41,7 +50,7 @@ foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 	|| rcap min95 max95 x, lcolor(jmpgreen%50)  ///
 	 yline(0, lcolor(black)) ///
 	xsc(range(1(10)131)) xla(none) xtitle("") graphregion(color(white)) plotregion(ilcolor(white)) ylabel(,nogrid ) legend(rows(2)) ///
-	yline(`b_rf', lcolor(red) lstyle(dash))  ///
+	yline(`b_rf', lcolor(red) lstyle(dash)) title("`outlab'") ///
 		caption( "`n' out of 130 significant at the 0.05 level" "Red line indicates full sample point estimate")
 		
 	graph export "$FIGS/exogeneity_tests/loo_rf_`outcome'.pdf", replace as(pdf)	
@@ -63,7 +72,7 @@ foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 	|| rcap min95 max95 x, lcolor(jmpgreen%50)  ///
 	 yline(0, lcolor(black)) ///
 	xsc(range(1(10)131)) xla(none) xtitle("") graphregion(color(white)) plotregion(ilcolor(white)) ylabel(,nogrid ) legend(rows(2)) ///
-	yline(`b_iv', lcolor(red) lstyle(dash)) ///
+	yline(`b_iv', lcolor(red) lstyle(dash)) title("`outlab'") ///
 		caption( "`n' out of 130 significant at the 0.05 level" "Red line indicates full sample point estimate")
 		graph export "$FIGS/exogeneity_tests/loo_iv_`outcome'.pdf", replace as(pdf)
 
@@ -72,6 +81,14 @@ foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 
 
 foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
+	
+	if "`outcome'"=="cgoodman" local outlab "C. Goodman municipalities" 
+	if "`outcome'"=="gen_muni" local outlab "CoG municipalities" 
+	if "`outcome'"=="schdist_ind" local outlab "School districts" 
+	if "`outcome'"=="gen_town" local outlab "Townships" 
+	if "`outcome'"=="spdist" local outlab "Special districts" 
+	if "`outcome'"=="totfrac" local outlab "Main City Share" 
+	
 	use "$CLEANDATA/cz_pooled", clear
 	labmask cz, values(cz_name)
 	keep if dcourt == 1
@@ -110,7 +127,7 @@ foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 	|| rcap min95 max95 x, lcolor(jmpgreen%50)  ///
 	 yline(0, lcolor(black)) ///
 	xsc(range(1(10)131)) xla(none) xtitle("") graphregion(color(white)) plotregion(ilcolor(white)) ylabel(,nogrid ) legend(rows(2)) ///
-	yline(`b_rf', lcolor(red) lstyle(dash))  ///
+	yline(`b_rf', lcolor(red) lstyle(dash)) title("`outlab'") ///
 		caption( "`n' out of 130 significant at the 0.05 level" "Red line indicates full sample point estimate")
 		
 	graph export "$FIGS/exogeneity_tests/loo_rf_`outcome'_new_ctrls.pdf", replace as(pdf)	
@@ -132,7 +149,7 @@ foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 	|| rcap min95 max95 x, lcolor(jmpgreen%50)  ///
 	 yline(0, lcolor(black)) ///
 	xsc(range(1(10)131)) xla(none) xtitle("") graphregion(color(white)) plotregion(ilcolor(white)) ylabel(,nogrid ) legend(rows(2)) ///
-	yline(`b_iv', lcolor(red) lstyle(dash)) ///
+	yline(`b_iv', lcolor(red) lstyle(dash)) title("`outlab'") ///
 		caption( "`n' out of 130 significant at the 0.05 level" "Red line indicates full sample point estimate")
 		graph export "$FIGS/exogeneity_tests/loo_iv_`outcome'_new_ctrls.pdf", replace as(pdf)	
 
