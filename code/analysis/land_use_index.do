@@ -154,9 +154,9 @@ ren STATEFP fips_state
 ren PLACEFP fips_place_2002
 merge 1:1 fips_state fips_place_2002 using "$INTDATA/census/IndFin12", keep(1 3) nogen
 
-g pct_rev_ff = finesandforfeits/totalrevenue
-g pct_rev_sa = specialassessments/totalrevenue
-
+g pct_rev_ff = 100*finesandforfeits/totalrevenue
+g pct_rev_sa = 100*specialassessments/totalrevenue
+g pct_rev_debt = 100*totaldebtoutstanding/totalrevenue
 
 g samp_destXabove_x_med = samp_dest * above_x_med
 g samp_destXabove_z_med = samp_dest * above_inst_med
@@ -177,11 +177,14 @@ lab var samp_destXabove_z_med "Above Median $\widehat{GM}$ X Incorporated 1940-7
 lab var above_x_med "Above Median GM"
 lab var samp_destXabove_x_med "Above Median GM X Incorporated 1940-70"
 
+replace landuse_sfr = 100*landuse_sfr
+replace landuse_apartment = 100*landuse_apartment 
+
 forv iv=0/1{
 	if "`iv'"=="0" local mod "Reduced Form"
 	if "`iv'"=="1" local mod "IV"
 	eststo clear
-	foreach covar of varlist landuse_sfr landuse_apartment pct_rev_ff pct_rev_sa {
+	foreach covar of varlist landuse_sfr landuse_apartment pct_rev_ff pct_rev_sa pct_rev_debt {
 		local mname = subinstr("`covar'","landuse_", "",.)
 		lab var `covar' "`mname'"
 		di "`covar'"
@@ -195,11 +198,14 @@ forv iv=0/1{
 	}
 
 
-	esttab using "$TABS/land_use_index/muni_outcomes_`iv'.tex", booktabs nonumber label replace lines se ///
+	esttab using "$TABS/land_use_index/muni_outcomes_`iv'.tex", booktabs label replace lines se frag ///
 				title("`mod' Estimates, Region FEs, weighted by population") starlevels( * 0.10 ** 0.05 *** 0.01) ///
-				addnotes("Non-Single Family land uses include apartments, multifamily, triplexes, duplexes, townhomes, condos, and mobile homes.") ///
-				mtitles("Single Family" "Apartments" "Fines/Forfeits" "Special Assessments") ///
-				mgroups("Fraction of Municipal Land Uses" "Fraction of Municipal Revenues", pattern(1 0 1 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(above_*_med samp_*)
+				mtitles("Single Family" "Apartments" "Fines/Forfeits" "Special Assessments" "Outstanding Debt")  ///
+				mgroups("Percentage of Municipal Land Uses" "Percentage of Municipal Revenues", pattern(1 0 1 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(above_*_med samp_*) b(%04.3f) se(%04.3f) ///
+				prehead( \begin{tabular}{l*{5}{c}} \toprule) postfoot(	\bottomrule \end{tabular}) 
+
+
+
 }
 
 
@@ -207,7 +213,7 @@ forv iv=0/1{
 	if "`iv'"=="0" local mod "Reduced Form"
 	if "`iv'"=="1" local mod "IV"
 	eststo clear
-	foreach covar of varlist landuse_sfr landuse_apartment pct_rev_ff pct_rev_sa {
+	foreach covar of varlist landuse_sfr landuse_apartment pct_rev_ff pct_rev_sa pct_rev_debt {
 		local mname = subinstr("`covar'","landuse_", "",.)
 		lab var `covar' "`mname'"
 		di "`covar'"
@@ -221,9 +227,14 @@ forv iv=0/1{
 	}
 
 
-	esttab using "$TABS/land_use_index/muni_outcomes_`iv'_new_ctrls.tex", booktabs nonumber label replace lines se ///
+	esttab using "$TABS/land_use_index/muni_outcomes_`iv'_new_ctrls.tex", booktabs nonumber label replace lines se frag ///
 				title("`mod' Estimates, Region FEs, weighted by population") starlevels( * 0.10 ** 0.05 *** 0.01) ///
-				addnotes("Non-Single Family land uses include apartments, multifamily, triplexes, duplexes, townhomes, condos, and mobile homes.") ///
-				mtitles("Single Family" "Apartments" "Fines/Forfeits" "Special Assessments") ///
-				mgroups("Fraction of Municipal Land Uses" "Fraction of Municipal Revenues", pattern(1 0 1 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(above_*_med samp_*)
+				mtitles("Single Family" "Apartments" "Fines/Forfeits" "Special Assessments" "Outstanding Debt") ///
+				mgroups("Percentage of Municipal Land Uses" "Percentage of Municipal Revenues", pattern(1 0 1 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(above_*_med samp_*) b(%04.3f) se(%04.3f) ///
+				prehead( \begin{tabular}{l*{5}{c}} \toprule) postfoot(	\bottomrule \end{tabular}) 
+
 }
+
+
+
+

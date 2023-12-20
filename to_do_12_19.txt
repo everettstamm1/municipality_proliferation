@@ -1,0 +1,9 @@
+can you fix the order in for main and appendix tables and add table notes to all tables and figures pleaes?
+
+- read the main table footer and see if it's still right? And/or make it shorter yeah?
+
+- appendix exhibits order --> (1) long difference, (2) balance table, (3) pre-trends table, (4) outcomes with balance, (5) quadratic and/or percentile table, (6) 50-70 table, (7) all the robustness figs, (8) european migration/white migration tables, (9) any appendix tables about the landuse stuff
+
+- main exhibits --> (1) two motivation figures David will finalize, (2) main table, (3) pcarrow, (4) land use, etc. table for a total of five exhibits
+
+

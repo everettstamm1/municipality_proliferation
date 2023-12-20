@@ -484,13 +484,12 @@ foreach level in cz {
 		lab var avg_precip "Average Precipitation, 1940"
 		lab var has_port "Has Port, 1940"
 		lab var coastal "Coastal"
-		lab var transpo_cost_1920 "Average Transport Cost out of CZ, 1920 (Donaldson and Hornbeck)"
+		lab var transpo_cost_1920 "Average Transport Cost out of CZ, 1920"
 		lab var m_rr "Meters of Railroad, 1940"
 		lab var m_rr_sqm_land "Meters of Railroad per Square Meter of Land, 1940"
-		lab var m_rr_sqm_total "Meters of Railroad per Square Meter, 1940"
+		lab var m_rr_sqm_total "Meters of Railroad per Square Meter of Area, 1940"
 		lab var urban_share1940 "Share population urban"
 		lab var frac_total "Fraction of area incorporated"
-		lab var transpo_cost_1920 "1920 transportation cost"
 		lab var coastal "Coastal CZ" 
 		lab var urbfrac_in_main_city "Fraction of urban population living in largest city" 
 		lab var avg_precip "Average precipitation" 
@@ -513,11 +512,10 @@ foreach level in cz {
 		merge 1:1 `level' using "$INTDATA/census/maxcitypop_2010", keep(1 3) nogen
 
 		// Total Fraction in main city outcomes, giving them unintuitive names so they can be ran properly in the table creation code, ignore the "n" and "pc"
-		g b_totfrac_cz1940_pc = (maxcitypop1940/pop1940)
+		g b_totfrac_cz1940_pc = 100* (maxcitypop1940/pop1940)
 		g n_totfrac_cz_pc = 100*((maxcitypop1970/pop1970) - (maxcitypop1940/pop1940))
 		g n2_totfrac_cz_pc = 100*((maxcitypop1970/pop1970) - (maxcitypop1950/pop1950))
 		g ld_totfrac_cz_pc = 100*((maxcitypop2010/pop2010) - (maxcitypop1940/pop1940))
-
 		save "$CLEANDATA/`level'_pooled`outsamptab'", replace
 		
 		/*

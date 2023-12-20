@@ -65,7 +65,7 @@ ren statefp statefips
 
 merge 1:1 placefips statefips using `incorps', keep(3) nogen
 ren czone cz
-merge m:1 cz using "$CLEANDATA/cz_pooled", keep(3) nogen keepusing(dcourt cz cz_name)
+merge m:1 cz using "$CLEANDATA/cz_pooled", keep(3) nogen keepusing(dcourt cz cz_name GM_hat_raw_pp GM_raw_pp)
 keep if dcourt == 1
 
 bys cz : egen cz_new_pop1970 = total(place_pop1970) if yr_incorp >=1940 & yr_incorp<=1970
@@ -78,10 +78,11 @@ bys cz (cz_new_wpop1970): replace cz_new_wpop1970 = cz_new_wpop1970[1]
 
 g cz_new_prop_white = 100*(cz_new_wpop1970 / cz_new_pop1970)
 
-keep cz cz_name cz_*
+keep cz cz_name cz_* GM_*
 duplicates drop
 
 merge 1:1 cz using `cz_pops', keep(3) nogen
 keep if cz_new_prop_white != .
+replace cz_name = "Louisville, KY/IN" if cz==13101
 
 save "$CLEANDATA/pcarrow_fig_data", replace
