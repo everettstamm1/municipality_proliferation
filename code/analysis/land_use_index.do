@@ -18,6 +18,7 @@ tabulate region, gen(reg)
 drop COUNTYFP cty_fips
 duplicates drop
 
+
 // As a result, we have duplicates in our CZ crosswalk. Force drop with tiebreak on being in sample 130 CZs
 duplicates tag STATEFP PLACEFP, gen(dup)
 bys STATEFP PLACEFP (sample_130_czs) : drop if dup == 1 & _n == 1
@@ -29,6 +30,21 @@ drop if FUNCSTAT=="S" | /// "Statistical entities"
 		 FUNCSTAT=="N" | /// Nonfunctioning legal entity	
 		 FUNCSTAT=="I" // Inactive governmental unit that has the power to provide primary special-purpose functions
 		 
+
+
+preserve
+	import delimited using "$CLEANDATA/corelogic/censusplace_clogic_ptile.csv", clear
+	replace ptile = ptile*100
+	ren land_square_footage sfr_p
+	drop acres name
+	reshape wide sfr_p, i(geoid) j(ptile)
+	g STATEFP = floor(geoid/100000)
+	g PLACEFP = mod(geoid,100000)
+	tempfile new_corelogic
+	save `new_corelogic'
+restore
+merge 1:1 STATEFP PLACEFP using `new_corelogic', keep(1 3) nogen
+
 // All cities vs cities in our 130 CZs incorporated 1940-70
 g samp_full = (yr_incorp >=1940 & yr_incorp <=1970) & sample_130_czs==1
 lab var samp_full "Full Sample"
@@ -198,10 +214,10 @@ forv iv=0/1{
 	}
 
 
-	esttab using "$TABS/land_use_index/muni_outcomes_`iv'.tex", booktabs label replace lines se frag ///
-				title("`mod' Estimates, Region FEs, weighted by population") starlevels( * 0.10 ** 0.05 *** 0.01) ///
-				mtitles("Single Family" "Apartments" "Fines/Forfeits" "Special Assessments" "Outstanding Debt")  ///
-				mgroups("Percentage of Municipal Land Uses" "Percentage of Municipal Revenues", pattern(1 0 1 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(above_*_med samp_*) b(%04.3f) se(%04.3f) ///
+	esttab using "$TABS/land_use_index/muni_outcomes_`iv'.tex", booktabs compress label replace lines se frag ///
+				starlevels( * 0.10 ** 0.05 *** 0.01) ///
+				mtitles("Single Family" "Apartments" "Fines/Forfeits" "\shortstack{Special \\ Assessments}" "\shortstack{Outstanding \\ Debt}") ///
+				mgroups("\shortstack{Percentage of \\ Municipal Land Uses}" "\shortstack{Percentage of \\ Municipal Revenues}", pattern(1 0 1 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(above_*_med samp_*) b(%04.3f) se(%04.3f) ///
 				prehead( \begin{tabular}{l*{5}{c}} \toprule) postfoot(	\bottomrule \end{tabular}) 
 
 
@@ -227,10 +243,10 @@ forv iv=0/1{
 	}
 
 
-	esttab using "$TABS/land_use_index/muni_outcomes_`iv'_new_ctrls.tex", booktabs nonumber label replace lines se frag ///
-				title("`mod' Estimates, Region FEs, weighted by population") starlevels( * 0.10 ** 0.05 *** 0.01) ///
-				mtitles("Single Family" "Apartments" "Fines/Forfeits" "Special Assessments" "Outstanding Debt") ///
-				mgroups("Percentage of Municipal Land Uses" "Percentage of Municipal Revenues", pattern(1 0 1 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(above_*_med samp_*) b(%04.3f) se(%04.3f) ///
+	esttab using "$TABS/land_use_index/muni_outcomes_`iv'_new_ctrls.tex", booktabs compress label replace lines se frag ///
+				 starlevels( * 0.10 ** 0.05 *** 0.01) ///
+				mtitles("Single Family" "Apartments" "Fines/Forfeits" "\shortstack{Special \\ Assessments}" "\shortstack{Outstanding \\ Debt}") ///
+				mgroups("\shortstack{Percentage of \\ Municipal Land Uses}" "\shortstack{Percentage of \\ Municipal Revenues}", pattern(1 0 1 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(above_*_med samp_*) b(%04.3f) se(%04.3f) ///
 				prehead( \begin{tabular}{l*{5}{c}} \toprule) postfoot(	\bottomrule \end{tabular}) 
 
 }
