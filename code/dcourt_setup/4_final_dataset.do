@@ -4,6 +4,7 @@
 
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 STEPS:
+	*0. Create list of 130 CZs for later reference
 	*1. Select sample of cities using complete count 1940 and CCDB 1944-1977. 
 	*2. Merge in data for instrument.
 	*3. Construct measure of black urban pop change and instrument for black urban in-migration at CZ level.
@@ -14,6 +15,7 @@ STEPS:
 *last updated: 12/29/2019
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/	
 
+	// 0. Create list of 130 CZs for later reference
 	use "$RAWDATA/dcourt/clean_city_population_census_1940.dta", clear // 711 cities in non-South
 	
 
@@ -60,24 +62,15 @@ STEPS:
 *1. Select sample of cities using complete count 1940 census and CCDB 1944-1977.
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 	/* Load city population data constructed from complete count 1940 census */
-	foreach samp in full dcourt {
-		if "`samp'" == "dcourt" {
-			local samptab = ""
-			local varstubs = ""
-			local varstubs2 = "2 1940 r"
-			
-			use "$RAWDATA/dcourt/clean_city_population_census_1940.dta", clear // 711 cities in non-South
-			merge 1:1 citycode using "$INTDATA/dcourt/clean_city_population_census_1940_full.dta", keepusing(wpopc1940)  // add in white urban pop
-			keep if _merge==3 | citycode == 910 /*butte, MT, correction later */ | citycode == 170 /* Amsterdam, NY,  correction later */
-			drop _merge
-		}
-		if "`samp'" == "full" {
-			local samptab = "_full"
-			local varstubs = "rm nt rmnt rmsc rmscnt scnt"
-			local varstubs2 = "2 2rm 2nt 2rmnt 2rmsc 2rmscnt 2scnt 1940 r"
-			use "$INTDATA/dcourt/clean_city_population_census_1940_full.dta", clear // 711 cities in non-South
-
-		}
+		local varstubs = ""
+		local varstubs2 = "2 1940 r"
+		
+		use "$RAWDATA/dcourt/clean_city_population_census_1940.dta", clear // 711 cities in non-South
+		merge 1:1 citycode using "$INTDATA/dcourt/clean_city_population_census_1940_full.dta", keepusing(wpopc1940)  // add in white urban pop
+		
+		keep if _merge==3 | citycode == 910 /*butte, MT, correction later */ | citycode == 170 /* Amsterdam, NY,  correction later */
+		drop _merge
+		
 		
 		merge 1:1 city using "$RAWDATA/dcourt/clean_city_population_ccdb_1944_1977.dta", keepusing(bpop1970 whtpop1970 pop1950 pop1940 pop1970 state_name)
 		ren whtpop1970 wpopc1970
@@ -112,11 +105,7 @@ STEPS:
 		
 		*/
 		
-		if "`samp'"=="full"{
-			// Flagging southern states
-			replace state_name = strproper(state_name)
-			g south =(state_name=="Alabama" | state_name=="Arkansas" | state_name=="Florida" | state_name=="Georgia" | state_name=="Kentucky"| state_name=="Louisiana" | state_name=="Mississippi" | state_name=="North Carolina" | state_name=="Oklahoma" | state_name=="South Carolina" | state_name=="Tennessee" | state_name=="Texas" | state_name=="Virginia" | state_name=="West Virginia") 
-		}
+		
 		
 		/* Keep cities large enough (25k+) to appear in CCDB in 1940 and 1970. Results are 
 		robust to changing this criterion.*/
@@ -320,24 +309,10 @@ STEPS:
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 	
 		
-		foreach level in cz {
-			use "$INTDATA/dcourt/GM_city_final_dataset`samptab'.dta", clear
-			if "`level'"=="cz"{
-				local levelvar cz
-			}
-			else if "`level'"=="county"{
-				merge 1:1 city using "$RAWDATA/dcourt/US_place_point_2010_crosswalks.dta", keepusing(countyfip state_fips)
-				destring countyfip, replace
-				g fips = 1000*state_fips + countyfip
-				drop state_fips countyfip
-				local levelvar fips
-			}
-			else if "`level'"=="msa"{
-				merge 1:1 city using "$RAWDATA/dcourt/US_place_point_2010_crosswalks.dta", keepusing(smsa)
-				local levelvar smsa
-			}
+			use "$INTDATA/dcourt/GM_city_final_dataset.dta", clear
+			local levelvar cz
 			
-			collapse (sum) *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc* bpopc* *migcity3539 wpopc1940 wpopc1970 (max) samp_*, by(`levelvar')
+			collapse (sum) *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc* bpopc* *migcity3539 wpopc1940 wpopc1970 (max) samp_*, by(cz)
 			
 			
 
@@ -412,26 +387,17 @@ STEPS:
 		*4. Merge in all datasets.
 		*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 			
-				if "`level'"=="cz"{
-					global datasets ///
-					"$INTDATA/dcourt/clean_cz_snq_european_immigration_instrument.dta"  "$INTDATA/dcourt/clean_cz_industry_employment_1940_1970.dta"
-				}
-			foreach dataset in "$datasets"{
-			merge 1:1 `levelvar' using "`dataset'"
-			drop if _merge==2
-			drop _merge
-			}
+			// White migration instrument
+			merge 1:1 cz using "$INTDATA/dcourt/clean_cz_snq_european_immigration_instrument.dta", keep(1 3) nogen
+			// mfg_lfshare1940
+			merge 1:1 cz using "$INTDATA/dcourt/clean_cz_industry_employment_1940_1970.dta", keep(1 3) nogen
 
 			
 			
-			if "`level'"=="cz"{
-				/* Get state and region info from cz-to-state_id-to-region crosswalk. */
-					merge 1:1 cz using "$RAWDATA/dcourt/cz_state_region_crosswalk.dta", keepusing(state_id region cz_name) keep (3) nogenerate
-					replace cz_name="Louisville, KY" if cz==13101 // Fill in Louisville, KY name, which was missing.
-				}
-			
-			
-		*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
+			/* Get state and region info from cz-to-state_id-to-region crosswalk. */
+			merge 1:1 cz using "$RAWDATA/dcourt/cz_state_region_crosswalk.dta", keepusing(state_id region cz_name) keep (3) nogenerate
+			replace cz_name="Louisville, KY" if cz==13101 // Fill in Louisville, KY name, which was missing.
+*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 		*5. Create rank measure of shock. 
 		*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 			* OLS
@@ -628,17 +594,12 @@ STEPS:
 		*6. Create regional dummies. 
 		*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 			tabulate region, gen(reg)	
-
 		*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 		*7. Create additional 1940 controls. 
 		*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 			
 			merge 1:1 cz using "$RAWDATA/dcourt/clean_cz_population_1940_1970", keep(1 3) keepusing(pop1940 pop1950 pop1960 pop1970) nogen
-			merge 1:1 cz using "$RAWDATA/dcourt/clean_cz_population_density_1940.dta", keepusing(pop_density1940) keep(1 3) nogen
-			di "here"
-			g urban_share1940 = popc1940/pop1940
-			g ln_pop_dens1940= log(pop_density1940)			
-				
+			
 				*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 			*8. Label key variables and save final dataset. 
 			*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
@@ -675,14 +636,8 @@ STEPS:
 			}
 			
 			
-			if "`samp'"=="full"{
-				foreach v in rm nt rmnt rmsc rmscnt scnt {
-					ren v2`v'_bcpp_pred1940_1970 GM_`v'_hat_raw_pp
-					ren v2`v'_bc_pred1940_1970 GM_`v'_hat_raw
-				}
-			}
 			
 			
-			save "$CLEANDATA/dcourt/GM_`level'_final_dataset`samptab'.dta", replace
-		}
-	}
+			save "$CLEANDATA/dcourt/GM_cz_final_dataset.dta", replace
+		
+	

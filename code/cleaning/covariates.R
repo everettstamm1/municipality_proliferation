@@ -1,16 +1,33 @@
-library(tidyverse)
-library(sf)
-library(haven)
-library(tigris)
-library(stringr)
-library(readxl)
 
-RAWDATA <- "C:/Users/Everett Stamm/Dropbox/municipality_proliferation/data/raw/"
-INTDATA <- "C:/Users/Everett Stamm/Dropbox/municipality_proliferation/data/interim/"
-XWALKS <- "C:/Users/Everett Stamm/Dropbox/municipality_proliferation/data/xwalks/"
+## Load dependencies, install if not already.
+packages <-
+  c('tidyverse',
+    'sf',
+    'haven',
+    'tigris',
+    'stringr',
+    'readxl')
+
+for (pkg in packages) {
+  if (require(pkg, character.only = TRUE) == FALSE) {
+    print(paste0("Trying to install ", pkg))
+    install.packages(pkg)
+    if (require(pkg, character.only = TRUE)) {
+      print(paste0(pkg, " installed and loaded"))
+    } else{
+      stop(paste0("could not install ", pkg))
+    }
+  }
+}
+
+# Get paths
+paths <- read.csv("paths.csv")
+RAWDATA <- paths[paths$global == "RAWDATA",2]
+INTDATA <- paths[paths$global == "INTDATA",2]
+XWALKS <- paths[paths$global == "XWALKS",2]
 
 #### Geographies ----
-county_cz_xwalk <- read_dta(paste0(XWALKS,"cw_cty_czone.dta"))
+county_cz_xwalk <- read_dta(paste0(XWALKS,"/cw_cty_czone.dta"))
 
 counties <- counties()  %>% 
   select(ALAND, AWATER, STATEFP, COUNTYFP, geometry) %>% 
@@ -25,7 +42,7 @@ crs <- st_crs(counties)
 #### Ports ----
 
 
-ports <- read_sf(paste0(RAWDATA,"covariates/ports/ports_x010g.shp")) %>% 
+ports <- read_sf(paste0(RAWDATA,"/covariates/ports/ports_x010g.shp")) %>% 
   st_set_crs(crs) %>% 
   mutate(has_port = 1) 
 
@@ -39,7 +56,7 @@ county_ports <- counties %>%
 
 
 #### Railroads ----
-railroads <- read_sf(paste0(RAWDATA,"covariates/historical_railroads/Historical_Railroads___Vanderbilt.shp")) %>%
+railroads <- read_sf(paste0(RAWDATA,"/covariates/historical_railroads/Historical_Railroads___Vanderbilt.shp")) %>%
   st_transform(crs) %>% 
   filter(InOpBy <=1940)
 
@@ -64,11 +81,11 @@ km_railroads_1940 <- aggregate(counties$cty_fips,list(counties$cty_fips),county_
 
 
 #### Network costs ----
-cost_id_county <-  read_excel(paste0(RAWDATA,"covariates/RR_NetworkDatabase_DH_Oct2015/Data/Transportation_Costs_AllDecades/Cost_ID_county.xlsx")) %>% 
+cost_id_county <-  read_excel(paste0(RAWDATA,"/covariates/RR_NetworkDatabase_DH_Oct2015/Data/Transportation_Costs_AllDecades/Cost_ID_county.xlsx")) %>% 
   select(`gis id`, ICPSRFIP) %>% 
   rename(cty_fips = ICPSRFIP, gisid= `gis id`)
 
-cost_matrix <- read_dta(paste0(RAWDATA,"covariates/RR_NetworkDatabase_DH_Oct2015/Data/Transportation_Costs_AllDecades/NSFtranspCost.dta")) %>%
+cost_matrix <- read_dta(paste0(RAWDATA,"/covariates/RR_NetworkDatabase_DH_Oct2015/Data/Transportation_Costs_AllDecades/NSFtranspCost.dta")) %>%
   merge(cost_id_county, by.x = 'gisid_origin', by.y = 'gisid', all = T) %>%
   rename(cty_fips_origin = cty_fips) %>% 
   merge(county_cz_xwalk, by.x = 'cty_fips_origin', by.y = 'cty_fips', all.x = T) %>% 
@@ -82,7 +99,7 @@ cost_matrix <- read_dta(paste0(RAWDATA,"covariates/RR_NetworkDatabase_DH_Oct2015
   summarise(transpo_cost_1920 = mean(cost1920))
 
 #### Coastal Counties ----
-coastline_counties <- read_excel(paste0(RAWDATA,"covariates/coastline-counties-list.xlsx"), skip = 3) %>% 
+coastline_counties <- read_excel(paste0(RAWDATA,"/covariates/coastline-counties-list.xlsx"), skip = 3) %>% 
   mutate(cty_fips = as.numeric(`STATE/\r\nCOUNTY\r\nFIPS`)) %>% 
   select(cty_fips) %>% 
   mutate(coastal = 1)
@@ -90,25 +107,25 @@ coastline_counties <- read_excel(paste0(RAWDATA,"covariates/coastline-counties-l
 ### Climate ----
 headers <- c("JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC","cty_fips","year")
 
-precip <- read.table(paste0(RAWDATA,"covariates/climate/ncei.noaa.gov_data_nclimdiv-monthly_access_climdiv-pcpncy-v1.0.0-20230606.txt")) %>% 
+precip <- read.table(paste0(RAWDATA,"/covariates/climate/ncei.noaa.gov_data_nclimdiv-monthly_access_climdiv-pcpncy-v1.0.0-20230606.txt")) %>% 
   mutate(cty_fips = if_else(nchar(V1)==11,str_sub(V1,1,5),str_sub(V1,1,4)), 
          year = if_else(nchar(V1)==11,str_sub(V1,8,11),str_sub(V1,7,10))) %>% 
   select(-c(V1)) %>% 
   filter(year==1940)
 
-max_temp <- read.table(paste0(RAWDATA,"covariates/climate/ncei.noaa.gov_data_nclimdiv-monthly_access_climdiv-tmaxcy-v1.0.0-20230606.txt")) %>% 
+max_temp <- read.table(paste0(RAWDATA,"/covariates/climate/ncei.noaa.gov_data_nclimdiv-monthly_access_climdiv-tmaxcy-v1.0.0-20230606.txt")) %>% 
   mutate(cty_fips = if_else(nchar(V1)==11,str_sub(V1,1,5),str_sub(V1,1,4)), 
          year = if_else(nchar(V1)==11,str_sub(V1,8,11),str_sub(V1,7,10))) %>% 
   select(-c(V1)) %>% 
   filter(year==1940)
 
-min_temp <- read.table(paste0(RAWDATA,"covariates/climate/ncei.noaa.gov_data_nclimdiv-monthly_access_climdiv-tmincy-v1.0.0-20230606.txt")) %>% 
+min_temp <- read.table(paste0(RAWDATA,"/covariates/climate/ncei.noaa.gov_data_nclimdiv-monthly_access_climdiv-tmincy-v1.0.0-20230606.txt")) %>% 
   mutate(cty_fips = if_else(nchar(V1)==11,str_sub(V1,1,5),str_sub(V1,1,4)), 
          year = if_else(nchar(V1)==11,str_sub(V1,8,11),str_sub(V1,7,10))) %>% 
   select(-c(V1) )%>% 
   filter(year==1940)
 
-avg_temp <- read.table(paste0(RAWDATA,"covariates/climate/ncei.noaa.gov_data_nclimdiv-monthly_access_climdiv-tmpccy-v1.0.0-20230606.txt")) %>% 
+avg_temp <- read.table(paste0(RAWDATA,"/covariates/climate/ncei.noaa.gov_data_nclimdiv-monthly_access_climdiv-tmpccy-v1.0.0-20230606.txt")) %>% 
   mutate(cty_fips = if_else(nchar(V1)==11,str_sub(V1,1,5),str_sub(V1,1,4)), 
          year = if_else(nchar(V1)==11,str_sub(V1,8,11),str_sub(V1,7,10))) %>% 
   select(-c(V1)) %>% 
@@ -159,7 +176,7 @@ min_temp <-  min_temp %>%
 # rm(filename.dta, filename.zip, url.Saiz2010)
 
 #### Natural Resources ----
-oil_nat_gas <- read.csv(paste0(RAWDATA,"covariates/Oil__and__Natural__Gas__Wells.csv")) %>% 
+oil_nat_gas <- read.csv(paste0(RAWDATA,"/covariates/Oil__and__Natural__Gas__Wells.csv")) %>% 
   mutate(year = as.numeric(substr(COMPDATE,1,4)),
          n = 1,
          cty_fips = as.numeric(COUNTYFIPS)) %>% 
@@ -201,6 +218,6 @@ output <- counties %>%
   rename(cz = czone)
 
 
-write_dta(output,path=paste0(INTDATA,"covariates/covariates.dta"))
+write_dta(output,path=paste0(INTDATA,"/covariates/covariates.dta"))
 
 
