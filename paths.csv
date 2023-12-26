@@ -1,0 +1,10 @@
+global,path
+RAWDATA,/Users/Everett Stamm/Dropbox/municipality_proliferation//data/raw
+INTDATA,/Users/Everett Stamm/Dropbox/municipality_proliferation//data/interim
+CLEANDATA,/Users/Everett Stamm/Dropbox/municipality_proliferation//data/clean
+XWALKS,/Users/Everett Stamm/Dropbox/municipality_proliferation//data/xwalks
+FIGS,/Users/Everett Stamm/Documents/Github/municipality_proliferation//exhibits/figures
+TABS,/Users/Everett Stamm/Documents/Github/municipality_proliferation//exhibits/tables
+DROPBOX,/Users/Everett Stamm/Dropbox/municipality_proliferation/
+REPO,/Users/Everett Stamm/Documents/Github/municipality_proliferation/
+Rterm_path,C:\Program Files\R\R-4.2.2\bin\x64\Rterm.exe

@@ -1,6 +1,7 @@
 // Flag to run
 gl run = 0
 gl run_dcourt = 0
+gl create_paths = 0
 
 // ADD AN IF ELSE BLOCK WITH YOUR COMPUTER'S ABSOLUTE PATH TO THE MUNICIPALITY PROLIFERATION DROPBOX FOLDER
 if "`c(username)'"=="Everett Stamm"{
@@ -27,12 +28,35 @@ gl MAPS "$REPO/exhibits/maps"
 
 adopath ++ "$CODE/ado"
 
+
+// Sending global paths to CSV file so they can be read by R and Matlab programs
+clear all
+set obs 9
+g global = ""
+g path = ""
+replace global = "RAWDATA" if _n == 1
+replace global = "INTDATA" if _n == 2
+replace global = "CLEANDATA" if _n == 3
+replace global = "XWALKS" if _n == 4
+replace global = "FIGS" if _n == 5
+replace global = "TABS" if _n == 6
+replace global = "DROPBOX" if _n == 7
+replace global = "REPO" if _n == 8
+replace global = "Rterm_path" if _n == 9
+forv i=1/9{
+	local temp = "$" + "`=global[`i']'"
+	replace path =  "`temp'" if _n == `i'
+}
+export delimited "$REPO/paths.csv", replace
+
+
 // Settings
 set maxvar 30000
 
 if `run_dcourt'==1{
 	
 	
+	/* These are no longer needed
 	// Files I made to create data necessary for stacked derenoncourt
 	do "$CODE/dcourt_setup/A1_census_1950_1960_racepop.do"
 	do "$CODE/dcourt_setup/A2_clean_cz_mobility_1900_2015.do"
@@ -40,7 +64,8 @@ if `run_dcourt'==1{
 	do "$CODE/dcourt_setup/A5_clean_cz_snq_european_immigration_instrument.do"
 
 	do "$CODE/dcourt_setup/4_final_dataset_split.do"
-
+	*/
+	
 	// Original derenoncourt final dataset, modified to drop data we don't need and reformat variables to what we need (e.g. percentage point instead of percentile instruments)
 	do "$CODE/cleaning/4_final_dataset.do"
 	
