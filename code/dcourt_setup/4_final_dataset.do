@@ -19,8 +19,12 @@ STEPS:
 	use "$RAWDATA/dcourt/clean_city_population_census_1940.dta", clear // 711 cities in non-South
 	
 
-	merge 1:1 city using "$RAWDATA/dcourt/clean_city_population_ccdb_1944_1977.dta", keepusing(bpop1970 pop1940 pop1970 pop1950 state_name)
+	merge 1:1 city using "$RAWDATA/dcourt/clean_city_population_ccdb_1944_1977.dta", keepusing(bpop1970 bpop1960 nwhtpop1950 nwhtpop1960 pop1940 pop1950 pop1960 pop1970)
 
+	foreach var of varlist bpop1960 nwhtpop1950 nwhtpop1960{
+		ren `var' `var'_ccdb
+	}
+	ren _merge ccdb_merge
 	/* Keep cities large enough (25k+) to appear in CCDB in 1940 and 1970. Results are 
 		robust to changing this criterion.*/
 		rename bpop1970 bpopc1970 // rename so it is clear these numbers correspond to city populations
@@ -47,9 +51,33 @@ STEPS:
 		Romulus, MI
 		*/	
 		
-		drop if _merge==2 // Dropping cities in CCDB that do not appear in the 1940 Census list of non-southern cities, see analysis of non-matches above. 
-		drop _merge
+		drop if ccdb_merge==2 // Dropping cities in CCDB that do not appear in the 1940 Census list of non-southern cities, see analysis of non-matches above. 
+		drop ccdb_merge
 		
+	merge 1:1 city using "$INTDATA/dcourt/census_1950_1960_racepop_cz", keepusing(pop1950 bpop1950 nwhtpop1950)
+	foreach var of varlist pop1950 bpop1950 nwhtpop1950 {
+		ren `var' `var'_census
+	}
+	ren _merge census_merge
+	
+	
+	// Imputing Black urban population 1950 as close to CCDB data we can
+	// First by multiplying CCDB nonwhite population by ratio of Black to nonwhite population from census
+	g adjust = bpop1950_census/nwhtpop1950_census
+	g bpop1950_ccdb = nwhtpop1950_ccdb * adjust
+	// For cities with missing values of adjust, instead adjust by nationwide mean ratio
+	qui su adjust,d
+	replace bpop1950_ccdb = nwhtpop1950_ccdb * `r(mean)' if bpop1950_ccdb==.
+	
+	// If still missing, just use census urban Black population
+	g bpopc1950 = cond(bpop1950_ccdb<.,bpop1950_ccdb,bpop1950_census)
+	drop adjust
+
+	drop *_ccdb *_census*
+	
+	//keep if popc1940 >=25000 | popc1970>=25000
+	drop *_merge
+
 	drop if bpopc1940 ==. | bpopc1970 ==. | ///
 					popc1940 ==.  | popc1970 ==.
 	keep if popc1940 >=25000 | popc1970>=25000
@@ -72,9 +100,13 @@ STEPS:
 		drop _merge
 		
 		
-		merge 1:1 city using "$RAWDATA/dcourt/clean_city_population_ccdb_1944_1977.dta", keepusing(bpop1970 whtpop1970 pop1950 pop1940 pop1970 state_name)
+		merge 1:1 city using "$RAWDATA/dcourt/clean_city_population_ccdb_1944_1977.dta", keepusing(bpop1970 bpop1960 nwhtpop1950 nwhtpop1960 pop1960 whtpop1970 pop1950 pop1940 pop1970)
 		ren whtpop1970 wpopc1970
-		ren pop1950 popc1950
+		foreach var of varlist bpop1960 nwhtpop1950 nwhtpop1960  pop1960{
+		ren `var' `var'_ccdb
+	}
+			ren _merge ccdb_merge
+
 		/*
 		* Analysis of non-matches
 		not matched                           789
@@ -111,7 +143,9 @@ STEPS:
 		robust to changing this criterion.*/
 		rename bpop1970 bpopc1970 // rename so it is clear these numbers correspond to city populations
 		rename pop1970 popc1970 // rename so it is clear these numbers correspond to city populations
-		
+		rename pop1950 popc1950 // rename so it is clear these numbers correspond to city populations
+		rename pop1960 popc1960 // rename so it is clear these numbers correspond to city populations
+		rename bpop1960 bpopc1960 // rename so it is clear these numbers correspond to city populations
 		/* Butte, MT and Amsterdam, NY received southern black migrants between 1935 and 1940, but are just below pop cutoff for CCDB. 
 		Keep them in sample by retrieving 1970 black pop info from Census for these cities */
 		replace bpopc1970=38 if city=="Butte, MT" // see Table 27 of published 1970 Census: https://www.census.gov/content/dam/Census/library/working-papers/2005/demo/POP-twps0076.pdf
@@ -132,8 +166,32 @@ STEPS:
 		Romulus, MI
 		*/	
 		
-		drop if _merge==2 // Dropping cities in CCDB that do not appear in the 1940 Census list of non-southern cities, see analysis of non-matches above. 
-		drop _merge
+		drop if ccdb_merge==2 // Dropping cities in CCDB that do not appear in the 1940 Census list of non-southern cities, see analysis of non-matches above. 
+		drop ccdb_merge
+		
+			
+		// Imputing Black urban population 1950 using census data as close to CCDB data we can
+
+		merge 1:1 city using "$INTDATA/dcourt/census_1950_1960_racepop_cz", keepusing(pop1950 bpop1950 nwhtpop1950) nogen
+		foreach var of varlist pop1950 bpop1950 nwhtpop1950 {
+			ren `var' `var'_census
+		}
+		
+		
+		// First by multiplying CCDB nonwhite population by ratio of Black to nonwhite population from census
+		g adjust = bpop1950_census/nwhtpop1950_census
+		g bpop1950_ccdb = nwhtpop1950_ccdb * adjust
+		// For cities with missing values of adjust, instead adjust by nationwide mean ratio
+		qui su adjust,d
+		replace bpop1950_ccdb = nwhtpop1950_ccdb * `r(mean)' if bpop1950_ccdb==.
+		
+		// If still missing, just use census urban Black population
+		g bpopc1950 = cond(bpop1950_ccdb<.,bpop1950_ccdb,bpop1950_census)
+		drop adjust
+
+		drop *_ccdb *_census*
+		
+		//keep if popc1940 >=25000 | popc1970>=25000
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 	*2. Merge in data for instrument.
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
@@ -246,7 +304,7 @@ STEPS:
 		*	1935-1940 white southern migrant location choice X normally distributed random shocks,
 		*	with mean 0 and variance 5, iterated 1000 times.
 
-		/*
+		
 		forval i=1(1)1000{
 		qui merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/rndmig/r`i'_black_prmig_1940_1940_wide_xw.dta" 
 		*keep if _merge==3
@@ -266,7 +324,7 @@ STEPS:
 		}
 		qui rename totblackmigcity3539 vr`i'_totblackmigcity3539
 		}
-		*/
+		
 		/*
 		* Northern CZ measure of 1940 southern county upward mobility: 
 		*	1935-1940 black southern migrant location choice X total observed 1940-1970 net-migration for southern counties,
@@ -298,11 +356,11 @@ STEPS:
 		rename `var' v`v'_`var'
 		}
 		}	
-		*/
 		
-		keep *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc1940 bpopc1940 popc1970 popc1950 bpopc1970 *migcity3539 statefip citycode city city_original cz cz_name wpopc1940 wpopc1970 samp_*
+		*/
+		keep *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc1940 bpopc1940 popc1970 popc1960 bpopc1950 bpopc1960 popc1950 bpopc1970 *migcity3539 statefip citycode city city_original cz cz_name wpopc1940 wpopc1970 samp_*
 		drop if popc1970==.
-		//save "$INTDATA/dcourt/GM_city_final_dataset`samptab'.dta", replace
+		save "$INTDATA/dcourt/GM_city_final_dataset`samptab'.dta", replace
 		
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 	*3. Construct measure of black urban pop change and instrument for black urban in-migration at CZ level.
@@ -311,7 +369,8 @@ STEPS:
 		
 			use "$INTDATA/dcourt/GM_city_final_dataset.dta", clear
 			local levelvar cz
-			
+			local varstubs = ""
+			local varstubs2 = "2 1940 r"
 			collapse (sum) *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc* bpopc* *migcity3539 wpopc1940 wpopc1970 (max) samp_*, by(cz)
 			
 			

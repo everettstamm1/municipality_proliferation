@@ -298,8 +298,8 @@ foreach level in cz {
 		
 		use "$CLEANDATA/dcourt/GM_`level'_final_dataset`samptab'.dta", clear
 		g ne_ut = state_id == 31 | state_id == 49
-		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*   GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_* WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970 urban_share1940 ln_pop_dens1940
-		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*   GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970 urban_share1940 ln_pop_dens1940
+		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*   GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_* WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970
+		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*   GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970 
 
 		if "`samp'"=="south" ren v2*_blackmig3539_share1940 *blackmig3539_share
 		if "`samp'"=="dcourt" ren v2_blackmig3539_share1940 blackmig3539_share
@@ -339,7 +339,7 @@ foreach level in cz {
 		*/
 		foreach ds in gen_muni schdist_ind all_local gen_subcounty spdist gen_town schdist{
 
-			merge 1:1 `levelvar' using "$INTDATA/counts/`ds'_`level'", keep(1 3) nogen keepusing(n_`ds'_`level' b_`ds'_`level'1970 b_`ds'_`level'1940 b_`ds'_`level'1950 b_`ds'_`level'2010)
+			merge 1:1 `levelvar' using "$INTDATA/counts/`ds'_`level'", keep(1 3) nogen keepusing(n_`ds'_`level' b_`ds'_`level'1970 b_`ds'_`level'1960 b_`ds'_`level'1940 b_`ds'_`level'1950 b_`ds'_`level'2010)
 		}
 		merge 1:1 `levelvar' using "$INTDATA/counts/cgoodman_`level'", keep(1 3) nogen keepusing(n_cgoodman_`level' b_cgoodman_`level'*)
 
@@ -389,6 +389,7 @@ foreach level in cz {
 		
 		replace n_cgoodman_cz = 0 if n_cgoodman_cz==.
 		replace b_cgoodman_cz1940 = 0 if b_cgoodman_cz1940==.
+		replace b_cgoodman_cz1960 = 0 if b_cgoodman_cz1960==.
 		replace b_cgoodman_cz1970 = 0 if b_cgoodman_cz1970==.
 		replace b_cgoodman_cz1950 = 0 if b_cgoodman_cz1950==.
 		replace b_cgoodman_cz2010 = 0 if b_cgoodman_cz2010==.
@@ -415,6 +416,10 @@ foreach level in cz {
 				lab var b_`ds'_`level'1970 "Base Govs 1970, `label'"
 				
 				g b_`ds'_`level'1940_pc = b_`ds'_`level'1940/(pop1940/10000) 
+				g b_`ds'_`level'1950_pc = b_`ds'_`level'1950/(pop1950/10000) 
+				g b_`ds'_`level'1960_pc = b_`ds'_`level'1960/(pop1960/10000) 
+				g b_`ds'_`level'1970_pc = b_`ds'_`level'1970/(pop1970/10000) 
+
 				g b_`ds'_`level'1940_pcc = b_`ds'_`level'1940/(popc1940/10000)
 				g b_`ds'_`level'1970_pcc = b_`ds'_`level'1970/(popc1970/10000) 
 
@@ -488,7 +493,6 @@ foreach level in cz {
 		lab var m_rr "Meters of Railroad, 1940"
 		lab var m_rr_sqm_land "Meters of Railroad per Square Meter of Land, 1940"
 		lab var m_rr_sqm_total "Meters of Railroad per Square Meter of Area, 1940"
-		lab var urban_share1940 "Share population urban"
 		lab var frac_total "Fraction of area incorporated"
 		lab var coastal "Coastal CZ" 
 		lab var urbfrac_in_main_city "Fraction of urban population living in largest city" 

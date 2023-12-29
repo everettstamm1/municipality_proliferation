@@ -138,6 +138,9 @@ if `run'==1{
 	// Alternative Instrument tests
 	do "$CODE/analysis/alt_inst_tests"
 	
+	// Motivating figures
+	do "$CODE/analysis/fig_1_panels_b_c"
+	
 	// In text calculations
 	do "$CODE/analysis/in_text_calculations"
 }
