@@ -22,7 +22,8 @@ for (pkg in packages) {
 }
 
 # Get paths
-paths <- read.csv("paths.csv")
+paths <- read.csv("../paths.csv")
+CLEANDATA <- paths[paths$global == "CLEANDATA",2]
 RAWDATA <- paths[paths$global == "RAWDATA",2]
 INTDATA <- paths[paths$global == "INTDATA",2]
 XWALKS <- paths[paths$global == "XWALKS",2]
