@@ -172,7 +172,7 @@ cityfix_census
 drop city_original
 merge 1:1 city using "$XWALKS/US_place_point_2010_crosswalks", keepusing(gisjoin) keep(3) nogen
 g GEOID = substr(gisjoin,2,2) + substr(gisjoin,5,.)
-
+drop city city_original citycode gisjoin
 save "$INTDATA/census/maxcitypop", replace
 
 
