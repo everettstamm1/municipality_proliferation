@@ -32,17 +32,32 @@ XWALKS <- paths[paths$global == "XWALKS",2]
 
 
 #### Geographies ----
-czs <- st_read(paste0(RAWDATA,"/shapefiles/cz1990_shapefile/cz1990.shp"))
-munis <- st_read(paste0(CLEANDATA,"/other/municipal_shapefile.shp"))
+
+munis <- st_read(paste0(CLEANDATA,"/other/municipal_shapefile.shp")) 
+crs <- st_crs(munis) # NAD 83
+
+czs <- st_read(paste0(RAWDATA,"/shapefiles/cz1990_shapefile/cz1990.shp")) %>% 
+  st_transform(crs)
+
 maxcity <- read_dta(paste0(INTDATA,"/census/maxcitypop.dta")) %>% 
   rename(GEOID_max = GEOID) %>% 
-  select(-cz_name)
+  dplyr::select(c(cz,maxcitypop,totfrac_in_main_city,GEOID_max))
+
+lakes <- st_read(paste0(RAWDATA,"/shapefiles/Lakes_and_Rivers_Shapefile_NA_Lakes_and_Rivers_data_hydrography_p_lakes_v2/Lakes_and_Rivers_Shapefile/NA_Lakes_and_Rivers/data/hydrography_p_lakes_v2.shp")) %>% 
+  st_transform(crs)
+land <- st_read(paste0(RAWDATA,"/shapefiles/USA_Federal_Lands/USA_Federal_Lands.shp")) %>% 
+  st_transform(crs)
+
+water <- st_read(paste0(RAWDATA,"/shapefiles/USA_Detailed_Water_Bodies/USA_Detailed_Water_Bodies.shp")) %>% 
+  st_transform(crs) %>% 
+  filter(!(FTYPE %in% c('Canal/Ditch','Stream/River')))
 
 df <- munis %>% 
   inner_join(maxcity, by = 'cz') %>% 
   mutate(Legend =  case_when((GEOID == GEOID_max) ~ "Principal City", # Butte-Silver Bow to Butte-Silver Bow (balance)
                              (yr_ncrp <= 1940 ~ "Incorporated Pre-1940"), # Princeton to Princeton
-                             TRUE ~ "Incorporated Post-1940 or Unincorporated"))
+                             TRUE ~ "Incorporated Post-1940 or Unincorporated")) %>% 
+  filter(!is.na(cz))
     
 for (cz in unique(df$cz)){
   cz_name <- df$cz_name[df$cz == cz]
@@ -60,9 +75,65 @@ for (cz in unique(df$cz)){
     
   ggsave(paste0(FIGS,"/circled_czs/",path_name,".png"), scale = 4, plot = cz_plot)
 }
-ggplot() + 
-  geom_sf(data = czs[czs$cz==35100,],fill=alpha("white",0.2)) +
-  geom_sf(data = df[df$cz==35100,], mapping = aes(fill = Legend))+
-  ggtitle("test")
-unique(df$cz_name) 
 
+main_munis <- df[df$GEOID == df$GEOID_max,] %>% 
+  st_cast(to = 'MULTILINESTRING')
+
+
+get_border <- function(cz){
+  print(paste0("Starting cz: ",cz))
+  m <- df[df$cz == cz,]
+  border <- st_intersection(m$geometry[m$GEOID == m$GEOID_max],
+                            m$geometry[(m$GEOID != m$GEOID_max) & (m$yr_ncrp<1940)],
+                            model = 'closed')
+  return(border)
+}
+  
+
+get_land <- function(cz){
+  print(paste0("Starting cz: ",cz))
+  main_muni <- main_munis[main_munis$cz==cz,]
+  main_muni_buff <- main_muni %>% 
+    st_buffer(dist = 10)
+  int <- land %>% 
+    st_make_valid() %>% 
+    st_intersection(main_muni_buff)
+  if(nrow(int)>0){
+    border <- main_muni %>% 
+      st_crop(int)
+  }
+  else{
+    border <- NA
+  }
+  return(border)
+}
+
+get_water <- function(cz){
+  print(paste0("Starting cz: ",cz))
+  main_muni <- main_munis[main_munis$cz==cz,]
+  main_muni_buff <- main_muni %>% 
+    st_buffer(dist = 10)
+  int <- water %>% 
+    st_make_valid() %>% 
+    st_intersection(main_muni_buff)
+  if(nrow(int)>0){
+    border <- main_muni %>% 
+      st_crop(int)
+  }
+  else{
+    border <- NA
+  }
+  return(border)
+}
+
+muni_borders <- sapply(unique(df$cz), get_border)
+land_borders <- sapply(unique(df$cz), get_land)
+water_borders <- sapply(unique(df$cz), get_water)
+
+
+order
+1: cast principal city to multilinestring
+2: buffer (1) by 10 or so
+3: intersect (2) with land
+4: crop (1) by (3)
+5: measure (4)
