@@ -5,7 +5,7 @@ local balance_cutoff = 0.10
 local samp = "urban"
 
 use "$CLEANDATA/cz_pooled", clear
-local covars avg_precip avg_temp coastal mfg_lfshare1940 m_rr_sqm_total p90_total p95_total transpo_cost_1920  urbfrac_in_main_city 
+local covars avg_precip avg_temp coastal mfg_lfshare1940 m_rr_sqm_total p90_total p95_total transpo_cost_1920  
 	
 local pooled_covars_`samp'  ""
 foreach covar in `covars' {

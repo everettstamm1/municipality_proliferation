@@ -1,7 +1,7 @@
 
 
-local b_controls reg2 reg3 reg4 blackmig3539_share
-local extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
+local b_controls reg2 reg3 reg4 blackmig3539_share 
+local extra_controls mfg_lfshare1940 m_rr_sqm_total transpo_cost_1920
 
 use "$CLEANDATA/cz_pooled", clear
 keep if dcourt == 1

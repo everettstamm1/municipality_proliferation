@@ -381,7 +381,7 @@ foreach level in cz {
 
 		}
 		// Missing dummies
-		foreach var of varlist frac_land transpo_cost_1920 coastal has_port avg_precip avg_temp n_wells totfrac_in_main_city urbfrac_in_main_city m_rr m_rr_sqm_land m_rr_sqm_total{
+		foreach var of varlist frac_land transpo_cost_1920 coastal has_port avg_precip avg_temp n_wells totfrac_in_main_city m_rr m_rr_sqm_land m_rr_sqm_total{
 			g `var'_m = `var'==.
 			replace `var' = 0 if `var'==.
 		}
@@ -481,7 +481,6 @@ foreach level in cz {
 		
 
 		lab var totfrac_in_main_city "Fraction of population in largest city"
-		lab var urbfrac_in_main_city "Fraction of urban population in largest city"
 		lab var n_wells "Number of Oil/Nat Gas Wells, 1940"
 		lab var max_temp "Maximum Temperature, 1940"
 		lab var min_temp "Minimum Temperature, 1940"
@@ -495,7 +494,6 @@ foreach level in cz {
 		lab var m_rr_sqm_total "Meters of Railroad per Square Meter of Area, 1940"
 		lab var frac_total "Fraction of area incorporated"
 		lab var coastal "Coastal CZ" 
-		lab var urbfrac_in_main_city "Fraction of urban population living in largest city" 
 		lab var avg_precip "Average precipitation" 
 		lab var avg_temp "Average temperature"
 		
