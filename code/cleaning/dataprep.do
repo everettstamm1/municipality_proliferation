@@ -518,6 +518,20 @@ foreach level in cz {
 		g n_totfrac_cz_pc = 100*((maxcitypop1970/pop1970) - (maxcitypop1940/pop1940))
 		g n2_totfrac_cz_pc = 100*((maxcitypop1970/pop1970) - (maxcitypop1950/pop1950))
 		g ld_totfrac_cz_pc = 100*((maxcitypop2010/pop2010) - (maxcitypop1940/pop1940))
+		
+		// Adding measure of enclosedness
+		preserve	
+			import delimited using "$CLEANDATA/other/length_enclosed.csv", clear
+			duplicates drop
+			replace enclosed_length = 0 if mi(enclosed_length)
+			g prop_enclosed = enclosed_length / total_length
+			keep cz prop_enclosed
+			tempfile enclosed
+			save `enclosed'
+		restore
+		
+		merge 1:1 cz using `enclosed', keep(1 3) nogen
+		
 		save "$CLEANDATA/`level'_pooled`outsamptab'", replace
 		
 		/*

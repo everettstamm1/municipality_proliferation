@@ -35,8 +35,12 @@ STEPS:
 		Keep them in sample by retrieving 1970 black pop info from Census for these cities */
 		replace bpopc1970=38 if city=="Butte, MT" // see Table 27 of published 1970 Census: https://www.census.gov/content/dam/Census/library/working-papers/2005/demo/POP-twps0076.pdf
 		replace popc1970=23368 if city=="Butte, MT" // see Table 27 of published 1970 Census: https://www.census.gov/content/dam/Census/library/working-papers/2005/demo/POP-twps0076.pdf
+		//replace wpopc1970= 23013 if city=="Butte, MT"
+		
 		replace bpopc1970=140 if city=="Amsterdam, NY" // see Table 27 of published 1970 Census: https://www2.census.gov/prod2/decennial/documents/1970a_ny1-02.pdf
 		replace popc1970=25524 if city=="Amsterdam, NY" // see Table 27 of published 1970 Census: https://www2.census.gov/prod2/decennial/documents/1970a_ny1-02.pdf
+		//replace wpopc1970= 25346 if city=="Amsterdam, NY"
+		
 		keep if  bpopc1970!=. & pop1940!=.
 		
 		/* The following non-southern cities are missing Black population data in 1970 though they have total population data for that year
@@ -150,9 +154,11 @@ STEPS:
 		Keep them in sample by retrieving 1970 black pop info from Census for these cities */
 		replace bpopc1970=38 if city=="Butte, MT" // see Table 27 of published 1970 Census: https://www.census.gov/content/dam/Census/library/working-papers/2005/demo/POP-twps0076.pdf
 		replace popc1970=23368 if city=="Butte, MT" // see Table 27 of published 1970 Census: https://www.census.gov/content/dam/Census/library/working-papers/2005/demo/POP-twps0076.pdf
+		replace wpopc1970= 23013 if city=="Butte, MT"
+		
 		replace bpopc1970=140 if city=="Amsterdam, NY" // see Table 27 of published 1970 Census: https://www2.census.gov/prod2/decennial/documents/1970a_ny1-02.pdf
 		replace popc1970=25524 if city=="Amsterdam, NY" // see Table 27 of published 1970 Census: https://www2.census.gov/prod2/decennial/documents/1970a_ny1-02.pdf
-		keep if  bpopc1970!=. & pop1940!=.
+		replace wpopc1970= 25346 if city=="Amsterdam, NY"
 		
 		/* The following non-southern cities are missing Black population data in 1970 though they have total population data for that year
 		city
@@ -300,6 +306,28 @@ STEPS:
 		rename totwhitemigcity3539 v`v'_totwhitemigcity3539
 		}
 		
+		* Version 80 of the instrument: 
+		*	1935-1940 black southern migrant location choice X total observed 1940-1970 black net-migration for southern counties,
+		foreach v in "80" {
+		merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/`v'_black_actmig_1940_1970_wide_xw.dta", keepusing(totblackmigcity3539 black_actoutmigact*)
+		
+		/* Drop cities for which there's no hope of getting predictions for black pop in 
+		1970 data for these cities. This set of cities will change depending on the 
+		migration matrix used.*/
+		drop if _merge==2 
+		drop _merge
+
+		/* Assume zero change in black pop for cities that black migrants did not move 
+		to between 1935 and 1940. Results are robust to changing this criterion. 
+		Uncomment "keep if _merge==3" and run again. */
+		
+		foreach var of varlist black_actoutmigact*{
+		replace `var'=0 if `var'==.
+		rename `var' v`v'_`var'
+		}
+		rename totblackmigcity3539 v`v'_totblackmigcity3539
+		}
+		
 		* Placebo versions of the instrument: 
 		*	1935-1940 white southern migrant location choice X normally distributed random shocks,
 		*	with mean 0 and variance 5, iterated 1000 times.
@@ -358,8 +386,11 @@ STEPS:
 		}	
 		
 		*/
-		keep *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc1940 bpopc1940 popc1970 popc1960 bpopc1950 bpopc1960 popc1950 bpopc1970 *migcity3539 statefip citycode city city_original cz cz_name wpopc1940 wpopc1970 samp_*
+		g wpopc4070 = wpopc1970 - wpopc1940
+		g nbpopc4070 = (popc1970 - bpopc1970) - (popc1940 - bpopc1940)
+		keep *_proutmigpr* *_actoutmigact* *_residoutmigresid* nbpopc4070 popc1940 bpopc1940 popc1970 popc1960 bpopc1950 bpopc1960 popc1950 bpopc1970 *migcity3539 statefip citycode city city_original cz cz_name wpopc1940 wpopc1970 samp_*
 		drop if popc1970==.
+		
 		save "$INTDATA/dcourt/GM_city_final_dataset`samptab'.dta", replace
 		
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
@@ -371,12 +402,12 @@ STEPS:
 			local levelvar cz
 			local varstubs = ""
 			local varstubs2 = "2 1940 r"
-			collapse (sum) *_proutmigpr* *_actoutmigact* *_residoutmigresid* popc* bpopc* *migcity3539 wpopc1940 wpopc1970 (max) samp_*, by(cz)
+			collapse (sum) *_proutmigpr* *_actoutmigact* *_residoutmigresid* nbpopc4070  popc* bpopc* *migcity3539 wpopc1940 wpopc1970 wpopc4070 (max) samp_*, by(cz)
 			
-			
+			g bpopc4070 = bpopc1970-bpopc1940
 
 			* Actual black pop change in city
-			g bc1940_1970=100*(bpopc1970-bpopc1940)/popc1940
+			g bc1940_1970=100*(bpopc4070)/popc1940
 			g bcpp1940_1970=100*((bpopc1970/popc1970)-(bpopc1940/popc1940))
 			
 			g wcpp1940_1970=100*((wpopc1970/popc1970)-(wpopc1940/popc1940))
@@ -395,7 +426,7 @@ STEPS:
 			
 			g v`v'_blackmig3539_share1940=100*v`v'_totblackmigcity3539/popc1940
 			
-			g v`v'_bcpp_pred1940_1970=100*((v`v'_black_proutmigpr+bpopc1940)/(v`v'_black_proutmigpr+ popc1940) - bpopc1940/popc1940)
+			g v`v'_bcpp_pred1940_1970=100*((v`v'_black_proutmigpr+bpopc1940)/(popc1940 + v`v'_black_proutmigpr + nbpopc4070) - bpopc1940/popc1940)
 
 
 
@@ -407,7 +438,7 @@ STEPS:
 			g v`v'_bc_resid1940_1970=100*v`v'_black_residoutmigresid/popc1940
 			
 			g v`v'_blackmig3539_share1940=100*v`v'_totblackmigcity3539/popc1940
-			g v`v'_bcpp_pred1940_1970=100*((v`v'_black_residoutmigresid+bpopc1940)/(v`v'_black_residoutmigresid+ popc1940) - bpopc1940/popc1940)
+			g v`v'_bcpp_pred1940_1970=100*((v`v'_black_residoutmigresid+bpopc1940)/(popc1940 + v`v'_black_residoutmigresid + nbpopc4070) - bpopc1940/popc1940)
 
 			}
 			
@@ -415,7 +446,7 @@ STEPS:
 			foreach v in "8"{
 
 			g v`v'_wc_pred1940_1970=100*v`v'_white_actoutmigact/popc1940
-			g v`v'_wcpp_pred1940_1970=100*((v`v'_white_actoutmigact+wpopc1940)/(v`v'_white_actoutmigact + popc1940) - wpopc1940/popc1940)
+			g v`v'_wcpp_pred1940_1970=100*((v`v'_white_actoutmigact+wpopc1940)/(popc1940 + bpopc4070 + v`v'_white_actoutmigact) - wpopc1940/popc1940)
 
 			g v`v'_whitemig3539_share1940=100*v`v'_totwhitemigcity3539/popc1940
 			}
@@ -425,7 +456,7 @@ STEPS:
 			forval i=1(1)1000{
 				g vr`i'_bc_pred1940_1970 = 100*vr`i'_black_proutmigpr/popc1940
 
-			g vr`i'_bcpp_pred1940_1970=100* ((vr`i'_black_proutmigpr+bpopc1940)/(vr`i'_black_proutmigpr + popc1940) - bpopc1940/popc1940)
+			g vr`i'_bcpp_pred1940_1970=100* ((vr`i'_black_proutmigpr+bpopc1940)/(popc1940 + vr`i'_black_proutmigpr + nbpopc4070) - bpopc1940/popc1940)
 
 			}
 		

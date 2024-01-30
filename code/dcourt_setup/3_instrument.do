@@ -464,6 +464,35 @@ STEPS:
 		
 	do "$CODE/helper/bartik_generic.do"
 	*/
+	
+	
+*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
+*6b. nonwhite southern migration.
+*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
+
+	clear all
+	//set maxvar 120000
+		
+	global groups black // took out white
+	global origin_id origin_fips
+	global origin_id_code origin_fips_code
+	global origin_sample origin_sample
+	global destination_id city
+	global destination_id_code city_code
+	global dest_sample dest_sample
+	global weights_data "$INTDATA/dcourt/5_nonwhite_mig.dta"
+	global version 80
+	global weight_types act // took out act
+	global weight_var outmig
+	global start_year 1940
+	global panel_length 3
+	global shares_dir "$INTDATA/dcourt/shares" 
+	global sharesXweights_dir "$INTDATA/dcourt/instrument" 
+	
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
+		
+	do "$CODE/helper/bartik_generic.do"
+	
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 *10. Clean and standardize city names and output final instrument measures at the city-level
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
@@ -812,6 +841,86 @@ STEPS:
 		drop if _merge==2
 		drop _merge
 		save "$INTDATA/dcourt/instrument/city_crosswalked/`v'_white_actmig_1940_1970_wide_xw.dta", replace
+}
+
+* Version 80	
+	foreach v in  "80" {
+		use "$INTDATA/dcourt/bartik/`v'_blackorigin_fips1940.dta", clear
+		order black* total*
+		egen totblackmigcity3539=rowmean(total_blackcity*)
+		sum totblackmigcity3539
+		drop total* black*
+		save "$INTDATA/dcourt/instrument/`v'_city_blackmigshare3539.dta", replace
+		
+		use "$INTDATA/dcourt/bartik/`v'_black_actoutmigorigin_fips19401970_collapsed_wide.dta", clear
+		merge 1:1 city using "$INTDATA/dcourt/instrument/`v'_city_blackmigshare3539.dta", keep(3) nogenerate
+		
+		save "$INTDATA/dcourt/instrument/`v'_black_actmig_1940_1970_wide.dta", replace
+	
+		use "$INTDATA/dcourt/instrument/`v'_black_actmig_1940_1970_wide.dta", clear
+		decode city, gen(city_str)
+		drop city 
+		rename city_str city
+		
+		*Standardize City Names
+			//A - fix spelling and formatting variations
+			split city, p(,) g(part)
+			replace city = proper(part1) + "," + upper(part2) 
+			drop part1 part2
+		
+	*** Initial cleaning done. Save at this point.
+	save "$INTDATA/dcourt/instrument/city_crosswalked/`v'_black_actmig_1940_1970_wide_preprocessed.dta", replace
+	
+	use "$INTDATA/dcourt/instrument/city_crosswalked/`v'_black_actmig_1940_1970_wide_preprocessed.dta", clear
+	g city_original=city
+		
+			replace city = "St. Joseph, MO" if city == "Saint Joseph, MO" 
+			replace city = "St. Louis, MO" if city == "Saint Louis, MO" 
+			replace city = "St. Paul, MN" if city == "Saint Paul, MN" 
+			replace city = "McKeesport, PA" if city == "Mckeesport, PA" 
+			replace city = "Norristown, PA" if city == "Norristown Borough, PA"
+			replace city = "Shenandoah, PA" if city == "Shenandoah Borough, PA"
+			replace city = "Jamestown, NY" if city == "Jamestown , NY"
+			replace city = "Kensington, PA" if city == "Kensington,"
+			replace city = "Oak Park Village, IL" if city == "Oak Park Village,"
+			replace city = "Fond du Lac, WI" if city == "Fond Du Lac, WI"
+			replace city = "DuBois, PA" if city == "Du Bois, PA"
+			replace city = "McKees Rocks, PA" if city == "Mckees Rocks, PA"
+			replace city = "McKeesport, PA" if city == "Mckeesport, PA"
+			replace city = "Hamtramck, MI" if city == "Hamtramck Village, MI"
+			replace city = "Lafayette, IN" if city == "La Fayette, IN"
+			replace city = "Schenectady, NY" if city == "Schenectedy, NY"
+			replace city = "Wallingford Center, CT" if city == "Wallingford, CT"
+			replace city = "Oak Park, IL" if city == "Oak Park Village, IL"
+			replace city = "New Kensington, PA" if city == "Kensington, PA"
+		
+			//B - Replace city names with substitutes in the crosswalk when perfect match with crosswalk impossible
+			//B1 - the following cities overlap with their subsitutes
+			replace city = "Brookdale, NJ" if city == "Bloomfield, NJ" 
+			replace city = "Upper Montclair, NJ" if city == "Montclair, NJ"
+		
+			//B2 - the following cities just share a border with their subsitutes but do not overlap
+			replace city = "Glen Ridge, NJ" if city == "Orange, NJ"
+			replace city = "Essex Fells, NJ" if city == "West Orange, NJ" 
+			replace city = "Bogota, NJ" if city == "Teaneck, NJ" 
+		
+			//B3 - the following cities do not share a border with their substitutes but are within a few miles
+			replace city = "Kenilworth, NJ" if city == "Irvington, NJ"  
+			replace city = "Wallington, NJ" if city == "Nutley, NJ" 
+			replace city = "Short Hills, NJ" if city == "South Orange, NJ"
+			replace city = "Lafayette, IN" if city == "Lafayette, IL"
+	   
+		*Merge with State Crosswalks
+		merge 1:1 city using "$RAWDATA/dcourt/US_place_point_2010_crosswalks.dta", keepusing(cz cz_name)
+		replace cz = 19600 if city=="Belleville, NJ"
+		replace cz_name = "Newark, NJ" if city=="Belleville, NJ"    
+		*Resolve Unmerged Cities
+		tab _merge
+		
+		*Save
+		drop if _merge==2
+		drop _merge
+		save "$INTDATA/dcourt/instrument/city_crosswalked/`v'_black_actmig_1940_1970_wide_xw.dta", replace
 }
 		
 	* Version m (southern upward mobility in the North)

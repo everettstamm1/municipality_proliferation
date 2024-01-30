@@ -1,0 +1,12 @@
+QGIS NOTES
+1. Import main_munis.shp, other_munis.shp, USA_Federal_Lands.shp, and USA_Detailed_Water_Bodies.shp 
+2. Reproject USA_Federal_Lands and USA_Detailed_Water_Bodies as EPSG:4269
+3. For USA_Federal_Lands and USA_Detailed_Water_Bodies run Vector Geometry -> Fix Geometries with Repair method == Linework
+4. Vector Intersect main munis with other munis, water, and land (keep only GEOID, NAME, NAMELSA, and CZ from main_munis)
+5. Merge the three intersections
+6. Dissolve the merge on GEOID, NAME, NAMELSA, and CZ
+7. Use editing mode to calculate length for the original muni borders and (6).
+8. Merge original muni borders and (6)
+9. Export
+
+Note that there may be some duplicated rows. Not sure why, just deleting for now.

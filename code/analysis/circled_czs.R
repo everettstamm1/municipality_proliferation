@@ -30,10 +30,9 @@ FIGS <- paths[paths$global == "FIGS",2]
 XWALKS <- paths[paths$global == "XWALKS",2]
 
 
-
 #### Geographies ----
 
-munis <- st_read(paste0(CLEANDATA,"/other/municipal_shapefile.shp")) 
+munis <- st_read(paste0(CLEANDATA,"/other/municipal_shapefile/munis.shp")) 
 crs <- st_crs(munis) # NAD 83
 
 czs <- st_read(paste0(RAWDATA,"/shapefiles/cz1990_shapefile/cz1990.shp")) %>% 
@@ -53,7 +52,8 @@ water <- st_read(paste0(RAWDATA,"/shapefiles/USA_Detailed_Water_Bodies/USA_Detai
   filter(!(FTYPE %in% c('Canal/Ditch','Stream/River')))
 
 df <- munis %>% 
-  inner_join(maxcity, by = 'cz') %>% 
+  inner_join(maxcity, by = 'cz') %>%
+  mutate(GEOID_max = as.numeric(GEOID_max)) %>% 
   mutate(Legend =  case_when((GEOID == GEOID_max) ~ "Principal City", # Butte-Silver Bow to Butte-Silver Bow (balance)
                              (yr_ncrp <= 1940 ~ "Incorporated Pre-1940"), # Princeton to Princeton
                              TRUE ~ "Incorporated Post-1940 or Unincorporated")) %>% 
@@ -76,8 +76,18 @@ for (cz in unique(df$cz)){
   ggsave(paste0(FIGS,"/circled_czs/",path_name,".png"), scale = 4, plot = cz_plot)
 }
 
-main_munis <- df[df$GEOID == df$GEOID_max,] %>% 
-  st_cast(to = 'MULTILINESTRING')
+x <- df[df$GEOID == df$GEOID_max,]
+
+y <- df[!(df$cz %in% x$cz),] 
+df[df$GEOID == df$GEOID_max,] %>% 
+  st_cast(to = 'MULTILINESTRING') %>% 
+  st_write(paste0(CLEANDATA,"/other/main_munis.shp"), append = FALSE)
+
+df[df$GEOID != df$GEOID_max,] %>% 
+  st_cast(to = 'MULTILINESTRING') %>% 
+  filter(yr_ncrp <= 1940) %>% 
+  st_write(paste0(CLEANDATA,"/other/other_munis.shp"), append = FALSE)
+
 
 
 get_border <- function(cz){
@@ -130,6 +140,13 @@ muni_borders <- sapply(unique(df$cz), get_border)
 land_borders <- sapply(unique(df$cz), get_land)
 water_borders <- sapply(unique(df$cz), get_water)
 
+x <- unique(df$cz)
+plot(df$geometry[df$cz==35001])
+plot(main_munis$geometry[main_munis$cz == 35001])
+plot(muni_borders[[2]], add = T, col = 'red')
+plot(land_borders[[2]], add = T, col = 'green')
+plot(water_borders[[2]], add = T, col = 'blue')
+plot(land$geometry, add = T, col = 'green')
 
 order
 1: cast principal city to multilinestring

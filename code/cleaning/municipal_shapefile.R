@@ -22,7 +22,7 @@ for (pkg in packages) {
 }
 
 # Get paths
-paths <- read.csv("../paths.csv")
+paths <- read.csv("../../paths.csv")
 CLEANDATA <- paths[paths$global == "CLEANDATA",2]
 RAWDATA <- paths[paths$global == "RAWDATA",2]
 INTDATA <- paths[paths$global == "INTDATA",2]
@@ -87,13 +87,13 @@ out <- places %>%
   select(-COUNTYFP_xwalk) %>% 
   left_join(county_cz_xwalk, by = 'cty_fips') %>% 
   rename(cz = czone) %>% 
-  left_join(sample_czs, by = 'cz') %>% 
+  left_join(sample_czs[c('cz','sample_130_czs')], by = 'cz') %>% 
   mutate(sample_130_czs = if_else(is.na(sample_130_czs),  FALSE, TRUE)) %>% 
   left_join(population, by = c('STATEFP','PLACEFP'))
 
 
 out %>% 
-  st_write(paste0(CLEANDATA,"/other/municipal_shapefile.shp"), layer = "munis")
+  st_write(paste0(CLEANDATA,"/other/municipal_shapefile/municipal_shapefile.shp"), layer = 'munis')
 
 # Also save attributes without shapefile for ease of use
 out %>% 
