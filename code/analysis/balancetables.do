@@ -6,8 +6,8 @@ local samp = "urban"
 
 use "$CLEANDATA/cz_pooled", clear
 local covars avg_precip avg_temp coastal mfg_lfshare1940 m_rr_sqm_total p90_total p95_total transpo_cost_1920
-	
 local pooled_covars_`samp'  ""
+keep if dcourt == 1
 foreach covar in `covars' {
 	local lab : variable label `covar'
 	g GM`covar' = GM_hat_raw_pp
@@ -42,7 +42,8 @@ local extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
 
 use "$CLEANDATA/cz_pooled", clear
 local vars n10_cgoodman_cz_pc n20_cgoodman_cz_pc n30_cgoodman_cz_pc n40_cgoodman_cz_pc pre_cgoodman_cz_pc
-	
+	keep if dcourt == 1
+
 foreach var in `vars' {
 	local lab : variable label `var'
 	g GM`var' = GM_raw_pp
@@ -82,7 +83,8 @@ esttab tsls_`samp' rf_`samp' ///
 
 use "$CLEANDATA/cz_pooled", clear
 local vars n10_cgoodman_cz_pc n20_cgoodman_cz_pc n30_cgoodman_cz_pc n40_cgoodman_cz_pc pre_cgoodman_cz_pc
-	
+	keep if dcourt == 1
+
 foreach var in `vars' {
 	local lab : variable label `var'
 	g GM`var' = GM_raw_pp

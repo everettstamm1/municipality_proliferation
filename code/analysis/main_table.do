@@ -1,7 +1,7 @@
 
 
 local b_controls reg2 reg3 reg4 blackmig3539_share 
-local extra_controls mfg_lfshare1940 
+local extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
 
 use "$CLEANDATA/cz_pooled", clear
 keep if dcourt == 1
@@ -18,7 +18,7 @@ lab var GM_hat_raw_pp_recentered "$\widehat{GM}$, recentered"
 lab var GM_raw_pp_recentered "GM, recentered"
 g order = frac_total^2
 
-su prop_enclosed, d
+qui su prop_enclosed, d
 g above_med_enclosed = prop_enclosed >= `r(p50)'
 
 g GM_X_above_med_enclosed = GM_raw_pp * above_med_enclosed
