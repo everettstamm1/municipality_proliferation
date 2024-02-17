@@ -1,3 +1,5 @@
+local do_placebo = 0
+
 /*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 
 4. Assemble final dataset.
@@ -205,7 +207,7 @@ STEPS:
 		* Version 0 of the instrument: 1935-1940 black southern migrant location choice X observed total 1940-1970 net-migration for southern counties
 		foreach v in "0"{
 		merge 1:1 city using "$INTDATA/dcourt/instrument/city_crosswalked/`v'_black_actmig_1940_1970_wide_xw.dta"
-		
+		ren sumshares v`v'_sumshares
 		/* Drop cities for which there's no hope of getting predictions for black pop in 
 		1970 data for these cities. This set of cities will change depending on the 
 		migration matrix used.*/
@@ -241,7 +243,7 @@ STEPS:
 
 		foreach v in `varstubs2'{
 		merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/`v'_black_prmig_1940_1970_wide_xw.dta"
-
+ren sumshares v`v'_sumshares
 		/* Drop cities for which there's no hope of getting predictions for black pop in 
 		1970 data for these cities. This set of cities will change depending on the 
 		migration matrix used.*/
@@ -264,9 +266,9 @@ STEPS:
 		*	1935-1940 black southern migrant location choice X total observed 1940-1970 net-migration for southern counties,
 		*	residualized on southern state fixed effects.
 		foreach v in "7r" {
-		merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/`v'_black_residmig_1940_1970_wide_xw.dta", keepusing(totblackmigcity3539 black_residoutmigresid*)
+		merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/`v'_black_residmig_1940_1970_wide_xw.dta", keepusing(totblackmigcity3539 black_residoutmigresid* sumshares)
 		*keep if _merge==3
-		
+		ren sumshares v`v'_sumshares
 		/* Drop cities for which there's no hope of getting predictions for black pop in 
 		1970 data for these cities. This set of cities will change depending on the 
 		migration matrix used.*/
@@ -287,8 +289,8 @@ STEPS:
 		* Version 8 of the instrument: 
 		*	1935-1940 white southern migrant location choice X total observed 1940-1970 white net-migration for southern counties,
 		foreach v in "8" {
-		merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/`v'_white_actmig_1940_1970_wide_xw.dta", keepusing(totwhitemigcity3539 white_actoutmigact*)
-		
+		merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/`v'_white_actmig_1940_1970_wide_xw.dta", keepusing(totwhitemigcity3539 white_actoutmigact* sumshares)
+		ren sumshares v`v'_sumshares
 		/* Drop cities for which there's no hope of getting predictions for black pop in 
 		1970 data for these cities. This set of cities will change depending on the 
 		migration matrix used.*/
@@ -309,8 +311,8 @@ STEPS:
 		* Version 80 of the instrument: 
 		*	1935-1940 black southern migrant location choice X total observed 1940-1970 black net-migration for southern counties,
 		foreach v in "80" {
-		merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/`v'_black_actmig_1940_1970_wide_xw.dta", keepusing(totblackmigcity3539 black_actoutmigact*)
-		
+		merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/`v'_black_actmig_1940_1970_wide_xw.dta", keepusing(totblackmigcity3539 black_actoutmigact* sumshares)
+		ren sumshares v`v'_sumshares
 		/* Drop cities for which there's no hope of getting predictions for black pop in 
 		1970 data for these cities. This set of cities will change depending on the 
 		migration matrix used.*/
@@ -327,7 +329,8 @@ STEPS:
 		}
 		rename totblackmigcity3539 v`v'_totblackmigcity3539
 		}
-		
+		if `do_placebo'==1{
+
 		* Placebo versions of the instrument: 
 		*	1935-1940 white southern migrant location choice X normally distributed random shocks,
 		*	with mean 0 and variance 5, iterated 1000 times.
@@ -352,7 +355,7 @@ STEPS:
 		}
 		qui rename totblackmigcity3539 vr`i'_totblackmigcity3539
 		}
-		
+		}
 		/*
 		* Northern CZ measure of 1940 southern county upward mobility: 
 		*	1935-1940 black southern migrant location choice X total observed 1940-1970 net-migration for southern counties,
@@ -388,7 +391,7 @@ STEPS:
 		*/
 		g wpopc4070 = wpopc1970 - wpopc1940
 		g nbpopc4070 = (popc1970 - bpopc1970) - (popc1940 - bpopc1940)
-		keep *_proutmigpr* *_actoutmigact* *_residoutmigresid* nbpopc4070 popc1940 bpopc1940 popc1970 popc1960 bpopc1950 bpopc1960 popc1950 bpopc1970 *migcity3539 statefip citycode city city_original cz cz_name wpopc1940 wpopc1970 samp_*
+		keep *_proutmigpr* *_actoutmigact* *_residoutmigresid* nbpopc4070 popc1940 bpopc1940 popc1970 popc1960 bpopc1950 bpopc1960 popc1950 bpopc1970 *migcity3539 statefip citycode city city_original cz cz_name wpopc1940 wpopc1970 samp_* *_sumshares
 		drop if popc1970==.
 		
 		save "$INTDATA/dcourt/GM_city_final_dataset`samptab'.dta", replace
@@ -402,7 +405,7 @@ STEPS:
 			local levelvar cz
 			local varstubs = ""
 			local varstubs2 = "2 1940 r"
-			collapse (sum) *_proutmigpr* *_actoutmigact* *_residoutmigresid* nbpopc4070  popc* bpopc* *migcity3539 wpopc1940 wpopc1970 (max) samp_*, by(cz)
+			collapse (sum) *_sumshares *_proutmigpr* *_actoutmigact* *_residoutmigresid* nbpopc4070  popc* bpopc* *migcity3539 wpopc1940 wpopc1970 (max) samp_*, by(cz)
 			
 			g bpopc4070 = bpopc1970-bpopc1940
 
@@ -428,8 +431,6 @@ STEPS:
 			
 			g v`v'_bcpp_pred1940_1970=100*((v`v'_black_proutmigpr+bpopc1940)/(popc1940 + v`v'_black_proutmigpr) - bpopc1940/popc1940)
 
-
-
 			}
 			
 			
@@ -451,7 +452,7 @@ STEPS:
 			g v`v'_whitemig3539_share1940=100*v`v'_totwhitemigcity3539/popc1940
 			}
 				
-		
+		if `do_placebo'==1{
 			* Placebo shocks
 			forval i=1(1)1000{
 				g vr`i'_bc_pred1940_1970 = 100*vr`i'_black_proutmigpr/popc1940
@@ -459,7 +460,7 @@ STEPS:
 			g vr`i'_bcpp_pred1940_1970=100* ((vr`i'_black_proutmigpr+bpopc1940)/(popc1940 +  vr`i'_black_proutmigpr) - bpopc1940/popc1940)
 
 			}
-		
+		}
 /*
 			* Northern CZ measure of 1940 southern county upward mobility
 			foreach v in "m"{
@@ -515,12 +516,12 @@ STEPS:
 			xtile GM_`v'_hat = v`v'_wc_pred1940_1970, nq(100) 
 			}
 			
-		
-			* Placebo shocks
-			forval i=1(1)1000{	
-			xtile GM_r`i'_hat = vr`i'_bc_pred1940_1970, nq(100) 
-			}	
-			
+			if `do_placebo'==1{
+				* Placebo shocks
+				forval i=1(1)1000{	
+				xtile GM_r`i'_hat = vr`i'_bc_pred1940_1970, nq(100) 
+				}	
+			}
 			
 		*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 		*6. Finalize mechanism variables 
@@ -716,11 +717,12 @@ STEPS:
 			ren v8_wc_pred1940_1970 GM_8_hat_raw
 			ren v8_wcpp_pred1940_1970 GM_8_hat_raw_pp
 			
-			
+			if `do_placebo'==1{
+
 			forv i=1(1)1000{	
 			ren vr`i'_bcpp_pred1940_1970 GM_hat_raw_r`i'
 			}	
-			
+			}
 			foreach v in 1940 r 7r{
 				ren v`v'_bcpp_pred1940_1970 GM_`v'_hat_raw_pp
 			}

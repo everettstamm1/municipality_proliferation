@@ -1,0 +1,69 @@
+\documentclass{article}
+\usepackage{blindtext}
+\usepackage{booktabs}
+\usepackage[margin=0.25in]{geometry}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage{tikz}
+\usepackage{threeparttable}
+\usepackage{algorithmic}
+
+
+\title{Simple Tables for Municipality Proliferation}
+
+\begin{document}
+\maketitle
+\tableofcontents
+{\footnotesize 
+\listoffigures
+\listoftables}
+\clearpage
+
+\section*{Explainer}
+To clarify what we're controling for here:
+\[
+	blackmig_{CZ} = \frac{\sum\limits_{j \in CZ} \sum\limits_{c \in C} b_{j,c}}{popc1940}
+\]
+\[
+	sumshare_{CZ} = \frac{\sum\limits_{j \in CZ} \sum\limits_{c \in C} \frac{b_{j,c}}{b_c}}{popc1940}
+\]
+
+Where $b_{j,c}$ is the number of Black people who left southern county $c$ for a northern city $j$ that is in $CZ$, $b_c$ is the total number of Black people who left southern county $c$, i.e. $b_c = \sum\limits_{j \in J} b_{j,c}$, with $J$ being anywhere in the US (except $c$, of course).
+
+The document is organized as follows. Sections 1, 2, and 3 all use the percentage point instrument and X variables. Sections 4, 5, and 6 all use the percentage instrument and percentage point X variables. Sections 1 and 4 use the original blackmig control, sections 2 and 5 use the sumshare control, and sections 3 and 6 use both. Each section has a balance table, then a pretrends and main table without the imbalanced control(s), then a pretrends and main table with the imbalanced control(s). 
+\begin{landscape}
+\foreach \inst in {original, percent}{
+	\foreach \ctrl in {blackmig, sumshares, both}{
+		\section{\inst  Instrument, \ctrl  control}
+		
+		\input{tables/balancetables/balancetable_\inst_\ctrl}
+	 	\clearpage
+		
+		\subsection*{Base Controls}
+		\input{tables/balancetables/pretrends_\inst_\ctrl_base}
+		\clearpage
+		
+		\begin{table}[htbp]\centering \begin{threeparttable} \caption{Effects of change in Black Migration on Municipal Proliferation}
+		\input{tables/final/main_effect_\inst_\ctrl_base.tex}
+		{\caption*{\begin{scriptsize} "\(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)"\end{scriptsize}}} \end{threeparttable} \end{table}
+		\clearpage
+
+		\subsection*{With Imbalanced Controls}
+		\input{tables/balancetables/pretrends_\inst_\ctrl_new_ctrls}
+		\clearpage
+		
+		\begin{table}[htbp]\centering \begin{threeparttable} \caption{Effects of change in Black Migration on Municipal Proliferation}
+		\input{tables/final/main_effect_\inst_\ctrl_new_ctrls.tex}
+		{\caption*{\begin{scriptsize} "\(p<0.10\), ** \(p<0.05\), *** \(p<0.01\)"\end{scriptsize}}} \end{threeparttable} \end{table}
+		\clearpage
+		
+
+	}
+
+}
+\end{landscape}
+
+\end{document}

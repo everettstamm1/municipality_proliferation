@@ -493,6 +493,49 @@ STEPS:
 		
 	do "$CODE/helper/bartik_generic.do"
 	
+	
+*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
+* Shock reassignment randomization.
+*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
+
+	// Seed comes from the Saturday, Feb 10th 2024 MA Powerball numbers: https://www.masslottery.com/tools/past-results/powerball?start_date=2024-02-07&end_date=2024-02-10
+	// First four numbers as stata has a limit on seeds
+	set seed 27283437
+	forval i=1(1)1000{  
+		
+	use	"$INTDATA/dcourt/2_lasso_boustan_predict_mig.dta", clear
+	keep year origin_fips proutmig
+	g order = _n
+	g rng = uniform()
+	sort rng
+	replace  proutmig = proutmig[order]
+	
+	tempfile proutmig`i'
+	save `proutmig`i''
+
+	clear all
+	set maxvar 32000
+		
+	global groups black // took out white
+	global origin_id origin_fips
+	global origin_id_code origin_fips_code
+	global origin_sample origin_sample
+	global destination_id city
+	global destination_id_code city_code
+	global dest_sample dest_sample
+	global weights_data "`proutmig`i''"
+	global version re`i'
+	global weight_types pr // took out act
+	global weight_var outmig
+	global start_year 1940
+	global panel_length 0
+	global shares_dir "$INTDATA/dcourt/shares/reassignment" 
+	global sharesXweights_dir "$INTDATA/dcourt/instrument/reassignment" 
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
+
+	do "$CODE/helper/bartik_generic.do"
+	}
+	
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 *10. Clean and standardize city names and output final instrument measures at the city-level
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
@@ -510,7 +553,8 @@ STEPS:
 		order black* total*
 		egen totblackmigcity3539=rowmean(total_blackcity*)
 		sum totblackmigcity3539
-		
+		egen sumshares = rowtotal(blackorigin_fips*)
+
 		drop total* black*
 		save "$INTDATA/dcourt/instrument/`v'_city_blackmigshare3539.dta", replace
 		
@@ -601,7 +645,7 @@ STEPS:
 		order black* total*
 		egen totblackmigcity3539=rowmean(total_blackcity*)
 		sum totblackmigcity3539
-		
+		egen sumshares = rowtotal(black`origincode'*)
 		drop total* black*
 		save "$INTDATA/dcourt/instrument/`v'_city_blackmigshare3539.dta", replace
 		
@@ -686,7 +730,8 @@ STEPS:
 		order black* total*
 		egen totblackmigcity3539=rowmean(total_blackcity*)
 		sum totblackmigcity3539
-		
+		egen sumshares = rowtotal(blackorigin_fips*)
+
 		*egen totblackmig3539=sum(totblackmigcity3539)
 		drop total* black*
 		save "$INTDATA/dcourt/instrument/`v'_city_blackmigshare3539.dta", replace
@@ -769,6 +814,8 @@ STEPS:
 		order white* total*
 		egen totwhitemigcity3539=rowmean(total_whitecity*)
 		sum totwhitemigcity3539
+		egen sumshares = rowtotal(whiteorigin_fips*)
+
 		drop total* white*
 		save "$INTDATA/dcourt/instrument/`v'_city_whitemigshare3539.dta", replace
 		
@@ -849,6 +896,8 @@ STEPS:
 		order black* total*
 		egen totblackmigcity3539=rowmean(total_blackcity*)
 		sum totblackmigcity3539
+				egen sumshares = rowtotal(blackorigin_fips*)
+
 		drop total* black*
 		save "$INTDATA/dcourt/instrument/`v'_city_blackmigshare3539.dta", replace
 		
@@ -936,7 +985,8 @@ STEPS:
 		order black* total*
 		egen totblackmigcity3539=rowmean(total_blackcity*)
 		sum totblackmigcity3539
-		
+		egen sumshares = rowtotal(blackorigin_fips*)
+
 		drop total* black*
 		save "$INTDATA/dcourt/instrument/`v'_city_blackmigshare3539.dta", replace
 		
@@ -1023,7 +1073,8 @@ STEPS:
 		order black* total*
 		egen totblackmigcity3539=rowmean(total_blackcity*)
 		sum totblackmigcity3539
-		
+		egen sumshares = rowtotal(blackorigin_fips*)
+
 		drop total* black*
 		save "$INTDATA/dcourt/bartik/rndmig/r`i'_city_blackmigshare3539.dta", replace
 		
