@@ -122,7 +122,6 @@ g samp_dest_pre_zbelow = samp_dest_pre if above_inst_med == 0
 egen landuse_sfr_plus = rowtotal(landuse_sfr landuse_residentialnec), m
 egen landuse_nonsfr = rowtotal(landuse_apartment landuse_multifam landuse_triplex landuse_duplex landuse_townhouse landuse_condo landuse_mobilehome ), m
 
-
 /*
 drop if yr_incorp>1970
 g time = 1 if yr_incorp <1940
@@ -137,7 +136,7 @@ foreach w in none pop{
 	eststo clear
 		
 	foreach covar of varlist landuse_sfr landuse_sfr_plus landuse_nonsfr landuse_apartment {
-		eststo `covar' : csdid `covar' i.region [weight=weight_`w'], time(time) gvar(treat)
+		eststo `covar' : didregress `covar' i.region [weight=weight_`w'], time(time) gvar(treat)
 	}
 
 
@@ -251,6 +250,51 @@ forv iv=0/1{
 
 }
 
+
+// Continuous DID model
+drop if yr_incorp>1970
+g time = 1 if yr_incorp <1940
+replace time = 2 if yr_incorp>=1940 & yr_incorp<=1970
+
+g treat = cond(time==1,GM_hat_raw_pp,0)
+
+eststo clear
+foreach covar of varlist landuse_sfr landuse_apartment pct_rev_ff pct_rev_sa pct_rev_debt {
+	local mname = subinstr("`covar'","landuse_", "",.)
+	lab var `covar' "`mname'"
+	di "`covar'"
+	eststo `covar' : didregress (`covar' i.region blackmig3539_share) (treat, continuous) [aw=weight_pop], group(cz) time(time) vce(cl cz)
+
+
+	
+}
+
+
+esttab using "$TABS/land_use_index/muni_outcomes_continuous_did.tex", booktabs compress label replace lines se frag ///
+			 starlevels( * 0.10 ** 0.05 *** 0.01) ///
+			mtitles("Single Family" "Apartments" "Fines/Forfeits" "\shortstack{Special \\ Assessments}" "\shortstack{Outstanding \\ Debt}") ///
+			mgroups("\shortstack{Percentage of \\ Municipal Land Uses}" "\shortstack{Percentage of \\ Municipal Revenues}", pattern(1 0 1 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(treat) b(%04.3f) se(%04.3f) ///
+			prehead( \begin{tabular}{l*{5}{c}} \toprule) postfoot(	\bottomrule \end{tabular}) 
+			
+			
+
+eststo clear
+foreach covar of varlist landuse_sfr landuse_apartment pct_rev_ff pct_rev_sa pct_rev_debt {
+	local mname = subinstr("`covar'","landuse_", "",.)
+	lab var `covar' "`mname'"
+	di "`covar'"
+	eststo `covar' : didregress (`covar' i.region blackmig3539_share mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total) (treat, continuous) [aw=weight_pop], group(cz) time(time) vce(cl cz)
+
+
+	
+}
+
+
+esttab using "$TABS/land_use_index/muni_outcomes_continuous_did_new_ctrls.tex", booktabs compress label replace lines se frag ///
+			 starlevels( * 0.10 ** 0.05 *** 0.01) ///
+			mtitles("Single Family" "Apartments" "Fines/Forfeits" "\shortstack{Special \\ Assessments}" "\shortstack{Outstanding \\ Debt}") ///
+			mgroups("\shortstack{Percentage of \\ Municipal Land Uses}" "\shortstack{Percentage of \\ Municipal Revenues}", pattern(1 0 1 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(treat) b(%04.3f) se(%04.3f) ///
+			prehead( \begin{tabular}{l*{5}{c}} \toprule) postfoot(	\bottomrule \end{tabular}) 
 
 
 

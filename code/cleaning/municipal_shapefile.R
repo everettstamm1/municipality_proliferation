@@ -1,23 +1,41 @@
-library(tidyverse)
-library(sf)
-library(haven)
-library(tigris)
-library(stringr)
-library(readxl)
-library(terra)
 
-RAWDATA <- "C:/Users/Everett Stamm/Dropbox/municipality_proliferation/data/raw/"
-INTDATA <- "C:/Users/Everett Stamm/Dropbox/municipality_proliferation/data/interim/"
-CLEANDATA <- "C:/Users/Everett Stamm/Dropbox/municipality_proliferation/data/clean/"
+## Load dependencies, install if not already.
+packages <-
+  c('tidyverse',
+    'sf',
+    'haven',
+    'tigris',
+    'stringr',
+    'readxl',
+    'terra')
 
-XWALKS <- "C:/Users/Everett Stamm/Dropbox/municipality_proliferation/data/xwalks/"
+for (pkg in packages) {
+  if (require(pkg, character.only = TRUE) == FALSE) {
+    print(paste0("Trying to install ", pkg))
+    install.packages(pkg)
+    if (require(pkg, character.only = TRUE)) {
+      print(paste0(pkg, " installed and loaded"))
+    } else{
+      stop(paste0("could not install ", pkg))
+    }
+  }
+}
+
+# Get paths
+paths <- read.csv("../../paths.csv")
+CLEANDATA <- paths[paths$global == "CLEANDATA",2]
+RAWDATA <- paths[paths$global == "RAWDATA",2]
+INTDATA <- paths[paths$global == "INTDATA",2]
+XWALKS <- paths[paths$global == "XWALKS",2]
+
+
 
 #### Geographies ----
-county_cz_xwalk <- read_dta(paste0(XWALKS,"cw_cty_czone.dta"))
-sample_czs <- read_dta(paste0(INTDATA,"dcourt/original_130_czs.dta")) %>% 
+county_cz_xwalk <- read_dta(paste0(XWALKS,"/cw_cty_czone.dta"))
+sample_czs <- read_dta(paste0(INTDATA,"/dcourt/original_130_czs.dta")) %>% 
   mutate(sample_130_czs = TRUE)
 
-fips_place_xwalk <- read_dta(paste0(XWALKS,"place_county_xwalk.dta")) %>% 
+fips_place_xwalk <- read_dta(paste0(XWALKS,"/place_county_xwalk.dta")) %>% 
   rename(STATEFP = statefp, PLACEFP = placefp, COUNTYFP_xwalk = countyfp) %>% 
   select(STATEFP, PLACEFP, COUNTYFP_xwalk)
 
@@ -26,7 +44,7 @@ munis <- read_stata(paste0(RAWDATA,'/cbgoodman/muni_incorporation_date.dta')) %>
   select(muniname,statefips,placefips,countyfips,yr_incorp) %>% 
   rename(STATEFP = statefips, PLACEFP = placefips, COUNTYFP = countyfips) 
   
-WRLURI <- read_stata(paste0(RAWDATA,"other/WHARTONLANDREGULATIONDATA_1_15_2020/WRLURI_01_15_2020.dta")) %>% 
+WRLURI <- read_stata(paste0(RAWDATA,"/other/WHARTONLANDREGULATIONDATA_1_15_2020/WRLURI_01_15_2020.dta")) %>% 
   filter(str_length(GEOID)==7) %>% # Keeping only census designated places
   mutate(PLACEFP = fipsplacecode18, STATEFP = statecode) %>% 
   select(PLACEFP, STATEFP,LPPI18,SPII18,LPAI18,LZAI18,SRI18,DRI18,
@@ -37,10 +55,10 @@ WRLURI <- read_stata(paste0(RAWDATA,"other/WHARTONLANDREGULATIONDATA_1_15_2020/W
                              TRUE ~ PLACEFP))
 
 
-corelogic <- read.csv(paste0(CLEANDATA,"corelogic/censusplace_clogic_chars.csv")) %>% 
+corelogic <- read.csv(paste0(CLEANDATA,"/corelogic/censusplace_clogic_chars.csv")) %>% 
   rename(NAME_corelogic = NAME)
 
-population <- read.csv(paste0(RAWDATA,"census/nhgis0025_csv/nhgis0025_csv/nhgis0025_ds258_2020_place.csv")) %>% 
+population <- read.csv(paste0(RAWDATA,"/census/nhgis0025_csv/nhgis0025_csv/nhgis0025_ds258_2020_place.csv")) %>% 
   select(STATEA, PLACEA, U7H001) %>% 
   rename(STATEFP = STATEA, PLACEFP = PLACEA, population = U7H001)
 
@@ -69,18 +87,18 @@ out <- places %>%
   select(-COUNTYFP_xwalk) %>% 
   left_join(county_cz_xwalk, by = 'cty_fips') %>% 
   rename(cz = czone) %>% 
-  left_join(sample_czs, by = 'cz') %>% 
+  left_join(sample_czs[c('cz','sample_130_czs')], by = 'cz') %>% 
   mutate(sample_130_czs = if_else(is.na(sample_130_czs),  FALSE, TRUE)) %>% 
   left_join(population, by = c('STATEFP','PLACEFP'))
 
 
 out %>% 
-  st_write(paste0(CLEANDATA,"other/municipal_shapefile.shp"), layer = "munis")
+  st_write(paste0(CLEANDATA,"/other/municipal_shapefile/municipal_shapefile.shp"), layer = 'munis')
 
 # Also save attributes without shapefile for ease of use
 out %>% 
   st_drop_geometry() %>% 
-  write_dta(paste0(CLEANDATA,"other/municipal_shapefile_attributes.dta"))
+  write_dta(paste0(CLEANDATA,"/other/municipal_shapefile_attributes.dta"))
 
 # TROUBLESHOOTING THE MERGE
 # test <- places %>% 

@@ -561,7 +561,7 @@ STEPS:
 	rename whitemig actoutmig
 	
 	/* Merge with 1940 crosswalks data file. */
-	keep fips state_name county_name *mig* year
+	keep fips state_name county_name *mig* year 
 	g origin_fips=fips
 	rename state_name origin_state_name
 	rename county_name origin_county_name 
@@ -569,7 +569,7 @@ STEPS:
 	/* Hand correct counties that didn't match using crosswalk file and internet search. */
 	
 	tostring origin_fips, replace
-	keep origin_fips year actoutmig
+	keep origin_fips year actoutmig 
 	
 	drop if actoutmig==.
 	
@@ -580,6 +580,37 @@ STEPS:
 	
 	save "$INTDATA/dcourt/5_white_mig.dta", replace
 	
-	collapse (sum) actoutmig, by(origin_fips year)
+	collapse (sum) actoutmig , by(origin_fips year)
 	save "$INTDATA/dcourt/5_white_mig_collapsed.dta", replace	
 	
+	use "$RAWDATA/dcourt/clean_south_county_white_nonwhite_mig_1940_1970.dta", clear
+	
+	/* One observation per county, year. */
+	
+	drop if year==year[_n-1]
+	sort fips year
+	drop if fips==.
+	rename nonwhitemig actoutmig
+	
+	/* Merge with 1940 crosswalks data file. */
+	keep fips state_name county_name *mig* year 
+	g origin_fips=fips
+	rename state_name origin_state_name
+	rename county_name origin_county_name 
+	
+	/* Hand correct counties that didn't match using crosswalk file and internet search. */
+	
+	tostring origin_fips, replace
+	keep origin_fips year actoutmig 
+	
+	drop if actoutmig==.
+	
+	bysort origin_fips year: gen dup= cond(_N==1,0,_n)
+	tab dup
+	
+	drop dup
+	
+	save "$INTDATA/dcourt/5_nonwhite_mig.dta", replace
+	
+	collapse (sum) actoutmig , by(origin_fips year)
+	save "$INTDATA/dcourt/5_nonwhite_mig_collapsed.dta", replace	

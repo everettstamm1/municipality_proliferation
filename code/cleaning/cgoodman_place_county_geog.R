@@ -1,16 +1,33 @@
-library(tidyverse)
-library(sf)
-library(haven)
-library(tigris)
-library(stringr)
 
-RAWDATA <- "C:/Users/Everett Stamm/Dropbox/municipality_proliferation/data/raw/"
-INTDATA <- "C:/Users/Everett Stamm/Dropbox/municipality_proliferation/data/interim/"
-XWALKS <- "C:/Users/Everett Stamm/Dropbox/municipality_proliferation/data/xwalks/"
+## Load dependencies, install if not already.
+packages <-
+  c('tidyverse',
+    'sf',
+    'haven',
+    'tigris',
+    'stringr',
+    'readxl')
 
-county_cz_xwalk <- read_dta(paste0(XWALKS,"cw_cty_czone.dta"))
+for (pkg in packages) {
+  if (require(pkg, character.only = TRUE) == FALSE) {
+    print(paste0("Trying to install ", pkg))
+    install.packages(pkg)
+    if (require(pkg, character.only = TRUE)) {
+      print(paste0(pkg, " installed and loaded"))
+    } else{
+      stop(paste0("could not install ", pkg))
+    }
+  }
+}
 
-cbgoodman <- read_dta(paste0(RAWDATA,"cbgoodman/muni_incorporation_date.dta")) %>% 
+# Get paths
+paths <- read.csv("../paths.csv")
+RAWDATA <- paths[paths$global == "RAWDATA",2]
+INTDATA <- paths[paths$global == "INTDATA",2]
+XWALKS <- paths[paths$global == "XWALKS",2]
+county_cz_xwalk <- read_dta(paste0(XWALKS,"/cw_cty_czone.dta"))
+
+cbgoodman <- read_dta(paste0(RAWDATA,"/cbgoodman/muni_incorporation_date.dta")) %>% 
   select(placefips,statefips,countyfips, yr_incorp) %>% 
   rename(PLACEFP = placefips,STATEFP = statefips, COUNTYFP = countyfips)
 
@@ -47,4 +64,4 @@ places <- places(cb=TRUE)  %>%
   merge(counties, by = c("COUNTYFP","STATEFP")) %>% 
   mutate(frac_land = place_land/county_land, frac_total = place_total/county_total)
 
-write_dta(places,path=paste0(INTDATA,"cgoodman/cgoodman_place_county_geog.dta"))
+write_dta(places,path=paste0(INTDATA,"/cgoodman/cgoodman_place_county_geog.dta"))

@@ -298,8 +298,8 @@ foreach level in cz {
 		
 		use "$CLEANDATA/dcourt/GM_`level'_final_dataset`samptab'.dta", clear
 		g ne_ut = state_id == 31 | state_id == 49
-		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*   GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_* WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970 urban_share1940 ln_pop_dens1940
-		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*   GM_hat_raw_r* GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970 urban_share1940 ln_pop_dens1940
+		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_* WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970 *_sumshares
+		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970  *_sumshares
 
 		if "`samp'"=="south" ren v2*_blackmig3539_share1940 *blackmig3539_share
 		if "`samp'"=="dcourt" ren v2_blackmig3539_share1940 blackmig3539_share
@@ -339,7 +339,7 @@ foreach level in cz {
 		*/
 		foreach ds in gen_muni schdist_ind all_local gen_subcounty spdist gen_town schdist{
 
-			merge 1:1 `levelvar' using "$INTDATA/counts/`ds'_`level'", keep(1 3) nogen keepusing(n_`ds'_`level' b_`ds'_`level'1970 b_`ds'_`level'1940 b_`ds'_`level'1950 b_`ds'_`level'2010)
+			merge 1:1 `levelvar' using "$INTDATA/counts/`ds'_`level'", keep(1 3) nogen keepusing(n_`ds'_`level' b_`ds'_`level'1970 b_`ds'_`level'1960 b_`ds'_`level'1940 b_`ds'_`level'1950 b_`ds'_`level'2010)
 		}
 		merge 1:1 `levelvar' using "$INTDATA/counts/cgoodman_`level'", keep(1 3) nogen keepusing(n_cgoodman_`level' b_cgoodman_`level'*)
 
@@ -381,7 +381,7 @@ foreach level in cz {
 
 		}
 		// Missing dummies
-		foreach var of varlist frac_land transpo_cost_1920 coastal has_port avg_precip avg_temp n_wells totfrac_in_main_city urbfrac_in_main_city m_rr m_rr_sqm_land m_rr_sqm_total{
+		foreach var of varlist frac_land transpo_cost_1920 coastal has_port avg_precip avg_temp n_wells totfrac_in_main_city m_rr m_rr_sqm_land m_rr_sqm_total{
 			g `var'_m = `var'==.
 			replace `var' = 0 if `var'==.
 		}
@@ -389,6 +389,7 @@ foreach level in cz {
 		
 		replace n_cgoodman_cz = 0 if n_cgoodman_cz==.
 		replace b_cgoodman_cz1940 = 0 if b_cgoodman_cz1940==.
+		replace b_cgoodman_cz1960 = 0 if b_cgoodman_cz1960==.
 		replace b_cgoodman_cz1970 = 0 if b_cgoodman_cz1970==.
 		replace b_cgoodman_cz1950 = 0 if b_cgoodman_cz1950==.
 		replace b_cgoodman_cz2010 = 0 if b_cgoodman_cz2010==.
@@ -415,6 +416,10 @@ foreach level in cz {
 				lab var b_`ds'_`level'1970 "Base Govs 1970, `label'"
 				
 				g b_`ds'_`level'1940_pc = b_`ds'_`level'1940/(pop1940/10000) 
+				g b_`ds'_`level'1950_pc = b_`ds'_`level'1950/(pop1950/10000) 
+				g b_`ds'_`level'1960_pc = b_`ds'_`level'1960/(pop1960/10000) 
+				g b_`ds'_`level'1970_pc = b_`ds'_`level'1970/(pop1970/10000) 
+
 				g b_`ds'_`level'1940_pcc = b_`ds'_`level'1940/(popc1940/10000)
 				g b_`ds'_`level'1970_pcc = b_`ds'_`level'1970/(popc1970/10000) 
 
@@ -476,7 +481,6 @@ foreach level in cz {
 		
 
 		lab var totfrac_in_main_city "Fraction of population in largest city"
-		lab var urbfrac_in_main_city "Fraction of urban population in largest city"
 		lab var n_wells "Number of Oil/Nat Gas Wells, 1940"
 		lab var max_temp "Maximum Temperature, 1940"
 		lab var min_temp "Minimum Temperature, 1940"
@@ -488,10 +492,8 @@ foreach level in cz {
 		lab var m_rr "Meters of Railroad, 1940"
 		lab var m_rr_sqm_land "Meters of Railroad per Square Meter of Land, 1940"
 		lab var m_rr_sqm_total "Meters of Railroad per Square Meter of Area, 1940"
-		lab var urban_share1940 "Share population urban"
 		lab var frac_total "Fraction of area incorporated"
 		lab var coastal "Coastal CZ" 
-		lab var urbfrac_in_main_city "Fraction of urban population living in largest city" 
 		lab var avg_precip "Average precipitation" 
 		lab var avg_temp "Average temperature"
 		
@@ -516,6 +518,26 @@ foreach level in cz {
 		g n_totfrac_cz_pc = 100*((maxcitypop1970/pop1970) - (maxcitypop1940/pop1940))
 		g n2_totfrac_cz_pc = 100*((maxcitypop1970/pop1970) - (maxcitypop1950/pop1950))
 		g ld_totfrac_cz_pc = 100*((maxcitypop2010/pop2010) - (maxcitypop1940/pop1940))
+		
+		// Adding measure of enclosedness
+		preserve	
+			import delimited using "$CLEANDATA/other/length_enclosed.csv", clear
+			duplicates drop
+			replace enclosed_length = 0 if mi(enclosed_length)
+			g prop_enclosed = enclosed_length / total_length
+			keep cz prop_enclosed
+			tempfile enclosed
+			save `enclosed'
+		restore
+		
+		merge 1:1 cz using `enclosed', keep(1 3) nogen
+		
+		foreach s of varlist *_sumshares{
+		    g `s'_total = `s'/(pop1940/10000)
+			g `s'_urban = `s'/(popc1940/10000)
+		}
+		
+		
 		save "$CLEANDATA/`level'_pooled`outsamptab'", replace
 		
 		/*

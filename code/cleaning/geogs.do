@@ -2,7 +2,7 @@
 use "$INTDATA/cgoodman/cgoodman_place_county_geog.dta", clear
 
 destring *FP, replace
-g cty_fips = STATEFP*1000 + COUNTYFP
+//g cty_fips = STATEFP*1000 + COUNTYFP
 merge m:1 cty_fips using "$XWALKS/cw_cty_czone.dta", keep(3) nogen
 ren cty_fips fips
 ren czone cz

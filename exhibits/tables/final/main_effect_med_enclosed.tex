@@ -1,0 +1,39 @@
+ \begin{tabular}{l*{8}{c}} \toprule
+&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}
+&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}
+&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\
+\cmidrule(lr){1-7}
+\multicolumn{6}{l}{Panel A: First Stage}\\
+\cmidrule(lr){1-7}
+$\widehat{GM}$  &    3.198***&    3.198***&    3.198***&    3.198***&    3.198***&    3.198***\\
+                &  (0.300)   &  (0.300)   &  (0.300)   &  (0.300)   &  (0.300)   &  (0.300)   \\
+\cmidrule(lr){1-7}
+\multicolumn{6}{l}{Panel B: OLS}\\
+\cmidrule(lr){1-7}
+GM              &   -0.000   &    0.005   &    0.155   &   -0.008   &   -0.047***&   -0.634** \\
+                &  (0.007)   &  (0.008)   &  (0.198)   &  (0.014)   &  (0.015)   &  (0.247)   \\
+\addlinespace
+GM\_X\_above\_med\_enclosed&    0.003   &    0.001   &    0.175   &    0.023*  &    0.017** &   -0.251   \\
+                &  (0.007)   &  (0.007)   &  (0.177)   &  (0.012)   &  (0.008)   &  (0.161)   \\
+\cmidrule(lr){1-7}
+\multicolumn{6}{l}{Panel C: Reduced Form}\\
+\cmidrule(lr){1-7}
+$\widehat{GM}$  &    0.034   &    0.044   &    1.242*  &    0.043   &   -0.086   &   -2.333** \\
+                &  (0.028)   &  (0.032)   &  (0.742)   &  (0.043)   &  (0.062)   &  (1.103)   \\
+\addlinespace
+GM\_hat\_X\_above\_med\_enclosed&   -0.014   &   -0.014   &    0.241   &    0.040   &   -0.002   &   -1.096   \\
+                &  (0.028)   &  (0.031)   &  (0.699)   &  (0.040)   &  (0.050)   &  (0.873)   \\
+\cmidrule(lr){1-7}
+\multicolumn{6}{l}{Panel D: 2SLS}\\
+\cmidrule(lr){1-7}
+GM              &    0.013   &    0.018*  &    0.590***&    0.025*  &   -0.039** &   -1.198***\\
+                &  (0.009)   &  (0.010)   &  (0.228)   &  (0.015)   &  (0.019)   &  (0.355)   \\
+\addlinespace
+GM\_X\_above\_med\_enclosed&   -0.006   &   -0.007   &   -0.108   &    0.001   &    0.010   &    0.099   \\
+                &  (0.007)   &  (0.008)   &  (0.168)   &  (0.010)   &  (0.012)   &  (0.218)   \\
+\midrule
+First Stage F-Stat&   113.48   &   113.48   &   113.48   &   113.48   &   113.48   &   113.48   \\
+Dep. Var. Mean  &    -0.14   &    -0.17   &    -3.57   &    -0.25   &     0.26   &   -14.64   \\
+1940 Dep. Var. Mean&     0.63   &     0.68   &     4.03   &     0.81   &     0.42   &    50.41   \\
+Observations    &      130   &      130   &      130   &      130   &      130   &      130   \\
+       \bottomrule \end{tabular}
