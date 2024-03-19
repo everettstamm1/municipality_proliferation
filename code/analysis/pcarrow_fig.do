@@ -5,10 +5,10 @@ labmask order, values(cz_name)
 
 g namepos = min(cz_prop_white, cz_new_prop_white)
 
-qui sum GM_hat_raw_pp, d
+qui sum GM_hat_raw, d
 local cmin = r(min)
 local cmax = r(max)
-g c255 = round(255*(GM_hat_raw_pp - `cmin')/(`cmax' - `cmin'))
+g c255 = round(255*(GM_hat_raw - `cmin')/(`cmax' - `cmin'))
 
 local base tw (pcarrow order cz_prop_white order cz_new_prop_white,  mcol(black) lcol(black)) (scatter order cz_prop_white, ms(oh) barbsize(2) mlcol(black) mfcol(black)) (scatter order namepos, ms(none) mlabel(cz_name) mlabpos(9) mlabsize(2)) (function y=80, ra(80 80) lcol("`: di 0' 0 `: di 255'") lpat(solid) lw(*5)) (function y=80, ra(80 80) lcol("`: di 255' 0 `: di 0'") lpat(solid) lw(*5))
 levelsof c255, local(levels)

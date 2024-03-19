@@ -17,18 +17,30 @@ di ((`x' * `est2')) - ((`x' * `est1'))
 di ((`x' * `est3'))
 
 
-	use "$CLEANDATA/cz_pooled", clear
+use "$CLEANDATA/cz_pooled", clear
 	
-	summarize GM_raw_pp
+summarize GM_raw_pp
 local est1 = r(sd)
-ivreg2 n_cgoodman_cz_pc (GM_raw_pp = GM_hat_raw_pp) reg2 reg3 reg4 blackmig3539_share mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total [aw = popc1940], r
+ivreg2 n_cgoodman_cz_pc (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 v2_sumshares_urban  transpo_cost_1920 coastal [aw = popc1940], r
+
 su b_cgoodman_cz1940_pc [aw=popc1940]
 local d = r(mean)
+
+di ((_b[GM_raw_pp] * `est1')) /`d'
+
+
+summarize GM_raw_pp
+local est1 = r(sd)
+ivreg2 n_gen_muni_cz_pc (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 v2_sumshares_urban  transpo_cost_1920 coastal [aw = popc1940], r
+
+su b_gen_muni_cz1940_pc [aw=popc1940]
+local d = r(mean)
+
 di ((_b[GM_raw_pp] * `est1')) /`d'
 
 	summarize GM_raw_pp
 local est1 = r(sd)
-ivreg2 n_schdist_ind_cz_pc (GM_raw_pp = GM_hat_raw_pp) reg2 reg3 reg4 blackmig3539_share mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total [aw = popc1940], r
+ivreg2 n_schdist_ind_cz_pc (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 v2_sumshares_urban  transpo_cost_1920 coastal [aw = popc1940], r
 su b_schdist_ind_cz1940_pc [aw=popc1940]
 local d = r(mean)
 di ((_b[GM_raw_pp] * `est1')) /`d'

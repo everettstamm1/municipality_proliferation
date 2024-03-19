@@ -1,5 +1,5 @@
-local do_placebo = 0
-
+local do_placebo = 1
+local do_resample = 1
 /*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 
 4. Assemble final dataset.
@@ -337,9 +337,10 @@ ren sumshares v`v'_sumshares
 
 		
 		forval i=1(1)1000{
-		qui merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/rndmig/r`i'_black_prmig_1940_1940_wide_xw.dta" 
+		qui merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/rndmig/r`i'_black_prmig_1940_1970_wide_xw.dta" 
 		*keep if _merge==3
-		
+		ren sumshares vr`i'_sumshares
+
 		/* Drop cities for which there's no hope of getting predictions for black pop in 
 		1970 data for these cities. This set of cities will change depending on the 
 		migration matrix used.*/
@@ -355,6 +356,28 @@ ren sumshares v`v'_sumshares
 		}
 		qui rename totblackmigcity3539 vr`i'_totblackmigcity3539
 		}
+		}
+		if `do_resample'==1{
+			forval i=1(1)1000{
+			qui merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/resample/re`i'_black_prmig_1940_1970_wide_xw.dta" 
+			*keep if _merge==3
+			ren sumshares vre`v'_sumshares
+
+			/* Drop cities for which there's no hope of getting predictions for black pop in 
+			1970 data for these cities. This set of cities will change depending on the 
+			migration matrix used.*/
+			qui drop if _merge==2 
+			qui drop _merge
+			
+			/* Assume zero change in black pop for cities that black migrants did not move 
+			to between 1935 and 1940. Results are robust to changing this criterion. 
+			Uncomment "keep if _merge==3" and run again. */
+			foreach var of varlist black_proutmigpr*{
+			qui replace `var'=0 if `var'==.
+			qui rename `var' vre`i'_`var'
+			}
+			qui rename totblackmigcity3539 vre`i'_totblackmigcity3539
+			}
 		}
 		/*
 		* Northern CZ measure of 1940 southern county upward mobility: 
@@ -394,8 +417,15 @@ ren sumshares v`v'_sumshares
 		keep *_proutmigpr* *_actoutmigact* *_residoutmigresid* nbpopc4070 popc1940 bpopc1940 popc1970 popc1960 bpopc1950 bpopc1960 popc1950 bpopc1970 *migcity3539 statefip citycode city city_original cz cz_name wpopc1940 wpopc1970 samp_* *_sumshares
 		drop if popc1970==.
 		
+		// Recentered at city level
+		egen vre_mean = rowmean(vre*_black_proutmigpr)
+		egen vr_mean = rowmean(vr*_black_proutmigpr)
+
+		g v2_black_proutmigpr_re = v2_black_proutmigpr - vre_mean
+		g v2_black_proutmigpr_r = v2_black_proutmigpr - vr_mean
+
 		save "$INTDATA/dcourt/GM_city_final_dataset`samptab'.dta", replace
-		
+		stop
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 	*3. Construct measure of black urban pop change and instrument for black urban in-migration at CZ level.
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
@@ -457,9 +487,64 @@ ren sumshares v`v'_sumshares
 			forval i=1(1)1000{
 				g vr`i'_bc_pred1940_1970 = 100*vr`i'_black_proutmigpr/popc1940
 
-			g vr`i'_bcpp_pred1940_1970=100* ((vr`i'_black_proutmigpr+bpopc1940)/(popc1940 +  vr`i'_black_proutmigpr) - bpopc1940/popc1940)
+				g vr`i'_bcpp_pred1940_1970=100* ((vr`i'_black_proutmigpr+bpopc1940)/(popc1940 +  vr`i'_black_proutmigpr) - bpopc1940/popc1940)
 
 			}
+			
+			// City level recentered by random shocks, pre-transformation
+			g v2_bc_pred1940_1970_r_c = 100*v2_black_proutmigpr_r/popc1940
+			g v2_bcpp_pred1940_1970_r_c = 100* ((v2_black_proutmigpr_r+bpopc1940)/(popc1940 +  v2_black_proutmigpr_r) - bpopc1940/popc1940)
+			
+			// CZ level recentered by random shocks, pre-transformation
+			egen vr_bc_mean = rowmean(vr*_black_proutmigpr)
+			g v2_black_proutmigpr_r_cz = v2_black_proutmigpr - vr_bc_mean
+			
+			g v2_bc_pred1940_1970_r_cz = 100*v2_black_proutmigpr_r_cz/popc1940
+			g v2_bcpp_pred1940_1970_r_cz = 100* ((v2_black_proutmigpr_r_cz+bpopc1940)/(popc1940 +  v2_black_proutmigpr_r_cz) - bpopc1940/popc1940)
+			drop vr_bc_mean v2_black_proutmigpr_r_cz
+			
+			// CZ level recentered by random shocks, post-transformation
+			egen vr_bc_mean = rowmean(vr*_bc_pred1940_1970)
+			egen vr_bcpp_mean = rowmean(vr*_bcpp_pred1940_1970)
+
+			g v2_bc_pred1940_1970_r_cz_t = v2_bc_pred1940_1970 - vr_bc_mean
+			g v2_bcpp_pred1940_1970_r_cz_t = v2_bcpp_pred1940_1970 - vr_bcpp_mean
+			
+			drop vr_bc_mean vr_bcpp_mean
+		}
+		
+		if `do_resample'==1{
+			* Placebo shocks
+			forval i=1(1)1000{
+				g vre`i'_bc_pred1940_1970 = 100*vre`i'_black_proutmigpr/popc1940
+
+				g vre`i'_bcpp_pred1940_1970=100* ((vre`i'_black_proutmigpr+bpopc1940)/(popc1940 +  vre`i'_black_proutmigpr) - bpopc1940/popc1940)
+				
+				
+			}
+			
+			// City level recentered by resampled shocks, pre-transformation
+			g v2_bc_pred1940_1970_re_c = 100*v2_black_proutmigpr_re/popc1940
+			g v2_bcpp_pred1940_1970_re_c = 100* ((v2_black_proutmigpr_re+bpopc1940)/(popc1940 +  v2_black_proutmigpr_re) - bpopc1940/popc1940)
+			
+			// CZ level recentered by random shocks, pre-transformation
+			egen vr_bc_mean = rowmean(vre*_black_proutmigpr)
+			g v2_black_proutmigpr_re_cz = v2_black_proutmigpr - vre_bc_mean
+			
+			g v2_bc_pred1940_1970_re_cz = 100*v2_black_proutmigpr_re_cz/popc1940
+			g v2_bcpp_pred1940_1970_re_cz = 100* ((v2_black_proutmigpr_re_cz+bpopc1940)/(popc1940 +  v2_black_proutmigpr_re_cz) - bpopc1940/popc1940)
+			drop vre_bc_mean v2_black_proutmigpr_re_cz
+			
+			
+			// CZ level recentered by resampled shocks, post-transformation
+			egen vre_bc_mean = rowmean(vre*_bc_pred1940_1970)
+			egen vre_bcpp_mean = rowmean(vre*_bcpp_pred1940_1970)
+
+			g v2_bc_pred1940_1970_re_cz_t = v2_bc_pred1940_1970 - vre_bc_mean
+			g v2_bcpp_pred1940_1970_re_cz_t = v2_bcpp_pred1940_1970 - vre_bcpp_mean
+			
+			drop vre_bc_mean vre_bcpp_mean
+
 		}
 /*
 			* Northern CZ measure of 1940 southern county upward mobility
@@ -519,7 +604,7 @@ ren sumshares v`v'_sumshares
 			if `do_placebo'==1{
 				* Placebo shocks
 				forval i=1(1)1000{	
-				xtile GM_r`i'_hat = vr`i'_bc_pred1940_1970, nq(100) 
+				//xtile GM_r`i'_hat = vr`i'_bc_pred1940_1970, nq(100) 
 				}	
 			}
 			
@@ -717,16 +802,38 @@ ren sumshares v`v'_sumshares
 			ren v8_wc_pred1940_1970 GM_8_hat_raw
 			ren v8_wcpp_pred1940_1970 GM_8_hat_raw_pp
 			
+			
+			foreach v in 1940 r 7r{
+				ren v`v'_bcpp_pred1940_1970 GM_`v'_hat_raw_pp
+			}
 			if `do_placebo'==1{
 
 			forv i=1(1)1000{	
 			ren vr`i'_bcpp_pred1940_1970 GM_hat_raw_r`i'
+			}
+			ren v2_bc_pred1940_1970_r_c GM_hat_raw_r_c
+			ren v2_bcpp_pred1940_1970_r_c GM_hat_raw_pp_r_c
+			ren v2_bc_pred1940_1970_r_cz GM_hat_raw_r_cz
+			ren v2_bcpp_pred1940_1970_r_cz GM_hat_raw_pp_r_cz
+			ren v2_bc_pred1940_1970_r_cz_t GM_hat_raw_r_cz_t
+			ren v2_bcpp_pred1940_1970_r_cz_t GM_hat_raw_pp_r_cz_t
+			}
+			if `do_resample'==1{
+
+			forv i=1(1)1000{	
+			ren vre`i'_bcpp_pred1940_1970 GM_hat_raw_re`i'
 			}	
-			}
-			foreach v in 1940 r 7r{
-				ren v`v'_bcpp_pred1940_1970 GM_`v'_hat_raw_pp
-			}
 			
+			ren v2_bc_pred1940_1970_re_c GM_hat_raw_re_c
+			ren v2_bcpp_pred1940_1970_re_c GM_hat_raw_pp_re_c
+			ren v2_bc_pred1940_1970_re_cz GM_hat_raw_re_cz
+			ren v2_bcpp_pred1940_1970_re_cz GM_hat_raw_pp_re_cz
+			ren v2_bc_pred1940_1970_re_cz_t GM_hat_raw_re_cz_t
+			ren v2_bcpp_pred1940_1970_re_cz_t GM_hat_raw_pp_re_cz_t
+
+			
+			
+			}
 			
 			
 			

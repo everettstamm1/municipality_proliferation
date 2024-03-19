@@ -1,11 +1,40 @@
 
+local use_sumshare = 1
+local use_pct_inst = 1
 
-local b_controls reg2 reg3 reg4 blackmig3539_share 
-local extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
+
+// Controls
+if `use_sumshare' == 0 local b_controls reg2 reg3 reg4 blackmig3539_share 
+if `use_sumshare' == 1 local b_controls reg2 reg3 reg4 v2_sumshares_urban 
+
+
+if `use_sumshare' == 0 & `use_pct_inst' == 0 local extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
+if `use_sumshare' == 0 & `use_pct_inst' == 1 local extra_controls mfg_lfshare1940
+if `use_sumshare' == 1 & `use_pct_inst' == 0 local extra_controls coastal transpo_cost_1920
+if `use_sumshare' == 1 & `use_pct_inst' == 1 local extra_controls coastal transpo_cost_1920
+
+// Inst
+if `use_pct_inst' == 0 local inst GM_hat_raw_pp
+if `use_pct_inst' == 1 local inst GM_hat_raw
+
+// White inst
+if `use_pct_inst' == 0 local winst GM_8_hat_raw
+if `use_pct_inst' == 1 local winst GM_8_hat_raw_pp
+
+// White controls
+if `use_sumshare' == 0 local w_b_controls reg2 reg3 reg4 v8_whitemig3539_share1940 
+if `use_sumshare' == 1 local w_b_controls reg2 reg3 reg4 v8_sumshares_urban 
+
+if `use_sumshare' == 0 & `use_pct_inst' == 0 local w_extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
+if `use_sumshare' == 0 & `use_pct_inst' == 1 local w_extra_controls mfg_lfshare1940
+if `use_sumshare' == 1 & `use_pct_inst' == 0 local w_extra_controls coastal transpo_cost_1920
+if `use_sumshare' == 1 & `use_pct_inst' == 1 local w_extra_controls coastal transpo_cost_1920
+
+
 
 use "$CLEANDATA/cz_pooled", clear
 keep if dcourt == 1
-lab var GM_hat_raw_pp "$\widehat{GM}$"
+lab var `inst' "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
 
 qui su GM_raw_pp, d
@@ -22,7 +51,7 @@ qui su prop_enclosed, d
 g above_med_enclosed = prop_enclosed >= `r(p50)'
 
 g GM_X_above_med_enclosed = GM_raw_pp * above_med_enclosed
-g GM_hat_X_above_med_enclosed = GM_hat_raw_pp * above_med_enclosed
+g GM_hat_X_above_med_enclosed = `inst' * above_med_enclosed
 
 	
 	
@@ -35,18 +64,18 @@ g GM_hat_X_above_med_enclosed = GM_hat_raw_pp * above_med_enclosed
 		local bv : di %6.2f r(mean)
 		
 		// First Stage
-		eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' [aw=popc1940], r
-		test GM_hat_raw_pp=0
+		eststo fs_`outcome' : reg GM_raw_pp `inst' `b_controls' [aw=popc1940], r
+		test `inst'=0
 		local F : di %6.2f r(F)
 
 		// OLS
 		eststo ols_`outcome' : reg n_`outcome'_cz_pc GM_raw_pp `b_controls' [aw = popc1940], r
 		
 		// RF
-		eststo rf_`outcome' : reg n_`outcome'_cz_pc GM_hat_raw_pp `b_controls' [aw = popc1940], r
+		eststo rf_`outcome' : reg n_`outcome'_cz_pc `inst' `b_controls' [aw = popc1940], r
 		
 		// 2SLS 
-		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls' [aw = popc1940], r
+		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp = `inst') `b_controls' [aw = popc1940], r
 			estadd scalar Fs = `F'
 			estadd scalar dep_var = `dv'
 			estadd scalar b_var = `bv'
@@ -65,7 +94,7 @@ g GM_hat_X_above_med_enclosed = GM_hat_raw_pp * above_med_enclosed
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
 		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
-	 keep(GM_hat_raw_pp) 
+	 keep(`inst') 
 
 	// Panel B: OLS
 	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
@@ -84,7 +113,7 @@ g GM_hat_X_above_med_enclosed = GM_hat_raw_pp * above_med_enclosed
 		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		keep(GM_hat_raw_pp)
+		keep(`inst')
 
 		
 	// Panel D: 2SLS
@@ -107,18 +136,18 @@ g GM_hat_X_above_med_enclosed = GM_hat_raw_pp * above_med_enclosed
 		local bv : di %6.2f r(mean)		
 		
 		// First Stage
-		eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' `extra_controls' [aw=popc1940], r
-		test GM_hat_raw_pp=0
+		eststo fs_`outcome' : reg GM_raw_pp `inst' `b_controls' `extra_controls' [aw=popc1940], r
+		test `inst'=0
 		local F : di %6.2f r(F)
 
 		// OLS
 		eststo ols_`outcome' : reg n_`outcome'_cz_pc GM_raw_pp `b_controls' `extra_controls' [aw = popc1940], r
 		
 		// RF
-		eststo rf_`outcome' : reg n_`outcome'_cz_pc GM_hat_raw_pp `b_controls' `extra_controls' [aw = popc1940], r
+		eststo rf_`outcome' : reg n_`outcome'_cz_pc `inst' `b_controls' `extra_controls' [aw = popc1940], r
 		
 		// 2SLS 
-		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls' `extra_controls' [aw = popc1940], r
+		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp = `inst') `b_controls' `extra_controls' [aw = popc1940], r
 			estadd scalar Fs = `F'
 			estadd scalar dep_var = `dv'
 			estadd scalar b_var = `bv'
@@ -137,7 +166,7 @@ g GM_hat_X_above_med_enclosed = GM_hat_raw_pp * above_med_enclosed
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
 		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
-	 keep(GM_hat_raw_pp) 
+	 keep(`inst') 
 
 	// Panel B: OLS
 	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
@@ -156,7 +185,7 @@ g GM_hat_X_above_med_enclosed = GM_hat_raw_pp * above_med_enclosed
 		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		keep(GM_hat_raw_pp)
+		keep(`inst')
 
 		
 	// Panel D: 2SLS
@@ -326,18 +355,18 @@ g GM_hat_X_above_med_enclosed = GM_hat_raw_pp * above_med_enclosed
 		su b_`outcome'_cz1940_pc [aw=popc1940]
 		local bv : di %6.2f r(mean)
 		// First Stage
-		eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' wt_instmig_avg_pp [aw=popc1940], r
-		test GM_hat_raw_pp=0
+		eststo fs_`outcome' : reg GM_raw_pp `inst' `b_controls' wt_instmig_avg_pp [aw=popc1940], r
+		test `inst'=0
 		local F : di %6.2f r(F)
 
 		// OLS
 		eststo ols_`outcome' : reg n_`outcome'_cz_pc GM_raw_pp `b_controls' wt_instmig_avg_pp [aw = popc1940], r
 		
 		// RF
-		eststo rf_`outcome' : reg n_`outcome'_cz_pc GM_hat_raw_pp `b_controls' wt_instmig_avg_pp [aw = popc1940], r
+		eststo rf_`outcome' : reg n_`outcome'_cz_pc `inst' `b_controls' wt_instmig_avg_pp [aw = popc1940], r
 		
 		// 2SLS 
-		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls' wt_instmig_avg_pp [aw = popc1940], r
+		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp = `inst') `b_controls' wt_instmig_avg_pp [aw = popc1940], r
 			estadd scalar Fs = `F'
 			estadd scalar dep_var = `dv'
 			estadd scalar b_var = `bv'
@@ -356,7 +385,7 @@ g GM_hat_X_above_med_enclosed = GM_hat_raw_pp * above_med_enclosed
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
 		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
-	 keep(GM_hat_raw_pp) 
+	 keep(`inst') 
 
 	// Panel B: OLS
 	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
@@ -375,7 +404,7 @@ g GM_hat_X_above_med_enclosed = GM_hat_raw_pp * above_med_enclosed
 		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		keep(GM_hat_raw_pp)
+		keep(`inst')
 
 		
 	// Panel D: 2SLS
@@ -398,18 +427,18 @@ eststo clear
 		su b_`outcome'_cz1940_pc [aw=popc1940]
 		local bv : di %6.2f r(mean)
 		// First Stage
-		eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' `extra_controls' wt_instmig_avg_pp [aw=popc1940], r
-		test GM_hat_raw_pp=0
+		eststo fs_`outcome' : reg GM_raw_pp `inst' `b_controls' `extra_controls' wt_instmig_avg_pp [aw=popc1940], r
+		test `inst'=0
 		local F : di %6.2f r(F)
 
 		// OLS
 		eststo ols_`outcome' : reg n_`outcome'_cz_pc GM_raw_pp `b_controls' `extra_controls' wt_instmig_avg_pp [aw = popc1940], r
 		
 		// RF
-		eststo rf_`outcome' : reg n_`outcome'_cz_pc GM_hat_raw_pp `b_controls' `extra_controls' wt_instmig_avg_pp [aw = popc1940], r
+		eststo rf_`outcome' : reg n_`outcome'_cz_pc `inst' `b_controls' `extra_controls' wt_instmig_avg_pp [aw = popc1940], r
 		
 		// 2SLS 
-		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls' `extra_controls' wt_instmig_avg_pp [aw = popc1940], r
+		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp = `inst') `b_controls' `extra_controls' wt_instmig_avg_pp [aw = popc1940], r
 			estadd scalar Fs = `F'
 			estadd scalar dep_var = `dv'
 			estadd scalar b_var = `bv'
@@ -428,7 +457,7 @@ eststo clear
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
 		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
-	 keep(GM_hat_raw_pp) 
+	 keep(`inst') 
 
 	// Panel B: OLS
 	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
@@ -447,7 +476,7 @@ eststo clear
 		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		keep(GM_hat_raw_pp)
+		keep(`inst')
 
 		
 	// Panel D: 2SLS
@@ -465,11 +494,11 @@ eststo clear
 // Quadratic Effect
 
 
-lab var GM_hat_raw_pp "$\widehat{GM}$"
+lab var `inst' "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
 
 g GM_raw_pp_2 = GM_raw_pp^2
-g GM_hat_raw_pp_2 = GM_hat_raw_pp^2
+g `inst'_2 = `inst'^2
 
 eststo clear
 foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
@@ -478,18 +507,18 @@ foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 	su b_`outcome'_cz1940_pc [aw=popc1940]
 	local bv : di %6.2f r(mean)
 	// First Stage
-	eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' [aw=popc1940], r
-	test GM_hat_raw_pp=0
+	eststo fs_`outcome' : reg GM_raw_pp `inst' `b_controls' [aw=popc1940], r
+	test `inst'=0
 	local F : di %6.2f r(F)
 
 	// OLS
 	eststo ols_`outcome' : reg n_`outcome'_cz_pc GM_raw_pp GM_raw_pp_2 `b_controls'  [aw = popc1940], r
 	
 	// RF
-	eststo rf_`outcome' : reg n_`outcome'_cz_pc GM_hat_raw_pp GM_hat_raw_pp_2 `b_controls'  [aw = popc1940], r
+	eststo rf_`outcome' : reg n_`outcome'_cz_pc `inst' `inst'_2 `b_controls'  [aw = popc1940], r
 	
 	// 2SLS 
-	eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp GM_raw_pp_2 = GM_hat_raw_pp GM_hat_raw_pp_2) `b_controls'  [aw = popc1940], r
+	eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp GM_raw_pp_2 = `inst' `inst'_2) `b_controls'  [aw = popc1940], r
 		estadd scalar Fs = `F'
 		estadd scalar dep_var = `dv'
 			estadd scalar b_var = `bv'
@@ -508,7 +537,7 @@ esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist fs_totfrac  
 			"\cmidrule(lr){1-7}" ///
 			"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
 	prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
- keep(GM_hat_raw_pp) 
+ keep(`inst') 
 
 // Panel B: OLS
 esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
@@ -527,7 +556,7 @@ esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist rf_totfrac  
 	posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 	b(%04.3f) se(%04.3f) ///
 	starlevels( * 0.10 ** 0.05 *** 0.01) ///
-	keep(GM_hat_raw_pp GM_hat_raw_pp_2)
+	keep(`inst' `inst'_2)
 
 	
 // Panel D: 2SLS
@@ -544,7 +573,7 @@ esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist iv_totfrac  
 eststo clear
 
 
-lab var GM_hat_raw_pp "$\widehat{GM}$"
+lab var `inst' "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
 
 
@@ -556,18 +585,18 @@ foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 	su b_`outcome'_cz1940_pc [aw=popc1940]
 	local bv : di %6.2f r(mean)
 	// First Stage
-	eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' `extra_controls' [aw=popc1940], r
-	test GM_hat_raw_pp=0
+	eststo fs_`outcome' : reg GM_raw_pp `inst' `b_controls' `extra_controls' [aw=popc1940], r
+	test `inst'=0
 	local F : di %6.2f r(F)
 
 	// OLS
 	eststo ols_`outcome' : reg n_`outcome'_cz_pc GM_raw_pp GM_raw_pp_2 `b_controls'  `extra_controls' [aw = popc1940], r
 	
 	// RF
-	eststo rf_`outcome' : reg n_`outcome'_cz_pc GM_hat_raw_pp GM_hat_raw_pp_2 `b_controls'  `extra_controls' [aw = popc1940], r
+	eststo rf_`outcome' : reg n_`outcome'_cz_pc `inst' `inst'_2 `b_controls'  `extra_controls' [aw = popc1940], r
 	
 	// 2SLS 
-	eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp GM_raw_pp_2 = GM_hat_raw_pp GM_hat_raw_pp_2) `b_controls'  `extra_controls' [aw = popc1940], r
+	eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp GM_raw_pp_2 = `inst' `inst'_2) `b_controls'  `extra_controls' [aw = popc1940], r
 		estadd scalar Fs = `F'
 		estadd scalar dep_var = `dv'
 			estadd scalar b_var = `bv'
@@ -586,7 +615,7 @@ esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist fs_totfrac  
 			"\cmidrule(lr){1-7}" ///
 			"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
 	prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
- keep(GM_hat_raw_pp) 
+ keep(`inst') 
 
 // Panel B: OLS
 esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
@@ -605,7 +634,7 @@ esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist rf_totfrac  
 	posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 	b(%04.3f) se(%04.3f) ///
 	starlevels( * 0.10 ** 0.05 *** 0.01) ///
-	keep(GM_hat_raw_pp GM_hat_raw_pp_2)
+	keep(`inst' `inst'_2)
 
 	
 // Panel D: 2SLS
@@ -623,7 +652,7 @@ eststo clear
 	
 
 
-lab var GM_hat_raw_pp "$\widehat{GM}$"
+lab var `inst' "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
 
 	
@@ -631,7 +660,7 @@ lab var GM_raw_pp "GM"
 //1950-70
 
 
-lab var GM_hat_raw_pp "$\widehat{GM}$"
+lab var `inst' "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
 
 	eststo clear
@@ -642,18 +671,18 @@ lab var GM_raw_pp "GM"
 		local bv : di %6.2f r(mean)
 		
 		// First Stage
-		eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' [aw=popc1940], r
-		test GM_hat_raw_pp=0
+		eststo fs_`outcome' : reg GM_raw_pp `inst' `b_controls' [aw=popc1940], r
+		test `inst'=0
 		local F : di %6.2f r(F)
 
 		// OLS
 		eststo ols_`outcome' : reg n2_`outcome'_cz_pc GM_raw_pp `b_controls'  [aw = popc1940], r
 		
 		// RF
-		eststo rf_`outcome' : reg n2_`outcome'_cz_pc GM_hat_raw_pp `b_controls'  [aw = popc1940], r
+		eststo rf_`outcome' : reg n2_`outcome'_cz_pc `inst' `b_controls'  [aw = popc1940], r
 		
 		// 2SLS 
-		eststo iv_`outcome' : ivreg2 n2_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls'  [aw = popc1940], r
+		eststo iv_`outcome' : ivreg2 n2_`outcome'_cz_pc (GM_raw_pp = `inst') `b_controls'  [aw = popc1940], r
 			estadd scalar Fs = `F'
 			estadd scalar dep_var = `dv'
 			estadd scalar b_var = `bv'
@@ -672,7 +701,7 @@ lab var GM_raw_pp "GM"
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
 		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
-	 keep(GM_hat_raw_pp) 
+	 keep(`inst') 
 
 	// Panel B: OLS
 	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
@@ -691,7 +720,7 @@ lab var GM_raw_pp "GM"
 		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		keep(GM_hat_raw_pp)
+		keep(`inst')
 
 		
 	// Panel D: 2SLS
@@ -707,7 +736,7 @@ lab var GM_raw_pp "GM"
 	eststo clear
 
 
-lab var GM_hat_raw_pp "$\widehat{GM}$"
+lab var `inst' "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
 
 	eststo clear
@@ -718,18 +747,18 @@ lab var GM_raw_pp "GM"
 		local bv : di %6.2f r(mean)
 		
 		// First Stage
-		eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' `extra_controls'[aw=popc1940], r
-		test GM_hat_raw_pp=0
+		eststo fs_`outcome' : reg GM_raw_pp `inst' `b_controls' `extra_controls'[aw=popc1940], r
+		test `inst'=0
 		local F : di %6.2f r(F)
 
 		// OLS
 		eststo ols_`outcome' : reg n2_`outcome'_cz_pc GM_raw_pp `b_controls' `extra_controls' [aw = popc1940], r
 		
 		// RF
-		eststo rf_`outcome' : reg n2_`outcome'_cz_pc GM_hat_raw_pp `b_controls' `extra_controls' [aw = popc1940], r
+		eststo rf_`outcome' : reg n2_`outcome'_cz_pc `inst' `b_controls' `extra_controls' [aw = popc1940], r
 		
 		// 2SLS 
-		eststo iv_`outcome' : ivreg2 n2_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls' `extra_controls' [aw = popc1940], r
+		eststo iv_`outcome' : ivreg2 n2_`outcome'_cz_pc (GM_raw_pp = `inst') `b_controls' `extra_controls' [aw = popc1940], r
 			estadd scalar Fs = `F'
 			estadd scalar dep_var = `dv'
 			estadd scalar b_var = `bv'
@@ -748,7 +777,7 @@ lab var GM_raw_pp "GM"
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
 		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
-	 keep(GM_hat_raw_pp) 
+	 keep(`inst') 
 
 	// Panel B: OLS
 	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
@@ -767,7 +796,7 @@ lab var GM_raw_pp "GM"
 		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		keep(GM_hat_raw_pp)
+		keep(`inst')
 
 		
 	// Panel D: 2SLS
@@ -787,7 +816,7 @@ lab var GM_raw_pp "GM"
 
 
 
-lab var GM_hat_raw_pp "$\widehat{GM}$"
+lab var `inst' "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
 
 	eststo clear
@@ -798,18 +827,18 @@ lab var GM_raw_pp "GM"
 		local bv : di %6.2f r(mean)
 		
 		// First Stage
-		eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' [aw=popc1940], r
-		test GM_hat_raw_pp=0
+		eststo fs_`outcome' : reg GM_raw_pp `inst' `b_controls' [aw=popc1940], r
+		test `inst'=0
 		local F : di %6.2f r(F)
 
 		// OLS
 		eststo ols_`outcome' : reg ld_`outcome'_cz_pc GM_raw_pp `b_controls'  [aw = popc1940], r
 		
 		// RF
-		eststo rf_`outcome' : reg ld_`outcome'_cz_pc GM_hat_raw_pp `b_controls'  [aw = popc1940], r
+		eststo rf_`outcome' : reg ld_`outcome'_cz_pc `inst' `b_controls'  [aw = popc1940], r
 		
 		// 2SLS 
-		eststo iv_`outcome' : ivreg2 ld_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls'  [aw = popc1940], r
+		eststo iv_`outcome' : ivreg2 ld_`outcome'_cz_pc (GM_raw_pp = `inst') `b_controls'  [aw = popc1940], r
 			estadd scalar Fs = `F'
 			estadd scalar dep_var = `dv'
 			estadd scalar b_var = `bv'
@@ -828,7 +857,7 @@ lab var GM_raw_pp "GM"
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
 		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
-	 keep(GM_hat_raw_pp) 
+	 keep(`inst') 
 
 	// Panel B: OLS
 	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
@@ -847,7 +876,7 @@ lab var GM_raw_pp "GM"
 		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		keep(GM_hat_raw_pp)
+		keep(`inst')
 
 		
 	// Panel D: 2SLS
@@ -867,7 +896,7 @@ lab var GM_raw_pp "GM"
 
 
 
-lab var GM_hat_raw_pp "$\widehat{GM}$"
+lab var `inst' "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
 
 	eststo clear
@@ -878,18 +907,18 @@ lab var GM_raw_pp "GM"
 		local bv : di %6.2f r(mean)
 		
 		// First Stage
-		eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' `extra_controls'[aw=popc1940], r
-		test GM_hat_raw_pp=0
+		eststo fs_`outcome' : reg GM_raw_pp `inst' `b_controls' `extra_controls'[aw=popc1940], r
+		test `inst'=0
 		local F : di %6.2f r(F)
 
 		// OLS
 		eststo ols_`outcome' : reg ld_`outcome'_cz_pc GM_raw_pp `b_controls' `extra_controls' [aw = popc1940], r
 		
 		// RF
-		eststo rf_`outcome' : reg ld_`outcome'_cz_pc GM_hat_raw_pp `b_controls' `extra_controls' [aw = popc1940], r
+		eststo rf_`outcome' : reg ld_`outcome'_cz_pc `inst' `b_controls' `extra_controls' [aw = popc1940], r
 		
 		// 2SLS 
-		eststo iv_`outcome' : ivreg2 ld_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls' `extra_controls' [aw = popc1940], r
+		eststo iv_`outcome' : ivreg2 ld_`outcome'_cz_pc (GM_raw_pp = `inst') `b_controls' `extra_controls' [aw = popc1940], r
 			estadd scalar Fs = `F'
 			estadd scalar dep_var = `dv'
 			estadd scalar b_var = `bv'
@@ -908,7 +937,7 @@ lab var GM_raw_pp "GM"
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
 		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
-	 keep(GM_hat_raw_pp) 
+	 keep(`inst') 
 
 	// Panel B: OLS
 	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
@@ -927,7 +956,7 @@ lab var GM_raw_pp "GM"
 		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		keep(GM_hat_raw_pp)
+		keep(`inst')
 
 		
 	// Panel D: 2SLS
@@ -1104,7 +1133,6 @@ lab var GM "GM Percentile"
 		
 // White inst
 
-local b_controls reg2 reg3 reg4 v8_whitemig3539_share1940
 
 lab var GM_hat_raw_pp "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
@@ -1117,18 +1145,18 @@ lab var GM_raw_pp "GM"
 		local bv : di %6.2f r(mean)
 		
 		// First Stage
-		eststo fs_`outcome' : reg WM_raw_pp GM_8_hat_raw_pp `b_controls' [aw=popc1940], r
+		eststo fs_`outcome' : reg WM_raw_pp `winst' `w_b_controls' [aw=popc1940], r
 		test GM_8_hat_raw_pp=0
 		local F : di %6.2f r(F)
 
 		// OLS
-		eststo ols_`outcome' : reg n_`outcome'_cz_pc WM_raw_pp `b_controls' [aw = popc1940], r
+		eststo ols_`outcome' : reg n_`outcome'_cz_pc WM_raw_pp `w_b_controls' [aw = popc1940], r
 		
 		// RF
-		eststo rf_`outcome' : reg n_`outcome'_cz_pc GM_8_hat_raw_pp `b_controls' [aw = popc1940], r
+		eststo rf_`outcome' : reg n_`outcome'_cz_pc `winst' `w_b_controls' [aw = popc1940], r
 		
 		// 2SLS 
-		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (WM_raw_pp = GM_8_hat_raw_pp) `b_controls' [aw = popc1940], r
+		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (WM_raw_pp = `winst') `w_b_controls' [aw = popc1940], r
 			estadd scalar Fs = `F'
 			estadd scalar dep_var = `dv'
 			estadd scalar b_var = `bv'
@@ -1147,7 +1175,7 @@ lab var GM_raw_pp "GM"
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
 		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
-	 keep(GM_8_hat_raw_pp) 
+	 keep(`winst') 
 
 	// Panel B: OLS
 	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
@@ -1166,7 +1194,7 @@ lab var GM_raw_pp "GM"
 		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		keep(GM_8_hat_raw_pp)
+		keep(`winst')
 
 		
 	// Panel D: 2SLS
@@ -1186,7 +1214,6 @@ eststo clear
 
 lab var GM_8_hat_raw_pp "$\widehat{WM}$"
 lab var WM_raw_pp "WM"
-local b_controls reg2 reg3 reg4 v8_whitemig3539_share1940
 	eststo clear
 	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
 		su n_`outcome'_cz_pc [aw=popc1940]
@@ -1195,18 +1222,18 @@ local b_controls reg2 reg3 reg4 v8_whitemig3539_share1940
 		local bv : di %6.2f r(mean)
 		
 		// First Stage
-		eststo fs_`outcome' : reg WM_raw_pp GM_8_hat_raw_pp `b_controls' `extra_controls'[aw=popc1940], r
+		eststo fs_`outcome' : reg WM_raw_pp `winst' `w_b_controls' `w_extra_controls'[aw=popc1940], r
 		test GM_8_hat_raw_pp=0
 		local F : di %6.2f r(F)
 
 		// OLS
-		eststo ols_`outcome' : reg n_`outcome'_cz_pc WM_raw_pp `b_controls' `extra_controls'[aw = popc1940], r
+		eststo ols_`outcome' : reg n_`outcome'_cz_pc WM_raw_pp `w_b_controls' `w_extra_controls'[aw = popc1940], r
 		
 		// RF
-		eststo rf_`outcome' : reg n_`outcome'_cz_pc GM_8_hat_raw_pp `b_controls' `extra_controls'[aw = popc1940], r
+		eststo rf_`outcome' : reg n_`outcome'_cz_pc `winst' `w_b_controls' `w_extra_controls'[aw = popc1940], r
 		
 		// 2SLS 
-		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (WM_raw_pp = GM_8_hat_raw_pp) `b_controls' `extra_controls'[aw = popc1940], r
+		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (WM_raw_pp = `winst') `w_b_controls' `w_extra_controls'[aw = popc1940], r
 			estadd scalar Fs = `F'
 			estadd scalar dep_var = `dv'
 			estadd scalar b_var = `bv'
@@ -1224,7 +1251,7 @@ local b_controls reg2 reg3 reg4 v8_whitemig3539_share1940
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
 		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
-	 keep(GM_8_hat_raw_pp) 
+	 keep(`winst') 
 
 	// Panel B: OLS
 	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
@@ -1243,7 +1270,7 @@ local b_controls reg2 reg3 reg4 v8_whitemig3539_share1940
 		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		keep(GM_8_hat_raw_pp)
+		keep(`winst')
 
 		
 	// Panel D: 2SLS
@@ -1270,18 +1297,18 @@ eststo clear
 		local bv : di %6.2f r(mean)
 		
 		// First Stage
-		eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' [aw=popc1940], r
-		test GM_hat_raw_pp=0
+		eststo fs_`outcome' : reg GM_raw_pp `inst' `b_controls' [aw=popc1940], r
+		test `inst'=0
 		local F : di %6.2f r(F)
 
 		// OLS
 		eststo ols_`outcome' : reg n_`outcome'_cz_pc GM_raw_pp GM_X_above_med_enclosed `b_controls' [aw = popc1940], r
 		
 		// RF
-		eststo rf_`outcome' : reg n_`outcome'_cz_pc GM_hat_raw_pp GM_hat_X_above_med_enclosed `b_controls' [aw = popc1940], r
+		eststo rf_`outcome' : reg n_`outcome'_cz_pc `inst' GM_hat_X_above_med_enclosed `b_controls' [aw = popc1940], r
 		
 		// 2SLS 
-		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp GM_X_above_med_enclosed = GM_hat_raw_pp GM_hat_X_above_med_enclosed) `b_controls' [aw = popc1940], r
+		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp GM_X_above_med_enclosed = `inst' GM_hat_X_above_med_enclosed) `b_controls' [aw = popc1940], r
 			estadd scalar Fs = `F'
 			estadd scalar dep_var = `dv'
 			estadd scalar b_var = `bv'
@@ -1300,7 +1327,7 @@ eststo clear
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
 		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
-	 keep(GM_hat_raw_pp) 
+	 keep(`inst') 
 
 	// Panel B: OLS
 	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
@@ -1319,7 +1346,7 @@ eststo clear
 		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		keep(GM_hat_raw_pp GM_hat_X_above_med_enclosed)
+		keep(`inst' GM_hat_X_above_med_enclosed)
 
 		
 	// Panel D: 2SLS
@@ -1345,18 +1372,18 @@ eststo clear
 		local bv : di %6.2f r(mean)
 		
 		// First Stage
-		eststo fs_`outcome' : reg GM_raw_pp GM_hat_raw_pp `b_controls' `extra_controls' [aw=popc1940], r
-		test GM_hat_raw_pp=0
+		eststo fs_`outcome' : reg GM_raw_pp `inst' `b_controls' `extra_controls' [aw=popc1940], r
+		test `inst'=0
 		local F : di %6.2f r(F)
 
 		// OLS
 		eststo ols_`outcome' : reg n_`outcome'_cz_pc GM_raw_pp GM_X_above_med_enclosed `b_controls' `extra_controls' [aw = popc1940], r
 		
 		// RF
-		eststo rf_`outcome' : reg n_`outcome'_cz_pc GM_hat_raw_pp GM_hat_X_above_med_enclosed `b_controls' `extra_controls' [aw = popc1940], r
+		eststo rf_`outcome' : reg n_`outcome'_cz_pc `inst' GM_hat_X_above_med_enclosed `b_controls' `extra_controls' [aw = popc1940], r
 		
 		// 2SLS 
-		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp GM_X_above_med_enclosed = GM_hat_raw_pp GM_hat_X_above_med_enclosed) `b_controls' `extra_controls' [aw = popc1940], r
+		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp GM_X_above_med_enclosed = `inst' GM_hat_X_above_med_enclosed) `b_controls' `extra_controls' [aw = popc1940], r
 			estadd scalar Fs = `F'
 			estadd scalar dep_var = `dv'
 			estadd scalar b_var = `bv'
@@ -1375,7 +1402,7 @@ eststo clear
 				"\cmidrule(lr){1-7}" ///
 				"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
 		prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
-	 keep(GM_hat_raw_pp) 
+	 keep(`inst') 
 
 	// Panel B: OLS
 	esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
@@ -1394,7 +1421,7 @@ eststo clear
 		posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
-		keep(GM_hat_raw_pp GM_hat_X_above_med_enclosed)
+		keep(`inst' GM_hat_X_above_med_enclosed)
 
 		
 	// Panel D: 2SLS

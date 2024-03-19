@@ -14,7 +14,7 @@ lab var GM_raw_pp "GM"
 keep if dcourt == 1
 // Create groups of variables
 local panel_A_vars n_cgoodman_cz_pc n_gen_muni_cz_pc n_schdist_ind_cz_pc n_gen_town_cz_pc n_spdist_cz_pc  n_totfrac_cz_pc
-local panel_B_vars GM_raw_pp GM_hat_raw_pp
+local panel_B_vars GM_raw_pp GM_hat_raw
 local panel_C_vars blackmig3539_share mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
 
 // Generate summary statistics using eststo and estpost

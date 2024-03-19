@@ -1,0 +1,32 @@
+1950
+% tenant farms 1959, 
+% labor force in agriculture, 
+$ War Industry 1940-45 per capita, 
+% of planted acres cotton, 
+% labor force in agriculture interacted with tobacco growing state 
+Mineral State (OK & TX)
+% Labor force in mining interacted with mineral state
+
+
+1960
+% of planted acres cotton, 
+% tenant farms 1959, 
+% labor force in agriculture, 
+% labor force in agriculture interacted with tobacco growing state  
+Tobacco growing state (NC, KY, TN) 
+$ War Industry 1940-45 per capita, 
+% Labor force in mining  
+% Labor force in mining interacted with mineral state
+Mineral State (OK & TX)
+
+
+1970
+% of planted acres cotton, 
+% tenant farms 1959, 
+% labor force in agriculture, 
+% labor force in agriculture interacted with tobacco growing state  
+Tobacco growing state (NC, KY, TN)
+$ War Industry 1940-45 per capita, 
+% Labor force in mining 
+% Labor force in mining interacted with mineral state
+Mineral State (OK & TX)

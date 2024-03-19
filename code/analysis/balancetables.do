@@ -1,6 +1,6 @@
 
 
-local b_controls reg2 reg3 reg4 blackmig3539_share
+local b_controls reg2 reg3 reg4 v2_sumshares_urban
 local balance_cutoff = 0.10
 local samp = "urban"
 
@@ -10,7 +10,7 @@ local pooled_covars_`samp'  ""
 keep if dcourt == 1
 foreach covar in `covars' {
 	local lab : variable label `covar'
-	g GM`covar' = GM_hat_raw_pp
+	g GM`covar' = GM_hat_raw
 	label var GM`covar' "`lab'"
 
 	qui eststo `covar': reg `covar' GM`covar' `b_controls' [aw=popc1940], r
@@ -36,8 +36,8 @@ esttab pooled_`samp'  ///
 	
 
 
-local b_controls reg2 reg3 reg4 blackmig3539_share
-local extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
+local b_controls reg2 reg3 reg4 v2_sumshares_urban
+local extra_controls transpo_cost_1920 coastal
  
 
 use "$CLEANDATA/cz_pooled", clear
@@ -49,7 +49,7 @@ foreach var in `vars' {
 	g GM`var' = GM_raw_pp
 	label var GM`var' "`lab'"
 
-	qui eststo `var': ivreg2 `var' (GM`var' = GM_hat_raw_pp) `b_controls' `extra_controls' [aw=popc1940], r
+	qui eststo `var': ivreg2 `var' (GM`var' = GM_hat_raw) `b_controls' `extra_controls' [aw=popc1940], r
 	
 	drop GM`var'
 	
@@ -59,7 +59,7 @@ eststo tsls_`samp' : appendmodels `vars'
 
 foreach var in `vars' {
 	local lab : variable label `var'
-	g GM`var' = GM_hat_raw_pp
+	g GM`var' = GM_hat_raw
 	label var GM`var' "`lab'"
 
 	qui eststo `var': reg `var' GM`var' `b_controls' `extra_controls' [aw=popc1940], r
@@ -90,7 +90,7 @@ foreach var in `vars' {
 	g GM`var' = GM_raw_pp
 	label var GM`var' "`lab'"
 
-	qui eststo `var': ivreg2 `var' (GM`var' = GM_hat_raw_pp) `b_controls' [aw=popc1940], r
+	qui eststo `var': ivreg2 `var' (GM`var' = GM_hat_raw) `b_controls' [aw=popc1940], r
 	
 	drop GM`var'
 	
@@ -100,7 +100,7 @@ eststo tsls_`samp' : appendmodels `vars'
 
 foreach var in `vars' {
 	local lab : variable label `var'
-	g GM`var' = GM_hat_raw_pp
+	g GM`var' = GM_hat_raw
 	label var GM`var' "`lab'"
 
 	qui eststo `var': reg `var' GM`var' `b_controls' [aw=popc1940], r

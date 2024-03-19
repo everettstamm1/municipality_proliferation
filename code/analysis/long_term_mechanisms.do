@@ -88,12 +88,12 @@ lab var weight_pop "Weighted by population density"
 preserve
 	use "$CLEANDATA/cz_pooled", clear
 	keep if dcourt == 1
-	keep cz popc1940 GM_raw_pp GM_hat_raw_pp blackmig3539_share mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
+	keep cz popc1940 GM_raw_pp GM_hat_raw v2_sumshares_urban transpo_cost_1920 coastal
 	qui su GM_raw_pp, d
 	g above_x_med = GM_raw_pp >= `r(p50)'
 
-	qui su GM_hat_raw_pp, d
-	g above_inst_med = GM_hat_raw_pp >= `r(p50)'
+	qui su GM_hat_raw, d
+	g above_inst_med = GM_hat_raw >= `r(p50)'
 	tempfile inst
 	save `inst'
 restore
@@ -183,8 +183,8 @@ g samp_dest_preXabove_z_med = samp_dest_pre * above_inst_med
 g samp_destXGM = samp_dest * GM_raw_pp
 g samp_dest_preXGM = samp_dest_pre * GM_raw_pp
 
-g samp_destXGM_hat = samp_dest * GM_hat_raw_pp
-g samp_dest_preXGM_hat = samp_dest * GM_hat_raw_pp
+g samp_destXGM_hat = samp_dest * GM_hat_raw
+g samp_dest_preXGM_hat = samp_dest * GM_hat_raw
 
 lab var above_inst_med "Above Median $\widehat{GM}$"
 lab var samp_destXabove_z_med "Above Median $\widehat{GM}$ X Incorporated 1940-70"
@@ -204,11 +204,11 @@ forv iv=0/1{
 		lab var `covar' "`mname'"
 		di "`covar'"
 		if "`iv'"=="1"{
-			 eststo `covar' : ivreghdfe `covar' samp_dest (above_x_med samp_destXabove_x_med = above_inst_med samp_destXabove_z_med) blackmig3539_share [aw=weight_pop], absorb(region) cl(cz)
+			 eststo `covar' : ivreghdfe `covar' samp_dest (above_x_med samp_destXabove_x_med = above_inst_med samp_destXabove_z_med) v2_sumshares_urban [aw=weight_pop], absorb(region) cl(cz)
 
 		}
 		else{
-			 eststo `covar' : reghdfe `covar' above_inst_med samp_destXabove_z_med samp_dest blackmig3539_share [aw=weight_pop], vce(cl cz) absorb(region)
+			 eststo `covar' : reghdfe `covar' above_inst_med samp_destXabove_z_med samp_dest v2_sumshares_urban [aw=weight_pop], vce(cl cz) absorb(region)
 		}
 	}
 
@@ -233,11 +233,11 @@ forv iv=0/1{
 		lab var `covar' "`mname'"
 		di "`covar'"
 		if "`iv'"=="1"{
-			 eststo `covar' : ivreghdfe `covar' samp_dest (above_x_med samp_destXabove_x_med = above_inst_med samp_destXabove_z_med) blackmig3539_share mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total [aw=weight_pop], absorb(region) cl(cz)
+			 eststo `covar' : ivreghdfe `covar' samp_dest (above_x_med samp_destXabove_x_med = above_inst_med samp_destXabove_z_med) v2_sumshares_urban  transpo_cost_1920 coastal [aw=weight_pop], absorb(region) cl(cz)
 
 		}
 		else{
-			 eststo `covar' : reghdfe `covar' above_inst_med samp_destXabove_z_med samp_dest blackmig3539_share mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total [aw=weight_pop], vce(cl cz) absorb(region)
+			 eststo `covar' : reghdfe `covar' above_inst_med samp_destXabove_z_med samp_dest v2_sumshares_urban  transpo_cost_1920 coastal [aw=weight_pop], vce(cl cz) absorb(region)
 		}
 	}
 
@@ -256,14 +256,14 @@ drop if yr_incorp>1970
 g time = 1 if yr_incorp <1940
 replace time = 2 if yr_incorp>=1940 & yr_incorp<=1970
 
-g treat = cond(time==1,GM_hat_raw_pp,0)
+g treat = cond(time==1,GM_hat_raw,0)
 
 eststo clear
 foreach covar of varlist landuse_sfr landuse_apartment pct_rev_ff pct_rev_sa pct_rev_debt {
 	local mname = subinstr("`covar'","landuse_", "",.)
 	lab var `covar' "`mname'"
 	di "`covar'"
-	eststo `covar' : didregress (`covar' i.region blackmig3539_share) (treat, continuous) [aw=weight_pop], group(cz) time(time) vce(cl cz)
+	eststo `covar' : didregress (`covar' i.region v2_sumshares_urban) (treat, continuous) [aw=weight_pop], group(cz) time(time) vce(cl cz)
 
 
 	
@@ -283,7 +283,7 @@ foreach covar of varlist landuse_sfr landuse_apartment pct_rev_ff pct_rev_sa pct
 	local mname = subinstr("`covar'","landuse_", "",.)
 	lab var `covar' "`mname'"
 	di "`covar'"
-	eststo `covar' : didregress (`covar' i.region blackmig3539_share mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total) (treat, continuous) [aw=weight_pop], group(cz) time(time) vce(cl cz)
+	eststo `covar' : didregress (`covar' i.region v2_sumshares_urban transpo_cost_1920 coastal) (treat, continuous) [aw=weight_pop], group(cz) time(time) vce(cl cz)
 
 
 	

@@ -1,6 +1,5 @@
-local b_controls reg2 reg3 reg4 blackmig3539_share
-local extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
-
+local b_controls reg2 reg3 reg4 v2_sumshares_urban
+local extra_controls transpo_cost_1920 coastal
 
 foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 	if "`outcome'"=="cgoodman" local outlab "C. Goodman municipalities" 
@@ -18,19 +17,19 @@ foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 
 	// Getting full sample values
 	// RF
-	reg n_`outcome'_cz_pc GM_hat_raw_pp `b_controls'  [aw=popc1940], r
-	local b_rf = _b[GM_hat_raw_pp]
-	local se_rf = _se[GM_hat_raw_pp]
+	reg n_`outcome'_cz_pc GM_hat_raw `b_controls'  [aw=popc1940], r
+	local b_rf = _b[GM_hat_raw]
+	local se_rf = _se[GM_hat_raw]
 	
-	ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls'  [aw=popc1940], r
+	ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw) `b_controls'  [aw=popc1940], r
 	local b_iv = _b[GM_raw_pp]
 	local se_iv = _se[GM_raw_pp]
 	levelsof cz, local(czs)
 	
 	foreach cz in `czs'{
-		qui parmby "reg n_`outcome'_cz_pc GM_hat_raw_pp `b_controls'  [aw=popc1940] if cz!=`cz', r", lab saving(`"rf`cz'`outcome'"', replace) idn(`cz') ids(vr) ylabel rename(idn vrsn) level(95 99)
+		qui parmby "reg n_`outcome'_cz_pc GM_hat_raw `b_controls'  [aw=popc1940] if cz!=`cz', r", lab saving(`"rf`cz'`outcome'"', replace) idn(`cz') ids(vr) ylabel rename(idn vrsn) level(95 99)
 		
-		qui parmby "ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls'  [aw=popc1940] if cz!=`cz', r", lab saving(`"iv`cz'`outcome'"', replace) idn(`cz') ids(vr) ylabel rename(idn vrsn) level(95 99)
+		qui parmby "ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw) `b_controls'  [aw=popc1940] if cz!=`cz', r", lab saving(`"iv`cz'`outcome'"', replace) idn(`cz') ids(vr) ylabel rename(idn vrsn) level(95 99)
 		
 	}
 	clear
@@ -95,19 +94,19 @@ foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 
 	// Getting full sample values
 	// RF
-	reg n_`outcome'_cz_pc GM_hat_raw_pp `b_controls' `extra_controls'  [aw=popc1940], r
-	local b_rf = _b[GM_hat_raw_pp]
-	local se_rf = _se[GM_hat_raw_pp]
+	reg n_`outcome'_cz_pc GM_hat_raw `b_controls' `extra_controls'  [aw=popc1940], r
+	local b_rf = _b[GM_hat_raw]
+	local se_rf = _se[GM_hat_raw]
 	
-	ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls' `extra_controls'  [aw=popc1940], r
+	ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw) `b_controls' `extra_controls'  [aw=popc1940], r
 	local b_iv = _b[GM_raw_pp]
 	local se_iv = _se[GM_raw_pp]
 	levelsof cz, local(czs)
 	
 	foreach cz in `czs'{
-		qui parmby "reg n_`outcome'_cz_pc GM_hat_raw_pp `b_controls' `extra_controls' [aw=popc1940] if cz!=`cz', r", lab saving(`"rf`cz'`outcome'"', replace) idn(`cz') ids(vr) ylabel rename(idn vrsn) level(95 99)
+		qui parmby "reg n_`outcome'_cz_pc GM_hat_raw `b_controls' `extra_controls' [aw=popc1940] if cz!=`cz', r", lab saving(`"rf`cz'`outcome'"', replace) idn(`cz') ids(vr) ylabel rename(idn vrsn) level(95 99)
 		
-		qui parmby "ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw_pp) `b_controls' `extra_controls' [aw=popc1940] if cz!=`cz', r", lab saving(`"iv`cz'`outcome'"', replace) idn(`cz') ids(vr) ylabel rename(idn vrsn) level(95 99)
+		qui parmby "ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw) `b_controls' `extra_controls' [aw=popc1940] if cz!=`cz', r", lab saving(`"iv`cz'`outcome'"', replace) idn(`cz') ids(vr) ylabel rename(idn vrsn) level(95 99)
 		
 	}
 	clear

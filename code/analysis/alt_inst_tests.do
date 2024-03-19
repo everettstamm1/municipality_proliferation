@@ -1,6 +1,6 @@
 // Alt Inst tests
-local b_controls reg2 reg3 reg4 blackmig3539_share
-local extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
+local b_controls reg2 reg3 reg4 v2_sumshares_urban
+local extra_controls transpo_cost_1920 coastal
 
 use "$CLEANDATA/cz_pooled", clear
 
@@ -12,13 +12,13 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 	if "`outcome'"=="spdist" local outlab "Special districts" 
 	if "`outcome'"=="totfrac" local outlab "Main City Share" 
 	preserve
-		ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_1940_hat_raw_pp GM_7r_hat_raw_pp GM_r_hat_raw_pp GM_hat_raw_pp) `b_controls' [aw = popc1940], r
+		ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_1940_hat_raw GM_7r_hat_raw GM_r_hat_raw GM_hat_raw) `b_controls' [aw = popc1940], r
 		local hansenj : di %4.2f e(jp)
 		
-		global spec1 (GM_raw_pp = GM_hat_raw_pp)  `b_controls'
-		global spec2 (GM_raw_pp = GM_7r_hat_raw_pp)  `b_controls'
-		global spec3 (GM_raw_pp = GM_r_hat_raw_pp) `b_controls'
-		global spec4 (GM_raw_pp = GM_1940_hat_raw_pp)  `b_controls'
+		global spec1 (GM_raw_pp = GM_hat_raw)  `b_controls'
+		global spec2 (GM_raw_pp = GM_7r_hat_raw)  `b_controls'
+		global spec3 (GM_raw_pp = GM_r_hat_raw) `b_controls'
+		global spec4 (GM_raw_pp = GM_1940_hat_raw)  `b_controls'
 		
 		forval spec=1(1)4{
 			tempfile spec`spec'
@@ -60,13 +60,13 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 	if "`outcome'"=="spdist" local outlab "Special districts" 
 	if "`outcome'"=="totfrac" local outlab "Main City Share" 
 	preserve
-		ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_1940_hat_raw_pp GM_7r_hat_raw_pp GM_r_hat_raw_pp GM_hat_raw_pp) `b_controls' `extra_controls' [aw = popc1940], r
+		ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_1940_hat_raw GM_7r_hat_raw GM_r_hat_raw GM_hat_raw) `b_controls' `extra_controls' [aw = popc1940], r
 		local hansenj : di %4.2f e(jp)
 		
-		global spec1 (GM_raw_pp = GM_hat_raw_pp)  `b_controls'  `extra_controls'
-		global spec2 (GM_raw_pp = GM_7r_hat_raw_pp)  `b_controls' `extra_controls'
-		global spec3 (GM_raw_pp = GM_r_hat_raw_pp) `b_controls' `extra_controls'
-		global spec4 (GM_raw_pp = GM_1940_hat_raw_pp)  `b_controls' `extra_controls'
+		global spec1 (GM_raw_pp = GM_hat_raw)  `b_controls'  `extra_controls'
+		global spec2 (GM_raw_pp = GM_7r_hat_raw)  `b_controls' `extra_controls'
+		global spec3 (GM_raw_pp = GM_r_hat_raw) `b_controls' `extra_controls'
+		global spec4 (GM_raw_pp = GM_1940_hat_raw)  `b_controls' `extra_controls'
 		
 		forval spec=1(1)4{
 			tempfile spec`spec'

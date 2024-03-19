@@ -990,7 +990,7 @@ STEPS:
 		drop total* black*
 		save "$INTDATA/dcourt/instrument/`v'_city_blackmigshare3539.dta", replace
 		
-		use "$INTDATA/dcourt/bartik/`v'_black_proutmig`destinationcode'19401940_collapsed_wide.dta", clear
+		use "$INTDATA/dcourt/bartik/`v'_black_proutmig`destinationcode'19401970_collapsed_wide.dta", clear
 		merge 1:1 city using "$INTDATA/dcourt/instrument/`v'_city_blackmigshare3539.dta", keep(3) nogenerate
 		
 		save "$INTDATA/dcourt/instrument/`v'_black_`svar'_1940_1940_wide.dta", replace
@@ -1076,14 +1076,13 @@ STEPS:
 		egen sumshares = rowtotal(blackorigin_fips*)
 
 		drop total* black*
-		save "$INTDATA/dcourt/bartik/rndmig/r`i'_city_blackmigshare3539.dta", replace
+		tempfile r`i'
+		save `r`i''
 		
 		use "$RAWDATA/dcourt/rndmig/r`i'_black_proutmig`origincode'19401940_collapsed_wide.dta", clear
-		merge 1:1 city using "$INTDATA/dcourt/bartik/rndmig/r`i'_city_blackmigshare3539.dta", keep(3) nogenerate
+		merge 1:1 city using `r`i'', keep(3) nogenerate
 		
-		save "$INTDATA/dcourt/bartik/rndmig/r`i'_black_prmig_1940_1940_wide.dta", replace
-	
-		use "$INTDATA/dcourt/bartik/rndmig/r`i'_black_prmig_1940_1940_wide.dta", clear
+		
 		decode city, gen(city_str)
 		drop city 
 		rename city_str city
@@ -1095,9 +1094,6 @@ STEPS:
 			drop part1 part2
 		
 		*** Initial cleaning done. Save at this point.
-		save "$INTDATA/dcourt/instrument/city_crosswalked/rndmig/r_`i'_black_prmig_1940_1940_wide_preprocessed.dta", replace
-		
-		use "$INTDATA/dcourt/instrument/city_crosswalked/rndmig/r_`i'_black_prmig_1940_1940_wide_preprocessed.dta", clear
 		g city_original=city
 		
 		replace city = "St. Joseph, MO" if city == "Saint Joseph, MO" 
@@ -1147,6 +1143,89 @@ STEPS:
 		*Save
 		drop if _merge==2
 		drop _merge
-		save "$INTDATA/dcourt/instrument/city_crosswalked/rndmig/r`i'_black_prmig_1940_1940_wide_xw.dta", replace
+		save "$INTDATA/dcourt/instrument/city_crosswalked/rndmig/r`i'_black_prmig_1940_1970_wide_xw.dta", replace
+	}
+	
+	
+	* Version re`i' (resampled shocks)
+	forval i=1(1)1000{
+		di "ITERATION: `i'"
+		local origincode origin_fips
+		
+		use "$INTDATA/dcourt/bartik/resample/re`i'_black`origincode'1940.dta", clear
+		
+		order black* total*
+		egen totblackmigcity3539=rowmean(total_blackcity*)
+		sum totblackmigcity3539
+		egen sumshares = rowtotal(blackorigin_fips*)
+
+		drop total* black*
+		tempfile re`i'
+		save `re`i''
+		use "$INTDATA/dcourt/bartik/resample/re`i'_black_proutmig`origincode'19401970_collapsed_wide.dta", clear
+		merge 1:1 city using `re`i'', keep(3) nogenerate
+		
+		decode city, gen(city_str)
+		drop city 
+		rename city_str city
+		
+		*Standardize City Names
+			//A - fix spelling and formatting variations
+			split city, p(,) g(part)
+			replace city = proper(part1) + "," + upper(part2) 
+			drop part1 part2
+		
+		*** Initial cleaning done. Save at this point.
+		
+		g city_original=city
+		
+		replace city = "St. Joseph, MO" if city == "Saint Joseph, MO" 
+		replace city = "St. Louis, MO" if city == "Saint Louis, MO" 
+		replace city = "St. Paul, MN" if city == "Saint Paul, MN" 
+		replace city = "McKeesport, PA" if city == "Mckeesport, PA" 
+		replace city = "Norristown, PA" if city == "Norristown Borough, PA"
+		replace city = "Shenandoah, PA" if city == "Shenandoah Borough, PA"
+		replace city = "Jamestown, NY" if city == "Jamestown , NY"
+		replace city = "Kensington, PA" if city == "Kensington,"
+		replace city = "Oak Park Village, IL" if city == "Oak Park Village,"
+		replace city = "Fond du Lac, WI" if city == "Fond Du Lac, WI"
+		replace city = "DuBois, PA" if city == "Du Bois, PA"
+		replace city = "McKees Rocks, PA" if city == "Mckees Rocks, PA"
+		replace city = "McKeesport, PA" if city == "Mckeesport, PA"
+		replace city = "Hamtramck, MI" if city == "Hamtramck Village, MI"
+		replace city = "Lafayette, IN" if city == "La Fayette, IN"
+		replace city = "Schenectady, NY" if city == "Schenectedy, NY"
+		replace city = "Wallingford Center, CT" if city == "Wallingford, CT"
+		replace city = "Oak Park, IL" if city == "Oak Park Village, IL"
+		replace city = "New Kensington, PA" if city == "Kensington, PA"
+	
+		//B - Replace city names with substitutes in the crosswalk when perfect match with crosswalk impossible
+		//B1 - the following cities overlap with their subsitutesq
+		*replace city = "Silver Lake, NJ" if city == "Belleville, NJ"
+		replace city = "Brookdale, NJ" if city == "Bloomfield, NJ" 
+		replace city = "Upper Montclair, NJ" if city == "Montclair, NJ"
+	
+		//B2 - the following cities just share a border with their subsitutes but do not overlap
+		replace city = "Glen Ridge, NJ" if city == "Orange, NJ"
+		replace city = "Essex Fells, NJ" if city == "West Orange, NJ" 
+		replace city = "Bogota, NJ" if city == "Teaneck, NJ" 
+	
+		//B3 - the following cities do not share a border with their substitutes but are within a few miles
+		replace city = "Kenilworth, NJ" if city == "Irvington, NJ"  
+		replace city = "Wallington, NJ" if city == "Nutley, NJ" 
+		replace city = "Short Hills, NJ" if city == "South Orange, NJ"
+		replace city = "Lafayette, IN" if city == "Lafayette, IL"
+	   
+		*Merge with State Crosswalks
+		merge 1:1 city using "$RAWDATA/dcourt/US_place_point_2010_crosswalks.dta", keepusing(cz cz_name)
+		replace cz = 19600 if city=="Belleville, NJ"
+		replace cz_name = "Newark, NJ" if city=="Belleville, NJ"    
+		*Resolve Unmerged Cities
+		tab _merge
+		
+		*Save
+		drop if _merge==2
+		drop _merge
+		save "$INTDATA/dcourt/instrument/city_crosswalked/resample/re`i'_black_prmig_1940_1970_wide_xw.dta", replace
 	}
 	
