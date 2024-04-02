@@ -18,7 +18,7 @@ g incwagec = incwage if _merge==3
 drop _merge
 
 
-joinby  icpsrst icpsrcty using "$XWALKS/consistent_1990", keepusing(weight nhgisst_1990 nhgiscty_1990) keep(3) nogen
+joinby  icpsrst icpsrcty using `consistent_xwalk', keepusing(weight nhgisst_1990 nhgiscty_1990) keep(3) nogen
 
 ren nhgisst_1990 statefip
 ren nhgiscty_1990 countyfip
