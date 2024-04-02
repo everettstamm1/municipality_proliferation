@@ -11,7 +11,7 @@ STEPS:
 *last updated:  07/16/2018 
 */
 
-	gz7, filepath("$RAWDATA/census") filename("usa_00048.dta.gz")
+	gz7, filepath("$RAWDATA/census") filename("usa_00055.dta.gz")
 	
 	g popc = perwt
 	g bpopc = perwt if race==2

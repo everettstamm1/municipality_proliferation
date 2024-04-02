@@ -195,60 +195,137 @@ lab var samp_destXabove_x_med "Above Median GM X Incorporated 1940-70"
 replace landuse_sfr = 100*landuse_sfr
 replace landuse_apartment = 100*landuse_apartment 
 
-forv iv=0/1{
-	if "`iv'"=="0" local mod "Reduced Form"
-	if "`iv'"=="1" local mod "IV"
+
+// Binary X/Z
+forv m in iv rf ols{
+	if "`m'"=="rf" local mod "Reduced Form"
+	if "`m'"=="iv" local mod "IV"
+	if "`m'"=="ols" local mod "OLS"
+
 	eststo clear
 	foreach covar of varlist landuse_sfr landuse_apartment pct_rev_ff pct_rev_sa pct_rev_debt {
 		local mname = subinstr("`covar'","landuse_", "",.)
 		lab var `covar' "`mname'"
 		di "`covar'"
-		if "`iv'"=="1"{
-			 eststo `covar' : ivreghdfe `covar' samp_dest (above_x_med samp_destXabove_x_med = above_inst_med samp_destXabove_z_med) v2_sumshares_urban [aw=weight_pop], absorb(region) cl(cz)
+		if "`m'"=="iv"{
+			 eststo `covar' : ivreghdfe `covar' samp_dest (above_x_med samp_destXabove_x_med = above_inst_med samp_destXabove_z_med) v2_sumshares_urban  [aw=weight_pop], absorb(region) cl(cz)
 
 		}
-		else{
-			 eststo `covar' : reghdfe `covar' above_inst_med samp_destXabove_z_med samp_dest v2_sumshares_urban [aw=weight_pop], vce(cl cz) absorb(region)
+		else if "`m'"=="rf"{
+			 eststo `covar' : reghdfe `covar' above_inst_med samp_destXabove_z_med samp_dest v2_sumshares_urban   [aw=weight_pop], vce(cl cz) absorb(region)
 		}
-	}
-
-
-	esttab using "$TABS/land_use_index/muni_outcomes_`iv'.tex", booktabs compress label replace lines se frag ///
-				starlevels( * 0.10 ** 0.05 *** 0.01) ///
-				mtitles("Single Family" "Apartments" "Fines/Forfeits" "\shortstack{Special \\ Assessments}" "\shortstack{Outstanding \\ Debt}") ///
-				mgroups("\shortstack{Percentage of \\ Municipal Land Uses}" "\shortstack{Percentage of \\ Municipal Revenues}", pattern(1 0 1 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(above_*_med samp_*) b(%04.3f) se(%04.3f) ///
-				prehead( \begin{tabular}{l*{5}{c}} \toprule) postfoot(	\bottomrule \end{tabular}) 
-
-
-
-}
-
-
-forv iv=0/1{
-	if "`iv'"=="0" local mod "Reduced Form"
-	if "`iv'"=="1" local mod "IV"
-	eststo clear
-	foreach covar of varlist landuse_sfr landuse_apartment pct_rev_ff pct_rev_sa pct_rev_debt {
-		local mname = subinstr("`covar'","landuse_", "",.)
-		lab var `covar' "`mname'"
-		di "`covar'"
-		if "`iv'"=="1"{
-			 eststo `covar' : ivreghdfe `covar' samp_dest (above_x_med samp_destXabove_x_med = above_inst_med samp_destXabove_z_med) v2_sumshares_urban  transpo_cost_1920 coastal [aw=weight_pop], absorb(region) cl(cz)
-
-		}
-		else{
-			 eststo `covar' : reghdfe `covar' above_inst_med samp_destXabove_z_med samp_dest v2_sumshares_urban  transpo_cost_1920 coastal [aw=weight_pop], vce(cl cz) absorb(region)
+		else if "`m'"=="ols"{
+			 eststo `covar' : reghdfe `covar' above_x_med samp_destXabove_x_med samp_dest v2_sumshares_urban  [aw=weight_pop], vce(cl cz) absorb(region)
 		}
 	}
 
 
-	esttab using "$TABS/land_use_index/muni_outcomes_`iv'_new_ctrls.tex", booktabs compress label replace lines se frag ///
+	esttab using "$TABS/land_use_index/muni_outcomes_`m'.tex", booktabs compress label replace lines se frag ///
 				 starlevels( * 0.10 ** 0.05 *** 0.01) ///
 				mtitles("Single Family" "Apartments" "Fines/Forfeits" "\shortstack{Special \\ Assessments}" "\shortstack{Outstanding \\ Debt}") ///
 				mgroups("\shortstack{Percentage of \\ Municipal Land Uses}" "\shortstack{Percentage of \\ Municipal Revenues}", pattern(1 0 1 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(above_*_med samp_*) b(%04.3f) se(%04.3f) ///
 				prehead( \begin{tabular}{l*{5}{c}} \toprule) postfoot(	\bottomrule \end{tabular}) 
 
 }
+
+
+forv m in iv rf ols{
+	if "`m'"=="rf" local mod "Reduced Form"
+	if "`m'"=="iv" local mod "IV"
+	if "`m'"=="ols" local mod "OLS"
+
+	eststo clear
+	foreach covar of varlist landuse_sfr landuse_apartment pct_rev_ff pct_rev_sa pct_rev_debt {
+		local mname = subinstr("`covar'","landuse_", "",.)
+		lab var `covar' "`mname'"
+		di "`covar'"
+		if "`m'"=="iv"{
+			 eststo `covar' : ivreghdfe `covar' samp_dest (above_x_med samp_destXabove_x_med = above_inst_med samp_destXabove_z_med) v2_sumshares_urban  transpo_cost_1920 coastal [aw=weight_pop], absorb(region) cl(cz)
+
+		}
+		else if "`m'"=="rf"{
+			 eststo `covar' : reghdfe `covar' above_inst_med samp_destXabove_z_med samp_dest v2_sumshares_urban  transpo_cost_1920 coastal [aw=weight_pop], vce(cl cz) absorb(region)
+		}
+		else if "`m'"=="ols"{
+			 eststo `covar' : reghdfe `covar' above_x_med samp_destXabove_x_med samp_dest v2_sumshares_urban  transpo_cost_1920 coastal [aw=weight_pop], vce(cl cz) absorb(region)
+		}
+	}
+
+
+	esttab using "$TABS/land_use_index/muni_outcomes_`m'_new_ctrls.tex", booktabs compress label replace lines se frag ///
+				 starlevels( * 0.10 ** 0.05 *** 0.01) ///
+				mtitles("Single Family" "Apartments" "Fines/Forfeits" "\shortstack{Special \\ Assessments}" "\shortstack{Outstanding \\ Debt}") ///
+				mgroups("\shortstack{Percentage of \\ Municipal Land Uses}" "\shortstack{Percentage of \\ Municipal Revenues}", pattern(1 0 1 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(above_*_med samp_*) b(%04.3f) se(%04.3f) ///
+				prehead( \begin{tabular}{l*{5}{c}} \toprule) postfoot(	\bottomrule \end{tabular}) 
+
+}
+
+// Normal X/Z
+
+
+forv m in iv rf ols{
+	if "`m'"=="rf" local mod "Reduced Form"
+	if "`m'"=="iv" local mod "IV"
+	if "`m'"=="ols" local mod "OLS"
+
+	eststo clear
+	foreach covar of varlist landuse_sfr landuse_apartment pct_rev_ff pct_rev_sa pct_rev_debt {
+		local mname = subinstr("`covar'","landuse_", "",.)
+		lab var `covar' "`mname'"
+		di "`covar'"
+		if "`m'"=="iv"{
+			 eststo `covar' : ivreghdfe `covar' samp_dest (GM_raw_pp samp_destXGM = GM_hat_raw samp_destXGM_hat) v2_sumshares_urban  [aw=weight_pop], absorb(region) cl(cz)
+
+		}
+		else if "`m'"=="rf"{
+			 eststo `covar' : reghdfe `covar' GM_hat_raw samp_destXGM_hat samp_dest v2_sumshares_urban   [aw=weight_pop], vce(cl cz) absorb(region)
+		}
+		else if "`m'"=="ols"{
+			 eststo `covar' : reghdfe `covar' GM_raw_pp samp_destXGM samp_dest v2_sumshares_urban  [aw=weight_pop], vce(cl cz) absorb(region)
+		}
+	}
+
+
+	esttab using "$TABS/land_use_index/muni_outcomes_`m'_full.tex", booktabs compress label replace lines se frag ///
+				 starlevels( * 0.10 ** 0.05 *** 0.01) ///
+				mtitles("Single Family" "Apartments" "Fines/Forfeits" "\shortstack{Special \\ Assessments}" "\shortstack{Outstanding \\ Debt}") ///
+				mgroups("\shortstack{Percentage of \\ Municipal Land Uses}" "\shortstack{Percentage of \\ Municipal Revenues}", pattern(1 0 1 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(above_*_med samp_*) b(%04.3f) se(%04.3f) ///
+				prehead( \begin{tabular}{l*{5}{c}} \toprule) postfoot(	\bottomrule \end{tabular}) 
+
+}
+
+
+forv m in iv rf ols{
+	if "`m'"=="rf" local mod "Reduced Form"
+	if "`m'"=="iv" local mod "IV"
+	if "`m'"=="ols" local mod "OLS"
+
+	eststo clear
+	foreach covar of varlist landuse_sfr landuse_apartment pct_rev_ff pct_rev_sa pct_rev_debt {
+		local mname = subinstr("`covar'","landuse_", "",.)
+		lab var `covar' "`mname'"
+		di "`covar'"
+		if "`m'"=="iv"{
+			 eststo `covar' : ivreghdfe `covar' samp_dest (GM_raw_pp samp_destXGM = GM_hat_raw samp_destXGM_hat) v2_sumshares_urban  transpo_cost_1920 coastal [aw=weight_pop], absorb(region) cl(cz)
+
+		}
+		else if "`m'"=="rf"{
+			 eststo `covar' : reghdfe `covar' GM_hat_raw samp_destXGM_hat samp_dest v2_sumshares_urban  transpo_cost_1920 coastal [aw=weight_pop], vce(cl cz) absorb(region)
+		}
+		else if "`m'"=="ols"{
+			 eststo `covar' : reghdfe `covar' GM_raw_pp samp_destXGM samp_dest v2_sumshares_urban  transpo_cost_1920 coastal [aw=weight_pop], vce(cl cz) absorb(region)
+		}
+	}
+
+
+	esttab using "$TABS/land_use_index/muni_outcomes_`m'_full_new_ctrls.tex", booktabs compress label replace lines se frag ///
+				 starlevels( * 0.10 ** 0.05 *** 0.01) ///
+				mtitles("Single Family" "Apartments" "Fines/Forfeits" "\shortstack{Special \\ Assessments}" "\shortstack{Outstanding \\ Debt}") ///
+				mgroups("\shortstack{Percentage of \\ Municipal Land Uses}" "\shortstack{Percentage of \\ Municipal Revenues}", pattern(1 0 1 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(above_*_med samp_*) b(%04.3f) se(%04.3f) ///
+				prehead( \begin{tabular}{l*{5}{c}} \toprule) postfoot(	\bottomrule \end{tabular}) 
+
+}
+
 
 
 // Continuous DID model

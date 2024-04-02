@@ -1,5 +1,21 @@
-local b_controls reg2 reg3 reg4 blackmig3539_share
-local extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
+
+local use_sumshare = 1
+local use_pct_inst = 1
+
+
+// Controls
+if `use_sumshare' == 0 local b_controls reg2 reg3 reg4 blackmig3539_share 
+if `use_sumshare' == 1 local b_controls reg2 reg3 reg4 v2_sumshares_urban 
+
+
+if `use_sumshare' == 0 & `use_pct_inst' == 0 local extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
+if `use_sumshare' == 0 & `use_pct_inst' == 1 local extra_controls mfg_lfshare1940
+if `use_sumshare' == 1 & `use_pct_inst' == 0 local extra_controls coastal transpo_cost_1920
+if `use_sumshare' == 1 & `use_pct_inst' == 1 local extra_controls coastal transpo_cost_1920
+
+// Inst
+if `use_pct_inst' == 0 local inst GM_hat_raw_pp
+if `use_pct_inst' == 1 local inst GM_hat_raw
 
 foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 	if "`outcome'"=="cgoodman" local outlab "C. Goodman municipalities" 

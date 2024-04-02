@@ -1302,13 +1302,13 @@ eststo clear
 		local F : di %6.2f r(F)
 
 		// OLS
-		eststo ols_`outcome' : reg n_`outcome'_cz_pc GM_raw_pp GM_X_above_med_enclosed `b_controls' [aw = popc1940], r
+		eststo ols_`outcome' : reg n_`outcome'_cz_pc GM_raw_pp GM_X_above_med_enclosed above_med_enclosed `b_controls' [aw = popc1940], r
 		
 		// RF
-		eststo rf_`outcome' : reg n_`outcome'_cz_pc `inst' GM_hat_X_above_med_enclosed `b_controls' [aw = popc1940], r
+		eststo rf_`outcome' : reg n_`outcome'_cz_pc `inst' GM_hat_X_above_med_enclosed above_med_enclosed  `b_controls' [aw = popc1940], r
 		
 		// 2SLS 
-		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp GM_X_above_med_enclosed = `inst' GM_hat_X_above_med_enclosed) `b_controls' [aw = popc1940], r
+		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp GM_X_above_med_enclosed = `inst' GM_hat_X_above_med_enclosed) above_med_enclosed  `b_controls' [aw = popc1940], r
 			estadd scalar Fs = `F'
 			estadd scalar dep_var = `dv'
 			estadd scalar b_var = `bv'
@@ -1377,13 +1377,13 @@ eststo clear
 		local F : di %6.2f r(F)
 
 		// OLS
-		eststo ols_`outcome' : reg n_`outcome'_cz_pc GM_raw_pp GM_X_above_med_enclosed `b_controls' `extra_controls' [aw = popc1940], r
+		eststo ols_`outcome' : reg n_`outcome'_cz_pc GM_raw_pp GM_X_above_med_enclosed `b_controls' `extra_controls' above_med_enclosed [aw = popc1940], r
 		
 		// RF
-		eststo rf_`outcome' : reg n_`outcome'_cz_pc `inst' GM_hat_X_above_med_enclosed `b_controls' `extra_controls' [aw = popc1940], r
+		eststo rf_`outcome' : reg n_`outcome'_cz_pc `inst' GM_hat_X_above_med_enclosed `b_controls' `extra_controls' above_med_enclosed [aw = popc1940], r
 		
 		// 2SLS 
-		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp GM_X_above_med_enclosed = `inst' GM_hat_X_above_med_enclosed) `b_controls' `extra_controls' [aw = popc1940], r
+		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp GM_X_above_med_enclosed = `inst' GM_hat_X_above_med_enclosed) above_med_enclosed `b_controls' `extra_controls' [aw = popc1940], r
 			estadd scalar Fs = `F'
 			estadd scalar dep_var = `dv'
 			estadd scalar b_var = `bv'

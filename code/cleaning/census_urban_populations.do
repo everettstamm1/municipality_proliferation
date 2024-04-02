@@ -97,7 +97,7 @@ forv d=49/52{
 save "$INTDATA/census/cz_urbanization_1900_1930", replace
 
 
-use city perwt stateicp countyicp using "$RAWDATA/census/usa_00048.dta", clear
+use city perwt stateicp countyicp using "$RAWDATA/census/usa_00055.dta", clear
 
 ren city citycode
 // 1900-30 include way more cities than 1940, so crosswalk to the cities we actually use
