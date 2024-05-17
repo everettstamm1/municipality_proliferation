@@ -10,8 +10,8 @@ if `use_sumshare' == 1 local b_controls reg2 reg3 reg4 v2_sumshares_urban
 
 if `use_sumshare' == 0 & `use_pct_inst' == 0 local extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
 if `use_sumshare' == 0 & `use_pct_inst' == 1 local extra_controls mfg_lfshare1940
-if `use_sumshare' == 1 & `use_pct_inst' == 0 local extra_controls coastal transpo_cost_1920
-if `use_sumshare' == 1 & `use_pct_inst' == 1 local extra_controls coastal transpo_cost_1920
+if `use_sumshare' == 1 & `use_pct_inst' == 0 local extra_controls coastal transpo_cost_1920 med_pos_income_1940 frac_total
+if `use_sumshare' == 1 & `use_pct_inst' == 1 local extra_controls coastal transpo_cost_1920 med_pos_income_1940 frac_total
 
 // Inst
 if `use_pct_inst' == 0 local inst GM_hat_raw_pp
@@ -27,8 +27,8 @@ if `use_sumshare' == 1 local w_b_controls reg2 reg3 reg4 v8_sumshares_urban
 
 if `use_sumshare' == 0 & `use_pct_inst' == 0 local w_extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
 if `use_sumshare' == 0 & `use_pct_inst' == 1 local w_extra_controls mfg_lfshare1940
-if `use_sumshare' == 1 & `use_pct_inst' == 0 local w_extra_controls coastal transpo_cost_1920
-if `use_sumshare' == 1 & `use_pct_inst' == 1 local w_extra_controls coastal transpo_cost_1920
+if `use_sumshare' == 1 & `use_pct_inst' == 0 local w_extra_controls coastal transpo_cost_1920 med_pos_income_1940 frac_total
+if `use_sumshare' == 1 & `use_pct_inst' == 1 local w_extra_controls coastal transpo_cost_1920 med_pos_income_1940 frac_total
 
 
 
@@ -1436,3 +1436,151 @@ eststo clear
 		stats(Fs dep_var b_var N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0))
 
 	eststo clear
+	
+// Log Differences
+
+	
+
+eststo clear
+foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
+	su n_`outcome'_cz_ld [aw=popc1940]
+	local dv : di %6.2f r(mean)
+	su b_`outcome'_cz1940_pc [aw=popc1940]
+	local bv : di %6.2f r(mean)
+	
+	// First Stage
+	eststo fs_`outcome' : reg GM_raw_pp `inst' `b_controls' [aw=popc1940], r
+	test `inst'=0
+	local F : di %6.2f r(F)
+
+	// OLS
+	eststo ols_`outcome' : reg n_`outcome'_cz_ld GM_raw_pp `b_controls' [aw = popc1940], r
+	
+	// RF
+	eststo rf_`outcome' : reg n_`outcome'_cz_ld `inst' `b_controls' [aw = popc1940], r
+	
+	// 2SLS 
+	eststo iv_`outcome' : ivreg2 n_`outcome'_cz_ld (GM_raw_pp = `inst') `b_controls' [aw = popc1940], r
+		estadd scalar Fs = `F'
+		estadd scalar dep_var = `dv'
+		estadd scalar b_var = `bv'
+
+}
+
+// Panel A: First Stage
+esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist fs_totfrac      ///
+	using "$TABS/final/main_effect_log.tex", ///
+	replace se booktabs noconstant noobs compress frag label nomtitles nonum ///
+	b(%04.3f) se(%04.3f) ///
+	starlevels( * 0.10 ** 0.05 *** 0.01) ///
+	posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
+			"&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+			"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
+			"\cmidrule(lr){1-7}" ///
+			"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
+	prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
+ keep(`inst') 
+
+// Panel B: OLS
+esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
+	using "$TABS/final/main_effect_log.tex", ///
+	se booktabs noconstant compress frag append noobs nonum nomtitle label ///
+	posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-7}" ) ///
+	b(%04.3f) se(%04.3f) ///
+	starlevels( * 0.10 ** 0.05 *** 0.01) ///
+	keep(GM_raw_pp)
+
+
+// Panel C: RF
+esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist rf_totfrac  ///
+	using "$TABS/final/main_effect_log.tex", ///
+	se booktabs noconstant compress frag append noobs nonum nomtitle label ///
+	posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
+	b(%04.3f) se(%04.3f) ///
+	starlevels( * 0.10 ** 0.05 *** 0.01) ///
+	keep(`inst')
+
+	
+// Panel D: 2SLS
+esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist iv_totfrac  ///
+	using "$TABS/final/main_effect_log.tex", ///
+	se booktabs noconstant compress frag append noobs nonum nomtitle label ///
+	posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-7}" ) ///
+	b(%04.3f) se(%04.3f) ///
+	starlevels( * 0.10 ** 0.05 *** 0.01) ///
+	keep(GM_raw_pp) ///
+	postfoot(	\bottomrule \end{tabular}) ///
+	stats(Fs dep_var b_var N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0))
+
+eststo clear
+
+foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac{
+	su n_`outcome'_cz_ld [aw=popc1940]
+	local dv : di %6.2f r(mean)
+	su b_`outcome'_cz1940_pc [aw=popc1940]
+	local bv : di %6.2f r(mean)		
+	
+	// First Stage
+	eststo fs_`outcome' : reg GM_raw_pp `inst' `b_controls' `extra_controls' [aw=popc1940], r
+	test `inst'=0
+	local F : di %6.2f r(F)
+
+	// OLS
+	eststo ols_`outcome' : reg n_`outcome'_cz_ld GM_raw_pp `b_controls' `extra_controls' [aw = popc1940], r
+	
+	// RF
+	eststo rf_`outcome' : reg n_`outcome'_cz_ld `inst' `b_controls' `extra_controls' [aw = popc1940], r
+	
+	// 2SLS 
+	eststo iv_`outcome' : ivreg2 n_`outcome'_cz_ld (GM_raw_pp = `inst') `b_controls' `extra_controls' [aw = popc1940], r
+		estadd scalar Fs = `F'
+		estadd scalar dep_var = `dv'
+		estadd scalar b_var = `bv'
+
+}
+
+// Panel A: First Stage
+esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist fs_totfrac      ///
+	using "$TABS/final/main_effect_log_new_ctrl.tex", ///
+	replace se booktabs noconstant noobs compress frag label nomtitles nonum ///
+	b(%04.3f) se(%04.3f) ///
+	starlevels( * 0.10 ** 0.05 *** 0.01) ///
+	posthead("&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}" ///
+			"&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}" ///
+			"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\" ///
+			"\cmidrule(lr){1-7}" ///
+			"\multicolumn{6}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-7}" ) ///
+	prehead( \begin{tabular}{l*{8}{c}} \toprule) ///
+ keep(`inst') 
+
+// Panel B: OLS
+esttab ols_cgoodman ols_gen_muni ols_schdist_ind ols_gen_town ols_spdist ols_totfrac  ///
+	using "$TABS/final/main_effect_log_new_ctrl.tex", ///
+	se booktabs noconstant compress frag append noobs nonum nomtitle label ///
+	posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel B: OLS}\\" "\cmidrule(lr){1-7}" ) ///
+	b(%04.3f) se(%04.3f) ///
+	starlevels( * 0.10 ** 0.05 *** 0.01) ///
+	keep(GM_raw_pp)
+
+
+// Panel C: RF
+esttab rf_cgoodman rf_gen_muni rf_schdist_ind rf_gen_town rf_spdist rf_totfrac  ///
+	using "$TABS/final/main_effect_log_new_ctrl.tex", ///
+	se booktabs noconstant compress frag append noobs nonum nomtitle label ///
+	posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel C: Reduced Form}\\" "\cmidrule(lr){1-7}" ) ///
+	b(%04.3f) se(%04.3f) ///
+	starlevels( * 0.10 ** 0.05 *** 0.01) ///
+	keep(`inst')
+
+	
+// Panel D: 2SLS
+esttab iv_cgoodman iv_gen_muni iv_schdist_ind iv_gen_town iv_spdist iv_totfrac  ///
+	using "$TABS/final/main_effect_log_new_ctrl.tex", ///
+	se booktabs noconstant compress frag append noobs nonum nomtitle label ///
+	posthead("\cmidrule(lr){1-7}" "\multicolumn{6}{l}{Panel D: 2SLS}\\" "\cmidrule(lr){1-7}" ) ///
+	b(%04.3f) se(%04.3f) ///
+	starlevels( * 0.10 ** 0.05 *** 0.01) ///
+	keep(GM_raw_pp) ///
+	postfoot(	\bottomrule \end{tabular}) ///
+	stats(Fs dep_var b_var N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0))
+eststo clear

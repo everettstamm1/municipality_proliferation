@@ -41,7 +41,7 @@ local extra_controls transpo_cost_1920 coastal
  
 
 use "$CLEANDATA/cz_pooled", clear
-local vars n10_cgoodman_cz_pc n20_cgoodman_cz_pc n30_cgoodman_cz_pc n40_cgoodman_cz_pc pre_cgoodman_cz_pc
+local vars n10_cgoodman_cz_pc n20_cgoodman_cz_pc n30_cgoodman_cz_pc n40_cgoodman_cz_pc pre_cgoodman_cz_pc 
 	keep if dcourt == 1
 
 foreach var in `vars' {

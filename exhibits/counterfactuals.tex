@@ -1,0 +1,52 @@
+\documentclass{article}
+\usepackage{blindtext}
+\usepackage{booktabs}
+\usepackage{geometry}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage{tikz}
+\usepackage{threeparttable}
+\usepackage{algorithmic}
+
+
+\title{Counterfactuals}
+
+\begin{document}
+\maketitle
+
+{\footnotesize }
+
+
+
+Here's how I did the counterfactual prediction. As the equation for outcome y given is by
+
+\[
+ y_{1940-70} = \frac{y1970}{pop1970/10000} - \frac{y1940}{pop1940/10000}
+\]
+I applied the following transformations to the predicted values $\hat y_{1940-70}$ from our IV regression:
+\[
+	\hat y_{1940-70} =  \frac{y_{1970}}{pop_{1970}/10000} - \frac{y_{1940}}{pop_{1940}/10000}
+\]
+\[
+	\hat y_{1940-70} +  \frac{y_{1940}}{pop_{1940}/10000} =  \frac{y_{1970}}{pop_{1970}/10000} 
+\]
+\[
+	(pop_{1970}/10000) *(\hat y_{1940-70} +  \frac{y_{1940}}{pop_{1940}/10000}) = y_{1970} 
+\]
+\[
+	(pop_{1970}/10000) *(\hat y_{1940-70} +  \frac{y_{1940}}{pop_{1940}/10000})  - y_{1940} = y_{1970} - y_{1940}
+\]
+\[
+counterfactual\_change = real\_change
+\]
+
+The results are given in the following table in raw jurisdictions.
+
+
+\centering
+\input{tables/counterfactual.tex}
+
+\end{document}

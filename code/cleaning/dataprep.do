@@ -379,7 +379,10 @@ foreach level in cz {
 			
 			merge 1:1 cz using "$INTDATA/covariates/covariates.dta", keep(1 3) nogen
 			merge 1:1 cz using "$INTDATA/census/maxcitypop", keep(1 3) nogen
-
+			ren cz czone
+			merge 1:1 czone using "$INTDATA/census/home_values", keep(1 3) nogen
+			merge 1:1 czone using "$INTDATA/census/incomes", keep(1 3) nogen
+			ren czone cz
 		}
 		// Missing dummies
 		foreach var of varlist frac_land transpo_cost_1920 coastal has_port avg_precip avg_temp n_wells totfrac_in_main_city m_rr m_rr_sqm_land m_rr_sqm_total{
@@ -434,6 +437,7 @@ foreach level in cz {
 				g n_`ds'_`level'_pcc = b_`ds'_`level'1970/(popc1970/10000) - b_`ds'_`level'1940/(popc1940/10000) 
 				g n2_`ds'_`level'_pcc = b_`ds'_`level'1970/(popc1970/10000) - b_`ds'_`level'1950/(popc1950/10000) 
 				
+				g n_`ds'_`level'_ld = log(b_`ds'_`level'1970) - log(b_`ds'_`level'1940)
 				
 				//g n3_`ds'_`level'_pc = (b_`ds'_`level'- b_`ds'_`level'1940)/(pop1940/10000) 
 				lab var n_`ds'_`level'_pc "New `label', P.C. (total)"
@@ -519,7 +523,8 @@ foreach level in cz {
 		g n_totfrac_cz_pc = 100*((maxcitypop1970/pop1970) - (maxcitypop1940/pop1940))
 		g n2_totfrac_cz_pc = 100*((maxcitypop1970/pop1970) - (maxcitypop1950/pop1950))
 		g ld_totfrac_cz_pc = 100*((maxcitypop2010/pop2010) - (maxcitypop1940/pop1940))
-		
+		g n_totfrac_cz_ld = log(maxcitypop2010) - log(maxcitypop1940)
+
 		// Adding measure of enclosedness
 		preserve	
 			import delimited using "$CLEANDATA/other/length_enclosed.csv", clear
