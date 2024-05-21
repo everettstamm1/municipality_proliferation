@@ -19,7 +19,29 @@ foreach level in cz {
 	drop if fips_state == "02" | fips_state=="15"
 	destring fips, replace
 	rename czone cz
+	keep if cz<.
+	// Notes from here: https://play.google.com/books/reader?id=hQCIHGUmiyAC&pg=GBS.PP4&hl=en
+//Maine , Mary- land , Massachusetts , North Carolina , Rhode Island , and Virginia are completely excluded (DC as well by our interpretation)-> Drop these CZs
+// Tennessee, Vermont, and CONNECTICUT all have a different definition resulting in large numbers of dependent school systems, but only starting in 1957. Impute backwards and or exclude from analysis. 
 
+	// Full removal
+	g schdist_m1_flag =  inlist(fips_state,"09","11","23","24","25","37","44","50","51")
+	g schdist_ind_m1 = schdist_ind if schdist_m1_flag==0
+	
+	// Backwards Imputation
+	// Need to impute dependent schools for 1942, 1952, 1997, 2012
+	
+	// Dependent 1997 and 2012
+	g schdist_dep_m2 = schdist_dep
+	bys fips (year) : replace schdist_dep_m2 = (schdist_dep_m2[_n-1] + schdist_dep_m2[_n+1])/2 if year==1997
+	bys fips (year) : replace schdist_dep_m2 = schdist_dep_m2[_n-1] if year == 2012
+	
+	// Backwards for 1942 and 1952 
+	g schdist_m2_flag =  inlist(fips_state,"11","23","24","25","37","44","51")
+	g schdist_ind_m2 = schdist_ind if schdist_m2_flag==0
+	g schdist_dep_1957 = schdist_dep_m2 if year == 1957
+	bys fips (schdist_dep_1957) : replace schdist_dep_m2 = schdist_dep_1957[1] if inlist(fips_state,"09","47","50") & inlist(year,1942,1952)
+	g schdist_m2 = schdist_ind_m2 + cond(inlist(fips_state,"09","47","50"), schdist_dep_m2,0)
 	// Census pop year
 	replace year = year-2
 
@@ -44,10 +66,18 @@ foreach level in cz {
 	restore
 	*/
 	
-	foreach var of varlist gen_town gen_muni schdist_ind all_local gen_subcounty spdist all_local_nosch schdist {
+	foreach var of varlist gen_town gen_muni schdist_ind all_local gen_subcounty spdist all_local_nosch schdist schdist_ind_m1 schdist_m2 {
 		preserve
 			local lab: variable label `var'
-
+			if "`var'"=="schdist_ind_m1"{
+				bys cz (schdist_m1_flag) : replace schdist_m1_flag = schdist_m1_flag[_N]
+				keep if schdist_m1_flag==0
+			} 
+			else if "`var'"=="schdist_m2"{
+				bys cz (schdist_m2_flag) : replace schdist_m2_flag = schdist_m2_flag[_N]
+				keep if schdist_m2_flag==0
+			}
+			
 			bys `levelvar' year : egen n = total(`var'), missing
 			keep `levelvar' year n
 			duplicates drop 
@@ -338,7 +368,7 @@ foreach level in cz {
 		
 		merge 1:1 `levelvar' using `totpop_insts', update nogen
 		*/
-		foreach ds in gen_muni schdist_ind all_local gen_subcounty spdist gen_town schdist{
+		foreach ds in gen_muni schdist_ind all_local gen_subcounty spdist gen_town schdist schdist_ind_m1 schdist_m2{
 
 			merge 1:1 `levelvar' using "$INTDATA/counts/`ds'_`level'", keep(1 3) nogen keepusing(n_`ds'_`level' b_`ds'_`level'1970 b_`ds'_`level'1960 b_`ds'_`level'1940 b_`ds'_`level'1950 b_`ds'_`level'2010)
 		}
@@ -413,7 +443,7 @@ foreach level in cz {
 		
 		// Adding labels
 		di "here"
-		foreach ds in  gen_muni schdist_ind all_local gen_subcounty spdist  gen_town cgoodman schdist {
+		foreach ds in  gen_muni schdist_ind all_local gen_subcounty spdist  gen_town cgoodman schdist schdist_ind_m1 schdist_m2{
 				local label : variable label n_`ds'_`level'
 				lab var n_`ds'_`level' "New Govs, `label'"
 				lab var b_`ds'_`level'1940 "Base Govs 1940, `label'"

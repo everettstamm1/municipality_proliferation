@@ -10,8 +10,8 @@ if `use_sumshare' == 1 local b_controls reg2 reg3 reg4 v2_sumshares_urban
 
 if `use_sumshare' == 0 & `use_pct_inst' == 0 local extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
 if `use_sumshare' == 0 & `use_pct_inst' == 1 local extra_controls mfg_lfshare1940
-if `use_sumshare' == 1 & `use_pct_inst' == 0 local extra_controls coastal transpo_cost_1920 med_pos_income_1940 frac_total
-if `use_sumshare' == 1 & `use_pct_inst' == 1 local extra_controls coastal transpo_cost_1920 med_pos_income_1940 frac_total
+if `use_sumshare' == 1 & `use_pct_inst' == 0 local extra_controls coastal transpo_cost_1920  
+if `use_sumshare' == 1 & `use_pct_inst' == 1 local extra_controls coastal transpo_cost_1920  
 
 // Inst
 if `use_pct_inst' == 0 local inst GM_hat_raw_pp
@@ -27,12 +27,16 @@ if `use_sumshare' == 1 local w_b_controls reg2 reg3 reg4 v8_sumshares_urban
 
 if `use_sumshare' == 0 & `use_pct_inst' == 0 local w_extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
 if `use_sumshare' == 0 & `use_pct_inst' == 1 local w_extra_controls mfg_lfshare1940
-if `use_sumshare' == 1 & `use_pct_inst' == 0 local w_extra_controls coastal transpo_cost_1920 med_pos_income_1940 frac_total
-if `use_sumshare' == 1 & `use_pct_inst' == 1 local w_extra_controls coastal transpo_cost_1920 med_pos_income_1940 frac_total
+if `use_sumshare' == 1 & `use_pct_inst' == 0 local w_extra_controls coastal transpo_cost_1920  
+if `use_sumshare' == 1 & `use_pct_inst' == 1 local w_extra_controls coastal transpo_cost_1920  
 
 
 
 use "$CLEANDATA/cz_pooled", clear
+ren *schdist_m2* *temp*
+
+drop *schdist_ind*
+ren *temp* *schdist_ind*
 keep if dcourt == 1
 lab var `inst' "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
@@ -53,6 +57,19 @@ g above_med_enclosed = prop_enclosed >= `r(p50)'
 g GM_X_above_med_enclosed = GM_raw_pp * above_med_enclosed
 g GM_hat_X_above_med_enclosed = `inst' * above_med_enclosed
 
+local b_controls_X `b_controls'
+local extra_controls_X `extra_controls'
+local w_b_controls_X `w_b_controls'
+local w_extra_controls_X `w_extra_controls'
+foreach controls in b extra w_b w_extra{
+	foreach var of varlist ``controls'_controls'{
+		cap confirm variable `var'_X_ame
+		if _rc!= 0 {
+			g `var'_X_ame = `var' * above_med_enclosed
+		}
+		local `controls'_controls_X ``controls'_controls_X' `var'_X_ame
+	}
+}
 	
 	
 
@@ -1287,6 +1304,19 @@ eststo clear
 
 
 
+local b_controls_X `b_controls'
+local extra_controls_X `extra_controls'
+local w_b_controls_X `w_b_controls'
+local w_extra_controls_X `w_extra_controls'
+foreach controls in b extra w_b w_extra{
+	foreach var of varlist ``controls'_controls'{
+		cap confirm variable `var'_X_ame
+		if _rc!= 0 {
+			g `var'_X_ame = `var' * above_med_enclosed
+		}
+		local `controls'_controls_X ``controls'_controls_X' `var'_X_ame
+	}
+}
 	
 	
 	eststo clear
@@ -1297,18 +1327,18 @@ eststo clear
 		local bv : di %6.2f r(mean)
 		
 		// First Stage
-		eststo fs_`outcome' : reg GM_raw_pp `inst' `b_controls' [aw=popc1940], r
+		eststo fs_`outcome' : reg GM_raw_pp `inst' GM_hat_X_above_med_enclosed  above_med_enclosed `b_controls_X' [aw=popc1940], r
 		test `inst'=0
 		local F : di %6.2f r(F)
 
 		// OLS
-		eststo ols_`outcome' : reg n_`outcome'_cz_pc GM_raw_pp GM_X_above_med_enclosed above_med_enclosed `b_controls' [aw = popc1940], r
+		eststo ols_`outcome' : reg n_`outcome'_cz_pc GM_raw_pp GM_X_above_med_enclosed above_med_enclosed `b_controls_X' [aw = popc1940], r
 		
 		// RF
-		eststo rf_`outcome' : reg n_`outcome'_cz_pc `inst' GM_hat_X_above_med_enclosed above_med_enclosed  `b_controls' [aw = popc1940], r
+		eststo rf_`outcome' : reg n_`outcome'_cz_pc `inst' GM_hat_X_above_med_enclosed above_med_enclosed  `b_controls_X' [aw = popc1940], r
 		
 		// 2SLS 
-		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp GM_X_above_med_enclosed = `inst' GM_hat_X_above_med_enclosed) above_med_enclosed  `b_controls' [aw = popc1940], r
+		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp GM_X_above_med_enclosed = `inst' GM_hat_X_above_med_enclosed) above_med_enclosed  `b_controls_X' [aw = popc1940], r
 			estadd scalar Fs = `F'
 			estadd scalar dep_var = `dv'
 			estadd scalar b_var = `bv'
@@ -1372,18 +1402,18 @@ eststo clear
 		local bv : di %6.2f r(mean)
 		
 		// First Stage
-		eststo fs_`outcome' : reg GM_raw_pp `inst' `b_controls' `extra_controls' [aw=popc1940], r
+		eststo fs_`outcome' : reg GM_raw_pp `inst'  GM_hat_X_above_med_enclosed  above_med_enclosed  `b_controls_X' `extra_controls_X' [aw=popc1940], r
 		test `inst'=0
 		local F : di %6.2f r(F)
 
 		// OLS
-		eststo ols_`outcome' : reg n_`outcome'_cz_pc GM_raw_pp GM_X_above_med_enclosed `b_controls' `extra_controls' above_med_enclosed [aw = popc1940], r
+		eststo ols_`outcome' : reg n_`outcome'_cz_pc GM_raw_pp GM_X_above_med_enclosed `b_controls_X' `extra_controls_X' above_med_enclosed [aw = popc1940], r
 		
 		// RF
-		eststo rf_`outcome' : reg n_`outcome'_cz_pc `inst' GM_hat_X_above_med_enclosed `b_controls' `extra_controls' above_med_enclosed [aw = popc1940], r
+		eststo rf_`outcome' : reg n_`outcome'_cz_pc `inst' GM_hat_X_above_med_enclosed `b_controls_X' `extra_controls_X' above_med_enclosed [aw = popc1940], r
 		
 		// 2SLS 
-		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp GM_X_above_med_enclosed = `inst' GM_hat_X_above_med_enclosed) above_med_enclosed `b_controls' `extra_controls' [aw = popc1940], r
+		eststo iv_`outcome' : ivreg2 n_`outcome'_cz_pc (GM_raw_pp GM_X_above_med_enclosed = `inst' GM_hat_X_above_med_enclosed) above_med_enclosed `b_controls_X' `extra_controls_X' [aw = popc1940], r
 			estadd scalar Fs = `F'
 			estadd scalar dep_var = `dv'
 			estadd scalar b_var = `bv'
