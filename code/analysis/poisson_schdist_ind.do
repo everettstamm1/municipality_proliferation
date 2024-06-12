@@ -22,11 +22,11 @@ reg GM_raw_pp GM_hat_raw reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_u
 predict GM_hat_raw_hat
 
 // Endogeneous Poisson
-nbreg n_schdist_ind_cz_pc GM_raw_pp reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban [pw=popc1940], r
+poisson n_schdist_ind_cz_pc GM_raw_pp reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban [pw=popc1940], r
 // Coef: -.0655289
 
 // Reduced Form Poisson
-nbreg n_schdist_ind_cz_pc GM_hat_raw reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban [pw=popc1940], r
+poisson n_schdist_ind_cz_pc GM_hat_raw reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban [pw=popc1940], r
 // Coef:  -.2332381 
 
 // IV Poisson
