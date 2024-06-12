@@ -442,7 +442,6 @@ foreach level in cz {
 		merge 1:1 cz using `oldpops', keep(1 3) nogen
 		
 		// Adding labels
-		di "here"
 		foreach ds in  gen_muni schdist_ind all_local gen_subcounty spdist  gen_town cgoodman schdist schdist_ind_m1 schdist_m2{
 				local label : variable label n_`ds'_`level'
 				lab var n_`ds'_`level' "New Govs, `label'"
@@ -469,12 +468,23 @@ foreach level in cz {
 				
 				g n_`ds'_`level'_ld = log(b_`ds'_`level'1970) - log(b_`ds'_`level'1940)
 				
+
+				g l_b_`ds'_`level'1940 = log(b_`ds'_`level'1940)
+				g l_b_`ds'_`level'1950 = log(b_`ds'_`level'1950)
+				g l_b_`ds'_`level'1960 = log(b_`ds'_`level'1960)
+				g l_b_`ds'_`level'1970 = log(b_`ds'_`level'1970)
+
 				//g n3_`ds'_`level'_pc = (b_`ds'_`level'- b_`ds'_`level'1940)/(pop1940/10000) 
 				lab var n_`ds'_`level'_pc "New `label', P.C. (total)"
 				lab var n_`ds'_`level'_pcc "New `label', P.C. (urban)"
 				lab var n2_`ds'_`level'_pcc "New `label', P.C. (urban) 1950-70"
 				lab var ld_`ds'_`level'_pc "New `label', P.C. (urban) 1940-2010"
 
+		}
+		
+		forv y=1940(10)1970{
+			g l_pop`y' = log(pop`y')
+			g l_popc`y' = log(popc`y')
 		}
 		
 		// Pretrends, cgoodman only
@@ -554,6 +564,8 @@ foreach level in cz {
 		g n2_totfrac_cz_pc = 100*((maxcitypop1970/pop1970) - (maxcitypop1950/pop1950))
 		g ld_totfrac_cz_pc = 100*((maxcitypop2010/pop2010) - (maxcitypop1940/pop1940))
 		g n_totfrac_cz_ld = log(maxcitypop2010) - log(maxcitypop1940)
+		g l_b_totfrac_cz1940 = log(maxcitypop1940/pop1940)
+		g l_b_totfrac_cz1970 = log(maxcitypop1970/pop1970)
 
 		// Adding measure of enclosedness
 		preserve	
