@@ -12,7 +12,7 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 	if "`outcome'"=="spdist" local outlab "Special districts" 
 	if "`outcome'"=="totfrac" local outlab "Main City Share" 
 	preserve
-		ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_1940_hat_raw GM_7r_hat_raw GM_r_hat_raw GM_hat_raw) `b_controls' [aw = popc1940], r
+		ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_1940_hat_raw GM_7r_hat_raw GM_r_hat_raw GM_hat_raw) `b_controls' [aw = popc1940], r partial(reg2 reg3 reg4)
 		local hansenj : di %4.2f e(jp)
 		
 		global spec1 (GM_raw_pp = GM_hat_raw)  `b_controls'
@@ -22,7 +22,7 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 		
 		forval spec=1(1)4{
 			tempfile spec`spec'
-			parmby "ivreg2 n_`outcome'_cz_pc ${spec`spec'} [aw = popc1940]", lab saving(`"spec`spec'"', replace) idn(`l') ids(spec) ylabel 
+			parmby "ivreg2 n_`outcome'_cz_pc ${spec`spec'} [aw = popc1940], r partial(reg2 reg3 reg4)", lab saving(`"spec`spec'"', replace) idn(`l') ids(spec) ylabel 
 		}
 			
 		drop _all
@@ -60,7 +60,7 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 	if "`outcome'"=="spdist" local outlab "Special districts" 
 	if "`outcome'"=="totfrac" local outlab "Main City Share" 
 	preserve
-		ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_1940_hat_raw GM_7r_hat_raw GM_r_hat_raw GM_hat_raw) `b_controls' `extra_controls' [aw = popc1940], r
+		ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_1940_hat_raw GM_7r_hat_raw GM_r_hat_raw GM_hat_raw) `b_controls' `extra_controls' [aw = popc1940], r partial(reg2 reg3 reg4)
 		local hansenj : di %4.2f e(jp)
 		
 		global spec1 (GM_raw_pp = GM_hat_raw)  `b_controls'  `extra_controls'
@@ -70,7 +70,7 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 		
 		forval spec=1(1)4{
 			tempfile spec`spec'
-			parmby "ivreg2 n_`outcome'_cz_pc ${spec`spec'} [aw = popc1940]", lab saving(`"spec`spec'"', replace) idn(`l') ids(spec) ylabel 
+			parmby "ivreg2 n_`outcome'_cz_pc ${spec`spec'} [aw = popc1940], r partial(reg2 reg3 reg4)", lab saving(`"spec`spec'"', replace) idn(`l') ids(spec) ylabel 
 		}
 			
 		drop _all

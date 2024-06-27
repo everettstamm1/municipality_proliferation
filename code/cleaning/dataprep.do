@@ -326,10 +326,10 @@ foreach level in cz {
 		}
 		// Pooled
 		
-		use "$CLEANDATA/dcourt/GM_`level'_final_dataset`samptab'.dta", clear
+		use "$CLEANDATA/dcourt/GM_`level'_final_dataset.dta", clear
 		g ne_ut = state_id == 31 | state_id == 49
-		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_* WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970 *_sumshares
-		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970  *_sumshares 
+		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_* WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970 *_sumshares GM_hat_r*
+		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970  *_sumshares GM_hat_r*
 		
 
 		if "`samp'"=="south" ren v2*_blackmig3539_share1940 *blackmig3539_share
@@ -584,6 +584,34 @@ foreach level in cz {
 		    g `s'_total = `s'/(pop1940/10000)
 			g `s'_urban = `s'/(popc1940/10000)
 		}
+		
+		// Pick School District Version
+		if $schdist_version == 1{
+			ren *schdist_ind_m1* *temporary*
+
+			drop *schdist_ind*
+			ren *temporary* *schdist_ind*
+		}
+		else if $schdist_version == 2{
+
+			ren *schdist_m2* *temporary*
+
+			drop *schdist_ind*
+			ren *temporary* *schdist_ind*
+		}
+		
+		// Add total black pop
+		preserve
+			use "$INTDATA/census/cz_race_data.dta", clear
+			keep year cz black 
+			keep if year >= 1940 & year <= 1970
+			ren black bpop
+			reshape wide bpop, i(cz) j(year)
+			tempfile bpop
+			save `bpop'
+		restore
+		
+		merge 1:1 cz using `bpop', keep(3) nogen
 		
 		
 		save "$CLEANDATA/`level'_pooled`outsamptab'", replace

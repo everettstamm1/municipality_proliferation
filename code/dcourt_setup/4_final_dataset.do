@@ -1,5 +1,5 @@
 local do_placebo = 1
-local do_resample = 1
+local do_resample = 0
 /*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 
 4. Assemble final dataset.
@@ -418,19 +418,19 @@ ren sumshares v`v'_sumshares
 		drop if popc1970==.
 		
 		// Recentered at city level
-		egen vre_mean = rowmean(vre*_black_proutmigpr)
-		egen vr_mean = rowmean(vr*_black_proutmigpr)
+		//egen vre_mean = rowmean(vre*_black_proutmigpr)
+		//egen vr_mean = rowmean(vr*_black_proutmigpr)
 
 		g v2_black_proutmigpr_re = v2_black_proutmigpr - vre_mean
 		g v2_black_proutmigpr_r = v2_black_proutmigpr - vr_mean
 
-		save "$INTDATA/dcourt/GM_city_final_dataset`samptab'.dta", replace
-		stop
+		save "$INTDATA/dcourt/GM_city_final_dataset.dta", replace
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 	*3. Construct measure of black urban pop change and instrument for black urban in-migration at CZ level.
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 	
-		
+		local do_placebo = 1
+local do_resample = 0
 			use "$INTDATA/dcourt/GM_city_final_dataset.dta", clear
 			local levelvar cz
 			local varstubs = ""
@@ -491,27 +491,8 @@ ren sumshares v`v'_sumshares
 
 			}
 			
-			// City level recentered by random shocks, pre-transformation
-			g v2_bc_pred1940_1970_r_c = 100*v2_black_proutmigpr_r/popc1940
-			g v2_bcpp_pred1940_1970_r_c = 100* ((v2_black_proutmigpr_r+bpopc1940)/(popc1940 +  v2_black_proutmigpr_r) - bpopc1940/popc1940)
-			
-			// CZ level recentered by random shocks, pre-transformation
-			egen vr_bc_mean = rowmean(vr*_black_proutmigpr)
-			g v2_black_proutmigpr_r_cz = v2_black_proutmigpr - vr_bc_mean
-			
-			g v2_bc_pred1940_1970_r_cz = 100*v2_black_proutmigpr_r_cz/popc1940
-			g v2_bcpp_pred1940_1970_r_cz = 100* ((v2_black_proutmigpr_r_cz+bpopc1940)/(popc1940 +  v2_black_proutmigpr_r_cz) - bpopc1940/popc1940)
-			drop vr_bc_mean v2_black_proutmigpr_r_cz
-			
-			// CZ level recentered by random shocks, post-transformation
-			egen vr_bc_mean = rowmean(vr*_bc_pred1940_1970)
-			egen vr_bcpp_mean = rowmean(vr*_bcpp_pred1940_1970)
-
-			g v2_bc_pred1940_1970_r_cz_t = v2_bc_pred1940_1970 - vr_bc_mean
-			g v2_bcpp_pred1940_1970_r_cz_t = v2_bcpp_pred1940_1970 - vr_bcpp_mean
-			
-			drop vr_bc_mean vr_bcpp_mean
 		}
+		
 		
 		if `do_resample'==1{
 			* Placebo shocks
@@ -544,6 +525,27 @@ ren sumshares v`v'_sumshares
 			g v2_bcpp_pred1940_1970_re_cz_t = v2_bcpp_pred1940_1970 - vre_bcpp_mean
 			
 			drop vre_bc_mean vre_bcpp_mean
+			
+			// City level recentered by random shocks, pre-transformation
+			g v2_bc_pred1940_1970_r_c = 100*v2_black_proutmigpr_r/popc1940
+			g v2_bcpp_pred1940_1970_r_c = 100* ((v2_black_proutmigpr_r+bpopc1940)/(popc1940 +  v2_black_proutmigpr_r) - bpopc1940/popc1940)
+			
+			// CZ level recentered by random shocks, pre-transformation
+			egen vr_bc_mean = rowmean(vr*_black_proutmigpr)
+			g v2_black_proutmigpr_r_cz = v2_black_proutmigpr - vr_bc_mean
+			
+			g v2_bc_pred1940_1970_r_cz = 100*v2_black_proutmigpr_r_cz/popc1940
+			g v2_bcpp_pred1940_1970_r_cz = 100* ((v2_black_proutmigpr_r_cz+bpopc1940)/(popc1940 +  v2_black_proutmigpr_r_cz) - bpopc1940/popc1940)
+			drop vr_bc_mean v2_black_proutmigpr_r_cz
+			
+			// CZ level recentered by random shocks, post-transformation
+			egen vr_bc_mean = rowmean(vr*_bc_pred1940_1970)
+			egen vr_bcpp_mean = rowmean(vr*_bcpp_pred1940_1970)
+
+			g v2_bc_pred1940_1970_r_cz_t = v2_bc_pred1940_1970 - vr_bc_mean
+			g v2_bcpp_pred1940_1970_r_cz_t = v2_bcpp_pred1940_1970 - vr_bcpp_mean
+			
+			drop vr_bc_mean vr_bcpp_mean
 
 		}
 /*
@@ -811,12 +813,7 @@ ren sumshares v`v'_sumshares
 			forv i=1(1)1000{	
 			ren vr`i'_bcpp_pred1940_1970 GM_hat_raw_r`i'
 			}
-			ren v2_bc_pred1940_1970_r_c GM_hat_raw_r_c
-			ren v2_bcpp_pred1940_1970_r_c GM_hat_raw_pp_r_c
-			ren v2_bc_pred1940_1970_r_cz GM_hat_raw_r_cz
-			ren v2_bcpp_pred1940_1970_r_cz GM_hat_raw_pp_r_cz
-			ren v2_bc_pred1940_1970_r_cz_t GM_hat_raw_r_cz_t
-			ren v2_bcpp_pred1940_1970_r_cz_t GM_hat_raw_pp_r_cz_t
+			
 			}
 			if `do_resample'==1{
 

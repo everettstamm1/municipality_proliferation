@@ -14,7 +14,14 @@ if "`c(username)'"=="Everett Stamm"{
 	gl Rterm_options `"--vanilla"'
 	gl use_gzuse = 0
 }
-
+if "`c(username)'"=="edog9"{
+	gl DROPBOX `"D:\municipality_proliferation"'
+	gl REPO "/Users/edog9/Documents/Github/municipality_proliferation/"
+	gl FFMPEG "/Users/edog9/ffmpeg/bin/ffmpeg.exe"
+	gl Rterm_path `"C:/Program Files/R/R-4.3.1/bin/x64/Rterm.exe"'
+	gl Rterm_options `"--vanilla"'
+	gl use_gzuse = 0
+}
 gl DATA "$DROPBOX/data"
 gl CODE "$REPO/code"
 
@@ -27,6 +34,12 @@ gl XWALKS "$DATA/xwalks"
 gl FIGS "$REPO/exhibits/figures"
 gl TABS "$REPO/exhibits/tables"
 gl MAPS "$REPO/exhibits/maps"
+
+// Which school districts version to use
+// 0: Raw
+// 1: CZs in Maine , Maryland , Massachusetts , North Carolina , Rhode Island , and Virginia with missing values dropped
+// 2: 1 + Values imputed from dependent school districts in Tennessee, Vermont, and Connecticut
+gl schdist_version = 2
 
 // Settings
 set maxvar 30000

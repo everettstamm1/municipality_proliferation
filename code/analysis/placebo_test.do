@@ -16,7 +16,7 @@ if `use_sumshare' == 1 & `use_pct_inst' == 1 local extra_controls coastal transp
 // Inst
 if `use_pct_inst' == 0 local inst GM_hat_raw_pp
 if `use_pct_inst' == 1 local inst GM_hat_raw
-
+/*
 foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 	if "`outcome'"=="cgoodman" local outlab "C. Goodman municipalities" 
 	if "`outcome'"=="gen_muni" local outlab "CoG municipalities" 
@@ -68,7 +68,7 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 	graph export "$FIGS/exogeneity_tests/D17_placebo_`outcome'.pdf", replace as(pdf)	
 }
 
-
+*/
 foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 	if "`outcome'"=="cgoodman" local outlab "C. Goodman municipalities" 
 	if "`outcome'"=="gen_muni" local outlab "CoG municipalities" 
@@ -83,7 +83,7 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 	tempfile vr`i'
 	capture confirm variable GM_hat_raw_r`i'
 	if !_rc{
-	qui parmby "reg n_`outcome'_cz_pc GM_hat_raw_r`i' `b_controls' `extra_controls' [aw=popc1940], r", lab saving(`"vr`i'`outcome'"', replace) idn(`i') ids(vr) ylabel rename(idn vrsn) level(95 99)
+	 parmby "reg n_`outcome'_cz_pc GM_hat_raw_r`i' `b_controls' `extra_controls' [aw=popc1940], r", lab saving(`"vr`i'`outcome'"') idn(`i') ids(vr) ylabel rename(idn vrsn) level(95 99)
 	}
 	}
 	

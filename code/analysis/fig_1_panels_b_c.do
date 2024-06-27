@@ -1,6 +1,7 @@
 
 use "$CLEANDATA/cz_pooled.dta", clear 
 keep cz_name popc* bpopc*
+drop bpopc4070
 //need : bpopc1950, 60; popc1960, outcomes 1960
 keep if cz_name=="Cleveland, OH" | cz_name=="Columbus, OH" 
 reshape long popc bpopc, i(cz_name) j(decade)

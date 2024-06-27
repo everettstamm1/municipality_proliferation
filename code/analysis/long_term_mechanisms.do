@@ -197,7 +197,7 @@ replace landuse_apartment = 100*landuse_apartment
 
 
 // Binary X/Z
-forv m in iv rf ols{
+foreach m in iv rf ols{
 	if "`m'"=="rf" local mod "Reduced Form"
 	if "`m'"=="iv" local mod "IV"
 	if "`m'"=="ols" local mod "OLS"
@@ -206,15 +206,19 @@ forv m in iv rf ols{
 	foreach covar of varlist landuse_sfr landuse_apartment pct_rev_ff pct_rev_sa pct_rev_debt {
 		local mname = subinstr("`covar'","landuse_", "",.)
 		lab var `covar' "`mname'"
-		di "`covar'"
 		if "`m'"=="iv"{
+			di "here1, m: `m', covar: `covar'"
 			 eststo `covar' : ivreghdfe `covar' samp_dest (above_x_med samp_destXabove_x_med = above_inst_med samp_destXabove_z_med) v2_sumshares_urban  [aw=weight_pop], absorb(region) cl(cz)
 
 		}
 		else if "`m'"=="rf"{
+						di "here2, m: `m', covar: `covar'"
+
 			 eststo `covar' : reghdfe `covar' above_inst_med samp_destXabove_z_med samp_dest v2_sumshares_urban   [aw=weight_pop], vce(cl cz) absorb(region)
 		}
 		else if "`m'"=="ols"{
+						di "here3, m: `m', covar: `covar'"
+
 			 eststo `covar' : reghdfe `covar' above_x_med samp_destXabove_x_med samp_dest v2_sumshares_urban  [aw=weight_pop], vce(cl cz) absorb(region)
 		}
 	}
@@ -229,7 +233,7 @@ forv m in iv rf ols{
 }
 
 
-forv m in iv rf ols{
+foreach m in iv rf ols{
 	if "`m'"=="rf" local mod "Reduced Form"
 	if "`m'"=="iv" local mod "IV"
 	if "`m'"=="ols" local mod "OLS"
@@ -263,7 +267,7 @@ forv m in iv rf ols{
 // Normal X/Z
 
 
-forv m in iv rf ols{
+foreach m in iv rf ols{
 	if "`m'"=="rf" local mod "Reduced Form"
 	if "`m'"=="iv" local mod "IV"
 	if "`m'"=="ols" local mod "OLS"
@@ -289,13 +293,13 @@ forv m in iv rf ols{
 	esttab using "$TABS/land_use_index/muni_outcomes_`m'_full.tex", booktabs compress label replace lines se frag ///
 				 starlevels( * 0.10 ** 0.05 *** 0.01) ///
 				mtitles("Single Family" "Apartments" "Fines/Forfeits" "\shortstack{Special \\ Assessments}" "\shortstack{Outstanding \\ Debt}") ///
-				mgroups("\shortstack{Percentage of \\ Municipal Land Uses}" "\shortstack{Percentage of \\ Municipal Revenues}", pattern(1 0 1 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(above_*_med samp_*) b(%04.3f) se(%04.3f) ///
+				mgroups("\shortstack{Percentage of \\ Municipal Land Uses}" "\shortstack{Percentage of \\ Municipal Revenues}", pattern(1 0 1 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(GM_* samp_*) b(%04.3f) se(%04.3f) ///
 				prehead( \begin{tabular}{l*{5}{c}} \toprule) postfoot(	\bottomrule \end{tabular}) 
 
 }
 
 
-forv m in iv rf ols{
+foreach m in iv rf ols{
 	if "`m'"=="rf" local mod "Reduced Form"
 	if "`m'"=="iv" local mod "IV"
 	if "`m'"=="ols" local mod "OLS"
@@ -321,7 +325,7 @@ forv m in iv rf ols{
 	esttab using "$TABS/land_use_index/muni_outcomes_`m'_full_new_ctrls.tex", booktabs compress label replace lines se frag ///
 				 starlevels( * 0.10 ** 0.05 *** 0.01) ///
 				mtitles("Single Family" "Apartments" "Fines/Forfeits" "\shortstack{Special \\ Assessments}" "\shortstack{Outstanding \\ Debt}") ///
-				mgroups("\shortstack{Percentage of \\ Municipal Land Uses}" "\shortstack{Percentage of \\ Municipal Revenues}", pattern(1 0 1 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(above_*_med samp_*) b(%04.3f) se(%04.3f) ///
+				mgroups("\shortstack{Percentage of \\ Municipal Land Uses}" "\shortstack{Percentage of \\ Municipal Revenues}", pattern(1 0 1 0 0) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(GM_* samp_*) b(%04.3f) se(%04.3f) ///
 				prehead( \begin{tabular}{l*{5}{c}} \toprule) postfoot(	\bottomrule \end{tabular}) 
 
 }
