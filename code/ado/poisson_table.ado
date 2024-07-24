@@ -1,44 +1,46 @@
 cap prog drop poisson_table
 prog def poisson_table
-	syntax, endog(varname) controls(varlist) exog(varname) weight(varname) path(string) type(string) [endog2(varlist) exog2(varlist) cgoodman(varlist) gen_muni(varlist) schdist_ind(varlist) gen_town(varlist) spdist(varlist)]
+	syntax, endog(varlist) controls(varlist) exog(varlist) weight(varname) path(string) type(string) startyr(string) endyr(string) [endog2(varlist) exog2(varlist) cgoodman(varlist) gen_muni(varlist) schdist_ind(varlist) gen_town(varlist) spdist(varlist)]
 	
+	local maininst : word 1 of `exog'
+
 	eststo clear
 	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni {
+		
+		
 		su n_`outcome'_cz_pc [aw=`weight']
 		local dv : di %6.2f r(mean)
-		su b_`outcome'_cz1940_pc [aw=`weight']
+		su b_`outcome'_cz1940 [aw=`weight']
 		local bv : di %6.2f r(mean)
 		
 		local ctrls `controls' ``outcome''
-		di "`ctrls'"
 		// First Stage
-		eststo fs_`outcome' : reg GM_raw_pp `exog' `ctrls' b_`outcome'_cz1940 pop1940 bpop1940 [pw=`weight'], r
-		test `exog'=0
+		eststo fs_`outcome' : reg GM_raw_pp `exog' `ctrls' b_`outcome'_cz`startyr'_pc  [pw=`weight'], r
+		test `maininst'=0
 		local F : di %6.2f r(F)
 
 		// OLS
-		eststo ols_`outcome' : poisson b_`outcome'_cz1970 `endog' `endog2' `ctrls' b_`outcome'_cz1940  [pw = `weight'], r 
+		eststo ols_`outcome' : poisson b_`outcome'_cz`endyr' `endog' `endog2' `ctrls' b_`outcome'_cz`startyr'_pc  [pw = `weight'], r  exposure(pop`endyr')
 		
 		// RF
-		eststo rf_`outcome' : poisson b_`outcome'_cz1970 `exog' `exog2' `ctrls' b_`outcome'_cz1940  [pw = `weight'], r 
+		eststo rf_`outcome' : poisson b_`outcome'_cz`endyr' `exog' `exog2' `ctrls' b_`outcome'_cz`startyr'_pc  [pw = `weight'], r  exposure(pop`endyr')
 		
 		// 2SLS 
 		if "`type'"=="ivpoisson"{
-			eststo iv_`outcome' : ivpoisson cfunction b_`outcome'_cz1970 (`endog' `endog2' = `exog' `exog2') `ctrls' b_`outcome'_cz1940  [pw = `weight'], vce(r) 
+			di "`HERE'"
+			eststo iv_`outcome' : ivpoisson cfunction b_`outcome'_cz`endyr' (`endog' `endog2' = `exog' `exog2') `ctrls' b_`outcome'_cz`startyr'_pc  [pw = `weight'], vce(r) exposure(pop`endyr')
 		}
 		else if "`type'"=="manual"{
 						
-			reg b_`outcome'_cz1970 `endog' `endog2' `exog' `exog2' `ctrls'  b_`outcome'_cz1940 [aw=`weight'], r
+			reg `endog' `exog' `exog2' `ctrls'  b_`outcome'_cz`startyr' [aw=`weight'], r
 			predict v2, resid
-			eststo iv_`outcome': poisson b_`outcome'_cz1970 pop1940 GM_raw_pp `ctrls' b_`outcome'_cz1940  v2 [pw=`weight'], r 
+			eststo iv_`outcome': poisson b_`outcome'_cz`endyr' `endog' `endog2' `ctrls' b_`outcome'_cz`startyr'_pc  v2 [pw=`weight'], r exposure(pop`endyr')
 			drop v2
 		}
 		estadd scalar Fs = `F'
 		estadd scalar dep_var = `dv'
 		estadd scalar b_var = `bv'
-
 	}
-
 	// Panel A: First Stage
 	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_gen_town fs_spdist      ///
 		using "`path'", ///

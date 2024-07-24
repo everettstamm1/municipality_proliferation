@@ -1,9 +1,6 @@
 
 use "$CLEANDATA/cz_pooled.dta", clear
-ren *schdist_m2* *temporary*
 
-drop *schdist_ind*
-ren *temporary* *schdist_ind*
 keep if dcourt == 1
 drop if n_schdist_ind_cz_pc==.
 
@@ -84,20 +81,21 @@ local samp = "urban"
 foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni {
 	
 use "$CLEANDATA/cz_pooled", clear
-local covars avg_precip avg_temp coastal mfg_lfshare1940 m_rr_sqm_total p90_total p95_total transpo_cost_1920
+local covars  avg_precip avg_temp coastal mfg_lfshare1940 m_rr_sqm_total p90_total p95_total transpo_cost_1920
 local pooled_covars_`samp'  ""
 keep if dcourt == 1
-	foreach covar in `covars' {
+	foreach covar in `covars'  {
 		local lab : variable label `covar'
 		g GM`covar' = GM_hat_raw
 		label var GM`covar' "`lab'"
 
-		qui eststo `covar': reg `covar' GM`covar' `b_controls' b_`outcome'_cz1940 [aw=popc1940], r
+		qui eststo `covar': reg `covar' GM`covar' `b_controls' b_`outcome'_cz1940_pc [aw=popc1940], r
 		local p =2*ttail(e(df_r),abs(_b[GM`covar']/_se[GM`covar']))
 		di "`covar' p value : `p'"
 		if `p'<=`balance_cutoff'{
 			local pooled_covars_`samp'  "`pooled_covars_`samp'' `covar'"
 		}
+
 	}
 
 	eststo pooled_`samp' : appendmodels `covars'
@@ -116,5 +114,14 @@ keep if dcourt == 1
 
 keep if dcourt == 1
 g ldiff =log(pop1970) - log(pop1940)
-poisson_table, endog(GM_raw_pp) exog(GM_hat_raw) type("ivpoisson") controls(reg2 reg3 reg4 v2_sumshares_urban bpop1940)  weight(popc1940) path("$TABS/poisson/base.tex") spdist(avg_temp) schdist_ind(mfg_lfshare1940 transpo_cost_1920)
+
+g wei = 1
+
+use "$CLEANDATA/cz_pooled", clear
+
+foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni {
+	replace b_`outcome'_cz1970_pc = (b_`outcome'_cz1970 - b_`outcome'_cz1940)/((pop1970 - pop1940)/10000)
+}
+g lpop1940 = log(pop1940)
+poisson_table, endog(GM_raw_pp) exog(GM_hat_raw) type("ivpoisson") controls(reg2 reg3 reg4 v2_sumshares_urban) weight(popc1940) path("$TABS/poisson/base.tex") ytype("raw") schdist_ind(coastal transpo_cost_1920 mfg_lfshare1940)
 

@@ -1,0 +1,4 @@
+QGIS NOTES
+1. Import main_munis.shp nd other_munis.shp
+2. Vector Intersect main munis with other munis (keep only GEOID, NAME, NAMELSA, and CZ from main_munis)
+3. Export

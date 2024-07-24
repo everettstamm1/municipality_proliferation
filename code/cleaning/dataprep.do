@@ -573,12 +573,28 @@ foreach level in cz {
 			duplicates drop
 			replace enclosed_length = 0 if mi(enclosed_length)
 			g prop_enclosed = enclosed_length / total_length
-			keep cz prop_enclosed
+			g open_length = total_length - enclosed_length
+			keep cz prop_enclosed open_length enclosed_length
 			tempfile enclosed
 			save `enclosed'
 		restore
 		
-		merge 1:1 cz using `enclosed', keep(1 3) nogen
+		merge 1:1 cz using `enclosed', assert(3) nogen
+
+		preserve	
+			import excel using "$CLEANDATA/other/enclosed_lengths_1970.xlsx", clear first 
+			keep cz len
+			ren len enclosed1970
+			duplicates drop
+			tempfile enclosed1970
+			save `enclosed1970'
+		restore
+		
+		merge 1:1 cz using `enclosed1970', keep(1 3) nogen
+		replace enclosed1970 = 0 if mi(enclosed1970)
+		
+		g prop_enclosed1970 = enclosed1970/open_length
+		g prop_enclosed4070 = (enclosed1970 - enclosed_length)/open_length
 		
 		foreach s of varlist *_sumshares{
 		    g `s'_total = `s'/(pop1940/10000)
@@ -613,7 +629,22 @@ foreach level in cz {
 		
 		merge 1:1 cz using `bpop', keep(3) nogen
 		
+		preserve
+			import excel using "$CLEANDATA/other/touching_munis.xlsx", clear first
+			g touching40 = yr_ncrp<=1940
+			g touching70 = yr_ncrp<=1970
+			collapse (sum) touching40 touching70, by(cz)
+			g touching_diff = touching70 - touching40
+			tempfile touching 
+			save `touching'
+		restore
 		
+		merge 1:1 cz using `touching', assert(1 3)
+		
+		replace touching40 = 0 if _merge == 1
+		replace touching70 = 0 if _merge == 1
+		replace touching_diff = 0 if _merge == 1
+		drop _merge
 		save "$CLEANDATA/`level'_pooled`outsamptab'", replace
 		
 		/*

@@ -89,13 +89,25 @@ df[df$GEOID != df$GEOID_max,] %>%
   st_write(paste0(CLEANDATA,"/other/other_munis.shp"), append = FALSE)
 
 
+df[df$GEOID != df$GEOID_max,] %>% 
+  st_cast(to = 'MULTILINESTRING') %>% 
+  select(-lnd_sq_) %>% 
+  st_write(paste0(CLEANDATA,"/other/all_other_munis.shp"), append = FALSE)
+
+
+
+df[df$GEOID != df$GEOID_max,] %>% 
+  st_cast(to = 'MULTILINESTRING') %>% 
+  select(-lnd_sq_) %>% 
+  filter(yr_ncrp <= 1970 & yr_ncrp > 1940) %>% 
+  st_write(paste0(CLEANDATA,"/other/other_194070_munis.shp"), append = FALSE)
 
 get_border <- function(cz){
   print(paste0("Starting cz: ",cz))
-  m <- df[df$cz == cz,]
+  m <- df[df$cz == cz,] %>% 
+    st_buffer(dist = 10)
   border <- st_intersection(m$geometry[m$GEOID == m$GEOID_max],
-                            m$geometry[(m$GEOID != m$GEOID_max) & (m$yr_ncrp<1940)],
-                            model = 'closed')
+                            m$geometry[(m$GEOID != m$GEOID_max) & (m$yr_ncrp<1940)])
   return(border)
 }
   
@@ -139,7 +151,8 @@ get_water <- function(cz){
 muni_borders <- sapply(unique(df$cz), get_border)
 land_borders <- sapply(unique(df$cz), get_land)
 water_borders <- sapply(unique(df$cz), get_water)
-
+n_touching <- sapply(muni_borders, length)
+df_touching <- data.frame(cz = unique(df$cz), n_touching)
 x <- unique(df$cz)
 plot(df$geometry[df$cz==35001])
 plot(main_munis$geometry[main_munis$cz == 35001])

@@ -18,8 +18,8 @@ if `use_pct_inst' == 0 local inst GM_hat_raw_pp
 if `use_pct_inst' == 1 local inst GM_hat_raw
 
 // White inst
-if `use_pct_inst' == 0 local winst GM_8_hat_raw
-if `use_pct_inst' == 1 local winst GM_8_hat_raw_pp
+if `use_pct_inst' == 0 local winst GM_8_hat_raw_pp
+if `use_pct_inst' == 1 local winst GM_8_hat_raw
 
 // White controls
 if `use_sumshare' == 0 local w_b_controls reg2 reg3 reg4 v8_whitemig3539_share1940 

@@ -1,0 +1,88 @@
+Step 1: Prep tl_2010_us_state00.shp
+1. Dissolve
+
+Step 2: Prep GL240425_lam.shp
+1. Reproject to 4269
+2. Fix geometry
+
+Step 3: Prep ne_10m_ocean.shp
+1. Reproject to 4269
+2. Fix Geometry
+
+Step 4: Prep main_munis.shp
+1. Line to Poly
+2. Fix geometry
+3. Dissolve on STATEFP PLACEFP GEOID cz
+
+
+Step 4: Combine
+1. Take Difference between State and Ocean
+2. Take Difference between that and great lakes
+3. Take Intersection between that and main munis
+4. Apply multipart to singleparts
+5. Add virtual layer with query:
+
+SELECT
+    *
+FROM
+    "mm_int_sp"
+GROUP BY
+    "cz"
+HAVING
+    MAX(area(geometry))
+
+6. Manually add back NYC, Los Angeles, San Diego, San Jose:
+
+SELECT
+    *
+FROM
+    "mm_int_sp"
+WHERE 
+	"cz" == '19400' OR "cz" == '38000' OR "cz" == '38300' OR "cz" == '37500'
+UNION ALL
+SELECT * FROM "mm_int_sp_v"
+
+6. Dissolve on cz GEOID STATEFP PLACEFP
+7. Polygon to lines
+
+Step 5: Create Coastal Borders
+1. Polygons to lines the object from 4.2
+2. Intersect that with 4.7
+
+Step 6: Create Federal Lands borders
+1. Reproject USA_Federal_Lands.shp to 4269
+2. Fix Geometries (linework)
+3. Polygons to lines
+4. Intersect with 4.7
+
+Step 7: 1940 Munis
+1. Virtual layer with
+
+SELECT
+    *
+FROM
+    "all_other_munis"
+WHERE 
+    "yr_ncrp" <= 1940
+
+2. Intersect with 4.7
+
+
+Step 8: 1970 Munis
+1. Virtual layer with
+
+SELECT
+    *
+FROM
+    "all_other_munis"
+WHERE 
+    "yr_ncrp" <= 1970
+
+2. Intersect with 4.7
+
+Step 9: 1940 Enclosedness
+1. Union 5.2 with 6.4
+2. Union that with 7.2
+
+Step 10: 1970 Enclosedness
+1. Union 9.2 with 8.2

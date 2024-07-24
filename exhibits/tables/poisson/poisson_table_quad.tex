@@ -1,0 +1,45 @@
+ \begin{tabular}{l*{8}{c}} \toprule
+&\multicolumn{1}{c}{C. Goodman}&\multicolumn{3}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-5}\cmidrule(lr){6-6}
+&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\\\cmidrule(lr){2-3}\cmidrule(lr){4-5}\cmidrule(lr){6-6}
+&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel A: First Stage}\\
+\cmidrule(lr){1-6}
+Predicted Percentage Change in Urban Black Population&    2.864***&    2.793***&    2.561***&    3.003***&    3.224***\\
+                &  (0.533)   &  (0.545)   &  (0.738)   &  (0.500)   &  (0.402)   \\
+\addlinespace
+GM\_hat\_raw\_2    &   -0.058** &   -0.055** &   -0.077   &   -0.066***&   -0.072***\\
+                &  (0.027)   &  (0.027)   &  (0.064)   &  (0.024)   &  (0.021)   \\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel B: OLS}\\
+\cmidrule(lr){1-6}
+main            &            &            &            &            &            \\
+Percentage Point Change in Urban Black Population&    0.021   &    0.032   &   -0.003   &   -0.179** &   -0.068   \\
+                &  (0.027)   &  (0.030)   &  (0.048)   &  (0.081)   &  (0.068)   \\
+\addlinespace
+GM\_raw\_pp\_2     &   -0.000   &   -0.000   &   -0.001   &    0.005*  &    0.002   \\
+                &  (0.001)   &  (0.001)   &  (0.002)   &  (0.003)   &  (0.003)   \\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel C: Reduced Form}\\
+\cmidrule(lr){1-6}
+main            &            &            &            &            &            \\
+Predicted Percentage Change in Urban Black Population&   -0.009   &    0.003   &   -0.312***&   -0.433***&   -0.169   \\
+                &  (0.051)   &  (0.057)   &  (0.099)   &  (0.162)   &  (0.108)   \\
+\addlinespace
+GM\_hat\_raw\_2    &    0.002   &    0.002   &    0.019***&    0.028*  &    0.010   \\
+                &  (0.003)   &  (0.003)   &  (0.007)   &  (0.015)   &  (0.007)   \\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel D: 2SLS}\\
+\cmidrule(lr){1-6}
+main            &            &            &            &            &            \\
+Percentage Point Change in Urban Black Population&    0.018   &    0.028   &   -0.174*  &   -0.529***&   -0.110   \\
+                &  (0.034)   &  (0.037)   &  (0.102)   &  (0.170)   &  (0.104)   \\
+\addlinespace
+GM\_raw\_pp\_2     &    0.000   &   -0.000   &    0.005   &    0.018***&    0.004   \\
+                &  (0.001)   &  (0.001)   &  (0.003)   &  (0.006)   &  (0.004)   \\
+\midrule
+First Stage F-Stat&    28.82   &    26.23   &    12.04   &    36.11   &    64.15   \\
+Dep. Var. Mean  &    -0.14   &    -0.17   &    -4.06   &    -0.25   &     0.26   \\
+1940 Dep. Var. Mean&    99.42   &   104.07   &   496.51   &    94.92   &    77.52   \\
+Observations    &      130   &      130   &      118   &      130   &      130   \\
+ \bottomrule \end{tabular}
