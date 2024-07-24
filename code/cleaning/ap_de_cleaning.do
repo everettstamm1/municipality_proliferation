@@ -33,7 +33,7 @@ preserve
 	keep crdc_id race enrollment_crdc
 	reshape wide enrollment_crdc, i(crdc_id) j(race)
 	g pct_white = enrollment_crdc1/enrollment_crdc99
-	ren enrollment_crdc99 totenrol
+	ren enrollment_crdc99 totenroll
 	ren enrollment_crdc1 wtenroll
 	ren enrollment_crdc2 blenroll
 	keep pct_white crdc_id totenrol blenroll wtenroll

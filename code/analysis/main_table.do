@@ -49,8 +49,8 @@ lab var GM_hat_raw_pp_recentered "$\widehat{GM}$, recentered"
 lab var GM_raw_pp_recentered "GM, recentered"
 g order = frac_total^2
 
-qui su prop_enclosed, d
-g above_med_enclosed = prop_enclosed >= `r(p50)'
+qui su prop_enclosed1940, d
+g above_med_enclosed = prop_enclosed1940 >= `r(p50)'
 g below_med_enclosed = -above_med_enclosed
 
 g GM_X_above_med_enclosed = GM_raw_pp * above_med_enclosed
@@ -60,8 +60,8 @@ g GM_X_below_med_enclosed = GM_raw_pp * below_med_enclosed
 g GM_hat_X_below_med_enclosed = `inst' * below_med_enclosed
 
 
-g GM_X_prop_enclosed = GM_raw_pp * prop_enclosed
-g GM_hat_X_prop_enclosed = `inst' * prop_enclosed
+g GM_X_prop_enclosed1940 = GM_raw_pp * prop_enclosed1940
+g GM_hat_X_prop_enclosed1940 = `inst' * prop_enclosed1940
 
 
 local b_controls_X `b_controls'
@@ -173,15 +173,15 @@ foreach controls in b extra w_b w_extra{
 	foreach var of varlist ``controls'_controls'{
 		cap confirm variable `var'_X_me
 		if _rc!= 0 {
-			g `var'_X_me = `var' * prop_enclosed
+			g `var'_X_me = `var' * prop_enclosed1940
 		}
 		local `controls'_controls_X ``controls'_controls_X' `var'_X_me
 	}
 }
 
-main_table, endog(GM_raw_pp) exog(`inst') controls(prop_enclosed `b_controls_X') weight(popc1940) path("$TABS/final/main_effect_med_enclosed.tex") deplab(n) endog2(GM_X_prop_enclosed) exog2(GM_hat_X_prop_enclosed)
+main_table, endog(GM_raw_pp) exog(`inst') controls(prop_enclosed1940 `b_controls_X') weight(popc1940) path("$TABS/final/main_effect_med_enclosed.tex") deplab(n) endog2(GM_X_prop_enclosed1940) exog2(GM_hat_X_prop_enclosed1940)
 
-main_table, endog(GM_raw_pp) exog(`inst') controls(prop_enclosed `b_controls_X' `extra_controls_X') weight(popc1940) path("$TABS/final/main_effect_med_enclosed_new_ctrl.tex") deplab(n) endog2(GM_X_prop_enclosed) exog2(GM_hat_X_prop_enclosed)
+main_table, endog(GM_raw_pp) exog(`inst') controls(prop_enclosed1940 `b_controls_X' `extra_controls_X') weight(popc1940) path("$TABS/final/main_effect_med_enclosed_new_ctrl.tex") deplab(n) endog2(GM_X_prop_enclosed1940) exog2(GM_hat_X_prop_enclosed1940)
 
 	
 	

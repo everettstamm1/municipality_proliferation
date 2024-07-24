@@ -332,6 +332,7 @@ foreach level in cz {
 		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970  *_sumshares GM_hat_r*
 		
 
+
 		if "`samp'"=="south" ren v2*_blackmig3539_share1940 *blackmig3539_share
 		if "`samp'"=="dcourt" ren v2_blackmig3539_share1940 blackmig3539_share
 
@@ -571,21 +572,31 @@ foreach level in cz {
 		preserve	
 			import delimited using "$CLEANDATA/other/length_enclosed.csv", clear
 			duplicates drop
-			replace enclosed_length = 0 if mi(enclosed_length)
-			g prop_enclosed = enclosed_length / total_length
-			g open_length = total_length - enclosed_length
-			keep cz prop_enclosed open_length enclosed_length
-			tempfile enclosed
-			save `enclosed'
+			keep cz total_length
+			tempfile length
+			save `length'
 		restore
 		
-		merge 1:1 cz using `enclosed', assert(3) nogen
+		merge 1:1 cz using `length', assert(3) nogen
 
-		preserve	
-			import excel using "$CLEANDATA/other/enclosed_lengths_1970.xlsx", clear first 
-			keep cz len
+		preserve 
+			import delimited using "$DATA/qgis/enclosedness/enclosed_1940.csv", clear
+			keep cz_2 cz_2_2 len
+			g cz = cond(mi(cz_2), cz_2_2, cz_2) 
+			collapse (sum) len, by(cz)
+			ren len enclosed1940
+			tempfile enclosed1940
+			save `enclosed1940'
+		restore
+		
+		merge 1:1 cz using `enclosed1940', keep(1 3) nogen
+		replace enclosed1940 = 0 if mi(enclosed1940)
+		preserve 
+			import delimited using "$DATA/qgis/enclosedness/enclosed_1970.csv", clear
+			keep cz_2 cz_2_2 len
+			g cz = cond(mi(cz_2), cz_2_2, cz_2) 
+			collapse (sum) len, by(cz)
 			ren len enclosed1970
-			duplicates drop
 			tempfile enclosed1970
 			save `enclosed1970'
 		restore
@@ -593,14 +604,22 @@ foreach level in cz {
 		merge 1:1 cz using `enclosed1970', keep(1 3) nogen
 		replace enclosed1970 = 0 if mi(enclosed1970)
 		
-		g prop_enclosed1970 = enclosed1970/open_length
-		g prop_enclosed4070 = (enclosed1970 - enclosed_length)/open_length
+		g prop_enclosed1940 = enclosed1940/total_length
+		g prop_enclosed1970 = enclosed1970/total_length
 		
+		g change_enclosed4070 = (enclosed1970 - enclosed1940)/(total_length - enclosed1940)
+		
+		// New York causing problems but clearly fully enclosed by 1940
+		replace prop_enclosed1940 = 1 if cz==19400
+		replace prop_enclosed1970 = 1 if cz==19400
+		replace change_enclosed4070 = 1 if cz == 19400
 		foreach s of varlist *_sumshares{
 		    g `s'_total = `s'/(pop1940/10000)
 			g `s'_urban = `s'/(popc1940/10000)
 		}
 		
+		lab var v2_sumshares_urban "Sum of shares control"
+
 		// Pick School District Version
 		if $schdist_version == 1{
 			ren *schdist_ind_m1* *temporary*

@@ -83,6 +83,10 @@ WHERE
 Step 9: 1940 Enclosedness
 1. Union 5.2 with 6.4
 2. Union that with 7.2
+3. Field calculator to create length
+4. Export to CSV with no geometry
 
 Step 10: 1970 Enclosedness
-1. Union 9.2 with 8.2
+1. Union 9.1 with 8.2
+2. Field calculator to create length
+4. Export to CSV with no geometry

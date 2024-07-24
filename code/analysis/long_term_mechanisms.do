@@ -202,7 +202,7 @@ merge 1:1 STATEFP PLACEFP using "$INTDATA/nces/place_offerings", keep(1 3) nogen
 foreach var of varlist v2_sumshares_urban coastal transpo_cost_1920{
 	g `var'_samp_dest = `var'*samp_dest
 }
-
+asdf
 // Binary X/Z
 if `run'==1{
 	
@@ -395,7 +395,7 @@ if `run'==1{
 
 merge 1:m STATEFP PLACEFP using "$INTDATA/nces/offerings", keep(3) nogen
 
-asdfasd
+
 // General outcomes
 reg n_ap_w75 samp_dest GM_raw_pp samp_destXGM 
 reg n_ap_w75 samp_dest GM_raw_pp samp_destXGM reg2 reg3 reg4 coastal v2_sumshares_urban v2_sumshares_urban_samp_dest transpo_cost_1920 coastal_samp_dest transpo_cost_1920_samp_dest [aw=totenrol], cl(cz)
