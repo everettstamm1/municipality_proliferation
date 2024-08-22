@@ -1,0 +1,64 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{School Presence}
+\begin{tabular}{l*{4}{c}}
+\hline\hline
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{one\_school}&\multicolumn{1}{c}{one\_school}&\multicolumn{1}{c}{no\_school}&\multicolumn{1}{c}{no\_school}\\
+\hline
+Incorporated 1940-70&      -0.127         &      -0.299         &       0.099         &      -0.186         \\
+                    &     (0.208)         &     (0.212)         &     (0.160)         &     (0.173)         \\
+[1em]
+Above Median GM     &      -0.061\sym{*}  &      -0.059         &      -0.006         &      -0.025         \\
+                    &     (0.032)         &     (0.056)         &     (0.018)         &     (0.028)         \\
+[1em]
+Above Median GM X Inc. 1940-70&       0.105         &       0.109         &       0.043         &       0.086         \\
+                    &     (0.068)         &     (0.068)         &     (0.065)         &     (0.061)         \\
+[1em]
+region==Midwest Region&       0.042         &      -0.021         &      -0.065         &      -0.092         \\
+                    &     (0.075)         &     (0.065)         &     (0.042)         &     (0.076)         \\
+[1em]
+region==South Region&       0.053         &       0.040         &       0.144         &       0.183\sym{*}  \\
+                    &     (0.176)         &     (0.084)         &     (0.090)         &     (0.095)         \\
+[1em]
+region==West Region &      -0.215\sym{***}&      -0.339\sym{***}&      -0.026         &      -0.052         \\
+                    &     (0.073)         &     (0.075)         &     (0.072)         &     (0.118)         \\
+[1em]
+Coastal CZ          &      -0.061         &      -0.006         &      -0.052         &      -0.012         \\
+                    &     (0.053)         &     (0.043)         &     (0.031)         &     (0.048)         \\
+[1em]
+Average Transport Cost out of CZ, 1920&       0.014         &       0.006         &      -0.007         &      -0.014         \\
+                    &     (0.011)         &     (0.010)         &     (0.010)         &     (0.016)         \\
+[1em]
+Sum of shares control&      -0.124\sym{***}&      -0.123\sym{*}  &      -0.059\sym{***}&      -0.058\sym{**} \\
+                    &     (0.047)         &     (0.068)         &     (0.016)         &     (0.022)         \\
+[1em]
+Sum of shares control X Incorporated 1940-70&      -0.214\sym{***}&      -0.172\sym{**} &       0.027         &       0.043         \\
+                    &     (0.064)         &     (0.085)         &     (0.051)         &     (0.055)         \\
+[1em]
+Coastal CZ X Incorporated 1940-70&      -0.259\sym{***}&      -0.235\sym{**} &       0.074         &       0.023         \\
+                    &     (0.096)         &     (0.107)         &     (0.067)         &     (0.086)         \\
+[1em]
+Average Transport Cost out of CZ, 1920 X Incorporated 1940-70&       0.047\sym{**} &       0.034         &      -0.000         &       0.014         \\
+                    &     (0.020)         &     (0.022)         &     (0.015)         &     (0.018)         \\
+[1em]
+region==Midwest Region X Incorporated 1940-70&      -0.225\sym{**} &      -0.143         &       0.061         &       0.123         \\
+                    &     (0.109)         &     (0.091)         &     (0.090)         &     (0.090)         \\
+[1em]
+region==South Region X Incorporated 1940-70&      -0.033         &      -0.101         &       0.137         &       0.203         \\
+                    &     (0.244)         &     (0.177)         &     (0.179)         &     (0.197)         \\
+[1em]
+region==West Region X Incorporated 1940-70&      -0.266\sym{**} &      -0.034         &      -0.117         &      -0.099         \\
+                    &     (0.129)         &     (0.132)         &     (0.114)         &     (0.120)         \\
+[1em]
+Constant            &       0.253\sym{*}  &       0.561\sym{***}&       0.239\sym{**} &       0.388\sym{**} \\
+                    &     (0.133)         &     (0.121)         &     (0.100)         &     (0.164)         \\
+\hline
+Observations        &        7894         &        3814         &        7894         &        3814         \\
+\(R^{2}\)           &       0.057         &       0.094         &       0.051         &       0.057         \\
+Adjusted \(R^{2}\)  &       0.055         &       0.091         &       0.050         &       0.053         \\
+\hline\hline
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

@@ -648,8 +648,11 @@ foreach level in cz {
 		
 		merge 1:1 cz using `bpop', keep(3) nogen
 		
+		// Touching Munis
 		preserve
 			import excel using "$CLEANDATA/other/touching_munis.xlsx", clear first
+			keep cz GEOID_2 yr_ncrp
+			duplicates drop
 			g touching40 = yr_ncrp<=1940
 			g touching70 = yr_ncrp<=1970
 			collapse (sum) touching40 touching70, by(cz)
@@ -659,11 +662,30 @@ foreach level in cz {
 		restore
 		
 		merge 1:1 cz using `touching', assert(1 3)
-		
 		replace touching40 = 0 if _merge == 1
 		replace touching70 = 0 if _merge == 1
 		replace touching_diff = 0 if _merge == 1
 		drop _merge
+		
+		// Incorporated populations
+		preserve 
+			use "$CLEANDATA/place_race_pop.dta", clear
+			g incpop1970 = place_pop1970 if yr_incorp <=1970
+			g incpop2010 = place_pop2010 if yr_incorp <= 2010
+			collapse (sum) incpop1970 incpop2010, by(cz)
+			ren czone cz
+			tempfile incpop
+			save `incpop'
+		restore
+		
+		merge 1:1 cz using `incpop', keep(3) nogen
+		
+		g frac_uninc1970 = (pop1970 - incpop1970)/pop1970
+		g frac_uninc2010 = (pop2010 - incpop2010)/pop2010
+		g frac_unc1970 = ((pop1970- popc1970)/pop1970) 
+		g frac_unc1940 = ((pop1940 - popc1940)/pop1940)
+		g change_frac_unc = frac_unc1970 - frac_unc1940
+		
 		save "$CLEANDATA/`level'_pooled`outsamptab'", replace
 		
 		/*

@@ -1,0 +1,27 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{School Presence}
+\begin{tabular}{l*{4}{c}}
+\hline\hline
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{one\_school}&\multicolumn{1}{c}{one\_school}&\multicolumn{1}{c}{no\_school}&\multicolumn{1}{c}{no\_school}\\
+\hline
+Incorporated 1940-70&      -0.126\sym{***}&      -0.159\sym{***}&       0.105\sym{***}&       0.109\sym{***}\\
+                    &     (0.028)         &     (0.038)         &     (0.029)         &     (0.039)         \\
+[1em]
+Above Median GM     &       0.010         &       0.042\sym{**} &      -0.040\sym{***}&      -0.077\sym{***}\\
+                    &     (0.012)         &     (0.018)         &     (0.012)         &     (0.019)         \\
+[1em]
+Above Median GM X Inc. 1940-70&       0.041         &       0.038         &      -0.030         &      -0.001         \\
+                    &     (0.035)         &     (0.045)         &     (0.036)         &     (0.046)         \\
+[1em]
+Constant            &       0.357\sym{***}&       0.365\sym{***}&       0.596\sym{***}&       0.586\sym{***}\\
+                    &     (0.010)         &     (0.015)         &     (0.010)         &     (0.015)         \\
+\hline
+Observations        &        7904         &        3815         &        7904         &        3815         \\
+\(R^{2}\)           &       0.005         &       0.013         &       0.005         &       0.012         \\
+\hline\hline
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

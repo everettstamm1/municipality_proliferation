@@ -1,0 +1,64 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Land Use}
+\begin{tabular}{l*{4}{c}}
+\hline\hline
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{Percentage of land use zoned for sfr, Corelogic}&\multicolumn{1}{c}{Percentage of land use zoned for sfr, Corelogic}&\multicolumn{1}{c}{Percentage of land use zoned for apartment, Corelogic}&\multicolumn{1}{c}{Percentage of land use zoned for apartment, Corelogic}\\
+\hline
+Incorporated 1940-70&      10.921         &     -11.223         &      -2.159\sym{**} &      -0.210         \\
+                    &    (13.464)         &    (10.242)         &     (0.964)         &     (0.960)         \\
+[1em]
+Above Median GM     &      -0.397         &       3.826         &       0.502\sym{**} &       0.186         \\
+                    &     (2.358)         &     (2.312)         &     (0.229)         &     (0.234)         \\
+[1em]
+Above Median GM X Inc. 1940-70&      11.212\sym{***}&       8.517\sym{***}&      -0.587\sym{***}&      -0.264         \\
+                    &     (2.298)         &     (2.466)         &     (0.194)         &     (0.177)         \\
+[1em]
+region==Midwest Region&      15.416\sym{**} &       2.315         &      -1.853\sym{***}&      -1.162\sym{**} \\
+                    &     (6.709)         &     (5.150)         &     (0.449)         &     (0.475)         \\
+[1em]
+region==South Region&      -6.225         &      -5.411         &      -2.986\sym{***}&      -1.429\sym{**} \\
+                    &    (13.834)         &     (7.561)         &     (0.544)         &     (0.560)         \\
+[1em]
+region==West Region &       3.212         &      -8.501         &      -1.286\sym{**} &      -0.982         \\
+                    &     (5.965)         &     (6.938)         &     (0.554)         &     (0.877)         \\
+[1em]
+Coastal CZ          &     -14.713\sym{***}&     -10.524\sym{***}&       1.274\sym{***}&       0.851         \\
+                    &     (4.030)         &     (3.794)         &     (0.324)         &     (0.564)         \\
+[1em]
+Average Transport Cost out of CZ, 1920&       2.686\sym{***}&       1.607\sym{**} &      -0.144\sym{*}  &      -0.044         \\
+                    &     (0.925)         &     (0.810)         &     (0.076)         &     (0.092)         \\
+[1em]
+Sum of shares control&      -1.517         &       3.531\sym{*}  &       0.317         &       0.102         \\
+                    &     (2.628)         &     (1.959)         &     (0.229)         &     (0.264)         \\
+[1em]
+Sum of shares control X Incorporated 1940-70&       0.506         &      -4.074         &      -0.099         &       0.248         \\
+                    &     (2.935)         &     (2.909)         &     (0.196)         &     (0.236)         \\
+[1em]
+Coastal CZ X Incorporated 1940-70&       3.540         &      -4.088         &      -0.341         &       0.464         \\
+                    &     (4.605)         &     (5.338)         &     (0.324)         &     (0.471)         \\
+[1em]
+Average Transport Cost out of CZ, 1920 X Incorporated 1940-70&       0.001         &       1.321         &       0.085         &      -0.065         \\
+                    &     (1.002)         &     (0.999)         &     (0.076)         &     (0.092)         \\
+[1em]
+region==Midwest Region X Incorporated 1940-70&     -16.316\sym{**} &      -5.475         &       1.294\sym{**} &       0.624         \\
+                    &     (7.346)         &     (5.666)         &     (0.597)         &     (0.610)         \\
+[1em]
+region==South Region X Incorporated 1940-70&      12.094         &      12.168         &       2.270\sym{***}&       0.557         \\
+                    &    (14.898)         &     (8.411)         &     (0.724)         &     (0.648)         \\
+[1em]
+region==West Region X Incorporated 1940-70&     -16.013\sym{**} &      -8.609         &       0.687         &       0.580         \\
+                    &     (6.818)         &     (7.946)         &     (0.676)         &     (0.868)         \\
+[1em]
+Constant            &      40.346\sym{***}&      62.084\sym{***}&       3.601\sym{***}&       2.011\sym{**} \\
+                    &    (12.025)         &     (8.362)         &     (0.831)         &     (0.890)         \\
+\hline
+Observations        &        7761         &        3778         &        7761         &        3778         \\
+\(R^{2}\)           &       0.263         &       0.081         &       0.299         &       0.136         \\
+Adjusted \(R^{2}\)  &       0.261         &       0.077         &       0.298         &       0.132         \\
+\hline\hline
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

@@ -32,7 +32,7 @@ XWALKS <- paths[paths$global == "XWALKS",2]
 
 #### Geographies ----
 
-munis <- st_read(paste0(CLEANDATA,"/other/municipal_shapefile/munis.shp")) 
+munis <- st_read(paste0(CLEANDATA,"/other/municipal_shapefile/municipal_shapefile_v2.shp")) 
 crs <- st_crs(munis) # NAD 83
 
 czs <- st_read(paste0(RAWDATA,"/shapefiles/cz1990_shapefile/cz1990.shp")) %>% 
@@ -42,14 +42,14 @@ maxcity <- read_dta(paste0(INTDATA,"/census/maxcitypop.dta")) %>%
   rename(GEOID_max = GEOID) %>% 
   dplyr::select(c(cz,maxcitypop,totfrac_in_main_city,GEOID_max))
 
-lakes <- st_read(paste0(RAWDATA,"/shapefiles/Lakes_and_Rivers_Shapefile_NA_Lakes_and_Rivers_data_hydrography_p_lakes_v2/Lakes_and_Rivers_Shapefile/NA_Lakes_and_Rivers/data/hydrography_p_lakes_v2.shp")) %>% 
-  st_transform(crs)
-land <- st_read(paste0(RAWDATA,"/shapefiles/USA_Federal_Lands/USA_Federal_Lands.shp")) %>% 
-  st_transform(crs)
+#lakes <- st_read(paste0(RAWDATA,"/shapefiles/Lakes_and_Rivers_Shapefile_NA_Lakes_and_Rivers_data_hydrography_p_lakes_v2/Lakes_and_Rivers_Shapefile/NA_Lakes_and_Rivers/data/hydrography_p_lakes_v2.shp")) %>% 
+#  st_transform(crs)
+#land <- st_read(paste0(RAWDATA,"/shapefiles/USA_Federal_Lands/USA_Federal_Lands.shp")) %>% 
+#  st_transform(crs)
 
-water <- st_read(paste0(RAWDATA,"/shapefiles/USA_Detailed_Water_Bodies/USA_Detailed_Water_Bodies.shp")) %>% 
-  st_transform(crs) %>% 
-  filter(!(FTYPE %in% c('Canal/Ditch','Stream/River')))
+#water <- st_read(paste0(RAWDATA,"/shapefiles/USA_Detailed_Water_Bodies/USA_Detailed_Water_Bodies.shp")) %>% 
+#  st_transform(crs) %>% 
+#  filter(!(FTYPE %in% c('Canal/Ditch','Stream/River')))
 
 df <- munis %>% 
   inner_join(maxcity, by = 'cz') %>%
@@ -57,7 +57,9 @@ df <- munis %>%
   mutate(Legend =  case_when((GEOID == GEOID_max) ~ "Principal City", # Butte-Silver Bow to Butte-Silver Bow (balance)
                              (yr_ncrp <= 1940 ~ "Incorporated Pre-1940"), # Princeton to Princeton
                              TRUE ~ "Incorporated Post-1940 or Unincorporated")) %>% 
-  filter(!is.na(cz))
+  filter(!is.na(cz)) %>% 
+  mutate(GEOID = if_else(is.na(GEOID), (100000*STATEFP + PLACEFP), GEOID))
+
     
 for (cz in unique(df$cz)){
   cz_name <- df$cz_name[df$cz == cz]
@@ -76,16 +78,15 @@ for (cz in unique(df$cz)){
   ggsave(paste0(FIGS,"/circled_czs/",path_name,".png"), scale = 4, plot = cz_plot)
 }
 
-x <- df[df$GEOID == df$GEOID_max,]
 
-y <- df[!(df$cz %in% x$cz),] 
+
 df[df$GEOID == df$GEOID_max,] %>% 
   st_cast(to = 'MULTILINESTRING') %>% 
   st_write(paste0(CLEANDATA,"/other/main_munis.shp"), append = FALSE)
 
 df[df$GEOID != df$GEOID_max,] %>% 
   st_cast(to = 'MULTILINESTRING') %>% 
-  filter(yr_ncrp <= 1940) %>% 
+  filter(yr_ncrp < 1940) %>% 
   st_write(paste0(CLEANDATA,"/other/other_munis.shp"), append = FALSE)
 
 
@@ -95,11 +96,10 @@ df[df$GEOID != df$GEOID_max,] %>%
   st_write(paste0(CLEANDATA,"/other/all_other_munis.shp"), append = FALSE)
 
 
-
 df[df$GEOID != df$GEOID_max,] %>% 
   st_cast(to = 'MULTILINESTRING') %>% 
   select(-lnd_sq_) %>% 
-  filter(yr_ncrp <= 1970 & yr_ncrp > 1940) %>% 
+  filter(yr_ncrp <= 1970 & yr_ncrp >= 1940) %>% 
   st_write(paste0(CLEANDATA,"/other/other_194070_munis.shp"), append = FALSE)
 
 get_border <- function(cz){

@@ -10,9 +10,11 @@ Step 3: Prep ne_10m_ocean.shp
 2. Fix Geometry
 
 Step 4: Prep main_munis.shp
-1. Line to Poly
-2. Fix geometry
-3. Dissolve on STATEFP PLACEFP GEOID cz
+1. Use field calculator to get length
+2. Export as length_enclosed.csv
+3. Line to Poly
+4. Fix geometry
+5. Dissolve on STATEFP PLACEFP GEOID cz
 
 
 Step 4: Combine

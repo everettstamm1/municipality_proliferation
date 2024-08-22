@@ -38,7 +38,7 @@ sample_czs <- read_dta(paste0(INTDATA,"/dcourt/original_130_czs.dta")) %>%
 fips_place_xwalk <- read_dta(paste0(XWALKS,"/place_county_xwalk.dta")) %>% 
   rename(STATEFP = statefp, PLACEFP = placefp, COUNTYFP_xwalk = countyfp) %>% 
   select(STATEFP, PLACEFP, COUNTYFP_xwalk)
-
+cz_place_xwalk <- read_dta(paste0(XWALKS,"/cz_place_xwalk.dta"))
 
 munis <- read_stata(paste0(RAWDATA,'/cbgoodman/muni_incorporation_date.dta')) %>% 
   select(muniname,statefips,placefips,countyfips,yr_incorp) %>% 
@@ -70,6 +70,14 @@ for(s in unique(munis$STATEFP)){
   places <- rbind(places,place_s)
 }
 
+places <- data.frame()
+
+for(s in unique(munis$STATEFP)){
+  place_s <- places(state = s) %>% 
+    full_join(munis[munis$STATEFP == s,], by = c('STATEFP', 'PLACEFP'))
+  places <- rbind(places,place_s)
+}
+
 out <- places %>% 
   mutate(STATEFP = as.numeric(STATEFP),
          PLACEFP = as.numeric(PLACEFP),
@@ -81,19 +89,13 @@ out <- places %>%
          GEOID = as.numeric(GEOID)) %>% 
   left_join(corelogic, by = 'GEOID')  %>% 
   mutate(STATEFP = if_else(is.na(STATEFP),floor(GEOID/100000),STATEFP)) %>% 
-  left_join(fips_place_xwalk, by = c('STATEFP','PLACEFP')) %>% 
-  mutate(COUNTYFP = if_else(is.na(COUNTYFP),COUNTYFP_xwalk,COUNTYFP)) %>% 
-  mutate(cty_fips = 1000*STATEFP+COUNTYFP) %>% 
-  select(-COUNTYFP_xwalk) %>% 
-  left_join(county_cz_xwalk, by = 'cty_fips') %>% 
-  rename(cz = czone) %>% 
+  left_join(cz_place_xwalk, by = c('STATEFP','PLACEFP')) %>% 
   left_join(sample_czs[c('cz','sample_130_czs')], by = 'cz') %>% 
   mutate(sample_130_czs = if_else(is.na(sample_130_czs),  FALSE, TRUE)) %>% 
   left_join(population, by = c('STATEFP','PLACEFP'))
 
-
 out %>% 
-  st_write(paste0(CLEANDATA,"/other/municipal_shapefile/municipal_shapefile.shp"), layer = 'munis')
+  st_write(paste0(CLEANDATA,"/other/municipal_shapefile/municipal_shapefile_v2.shp"), append = FALSE)
 
 # Also save attributes without shapefile for ease of use
 out %>% 

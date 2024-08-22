@@ -32,9 +32,36 @@ ren czone cz
 
 drop if cz_pop1970 ==.
 collapse (sum) cz_pop1970 cz_bpop1970 cz_wpop1970, by(cz)
-g cz_prop_white = 100*(cz_wpop1970 / cz_pop1970)
-tempfile cz_pops
-save `cz_pops'
+g cz_prop_white1970 = 100*(cz_wpop1970 / cz_pop1970)
+su cz_prop_white1970 ,d
+tempfile cz_pops1970
+save `cz_pops1970'
+
+import delimited "$RAWDATA/census/county_race_1950_2020/nhgis0017_ts_nominal_county.csv", clear
+drop if statefp == 2 | statefp == 15 // drop alaska hawaii
+
+egen cz_pop = rowtotal(b18*) 
+g cz_wpop = b18aa
+g cz_apop = b18ad
+g cty_fips = 1000*statefp+countyfp
+merge m:1 cty_fips using "$XWALKS/cw_cty_czone.dta", keep(3) nogen
+keep year cty_fips czone  cz_pop cz_wpop cz_apop
+
+collapse (sum) cz_pop  cz_wpop cz_apop, by(czone year)
+g cz_prop_white = 100*(cz_wpop / cz_pop)
+g cz_prop_asian = 100*(cz_apop / cz_pop)
+
+drop cz_pop cz_wpop cz_apop
+drop if year == 1970
+
+reshape wide cz_prop_white cz_prop_asian, i(czone) j(year)
+ren czone cz
+
+tempfile cz_pops_all
+save `cz_pops_all'
+
+
+
 
 use "$RAWDATA/cbgoodman/muni_incorporation_date.dta", clear
 
@@ -48,22 +75,33 @@ replace yr_incorp = yr_incorp-2
 tempfile incorps
 save `incorps'
 
-import delimited using "$RAWDATA/census/nhgis0022_csv/nhgis0022_ts_nominal_place.csv", clear
+import delimited using "$RAWDATA/census/nhgis0027_csv/nhgis0027_csv/nhgis0027_ts_nominal_place.csv", clear
 egen place_pop1970 = rowtotal(b18aa1970 b18ab1970 b18ac1970 b18ad1970)
 g place_wpop1970 = b18aa1970
 g place_bpop1970 = b18ab1970
+
+egen place_pop2010 = rowtotal(b18aa2010 b18ab2010 b18ac2010 b18ad2010)
+g place_wpop2010 = b18aa2010
+g place_bpop2010 = b18ab2010
 
 // Dropping duplicated unincorporated towns
 duplicates tag placea statefp, gen(dup)
 drop if dup == 1 & regexm(name1970,"(U)")
 drop if placea == 625 & statefp == 12 // duplicate, from Florida so not used for us anyway
 drop if placea == 3052 & statefp == 27 & name1970 == "" // duplicate, dropping the one missing the name in 1970
-
+drop if placea== 1990 & statefp == 34 & name1980 == "GORDON@S CORNER %CDP<"
 keep place_* placea statefp
 ren placea placefips
 ren statefp statefips
 
-merge 1:1 placefips statefips using `incorps', keep(3) nogen
+merge 1:1 placefips statefips using `incorps', keep(1 3) 
+g in_cgoodman_data = _merge == 3
+drop _merge
+
+save "$CLEANDATA/place_race_pop.dta", replace
+
+keep if in_cgoodman_data == 1
+
 ren czone cz
 merge m:1 cz using "$CLEANDATA/cz_pooled", keep(3) nogen keepusing(dcourt cz cz_name GM_hat_raw_pp GM_raw_pp)
 keep if dcourt == 1
@@ -76,13 +114,26 @@ bys cz (cz_new_pop1970): replace cz_new_pop1970 = cz_new_pop1970[1]
 bys cz (cz_new_bpop1970): replace cz_new_bpop1970 = cz_new_bpop1970[1]
 bys cz (cz_new_wpop1970): replace cz_new_wpop1970 = cz_new_wpop1970[1]
 
-g cz_new_prop_white = 100*(cz_new_wpop1970 / cz_new_pop1970)
+
+bys cz : egen cz_new_pop2010 = total(place_pop2010) if yr_incorp >=1940 & yr_incorp<=1970
+bys cz : egen cz_new_bpop2010 = total(place_bpop2010) if yr_incorp >=1940 & yr_incorp<=1970
+bys cz : egen cz_new_wpop2010 = total(place_wpop2010) if yr_incorp >=1940 & yr_incorp<=1970
+
+bys cz (cz_new_pop2010): replace cz_new_pop2010 = cz_new_pop2010[1]
+bys cz (cz_new_bpop2010): replace cz_new_bpop2010 = cz_new_bpop2010[1]
+bys cz (cz_new_wpop2010): replace cz_new_wpop2010 = cz_new_wpop2010[1]
+
+
+g cz_new_prop_white1970 = 100*(cz_new_wpop1970 / cz_new_pop1970)
+g cz_new_prop_white2010 = 100*(cz_new_wpop2010 / cz_new_pop2010)
 
 keep cz cz_name cz_* GM_*
 duplicates drop
 
-merge 1:1 cz using `cz_pops', keep(3) nogen
-keep if cz_new_prop_white != .
+merge 1:1 cz using `cz_pops1970', keep(3) nogen
+merge 1:1 cz using `cz_pops_all', keep(3) nogen
+
+keep if cz_new_prop_white1970 != . 
 replace cz_name = "Louisville, KY/IN" if cz==13101
 
 save "$CLEANDATA/pcarrow_fig_data", replace

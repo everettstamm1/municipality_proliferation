@@ -1,0 +1,64 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Proportion White Students}
+\begin{tabular}{l*{2}{c}}
+\hline\hline
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}\\
+                    &\multicolumn{1}{c}{prop\_white\_students}&\multicolumn{1}{c}{prop\_white\_students}\\
+\hline
+Incorporated 1940-70&      -0.041         &      -0.208         \\
+                    &     (0.157)         &     (0.142)         \\
+[1em]
+Above Median GM     &      -0.178\sym{***}&      -0.121\sym{***}\\
+                    &     (0.041)         &     (0.044)         \\
+[1em]
+Above Median GM X Inc. 1940-70&       0.153\sym{***}&       0.107\sym{***}\\
+                    &     (0.041)         &     (0.039)         \\
+[1em]
+region==Midwest Region&       0.070         &       0.001         \\
+                    &     (0.057)         &     (0.059)         \\
+[1em]
+region==South Region&       0.031         &       0.011         \\
+                    &     (0.107)         &     (0.069)         \\
+[1em]
+region==West Region &      -0.091         &      -0.174\sym{**} \\
+                    &     (0.078)         &     (0.072)         \\
+[1em]
+Coastal CZ          &      -0.188\sym{***}&      -0.267\sym{***}\\
+                    &     (0.047)         &     (0.039)         \\
+[1em]
+Average Transport Cost out of CZ, 1920&       0.009         &       0.010         \\
+                    &     (0.014)         &     (0.013)         \\
+[1em]
+Sum of shares control&      -0.152\sym{***}&      -0.098\sym{**} \\
+                    &     (0.040)         &     (0.038)         \\
+[1em]
+Sum of shares control X Incorporated 1940-70&       0.110\sym{**} &       0.062         \\
+                    &     (0.052)         &     (0.056)         \\
+[1em]
+Coastal CZ X Incorporated 1940-70&      -0.171\sym{*}  &      -0.121         \\
+                    &     (0.089)         &     (0.095)         \\
+[1em]
+Average Transport Cost out of CZ, 1920 X Incorporated 1940-70&       0.026         &       0.031\sym{*}  \\
+                    &     (0.018)         &     (0.017)         \\
+[1em]
+region==Midwest Region X Incorporated 1940-70&      -0.159\sym{**} &      -0.119\sym{**} \\
+                    &     (0.063)         &     (0.056)         \\
+[1em]
+region==South Region X Incorporated 1940-70&      -0.030         &       0.024         \\
+                    &     (0.144)         &     (0.096)         \\
+[1em]
+region==West Region X Incorporated 1940-70&      -0.349\sym{***}&      -0.300\sym{***}\\
+                    &     (0.113)         &     (0.095)         \\
+[1em]
+Constant            &       0.527\sym{***}&       0.668\sym{***}\\
+                    &     (0.131)         &     (0.132)         \\
+\hline
+Observations        &        3312         &        1706         \\
+\(R^{2}\)           &       0.302         &       0.354         \\
+Adjusted \(R^{2}\)  &       0.298         &       0.349         \\
+\hline\hline
+\multicolumn{3}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{3}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

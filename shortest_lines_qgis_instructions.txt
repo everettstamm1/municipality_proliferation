@@ -1,0 +1,7 @@
+QGIS NOTES
+1. Import main_munis.shp and all_other_munis.shp
+2. Run Shortest Lines Between Features with all_other_munis as source and main_munis as destination, once with method=Distance to Nearest Point on Feautre and another with method=Distance to feature centroid. Add tolerance for if they're closer to a different principal city by setting Max number of neighbors >= 5
+3. Run field calculator->geometry->$length on both outputs
+4. Export
+
+When using, make sure to ensure all the matches are to the correct principal city, i.e. keep only GEOID_m==GEOID_m_2
