@@ -18,7 +18,7 @@ use "$INTDATA/nces/school_offerings.dta", replace
 
 // Sample selection
 merge m:1 ncessch using "$INTDATA/nces/school_ccd_directory", keep(3) nogen keepusing(school_type school_level school_status charter magnet virtual teachers_fte enrollment)
-keep if school_level == 3 // High schools only
+keep if school_level == 1 | school_level == 2 | school_level == 3 // High schools only
 keep if school_type == 1 // Normal Schools
 keep if school_status == 1 // Open schools 
 drop if charter == 1

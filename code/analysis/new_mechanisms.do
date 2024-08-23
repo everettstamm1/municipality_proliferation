@@ -5,7 +5,7 @@ g one_school = n_schools == 1
 g no_school = n_schools == 0
 g prop_white_students = wtenroll_place / totenroll_place
 
-drop wtasenroll totenroll blenroll wtenroll n_ap n_ap_w75 gt de crdc_id wtenroll_hasap wtenroll_newmuni wtenroll_hasde wtenroll_hasgt ap gt de ncessch leaid  tot
+drop wtasenroll totenroll blenroll wtenroll n_ap n_ap_w75 gt de crdc_id wtenroll_hasap wtenroll_newmuni wtenroll_hasde wtenroll_hasgt ap gt de ncessch leaid  tot school_level 
 duplicates drop
 
 // Creating interactions
@@ -58,8 +58,8 @@ esttab using "$TABS/implications/school_presence.tex", replace label title("Scho
 
 // Exclusive district
 eststo clear
-eststo: reg exclusive_district samp_dest above_x_med samp_destXabove_x_med
-eststo: reg exclusive_district samp_dest above_x_med samp_destXabove_x_med if above_len_med == 0
+eststo: reg exclusive_district_place samp_dest above_x_med samp_destXabove_x_med
+eststo: reg exclusive_district_place samp_dest above_x_med samp_destXabove_x_med if above_len_med == 0
 esttab using "$TABS/implications/exclusive_district.tex", replace label title("Exclusive District") ///
     star(* 0.10 ** 0.05 *** 0.01) b(3) se(3) r2
 
@@ -140,8 +140,8 @@ esttab using "$TABS/implications/school_presence_full.tex", replace label title(
 
 // Exclusive district
 eststo clear
-eststo: reghdfe exclusive_district samp_dest above_x_med samp_destXabove_x_med reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban *_samp_dest [aw = weight_pop], vce(cl cz)
-eststo: reghdfe exclusive_district samp_dest above_x_med samp_destXabove_x_med reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban *_samp_dest if above_len_med == 0 [aw = weight_pop], vce(cl cz)
+eststo: reghdfe exclusive_district_place samp_dest above_x_med samp_destXabove_x_med reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban *_samp_dest [aw = weight_pop], vce(cl cz)
+eststo: reghdfe exclusive_district_place samp_dest above_x_med samp_destXabove_x_med reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban *_samp_dest if above_len_med == 0 [aw = weight_pop], vce(cl cz)
 esttab using "$TABS/implications/exclusive_district_full.tex", replace label title("Exclusive District") ///
     star(* 0.10 ** 0.05 *** 0.01) b(3) se(3) r2 ar2  keep(samp_dest above_x_med samp_destXabove_x_med)
 

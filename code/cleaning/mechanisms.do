@@ -105,21 +105,23 @@ ren fips_place_2002 PLACEFP
 merge 1:1 STATEFP PLACEFP using "$INTDATA/nces/place_offerings", keep(1 3) nogen
 
 // To get school district offerings (expands dataset to school district level (crdc_id))
-merge 1:m STATEFP PLACEFP using "$INTDATA/nces/offerings", keep(1 3) nogen keepusing(leaid crdc_id totenroll blenroll wtenroll wtasenroll n_ap n_ap_w75 gt de ap ncessch)
+merge 1:m STATEFP PLACEFP using "$INTDATA/nces/offerings", keep(1 3) nogen keepusing(leaid crdc_id totenroll blenroll wtenroll wtasenroll n_ap n_ap_w75 gt de ap ncessch school_level)
 
 // Own school district
 preserve
-	keep STATEFP PLACEFP leaid
+	keep STATEFP PLACEFP leaid school_level 
+	duplicates drop // Drops repeated elementary middle
 	drop if leaid==.
-	duplicates tag leaid, gen(dups)
+	duplicates tag leaid school_level, gen(dups)
 	g exclusive_district = dups == 0
-	keep leaid exclusive_district
+	bys STATEFP PLACEFP : egen exclusive_district_place = max(exclusive_district)
+	keep STATEFP PLACEFP exclusive_district_place
 	duplicates drop
 	tempfile exclusive_district
 	save `exclusive_district'
 restore
 
-merge m:1 leaid using `exclusive_district', assert(1 3) nogen
+merge m:1 STATEFP PLACEFP using `exclusive_district', assert(1 3) nogen
 
 // Average School Size
 bys PLACEFP STATEFP : egen avg_totenroll_place = mean(totenroll)
@@ -217,6 +219,7 @@ foreach var of varlist v2_sumshares_urban coastal transpo_cost_1920 reg2 reg3 re
 
 // AP Gini
 preserve
+	keep if school_level == 3
 	keep cz crdc_id totenroll totenroll_cz n_ap 
 	drop if mi(crdc_id) | mi(totenroll) | mi(n_ap) | n_ap == 0
 
