@@ -22,7 +22,7 @@ keep if school_level == 1 | school_level == 2 | school_level == 3 // High school
 keep if school_type == 1 // Normal Schools
 keep if school_status == 1 // Open schools 
 drop if charter == 1
-drop if magnet == 1
+//drop if magnet == 1
 drop if virtual == 1
 
 // Student teacher ratio

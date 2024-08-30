@@ -4,7 +4,7 @@
 \usepackage{subcaption}
 \usepackage{float}
 \usepackage{geometry}
-
+\usepackage{pdflscape}
 \geometry{margin=1in}
 
 \begin{document}
@@ -29,9 +29,18 @@
 \input{tables/implications/school_presence_full.tex}
 \input{tables/implications/exclusive_district.tex}
 \input{tables/implications/exclusive_district_full.tex}
+\input{tables/implications/exclusive_district_shape.tex}
+\input{tables/implications/exclusive_district_shape_full.tex}
+\input{tables/implications/land.tex}
+\input{tables/implications/land_full.tex}
+\input{tables/implications/land_nomain.tex}
+\input{tables/implications/land_nomain_full.tex}
 \input{tables/implications/enrollment.tex}
 \input{tables/implications/enrollment_full.tex}
-
+\begin{landscape}
+\input{tables/implications/muni_dist_similarity.tex}
+\input{tables/implications/muni_dist_similarity_full.tex}
+\end{landscape}
 \section{Land Use and Police Expenditure}
 \input{tables/implications/landuse.tex}
 \input{tables/implications/landuse_full.tex}
@@ -44,11 +53,46 @@
 \input{tables/implications/white_ap_access_full.tex}
 
 \section{CZ level differences}
+
 \input{tables/implications/raw_differences_1.tex}
 \input{tables/implications/raw_differences_2.tex}
 
 \section{Full Main CZ-level Specification}
+\begin{landscape}
 \input{tables/implications/full_main_spec_1.tex}
 \input{tables/implications/full_main_spec_2.tex}
+\end{landscape}
 
+\input{tables/implications/full_main_spec_3}
+\input{tables/implications/full_main_spec_4}
+
+\section{Special Districts}
+\begin{figure}
+	\includegraphics{figures/implications/spdist_emp_ft_0.pdf}
+\end{figure}
+\begin{figure}
+	\includegraphics{figures/implications/spdist_emp_ft_1.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\includegraphics{figures/implications/spdist_emp_p_ftp__0.pdf}
+\end{figure}
+\begin{figure}
+	\includegraphics{figures/implications/spdist_emp_p_ftp__1.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\includegraphics{figures/implications/spdist_emp_pc_0.pdf}
+\end{figure}
+\begin{figure}
+	\includegraphics{figures/implications/spdist_emp_pc_1.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\includegraphics{figures/implications/spdist_emp_salary__0.pdf}
+\end{figure}
+\begin{figure}
+	\includegraphics{figures/implications/spdist_emp_salary__1.pdf}
+\end{figure}
+\clearpage
 \end{document}

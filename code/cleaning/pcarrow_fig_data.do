@@ -34,32 +34,30 @@ drop if cz_pop1970 ==.
 collapse (sum) cz_pop1970 cz_bpop1970 cz_wpop1970, by(cz)
 g cz_prop_white1970 = 100*(cz_wpop1970 / cz_pop1970)
 su cz_prop_white1970 ,d
-tempfile cz_pops1970
-save `cz_pops1970'
+save "$INTDATA/census/cz_race_pop1970", replace
 
 import delimited "$RAWDATA/census/county_race_1950_2020/nhgis0017_ts_nominal_county.csv", clear
 drop if statefp == 2 | statefp == 15 // drop alaska hawaii
 
 egen cz_pop = rowtotal(b18*) 
 g cz_wpop = b18aa
+g cz_bpop = b18ab
 g cz_apop = b18ad
 g cty_fips = 1000*statefp+countyfp
 merge m:1 cty_fips using "$XWALKS/cw_cty_czone.dta", keep(3) nogen
-keep year cty_fips czone  cz_pop cz_wpop cz_apop
+keep year cty_fips czone  cz_pop cz_wpop cz_apop cz_bpop
 
-collapse (sum) cz_pop  cz_wpop cz_apop, by(czone year)
+collapse (sum) cz_pop cz_bpop cz_wpop cz_apop, by(czone year)
 g cz_prop_white = 100*(cz_wpop / cz_pop)
 g cz_prop_asian = 100*(cz_apop / cz_pop)
 
-drop cz_pop cz_wpop cz_apop
+//drop cz_pop cz_wpop cz_apop
 drop if year == 1970
 
-reshape wide cz_prop_white cz_prop_asian, i(czone) j(year)
+reshape wide cz_prop_white cz_prop_asian cz_pop cz_wpop cz_apop cz_bpop, i(czone) j(year)
 ren czone cz
 
-tempfile cz_pops_all
-save `cz_pops_all'
-
+save "$INTDATA/census/cz_race_pop.dta", replace
 
 
 
@@ -130,8 +128,8 @@ g cz_new_prop_white2010 = 100*(cz_new_wpop2010 / cz_new_pop2010)
 keep cz cz_name cz_* GM_*
 duplicates drop
 
-merge 1:1 cz using `cz_pops1970', keep(3) nogen
-merge 1:1 cz using `cz_pops_all', keep(3) nogen
+merge 1:1 cz using "$INTDATA/census/cz_race_pop1970", keep(3) nogen
+merge 1:1 cz using "$INTDATA/census/cz_race_pop", keep(3) nogen
 
 keep if cz_new_prop_white1970 != . 
 replace cz_name = "Louisville, KY/IN" if cz==13101

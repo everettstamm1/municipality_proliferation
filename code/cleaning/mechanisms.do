@@ -20,6 +20,11 @@ restore
 merge m:1 STATEFP using `regions', keep(1 3) nogen
 tabulate region, gen(reg)	
 
+
+merge m:1 STATEFP PLACEFP using "$INTDATA/other/main_cities", keep(1 3) 
+g main_city = _merge == 3
+drop _merge
+
 // Dropping noncomparables
 /*
 drop if FUNCSTAT=="S" | /// "Statistical entities"
@@ -64,6 +69,8 @@ preserve
 restore
 
 merge m:1 cz using `inst', keep(3) nogen
+
+
 
 // Interactions
 g samp_destXabove_x_med = samp_dest * above_x_med
@@ -122,6 +129,129 @@ preserve
 restore
 
 merge m:1 STATEFP PLACEFP using `exclusive_district', assert(1 3) nogen
+
+replace exclusive_district_place = 0 if mi(exclusive_district_place)
+
+preserve
+	use "$CLEANDATA/other/muni_district_overlap.dta", clear
+	keep if dist >= 1
+	keep GEOID_muni
+	duplicates drop 
+	ren GEOID_muni GEOID
+	tempfile exclusive_district_shapes
+	save `exclusive_district_shapes'
+restore
+merge m:1 GEOID using `exclusive_district_shapes', keep(1 3) 
+g exclusive_district_shape = _merge == 3
+drop _merge
+
+// Muni school district congruence
+preserve
+	use "$CLEANDATA/other/muni_district_overlap.dta", clear
+	collapse (max) dist, by(GEOID_dist)
+	ren GEOID_dist leaid
+	ren dist dist_max_int
+	tempfile dist_max_int
+	save `dist_max_int'
+restore
+
+merge m:1 leaid using `dist_max_int', keep(1 3) nogen
+
+preserve
+	keep GEOID samp_dest
+	keep if samp_dest == 1
+	ren GEOID GEOID_muni
+	duplicates drop
+	tempfile incorps
+	save `incorps'
+	use "$CLEANDATA/other/muni_district_overlap.dta", clear
+	merge m:1 GEOID_muni using `incorps', keep(3)
+	collapse (sum) dist, by(GEOID_dist)
+	ren GEOID_dist leaid
+	ren dist dist_int_4070
+	tempfile  dist_int_4070
+	save `dist_int_4070'
+restore
+
+merge m:1 leaid using `dist_int_4070', keep(1 3) nogen
+
+// Equivalence Index
+preserve
+	keep GEOID leaid cz
+	duplicates drop
+	tempfile xwalk
+	save `xwalk'
+	use "$CLEANDATA/other/muni_district_overlap.dta", clear
+	drop if dist == 0 | muni == 0
+	g EI = 2*((dist^(-1) + muni^(-1))^(-1))
+	ren GEOID_muni GEOID
+	ren GEOID_dist leaid
+	merge 1:1 GEOID leaid using `xwalk', keep(3) nogen
+	collapse (mean) EI, by(cz)
+	replace EI = 1 if EI > 1
+	tempfile EI
+	save `EI'
+restore
+
+merge m:1 cz using `EI', keep(1 3) nogen
+
+
+preserve
+	use "$CLEANDATA/other/similarity_dist_munis.dta", clear
+	// Average min Hausdorff distance, average max muni-schdist shared boundary
+	collapse (min) hausdorff, by(GEOID_i)
+	ren hausdorff min_hausdorff_muni
+	ren GEOID_i GEOID
+	tempfile muni_similarity
+	save `muni_similarity'
+restore
+
+merge m:1 GEOID using `muni_similarity', keep(1 3) nogen
+
+preserve
+	use "$CLEANDATA/other/similarity_dist_munis.dta", clear
+	// Average min Hausdorff distance, average max muni-schdist shared boundary
+	collapse (min) hausdorff, by(GEOID_j)
+	ren hausdorff min_hausdorff_dist
+	ren GEOID_j leaid
+	tempfile dist_similarity
+	save `dist_similarity'
+restore
+
+merge m:1 leaid using `dist_similarity', keep(1 3) nogen
+
+merge m:1 GEOID using "$INTDATA/other/shared_boundaries_muni", keep(1 3) nogen
+merge m:1 leaid using "$INTDATA/other/shared_boundaries_dist", keep(1 3) nogen
+
+replace pmax_shared_boundary_muni = 0 if !mi(GEOID) & mi(pmax_shared_boundary_muni)
+replace psum_shared_boundary_muni = 0 if !mi(GEOID) & mi(psum_shared_boundary_muni)
+replace pmax_shared_boundary_dist = 0 if !mi(leaid) & mi(pmax_shared_boundary_dist)
+replace psum_shared_boundary_dist = 0 if !mi(leaid) & mi(psum_shared_boundary_dist)
+
+preserve
+	keep leaid cz pmax_shared_boundary_dist psum_shared_boundary_dist min_hausdorff_dist dist_max_int
+	drop if mi(leaid)
+	duplicates drop
+	collapse (mean) p* min_hausdorff_dist dist_max_int, by(cz)
+	ren p* mean_p*
+	ren min_hausdorff_dist mean_min_hausdorff_dist
+	ren dist_max_int mean_dist_max_int
+	tempfile dist_shared
+	save `dist_shared'
+restore
+
+preserve
+	keep GEOID cz pmax_shared_boundary_muni psum_shared_boundary_muni min_hausdorff_muni
+	duplicates drop
+	collapse (mean) p* min_hausdorff_muni, by(cz)
+	ren p* mean_p*
+	ren min_hausdorff_muni mean_min_hausdorff_muni
+	tempfile muni_shared
+	save `muni_shared'
+restore
+
+merge m:1 cz using `muni_shared', assert(3) nogen
+merge m:1 cz using `dist_shared', assert(3) nogen
 
 // Average School Size
 bys PLACEFP STATEFP : egen avg_totenroll_place = mean(totenroll)
@@ -195,7 +325,6 @@ g vr_blwt_place = (iso_place - P_blwt_place)/(1 - P_blwt_place)
 g vr_blwtas_place = (iso_a_place - P_blwtas_place)/(1 - P_blwtas_place)
 g vr_bl_place = (iso_b_place - P_bl_place)/(1 - P_bl_place)
 
-drop exp1* exp2* exp3* iso_* P_* tot_* 
 
 foreach level in cz place{
 	local levelvars = cond("`level'"=="cz", "cz", "STATEFP PLACEFP") 
@@ -207,6 +336,21 @@ foreach level in cz place{
 
 	}
 }
+
+// Dissimilarity Index
+g num_blwt = tot * abs(exp2 - P_blwt_cz)
+g denom_blwt = 2 *(blenroll_cz + wtenroll_cz) *P_blwt_cz*(1-P_blwt_cz)
+bys cz : egen diss_blwt_cz =  total(0.5 *num_blwt/denom_blwt)
+
+g num_blwtas = (tot_a) * abs(exp2_a - P_blwtas_cz)
+g denom_blwtas = 2 *(blenroll_cz + wtasenroll_cz) *P_blwtas_cz*(1-P_blwtas_cz)
+bys cz : egen diss_blwtas_cz =  total(0.5 *num_blwtas/denom_blwtas)
+
+g num_bl = totenroll * abs(exp2_b - P_bl_cz)
+g denom_bl = 2 *totenroll_cz *P_bl_cz*(1-P_bl_cz)
+bys cz : egen diss_bl_cz =  total(0.5 *num_bl/denom_bl)
+
+drop exp1* exp2* exp3* iso_* P_* tot_*  num_* denom_*
 
 // Interactions
 
@@ -259,72 +403,23 @@ restore
 
 merge m:1 cz using `avg_alltransit_cz', assert(3) nogen
 
-// Touching Munis
-preserve
-	import excel using "$CLEANDATA/other/touching_munis.xlsx", clear first
-	drop if cz != cz_2 // Not counting those that are touching a *DIFFERENT* principle city
-	keep GEOID_2
-	duplicates drop
-	g STATEFP = floor(GEOID_2 / 100000)
-	g PLACEFP = mod(GEOID_2,100000)
-	drop GEOID_2
-	tempfile touching 
-	save `touching'
-restore
+// QGIS OUTPUT
 
-
-merge m:1 STATEFP PLACEFP using `touching', keep(1 3)
+merge m:1 STATEFP PLACEFP using "$INTDATA/other/touching_munis", keep(1 3)
 g touching = _merge == 3
 drop _merge
 
-// Distances to center city
-preserve
-	import excel using "$CLEANDATA/other/shortest_line_edge_edge.xlsx", clear first
-	keep if GEOID_m == GEOID_2
-	keep len STATEFP PLACEFP
-	duplicates drop
-	ren len len_edge_edge
-	tempfile edge_edge 
-	save `edge_edge'
-restore
-
-merge m:1 STATEFP PLACEFP using `edge_edge', keep(1 3) nogen
-
+merge m:1 STATEFP PLACEFP using "$INTDATA/other/edge_edge", keep(1 3) nogen
 replace touching = 1 if len_edge_edge == 0 // Manually checked these six, they all have a corner touching the principle city but QGIS doesn't notice
 
-preserve
-	import excel using "$CLEANDATA/other/shortest_line_center_edge.xlsx", clear first
-	keep if GEOID_m == GEOID_2
-	keep len STATEFP PLACEFP
-	duplicates drop
-	ren len len_center_edge
-	tempfile center_edge 
-	save `center_edge'
-restore
+merge m:1 STATEFP PLACEFP using "$INTDATA/other/center_edge", keep(1 3) nogen
 
-merge m:1 STATEFP PLACEFP using `center_edge', keep(1 3) nogen
-
-
-// Flagging main cities
-preserve
-	import excel using "$CLEANDATA/other/shortest_line_edge_edge.xlsx", clear first
-	drop STATEFP PLACEFP
-	g STATEFP = floor(GEOID_m/100000)
-	g PLACEFP = mod(GEOID_m, 100000)
-	keep PLACEFP STATEFP
-	duplicates drop
-	tempfile main_cites 
-	save `main_cites'
-restore
-
-merge m:1 STATEFP PLACEFP using `main_cites', keep(1 3) 
-g main_city = _merge == 3
-drop _merge
 
 
 // Number of schools
 bys STATEFP PLACEFP : egen n_schools = nvals(crdc_id) if crdc_id != ""
 replace n_schools = 0 if n_schools == .
+
 
 // Race popc
 ren STATEFP statefips
@@ -338,8 +433,18 @@ g prop_white2010 = place_wpop2010 / place_pop2010
 g prop_black1970 = place_bpop1970 / place_pop1970
 g prop_black2010 = place_bpop2010 / place_pop2010
 
-drop place_*
+preserve
+	use "$INTDATA/cgoodman/cgoodman_place_county_geog.dta", clear
+	keep PLACEFP STATEFP place_land
+	duplicates drop
+	destring PLACEFP STATEFP, replace
+	tempfile place_land
+	save `place_land'
+restore 
 
+merge m:1 STATEFP PLACEFP using `place_land', keep(1 3) nogen
+
+merge m:1 cz using "$INTDATA/cog/special_districts_employment", keep(3) nogen
 
 // Labels
 lab var st_ratio "Student Teacher Ratio"

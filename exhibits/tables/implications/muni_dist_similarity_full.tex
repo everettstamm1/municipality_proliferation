@@ -1,0 +1,25 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Muni-Dist Similarity}
+\begin{tabular}{l*{6}{c}}
+\hline\hline
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\
+                    &\multicolumn{1}{c}{(min) hausdorff}&\multicolumn{1}{c}{(min) hausdorff}&\multicolumn{1}{c}{pmax\_shared\_boundary\_muni}&\multicolumn{1}{c}{pmax\_shared\_boundary\_muni}&\multicolumn{1}{c}{psum\_shared\_boundary\_muni}&\multicolumn{1}{c}{psum\_shared\_boundary\_muni}\\
+\hline
+Incorporated 1940-70&      -0.045         &      -0.103\sym{**} &      -0.158         &      -0.028         &      -0.158         &      -0.028         \\
+                    &     (0.045)         &     (0.040)         &     (0.205)         &     (0.175)         &     (0.205)         &     (0.175)         \\
+[1em]
+Above Median GM     &      -0.024\sym{**} &      -0.039\sym{***}&       0.067\sym{*}  &       0.029         &       0.067\sym{*}  &       0.029         \\
+                    &     (0.010)         &     (0.009)         &     (0.040)         &     (0.039)         &     (0.040)         &     (0.039)         \\
+[1em]
+Above Median GM X Inc. 1940-70&      -0.005         &       0.010         &       0.029         &       0.067         &       0.029         &       0.067         \\
+                    &     (0.009)         &     (0.009)         &     (0.054)         &     (0.051)         &     (0.054)         &     (0.051)         \\
+\hline
+Observations        &        7844         &        7718         &        7844         &        7718         &        7844         &        7718         \\
+\(R^{2}\)           &       0.181         &       0.246         &       0.206         &       0.355         &       0.206         &       0.355         \\
+Adjusted \(R^{2}\)  &       0.179         &       0.245         &       0.204         &       0.353         &       0.204         &       0.353         \\
+\hline\hline
+\multicolumn{7}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{7}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}
