@@ -1,0 +1,24 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{School District Capital Expenditure}
+\begin{tabular}{l*{4}{c}}
+\hline\hline
+                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+                    &\multicolumn{1}{c}{Capital outlays/Total Expenditure}&\multicolumn{1}{c}{Capital outlays/Total Enrollment}&\multicolumn{1}{c}{Log Capital Outlays}&\multicolumn{1}{c}{log(Capital outlays/Total Enrollment)}\\
+\hline
+Prop Border with 40-70 incorporation&       0.040         &       1.275         &       2.175         &       1.288         \\
+                    &     (0.088)         &  (1318.729)         &     (2.454)         &     (1.254)         \\
+[1em]
+Above Median GM     &      -0.002         &      73.278         &       0.516\sym{**} &       0.137         \\
+                    &     (0.009)         &   (105.966)         &     (0.214)         &     (0.104)         \\
+[1em]
+Prop Border 40-70 X Above Median GM&      -0.036         &    -385.582         &      -1.882\sym{***}&      -0.520\sym{**} \\
+                    &     (0.022)         &   (364.857)         &     (0.496)         &     (0.244)         \\
+\hline
+Observations        &        4117         &        4117         &        4116         &        4116         \\
+\(R^{2}\)           &       0.063         &       0.013         &       0.180         &       0.055         \\
+\hline\hline
+\multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{5}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

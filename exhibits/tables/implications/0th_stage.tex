@@ -1,27 +1,24 @@
 \begin{table}[htbp]\centering
 \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
 \caption{Raw Splits}
-\begin{tabular}{l*{3}{c}}
+\begin{tabular}{l*{8}{c}}
 \hline\hline
-                    &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}\\
-                    &\multicolumn{1}{c}{Municipality Touches Principle City}&\multicolumn{1}{c}{Length to center city (edge-edge)}&\multicolumn{1}{c}{above\_len\_med}\\
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}&\multicolumn{1}{c}{(7)}&\multicolumn{1}{c}{(8)}\\
+            &\multicolumn{1}{c}{len\_edge\_edge}&\multicolumn{1}{c}{agg\_fam\_inc\_place1970}&\multicolumn{1}{c}{agg\_house\_value\_place1970}&\multicolumn{1}{c}{mean\_hh\_inc\_place}&\multicolumn{1}{c}{prop\_white1970}&\multicolumn{1}{c}{prop\_white2010}&\multicolumn{1}{c}{place\_pop1970}&\multicolumn{1}{c}{place\_land}\\
 \hline
-Incorporated 1940-70&       0.143\sym{***}&   -6162.352\sym{***}&      -0.156\sym{***}\\
-                    &     (0.017)         &  (1542.008)         &     (0.029)         \\
+samp\_dest   &      -3.828\sym{***}&    2516.791\sym{***}&    6302.485\sym{***}&   15683.184\sym{***}&      -1.125\sym{***}&      -4.746\sym{***}&   -1710.275\sym{**} & 6882501.058\sym{*}  \\
+            &     (1.098)         &   (516.102)         &   (844.591)         &  (2334.054)         &     (0.404)         &     (0.771)         &   (728.968)         &(3654673.685)         \\
 [1em]
-Above Median GM     &       0.017\sym{**} &   -3854.789\sym{***}&      -0.056\sym{***}\\
-                    &     (0.007)         &   (661.713)         &     (0.012)         \\
+above\_x\_med &      -2.394\sym{***}&    2475.390\sym{***}&    4974.003\sym{***}&   12472.923\sym{***}&      -2.407\sym{***}&      -6.011\sym{***}&    9655.558\sym{***}&  354706.808         \\
+            &     (0.411)         &   (142.102)         &   (231.908)         &   (734.444)         &     (0.190)         &     (0.299)         &  (2267.783)         &(1421922.782)         \\
 [1em]
-Above Median GM X Inc. 1940-70&      -0.030         &   -6751.830\sym{***}&      -0.112\sym{***}\\
-                    &     (0.021)         &  (1899.496)         &     (0.036)         \\
-[1em]
-Constant            &       0.065\sym{***}&   34591.827\sym{***}&       0.573\sym{***}\\
-                    &     (0.006)         &   (529.099)         &     (0.010)         \\
+samp\_destXabove\_x\_med&      -4.154\sym{***}&   -1287.800\sym{**} &   -1889.779\sym{*}  &   -2734.985         &       1.383\sym{**} &      -4.104\sym{***}&   -4257.355\sym{*}  &-3459014.750         \\
+            &     (1.266)         &   (607.202)         &  (1000.539)         &  (3150.446)         &     (0.679)         &     (1.258)         &  (2418.135)         &(3957431.706)         \\
 \hline
-Observations        &        7728         &        7595         &        7728         \\
-\(R^{2}\)           &       0.021         &       0.027         &       0.029         \\
+\(N\)       &        7596         &        2785         &        4252         &        7846         &        4345         &        7846         &        7859         &        7847         \\
+\(R^{2}\)   &       0.027         &       0.059         &       0.093         &       0.039         &       0.016         &       0.066         &       0.002         &       0.001         \\
 \hline\hline
-\multicolumn{4}{l}{\footnotesize Standard errors in parentheses}\\
-\multicolumn{4}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\multicolumn{9}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{9}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
 \end{tabular}
 \end{table}

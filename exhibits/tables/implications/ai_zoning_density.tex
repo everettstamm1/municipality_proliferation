@@ -1,0 +1,24 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Raw Splits}
+\begin{tabular}{l*{7}{c}}
+\hline\hline
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}&\multicolumn{1}{c}{(7)}\\
+            &\multicolumn{1}{c}{mf}&\multicolumn{1}{c}{mixed\_use}&\multicolumn{1}{c}{attached\_sfr}&\multicolumn{1}{c}{adu}&\multicolumn{1}{c}{flex\_zoning\_br}&\multicolumn{1}{c}{min\_lot\_size\_mean}&\multicolumn{1}{c}{min\_lot\_size\_max}\\
+\hline
+samp\_dest   &      -0.094         &      -0.831         &      -0.760\sym{***}&      -1.184\sym{**} &      -0.154         &   49889.752\sym{**} &  139634.815         \\
+            &     (0.082)         &     (0.557)         &     (0.196)         &     (0.596)         &     (0.248)         & (23167.306)         & (84248.118)         \\
+[1em]
+above\_x\_med &      -0.000         &      -0.128\sym{***}&       0.384\sym{***}&       0.093         &       0.189         &   -7415.561         &  -53398.490\sym{*}  \\
+            &     (0.004)         &     (0.040)         &     (0.130)         &     (0.125)         &     (0.136)         &  (6868.233)         & (31694.361)         \\
+[1em]
+samp\_destXabove\_x\_med&       0.002         &       0.037         &      -0.411\sym{***}&      -0.228\sym{*}  &      -0.227         &   -2933.187         &   46993.519         \\
+            &     (0.008)         &     (0.090)         &     (0.096)         &     (0.137)         &     (0.163)         &  (9744.735)         & (33741.665)         \\
+\hline
+\(N\)       &        3349         &        3326         &        3401         &        3383         &        3402         &        3156         &        3150         \\
+\(R^{2}\)   &       0.008         &       0.086         &       0.382         &       0.321         &       0.192         &       0.228         &       0.230         \\
+\hline\hline
+\multicolumn{8}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{8}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

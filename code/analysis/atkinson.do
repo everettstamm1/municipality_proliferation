@@ -1,12 +1,10 @@
 
 use "$CLEANDATA/mechanisms.dta", clear
 drop if badmuni==1
-g one_school = n_schools == 1
-g no_school = n_schools == 0
-g prop_white_students = wtenroll_place / totenroll_place
 
-drop wtasenroll totenroll blenroll wtenroll n_ap n_ap_w75 gt de crdc_id wtenroll_hasap wtenroll_newmuni wtenroll_hasde wtenroll_hasgt ap gt de ncessch leaid  tot school_level 
+drop mean_p* wtasenroll totenroll blenroll wtenroll n_ap n_ap_w75 gt de crdc_id wtenroll_hasap wtenroll_newmuni wtenroll_hasde wtenroll_hasgt ap gt de ncessch leaid  tot school_level psum_*_dist pmax_*_dist min_hausdorff_dist dist_max_int dist_int_4070 *_leaid teachers_fte
 duplicates drop
+
 
 merge m:1 cz using "$INTDATA/census/cz_race_pop", keep(1 3) nogen keepusing(cz_wpop2010 cz_bpop2010)
 merge m:1 cz using "$INTDATA/census/cz_race_pop1970", keep(1 3) nogen keepusing(cz_wpop1970 cz_bpop1970)
@@ -266,14 +264,18 @@ restore
 merge m:1 cz using `distance_decay', keep(1 3) nogen
 
 
-keep cz SP_* RCL_* DP_* atkinson* delta* aco* rco* 
+g s_vr_bb_1970 = (DP_bb_1970 - cz_bpop_munis1970/cz_pop_munis1970)/(1 - cz_bpop_munis1970/cz_pop_munis1970)
+g s_vr_ww_1970 = (DP_ww_1970 - cz_wpop_munis1970/cz_pop_munis1970)/(1 - cz_wpop_munis1970/cz_pop_munis1970)
+g s_vr_bb_2010 = (DP_bb_2010 - cz_bpop_munis2010/cz_pop_munis2010)/(1 - cz_bpop_munis2010/cz_pop_munis2010)
+g s_vr_ww_2010 = (DP_ww_2010 - cz_wpop_munis2010/cz_pop_munis2010)/(1 - cz_wpop_munis2010/cz_pop_munis2010)
 
-
+keep cz SP_* RCL_* DP_* atkinson* delta* aco* rco* s_vr_*
 duplicates drop
 
+save "$INTDATA/cz_segregation_vars.dta", replace
+
+
 merge 1:1 cz using "$CLEANDATA/cz_pooled", keep(3) keepusing(coastal transpo_cost_1920 GM_raw_pp GM_hat_raw v2_sumshares_urban reg2 reg3 reg4 frac_unc* frac_uninc* change_frac_unc n_schdist_ind_cz cz_name popc1940) nogen // Need to get 
-
-
 
 
 ivreg2 atkinson1970 (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban [aw = popc1940], r
@@ -284,11 +286,11 @@ ivreg2 delta1970 (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 coastal transpo_cost_19
 ivreg2 delta2010 (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban [aw = popc1940], r
 
 
-ivreg2 aco1970 (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban if aco1970 >= 0 & aco1970 <= 1 [aw = popc1940], r
+ivreg2 aco1970 (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban  [aw = popc1940], r
 ivreg2 aco2010 (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban if aco2010 >= 0 & aco2010 <= 1 [aw = popc1940], r
 
 
-ivreg2 rco1970 (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban if rco1970 >= -1 & rco1970 <= 1 [aw = popc1940], r
+ivreg2 rco1970 (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban  [aw = popc1940], r
 ivreg2 rco2010 (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban if rco2010 >= -1 & rco2010 <= 1 [aw = popc1940], r
 
 
@@ -323,3 +325,6 @@ ivreg2 DP_wb_2010 (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 coastal transpo_cost_1
 
 ivreg2 DP_ww_1970 (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban [aw = popc1940], r // insig
 ivreg2 DP_ww_2010 (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban [aw = popc1940], r //neg
+
+ivreg2 s_vr_bb_1970 (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban [aw = popc1940], r // insig
+ivreg2 s_vr_ww_1970 (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban [aw = popc1940], r // insig

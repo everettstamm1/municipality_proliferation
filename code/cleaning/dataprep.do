@@ -686,6 +686,9 @@ foreach level in cz {
 		g frac_unc1940 = ((pop1940 - popc1940)/pop1940)
 		g change_frac_unc = frac_unc1970 - frac_unc1940
 		
+		su GM_raw_pp, d
+		g above_x_med = GM_raw_pp >= r(p50)
+		
 		save "$CLEANDATA/`level'_pooled`outsamptab'", replace
 		
 	}

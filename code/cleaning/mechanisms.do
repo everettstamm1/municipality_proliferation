@@ -20,10 +20,12 @@ restore
 merge m:1 STATEFP using `regions', keep(1 3) nogen
 tabulate region, gen(reg)	
 
-
-merge m:1 STATEFP PLACEFP using "$INTDATA/other/main_cities", keep(1 3) 
-g main_city = _merge == 3
-drop _merge
+ren GEOID temp
+merge m:1 cz using "$INTDATA/census/maxcitypop", keep(1 3) keepusing(GEOID) nogen
+ren GEOID GEOID_main
+ren temp GEOID
+destring GEOID_main, replace
+g main_city = GEOID == GEOID_main
 
 // Dropping noncomparables
 /*
@@ -33,11 +35,13 @@ drop if FUNCSTAT=="S" | /// "Statistical entities"
 		 FUNCSTAT=="I" // Inactive governmental unit that has the power to provide primary special-purpose functions
 */	 
 
-g badmuni = FUNCSTAT=="S" | /// "Statistical entities"
+g badmuni = (FUNCSTAT=="S" | /// "Statistical entities"
 		 FUNCSTAT=="F" | /// Fictitious entity created to fill the Census Bureau geographic hierarch
-		 FUNCSTAT=="N" | /// Nonfunctioning legal entity	
+		 FUNCSTAT=="N" | /// Nonfunctioning legal entity
 		 FUNCSTAT=="I" | /// Inactive governmental unit that has the power to provide primary special-purpose functions
-		 CLASSFP == "M2" // Military bases
+		 CLASSFP == "M2") & /// Military bases
+		 regexm(NAME,"(balance)") == 0  & /// Need to keep consolidated city governments, classified as "F"
+		 GEOID != 1150000 // Washington DC, classified as "N"
 
 // All cities vs cities in our 130 CZs incorporated 1940-70
 
@@ -56,7 +60,7 @@ lab var weight_pop "Weighted by 1940 municipal population"
 preserve
 	use "$CLEANDATA/cz_pooled", clear
 	keep if dcourt == 1
-	keep cz cz_name popc1940 GM_raw_pp GM_hat_raw v2_sumshares_urban transpo_cost_1920 coastal n_schdist_ind_cz_pc
+	keep cz cz_name popc1940 GM_raw_pp GM_hat_raw v2_sumshares_urban transpo_cost_1920 coastal n_schdist_ind_cz_pc pop1940
 	g schoolflag = n_schdist_ind_cz_pc < .
 	drop n_schdist_ind_cz_pc
 	qui su GM_raw_pp, d
@@ -111,9 +115,11 @@ ren fips_place_2002 PLACEFP
 // To get place level mean school district offerings
 merge 1:1 STATEFP PLACEFP using "$INTDATA/nces/place_offerings", keep(1 3) nogen
 
-// To get school district offerings (expands dataset to school district level (crdc_id))
+// To get school  offerings (expands dataset to school district level (crdc_id))
 merge 1:m STATEFP PLACEFP using "$INTDATA/nces/offerings", keep(1 3) nogen keepusing(leaid crdc_id totenroll blenroll wtenroll wtasenroll n_ap n_ap_w75 gt de ap ncessch school_level)
+merge m:1 leaid using "$INTDATA/nces/leaid_offerings", keep(1 3) nogen 
 
+// CZ level achievement gaps
 // Own school district
 preserve
 	keep STATEFP PLACEFP leaid school_level 
@@ -125,7 +131,7 @@ preserve
 	keep STATEFP PLACEFP exclusive_district_place
 	duplicates drop
 	tempfile exclusive_district
-	save `exclusive_district'
+	save `exclusive_district' 
 restore
 
 merge m:1 STATEFP PLACEFP using `exclusive_district', assert(1 3) nogen
@@ -157,6 +163,8 @@ restore
 
 merge m:1 leaid using `dist_max_int', keep(1 3) nogen
 
+
+merge m:1 leaid using `dist_max_int', keep(1 3) nogen
 preserve
 	keep GEOID samp_dest
 	keep if samp_dest == 1
@@ -433,6 +441,9 @@ g prop_white2010 = place_wpop2010 / place_pop2010
 g prop_black1970 = place_bpop1970 / place_pop1970
 g prop_black2010 = place_bpop2010 / place_pop2010
 
+merge m:1 cz using "$INTDATA/census/cz_race_pop1970", keep(1 3) nogen keepusing(cz_prop_white1970)
+merge m:1 cz using "$INTDATA/census/cz_race_pop", keep(1 3) nogen keepusing(cz_prop_white2010)
+
 preserve
 	use "$INTDATA/cgoodman/cgoodman_place_county_geog.dta", clear
 	keep PLACEFP STATEFP place_land
@@ -446,8 +457,17 @@ merge m:1 STATEFP PLACEFP using `place_land', keep(1 3) nogen
 
 merge m:1 cz using "$INTDATA/cog/special_districts_employment", keep(3) nogen
 
+merge m:1 STATEFP PLACEFP using "$INTDATA/census/2010_hh_incomes", keep(1 3) nogen
+merge m:1 STATEFP PLACEFP using "$INTDATA/census/1970_hh_incomes_hv", keep(1 3) nogen
+merge m:1 STATEFP PLACEFP using "$INTDATA/other/ai_zoning", keep(1 3) nogen
+
+// Filling some missings
+bys cz (mean_hh_inc_cz) : replace mean_hh_inc_cz = mean_hh_inc_cz[1] if mi(mean_hh_inc_cz)
+bys cz (agg_fam_inc_cz1970) : replace agg_fam_inc_cz1970 = agg_fam_inc_cz1970[1] if mi(agg_fam_inc_cz1970)
+bys cz (agg_house_value_cz1970) : replace agg_house_value_cz1970 = agg_house_value_cz1970[1] if mi(agg_house_value_cz1970)
+
 // Labels
-lab var st_ratio "Student Teacher Ratio"
+lab var st_ratio_leaid "Student Teacher Ratio"
 lab var n_ap "Number of AP Classes, NCES"
 lab var n_ap_w75 "Number of AP Classes, District of 75pc white, NCES"
 lab var wtenroll "White Enrollment, NCES"

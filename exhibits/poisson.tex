@@ -1,7 +1,7 @@
 \documentclass{article}
 \usepackage{blindtext}
 \usepackage{booktabs}
-\usepackage{geometry}
+
 \usepackage{subcaption}
 \usepackage{graphicx}
 \usepackage{caption}
@@ -10,6 +10,7 @@
 \usepackage{tikz}
 \usepackage{threeparttable}
 \usepackage{algorithmic}
+\usepackage[margin=0.25in]{geometry}
 
 
 \title{Counterfactuals}
@@ -18,11 +19,61 @@
 \maketitle
 
 {\footnotesize }
-
-Latest attempt to diagnose what's wrong with the school districts counterfactual. First let's look at the distribution of the data
-
-
-
-
+\begin{figure}
+	\includegraphics{figures/pcarrow_figure_GM.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\includegraphics{figures/pcarrow_figure_inc2010.pdf}
+\end{figure}
+\clearpage
+\begin{landscape}
+\clearpage
+\input{tables/implications/richer_whiter.tex}
+\clearpage
+\begin{figure}
+	\includegraphics{figures/implications/dist_edge_edge_4070.pdf}
+\end{figure}
+\clearpage
+\begin{figure}
+	\includegraphics{figures/pcarrow_figure_inc2010.pdf}
+\end{figure}
+\clearpage
+\input{tables/implications/0th_stage_economic_full.tex}
+\clearpage
+\input{tables/implications/0th_stage_economic_mains.tex}
+\clearpage
+\input{tables/implications/0th_stage_distance_full.tex}
+\clearpage
+\input{tables/implications/school_exclusivity_full.tex}
+\clearpage
+\input{tables/implications/school_exclusivity_mains.tex}
+\clearpage
+\input{tables/implications/muni_exclusivity_full.tex}
+\clearpage
+\input{tables/implications/muni_exclusivity_mains.tex}
+\clearpage
+\input{tables/implications/school_exclusivity_cz.tex}
+\clearpage
+\input{tables/implications/cz_segregation.tex}
+\clearpage
+\input{tables/implications/school_level.tex}
+\clearpage
+\input{tables/implications/achievement_gaps.tex}
+\clearpage
+\input{tables/implications/school_capex.tex}
+\clearpage
+\input{tables/implications/ai_zoning_density.tex}
+\clearpage
+\input{tables/implications/ai_zoning_density_mains.tex}
+\clearpage
+\input{tables/implications/ai_zoning_regs.tex}
+\clearpage
+\input{tables/implications/ai_zoning_regs_mains.tex}
+\clearpage
+\input{tables/implications/ai_zoning_other.tex}
+\clearpage
+\input{tables/implications/ai_zoning_other_mains.tex}
+\end{landscape}
 
 \end{document}

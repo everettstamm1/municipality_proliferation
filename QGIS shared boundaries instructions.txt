@@ -4,5 +4,6 @@ QGIS shared boundaries instructions
 3. Calculate length of both
 4. Take a buffer of both (degrees = 0.0001, approx. 30 feet)
 5. Intersect 3 with 4 for both
-6. Compute lengths of intersection
-7. Export
+6. Aggregate both to GEOID level
+7. Compute lengths of intersection
+8. Export

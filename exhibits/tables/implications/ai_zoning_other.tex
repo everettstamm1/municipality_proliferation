@@ -1,0 +1,24 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Raw Splits}
+\begin{tabular}{l*{7}{c}}
+\hline\hline
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}&\multicolumn{1}{c}{(7)}\\
+            &\multicolumn{1}{c}{age\_restrictions}&\multicolumn{1}{c}{inclusionary\_zoning\_comply}&\multicolumn{1}{c}{lot\_size\_nature\_restriction}&\multicolumn{1}{c}{max\_frontage\_req\_sfr}&\multicolumn{1}{c}{n\_steps\_mf}&\multicolumn{1}{c}{First\_PC}&\multicolumn{1}{c}{Second\_PC}\\
+\hline
+samp\_dest   &       0.261         &       0.157         &      -0.077         &      84.956         &      -1.577         &      -0.863         &       2.046\sym{***}\\
+            &     (0.842)         &     (0.142)         &     (0.268)         &    (56.563)         &     (1.665)         &     (1.455)         &     (0.643)         \\
+[1em]
+above\_x\_med &       0.562\sym{***}&       0.059         &       0.011         &       4.612         &       0.235         &       1.726\sym{***}&      -0.356\sym{*}  \\
+            &     (0.093)         &     (0.037)         &     (0.030)         &    (12.399)         &     (0.247)         &     (0.512)         &     (0.196)         \\
+[1em]
+samp\_destXabove\_x\_med&      -0.603\sym{***}&      -0.170\sym{***}&      -0.017         &     -23.377         &      -0.043         &      -2.475\sym{***}&       0.231         \\
+            &     (0.162)         &     (0.051)         &     (0.063)         &    (16.974)         &     (0.387)         &     (0.395)         &     (0.249)         \\
+\hline
+\(N\)       &        3068         &        3397         &        2816         &        3060         &        3391         &        3405         &        3405         \\
+\(R^{2}\)   &       0.364         &       0.100         &       0.060         &       0.399         &       0.151         &       0.286         &       0.405         \\
+\hline\hline
+\multicolumn{8}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{8}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

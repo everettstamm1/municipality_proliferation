@@ -1,0 +1,24 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Raw Splits}
+\begin{tabular}{l*{3}{c}}
+\hline\hline
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}\\
+            &\multicolumn{1}{c}{exclusive\_district\_place}&\multicolumn{1}{c}{exclusive\_district\_shape}&\multicolumn{1}{c}{psum\_shared\_boundary\_muni}\\
+\hline
+samp\_dest   &      -0.141\sym{***}&      -0.002         &       0.008         \\
+            &     (0.030)         &     (0.011)         &     (0.015)         \\
+[1em]
+above\_x\_med &       0.086\sym{***}&       0.047\sym{***}&       0.110\sym{***}\\
+            &     (0.013)         &     (0.005)         &     (0.006)         \\
+[1em]
+samp\_destXabove\_x\_med&      -0.000         &      -0.024\sym{*}  &       0.006         \\
+            &     (0.036)         &     (0.013)         &     (0.018)         \\
+\hline
+\(N\)       &        7593         &        7593         &        7593         \\
+\(R^{2}\)   &       0.015         &       0.015         &       0.043         \\
+\hline\hline
+\multicolumn{4}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{4}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

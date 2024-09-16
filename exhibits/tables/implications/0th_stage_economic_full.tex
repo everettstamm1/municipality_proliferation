@@ -1,0 +1,24 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Raw Splits}
+\begin{tabular}{l*{7}{c}}
+\hline\hline
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}&\multicolumn{1}{c}{(7)}\\
+            &\multicolumn{1}{c}{agg\_fam\_inc\_place1970}&\multicolumn{1}{c}{agg\_house\_value\_place1970}&\multicolumn{1}{c}{mean\_hh\_inc\_place}&\multicolumn{1}{c}{prop\_white1970}&\multicolumn{1}{c}{prop\_white2010}&\multicolumn{1}{c}{place\_pop1970}&\multicolumn{1}{c}{place\_land}\\
+\hline
+samp\_dest   &    1087.121         &   -7254.719         &    8465.569         &      10.056\sym{**} &       9.164         &-6894554.204\sym{***}&  -5.739e+07         \\
+            &  (2309.335)         &  (4728.906)         & (16932.581)         &     (4.890)         &    (11.448)         &(1236989.222)         &(61514152.505)         \\
+[1em]
+above\_x\_med &     207.101         &     520.511         &   -4974.573         &      -7.318\sym{***}&      -6.841         &  424795.628         &  278467.519         \\
+            &   (329.818)         &   (928.211)         &  (3956.591)         &     (1.463)         &     (5.489)         &(319333.915)         &(10236335.651)         \\
+[1em]
+samp\_destXabove\_x\_med&    -583.189         &   -2192.153         &  -12345.204\sym{*}  &       7.532\sym{***}&       3.675         & -414796.063         &  -1.927e+07\sym{*}  \\
+            &   (813.064)         &  (1461.735)         &  (7444.362)         &     (1.271)         &     (4.129)         &(320434.280)         &(10517400.992)         \\
+\hline
+\(N\)       &        3626         &        5132         &        8819         &        5251         &        8819         &        8836         &        8512         \\
+\(R^{2}\)   &       0.127         &       0.567         &       0.212         &       0.617         &       0.539         &       0.863         &       0.377         \\
+\hline\hline
+\multicolumn{8}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{8}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

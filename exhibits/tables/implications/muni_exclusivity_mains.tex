@@ -1,0 +1,24 @@
+\begin{table}[htbp]\centering
+\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
+\caption{Raw Splits}
+\begin{tabular}{l*{5}{c}}
+\hline\hline
+            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\
+            &\multicolumn{1}{c}{landuse\_sfr}&\multicolumn{1}{c}{landuse\_apartment}&\multicolumn{1}{c}{pct\_rev\_ff}&\multicolumn{1}{c}{pct\_rev\_sa}&\multicolumn{1}{c}{pct\_rev\_debt}\\
+\hline
+samp\_dest   &      22.600\sym{*}  &      -3.391\sym{**} &       0.863         &       0.103         &     155.056         \\
+            &    (13.016)         &     (1.448)         &     (1.051)         &     (1.398)         &   (174.801)         \\
+[1em]
+above\_x\_med &      -4.672         &       1.045\sym{**} &       0.502\sym{**} &       0.718\sym{**} &     -83.421\sym{**} \\
+            &     (3.155)         &     (0.453)         &     (0.195)         &     (0.282)         &    (38.668)         \\
+[1em]
+samp\_destXabove\_x\_med&      14.176\sym{***}&      -1.156\sym{***}&       0.596         &      -2.320\sym{***}&      62.942         \\
+            &     (3.426)         &     (0.427)         &     (0.399)         &     (0.820)         &    (56.314)         \\
+\hline
+\(N\)       &        1448         &        1448         &        1439         &        1439         &        1439         \\
+\(R^{2}\)   &       0.905         &       0.879         &       0.297         &       0.263         &       0.392         \\
+\hline\hline
+\multicolumn{6}{l}{\footnotesize Standard errors in parentheses}\\
+\multicolumn{6}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
+\end{tabular}
+\end{table}

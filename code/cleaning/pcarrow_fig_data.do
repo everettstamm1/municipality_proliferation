@@ -101,7 +101,7 @@ save "$CLEANDATA/place_race_pop.dta", replace
 keep if in_cgoodman_data == 1
 
 ren czone cz
-merge m:1 cz using "$CLEANDATA/cz_pooled", keep(3) nogen keepusing(dcourt cz cz_name GM_hat_raw_pp GM_raw_pp)
+merge m:1 cz using "$CLEANDATA/cz_pooled", keep(3) nogen keepusing(above_x_med dcourt cz cz_name GM_hat_raw_pp GM_raw_pp)
 keep if dcourt == 1
 
 bys cz : egen cz_new_pop1970 = total(place_pop1970) if yr_incorp >=1940 & yr_incorp<=1970
@@ -125,7 +125,27 @@ bys cz (cz_new_wpop2010): replace cz_new_wpop2010 = cz_new_wpop2010[1]
 g cz_new_prop_white1970 = 100*(cz_new_wpop1970 / cz_new_pop1970)
 g cz_new_prop_white2010 = 100*(cz_new_wpop2010 / cz_new_pop2010)
 
-keep cz cz_name cz_* GM_*
+
+preserve
+	keep statefips placefips cz yr_incorp
+	tempfile incorps
+	save `incorps'
+	
+	use "$INTDATA/census/2010_hh_incomes", clear
+	ren PLACEFP placefips
+	ren STATEFP statefips
+	merge 1:1 cz statefips placefips using `incorps', keep(1 3) nogen
+	bys cz : egen cz_new_inc2010 = mean(mean_hh_inc_place) if (yr_incorp >= 1940 & yr_incorp <= 1970)
+	bys cz (cz_new_inc2010): replace cz_new_inc2010 = cz_new_inc2010[1]
+	ren mean_hh_inc_cz cz_inc2010
+	keep cz cz_inc2010 cz_new_inc2010
+	duplicates drop
+	tempfile economic
+	save `economic'
+restore 
+
+merge m:1 cz using `economic', keep(1 3) nogen
+keep cz cz_name cz_* GM_* above_x_med
 duplicates drop
 
 merge 1:1 cz using "$INTDATA/census/cz_race_pop1970", keep(3) nogen
@@ -133,5 +153,6 @@ merge 1:1 cz using "$INTDATA/census/cz_race_pop", keep(3) nogen
 
 keep if cz_new_prop_white1970 != . 
 replace cz_name = "Louisville, KY/IN" if cz==13101
+
 
 save "$CLEANDATA/pcarrow_fig_data", replace

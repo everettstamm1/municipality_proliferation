@@ -6,7 +6,7 @@ g no_school = n_schools == 0
 g prop_white_students = wtenroll_place / totenroll_place
 drop mean_p*
 
-foreach var of varlist pmax_shared_boundary_muni pmax_shared_boundary_dist psum_shared_boundary_muni psum_shared_boundary_dist EI dist_max_int_cz{
+foreach var of varlist pmax_shared_boundary_muni pmax_shared_boundary_dist psum_shared_boundary_muni psum_shared_boundary_dist EI mean_dist_max_int{
 	//replace `var' = . if main_city == 1
 }
 
@@ -17,7 +17,7 @@ bys cz : egen mean_pmax_shared_dist = mean(pmax_shared_boundary_dist)
 bys cz : egen mean_psum_shared_muni = mean(psum_shared_boundary_muni)
 bys cz : egen mean_psum_shared_dist = mean(psum_shared_boundary_dist)
 
-drop wtasenroll totenroll blenroll wtenroll n_ap n_ap_w75 gt de crdc_id wtenroll_hasap wtenroll_newmuni wtenroll_hasde wtenroll_hasgt ap gt de ncessch leaid  tot school_level psum_*_dist pmax_*_dist min_hausdorff_dist dist_max_int
+drop wtasenroll totenroll blenroll wtenroll n_ap n_ap_w75 gt de crdc_id wtenroll_hasap wtenroll_newmuni wtenroll_hasde wtenroll_hasgt ap gt de ncessch leaid  tot school_level psum_*_dist pmax_*_dist min_hausdorff_dist dist_max_int dist_int_4070 *_leaid
 duplicates drop
 
 // Creating interactions
@@ -241,6 +241,13 @@ eststo: reghdfe alltransit_performance_score samp_dest above_x_med samp_destXabo
 esttab using "$TABS/implications/transit_performance_full.tex", replace label title("Transit Performance") ///
     star(* 0.10 ** 0.05 *** 0.01) b(3) se(3) r2 ar2  keep(samp_dest above_x_med samp_destXabove_x_med)
 
+// Homeownership
+eststo clear
+eststo: reghdfe mean_hh_inc_place samp_dest above_x_med samp_destXabove_x_med reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban *_samp_dest [aw = weight_pop], vce(cl cz)
+eststo: reghdfe mean_hh_inc_place samp_dest above_x_med samp_destXabove_x_med reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban *_samp_dest if main_city == 0 [aw = weight_pop], vce(cl cz)
+esttab using "$TABS/implications/2010_economics.tex", replace label title("Homeownership Rate") ///
+    star(* 0.10 ** 0.05 *** 0.01) b(3) se(3) r2 ar2  keep(samp_dest above_x_med samp_destXabove_x_med)
+
 // White AP Access
 eststo clear
 eststo: reghdfe wtenroll_hasap_place samp_dest above_x_med samp_destXabove_x_med reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban *_samp_dest [aw = weight_pop], vce(cl cz)
@@ -262,7 +269,7 @@ esttab using "$TABS/implications/muni_dist_similarity_full.tex", replace label t
 // CZ Level stuff
 
 use "$CLEANDATA/mechanisms.dta", clear
-keep cz GM_raw_pp GM_hat_raw coastal transpo_cost_1920 v2_sumshares_urban popc1940 ap_gini_cz above_x_med vr_blwt_cz vr_blwtas_cz avg_alltransit_cz vr_bl_cz diss_bl_cz diss_blwt_cz diss_blwtas_cz dist_max_int_cz EI mean_pmax_* mean_psum_* mean_min_* 
+keep cz GM_raw_pp GM_hat_raw coastal transpo_cost_1920 v2_sumshares_urban popc1940 ap_gini_cz above_x_med vr_blwt_cz vr_blwtas_cz avg_alltransit_cz vr_bl_cz diss_bl_cz diss_blwt_cz diss_blwtas_cz mean_dist_max_int EI mean_pmax_* mean_psum_* mean_min_* 
 duplicates drop
 
 
@@ -317,7 +324,7 @@ esttab using "$TABS/implications/full_main_spec_2.tex", replace label title("Ful
 	
 eststo clear
 eststo: ivreg2 EI (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban if schoolflag <= 1 [aw = popc1940], r
-eststo: ivreg2 dist_max_int_cz (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban  if schoolflag <= 1 [aw = popc1940], r
+eststo: ivreg2 mean_dist_max_int (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban  if schoolflag <= 1 [aw = popc1940], r
 eststo: ivreg2 mean_min_hausdorff_muni (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban if schoolflag <= 1 [aw = popc1940], r
 eststo: ivreg2 mean_min_hausdorff_dist (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban if schoolflag <= 1 [aw = popc1940], r
 
@@ -446,7 +453,7 @@ forv sp=0/1{
 
 
 use "$CLEANDATA/mechanisms.dta", clear
-drop if badmuni==1 | leaid == .
+drop if badmuni==1 | leaid == . | schoolflag == 0
 bys leaid : egen n_hs = total(school_level == 3)
 g hs_enroll = totenroll if school_level == 3
 bys leaid : egen hs_totenroll = total(hs_enroll)
@@ -454,10 +461,61 @@ drop hs_enroll
 drop if n_hs == 0
 replace n_ap = . if school_level != 3
 bys leaid : egen mean_ap = mean(n_ap)
+replace dist_int_4070 = 0 if mi(dist_int_4070)
 
-keep leaid cz hs_totenroll above_x_med reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban mean_ap dist_int_4070
+g int_0 = dist_int_4070 > 0
+g int_90 = dist_int_4070 > 0.9
+
+keep leaid cz hs_totenroll above_x_med reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban mean_ap dist_int_4070 int_0 int_90 totenroll st_ratio_leaid
 foreach var of varlist above_x_med reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban{
 	g `var'_dist_int_4070 = `var' * dist_int_4070
+	g `var'_int_0 = `var' * int_0
+	g `var'_int_90 = `var' * int_90
 }
+bys leaid (cz) : keep if _n == 1
+
+reghdfe mean_ap int_0 above_x_med reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban *_int_0 [aw = hs_totenroll], vce(cl cz)
+
+reghdfe totenroll int_0 above_x_med reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban *_int_0 [aw = hs_totenroll], vce(cl cz)
+
+reghdfe st_ratio_leaid int_0 above_x_med reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban *_int_0 [aw = hs_totenroll], vce(cl cz)
+
+
+// Who's richer?
+// Richer than city as a whole
+
+
+use "$CLEANDATA/mechanisms.dta", clear
+drop if badmuni==1
+
+
+drop wtasenroll totenroll blenroll wtenroll n_ap n_ap_w75 gt de crdc_id wtenroll_hasap wtenroll_newmuni wtenroll_hasde wtenroll_hasgt ap gt de ncessch leaid  tot school_level psum_*_dist pmax_*_dist min_hausdorff_dist dist_max_int dist_int_4070 *_leaid mean_min_hausdorff_dist mean_pmax_shared_boundary_dist mean_psum_shared_boundary_dist mean_dist_max_int
 duplicates drop
-reghdfe mean_ap dist_int_4070 above_x_med above_x_med_dist_int_4070 reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban *_dist_int_4070 [aw = hs_totenroll], vce(cl cz)
+
+// Richer than other cities 
+su mean_hh_inc_place if samp_dest == 0 & above_x_med == 0
+su mean_hh_inc_place if samp_dest == 1 & above_x_med == 0
+su mean_hh_inc_place if samp_dest == 0 & above_x_med == 1
+su mean_hh_inc_place if samp_dest == 1 & above_x_med == 1
+reg mean_hh_inc_place samp_dest##above_x_med
+reghdfe mean_hh_inc_place samp_dest above_x_med samp_destXabove_x_med reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban *_samp_dest [aw = weight_pop], vce(cl cz)
+
+// Richer than main cities 
+su mean_hh_inc_place if main_city == 1 & above_x_med == 0
+su mean_hh_inc_place if samp_dest == 1 & above_x_med == 0
+su mean_hh_inc_place if main_city == 1 & above_x_med == 1
+su mean_hh_inc_place if samp_dest == 1 & above_x_med == 1
+reg mean_hh_inc_place samp_dest##above_x_med if samp_dest == 1 | main_city == 1
+reghdfe mean_hh_inc_place samp_dest above_x_med samp_destXabove_x_med reg2 reg3 reg4 coastal transpo_cost_1920 v2_sumshares_urban *_samp_dest if samp_dest == 1 | main_city == 1 [aw = weight_pop], vce(cl cz)
+
+// Richer than CZ as a whole (GAP LARGER IN ABOVE MEDIAN)
+bys cz : g czw = 1 if _n == 1
+su mean_hh_inc_cz if above_x_med == 0 [aw = czw]
+su mean_hh_inc_place if samp_dest == 1 & above_x_med == 0
+su mean_hh_inc_cz if above_x_med == 1 [aw = czw]
+su mean_hh_inc_place if samp_dest == 1 & above_x_med == 1
+
+/*
+Ok interpretation: these incorporated places are on average richer. Yet since the coefficient on the interaction is negative, you could say they're upper middle class areas that wouldn't normally incorporate, but do so to avoid being part of the main city and sharing with the new Black residents.
+
+*/
