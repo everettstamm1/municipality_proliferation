@@ -1,22 +1,22 @@
 \begin{table}[htbp]\centering
 \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
-\caption{Raw Splits}
+\caption{Muni-District similarity}
 \begin{tabular}{l*{4}{c}}
 \hline\hline
             &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
             &\multicolumn{1}{c}{exclusive\_district\_place}&\multicolumn{1}{c}{exclusive\_district\_shape}&\multicolumn{1}{c}{psum\_shared\_boundary\_muni}&\multicolumn{1}{c}{min\_hausdorff\_muni}\\
 \hline
-samp\_dest   &      -0.972\sym{***}&       0.417         &       0.082         &      -0.070\sym{*}  \\
-            &     (0.341)         &     (0.287)         &     (0.190)         &     (0.037)         \\
+samp\_dest   &       0.133         &      -0.055         &      -0.171         &      -0.044         \\
+            &     (0.222)         &     (0.214)         &     (0.214)         &     (0.045)         \\
 [1em]
-above\_x\_med &      -0.042         &      -0.309\sym{*}  &       0.068         &      -0.005         \\
-            &     (0.069)         &     (0.166)         &     (0.044)         &     (0.011)         \\
+above\_x\_med &       0.021         &      -0.081         &       0.077\sym{*}  &      -0.023\sym{**} \\
+            &     (0.022)         &     (0.052)         &     (0.040)         &     (0.010)         \\
 [1em]
-samp\_destXabove\_x\_med&       0.209\sym{***}&       0.403\sym{**} &       0.030         &      -0.020\sym{*}  \\
-            &     (0.077)         &     (0.167)         &     (0.065)         &     (0.011)         \\
+samp\_destXabove\_x\_med&      -0.087         &       0.129\sym{**} &       0.018         &      -0.005         \\
+            &     (0.076)         &     (0.055)         &     (0.054)         &     (0.009)         \\
 \hline
-\(N\)       &        8836         &        8836         &        8836         &        8836         \\
-\(R^{2}\)   &       0.163         &       0.480         &       0.166         &       0.446         \\
+\(N\)       &        7849         &        7849         &        7849         &        7849         \\
+\(R^{2}\)   &       0.069         &       0.174         &       0.205         &       0.175         \\
 \hline\hline
 \multicolumn{5}{l}{\footnotesize Standard errors in parentheses}\\
 \multicolumn{5}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\

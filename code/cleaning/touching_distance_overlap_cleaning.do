@@ -38,6 +38,46 @@ ren temp touching
 replace centroid_dist = 0 if GEOID_i == GEOID_j
 save "$CLEANDATA/other/touching_dist_munis.dta", replace
 
+
+use "$CLEANDATA/cz_pooled.dta", clear
+levelsof cz, local(czs)
+clear
+foreach cz in `czs'{
+	foreach t in touching centroid_dist{
+		import delimited using "$INTDATA/school_touching/school_`t'_`cz'.csv", clear
+		tostring v1, replace
+		replace v1 = "GEOID" if _n == 1
+		foreach v of varlist * {
+		   local vname = `v'[1]
+		   rename `v' `t'`vname'
+		}
+		drop if _n == 1
+		ren `t'GEOID GEOID_i
+		if "`t'" == "centroid_dist" qui destring *, replace force
+
+		qui reshape long `t', i(GEOID_i) j(GEOID_j) string
+		if "`t'" == "centroid_dist" qui destring GEOID_j, replace force
+
+		if "`t'" == "touching" qui destring GEOID_i GEOID_j, replace force
+
+		g cz = `cz'
+		tempfile `t'`cz'
+		save ``t'`cz''
+	}
+}
+
+clear
+foreach cz in `czs'{
+	append using `touching`cz''
+	merge 1:1 GEOID_i GEOID_j cz using `centroid_dist`cz'', nogen update
+}
+g temp  = touching == "TRUE"
+replace temp = 1 if GEOID_i == GEOID_j
+drop touching
+ren temp touching
+replace centroid_dist = 0 if GEOID_i == GEOID_j
+save "$CLEANDATA/other/touching_dist_schools.dta", replace
+
 forv s=4/55{
 	cap confirm file "$INTDATA/other/muni_district_overlap/distgrid_`s'.csv"
 	if _rc==0{

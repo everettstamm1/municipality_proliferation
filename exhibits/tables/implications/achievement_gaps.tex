@@ -1,18 +1,35 @@
-\begin{table}[htbp]\centering
-\def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}
-\caption{Raw Splits}
-\begin{tabular}{l*{6}{c}}
-\hline\hline
-            &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\
-            &\multicolumn{1}{c}{bw\_gap\_math\_raw}&\multicolumn{1}{c}{bw\_gap\_math\_pct}&\multicolumn{1}{c}{bw\_gap\_read\_raw}&\multicolumn{1}{c}{bw\_gap\_read\_pct}&\multicolumn{1}{c}{bw\_gap\_grad\_raw}&\multicolumn{1}{c}{bw\_gap\_grad\_pct}\\
-\hline
-GM\_raw\_pp   &       0.037         &      -0.004         &      -0.093         &      -0.004         &      -0.181\sym{***}&      -0.002\sym{**} \\
-            &     (0.177)         &     (0.004)         &     (0.189)         &     (0.004)         &     (0.060)         &     (0.001)         \\
-\hline
-\(N\)       &         108         &         108         &         108         &         108         &         115         &         115         \\
-\(R^{2}\)   &       0.555         &       0.517         &       0.587         &       0.594         &       0.341         &       0.453         \\
-\hline\hline
-\multicolumn{7}{l}{\footnotesize Standard errors in parentheses}\\
-\multicolumn{7}{l}{\footnotesize \sym{*} \(p<0.10\), \sym{**} \(p<0.05\), \sym{***} \(p<0.01\)}\\
-\end{tabular}
-\end{table}
+ \begin{tabular}{l*{9}{c}} \toprule
+&\multicolumn{1}{c}{All}&\multicolumn{1}{c}{White}&\multicolumn{1}{c}{Black}&\multicolumn{1}{c}{W-B Gap}&\multicolumn{1}{c}{Not Ec. Disadvantaged}&\multicolumn{1}{c}{Ec. Disadvantaged}&\multicolumn{1}{c}{NEC-ECD Gap}&\\\cmidrule(lr){2-2}\cmidrule(lr){3-3}\cmidrule(lr){4-4}\cmidrule(lr){5-5}\cmidrule(lr){6-6}\cmidrule(lr){7-7}\cmidrule(lr){8-8}
+&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}&\multicolumn{1}{c}{(7)}\\
+\cmidrule(lr){1-8}
+\multicolumn{7}{l}{Panel A: IV with GM}\\
+\cmidrule(lr){1-8}
+Percentage Point Change in Urban Black Population&   -0.003   &    0.002   &   -0.001   &    0.003   &   -0.002   &   -0.003** &    0.001   \\
+                &  (0.002)   &  (0.004)   &  (0.002)   &  (0.003)   &  (0.002)   &  (0.001)   &  (0.002)   \\
+\cmidrule(lr){1-8}
+\multicolumn{7}{l}{Panel B: OLS with Munis}\\
+\cmidrule(lr){1-8}
+New Number of Municipal Govts, P.C. (total)&   -0.114** &    0.083   &   -0.010   &    0.079   &    0.010   &   -0.040   &    0.046   \\
+                &  (0.047)   &  (0.077)   &  (0.039)   &  (0.072)   &  (0.049)   &  (0.037)   &  (0.054)   \\
+\cmidrule(lr){1-8}
+\multicolumn{7}{l}{Panel C: Two Step with Munis}\\
+\cmidrule(lr){1-8}
+New Number of Municipal Govts, P.C. (total)&   -0.493** &   -0.098   &   -0.404** &    0.244   &   -0.454** &   -0.498***&    0.032   \\
+                &  (0.198)   &  (0.333)   &  (0.156)   &  (0.246)   &  (0.213)   &  (0.131)   &  (0.168)   \\
+\midrule
+Dep. Var Mean   &    0.045   &    0.180   &   -0.377   &    0.562   &    0.318   &   -0.255   &    0.574   \\
+Observations    &      130   &      130   &      130   &      130   &      130   &      130   &      130   \\
+\cmidrule(lr){1-8}
+\multicolumn{7}{l}{Panel B: OLS with School Districts}\\
+\cmidrule(lr){1-8}
+New Ind. Sch. Dists., P.C. (total)&    0.001   &    0.006***&    0.003** &    0.002   &    0.002*  &    0.001   &    0.001   \\
+                &  (0.002)   &  (0.002)   &  (0.001)   &  (0.002)   &  (0.001)   &  (0.001)   &  (0.002)   \\
+\cmidrule(lr){1-8}
+\multicolumn{7}{l}{Panel E: Two Step with School Districts}\\
+\cmidrule(lr){1-8}
+New Ind. Sch. Dists., P.C. (total)&   -0.005** &   -0.001   &   -0.004** &    0.001   &   -0.007** &   -0.007***&   -0.001   \\
+                &  (0.003)   &  (0.005)   &  (0.002)   &  (0.005)   &  (0.003)   &  (0.002)   &  (0.003)   \\
+\midrule
+Dep. Var Mean   &    0.039   &    0.174   &   -0.390   &    0.570   &    0.313   &   -0.258   &    0.572   \\
+Observations    &      118   &      118   &      118   &      118   &      118   &      118   &      118   \\
+       \bottomrule \end{tabular}

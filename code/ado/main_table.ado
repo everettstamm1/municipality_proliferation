@@ -6,9 +6,9 @@ prog def main_table
 	foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 		local ctrls `controls' ``outcome''
 
-		su `deplab'_`outcome'_cz_pc [aw=`weight']
+		su `deplab'_`outcome'_cz_pc 
 		local dv : di %6.2f r(mean)
-		su b_`outcome'_cz1940_pc [aw=`weight']
+		su b_`outcome'_cz1940_pc 
 		local bv : di %6.2f r(mean)
 		
 		// First Stage

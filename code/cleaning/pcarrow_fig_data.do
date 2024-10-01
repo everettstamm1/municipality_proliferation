@@ -33,6 +33,7 @@ ren czone cz
 drop if cz_pop1970 ==.
 collapse (sum) cz_pop1970 cz_bpop1970 cz_wpop1970, by(cz)
 g cz_prop_white1970 = 100*(cz_wpop1970 / cz_pop1970)
+g cz_prop_black1970 = 100*(cz_bpop1970 / cz_pop1970)
 su cz_prop_white1970 ,d
 save "$INTDATA/census/cz_race_pop1970", replace
 
@@ -50,11 +51,11 @@ keep year cty_fips czone  cz_pop cz_wpop cz_apop cz_bpop
 collapse (sum) cz_pop cz_bpop cz_wpop cz_apop, by(czone year)
 g cz_prop_white = 100*(cz_wpop / cz_pop)
 g cz_prop_asian = 100*(cz_apop / cz_pop)
-
+g cz_prop_black = 100*(cz_bpop / cz_pop)
 //drop cz_pop cz_wpop cz_apop
 drop if year == 1970
 
-reshape wide cz_prop_white cz_prop_asian cz_pop cz_wpop cz_apop cz_bpop, i(czone) j(year)
+reshape wide cz_prop_black cz_prop_white cz_prop_asian cz_pop cz_wpop cz_apop cz_bpop, i(czone) j(year)
 ren czone cz
 
 save "$INTDATA/census/cz_race_pop.dta", replace

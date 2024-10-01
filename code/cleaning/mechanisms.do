@@ -116,16 +116,19 @@ ren fips_place_2002 PLACEFP
 merge 1:1 STATEFP PLACEFP using "$INTDATA/nces/place_offerings", keep(1 3) nogen
 
 // To get school  offerings (expands dataset to school district level (crdc_id))
-merge 1:m STATEFP PLACEFP using "$INTDATA/nces/offerings", keep(1 3) nogen keepusing(leaid crdc_id totenroll blenroll wtenroll wtasenroll n_ap n_ap_w75 gt de ap ncessch school_level)
-merge m:1 leaid using "$INTDATA/nces/leaid_offerings", keep(1 3) nogen 
+//merge 1:m STATEFP PLACEFP using "$INTDATA/nces/offerings", keep(1 3) nogen keepusing(leaid totenroll blenroll wtenroll wtasenroll n_ap n_ap_w75 gt de ap ncessch school_level)
+//g STATEFP_ncessch = STATEFP
+//g PLACEFP_ncessch = PLACEFP
+merge 1:m STATEFP PLACEFP using "$INTDATA/nces/leaid_offerings", nogen
+
 
 // CZ level achievement gaps
 // Own school district
 preserve
-	keep STATEFP PLACEFP leaid school_level 
+	keep STATEFP PLACEFP leaid 
 	duplicates drop // Drops repeated elementary middle
 	drop if leaid==.
-	duplicates tag leaid school_level, gen(dups)
+	duplicates tag leaid, gen(dups)
 	g exclusive_district = dups == 0
 	bys STATEFP PLACEFP : egen exclusive_district_place = max(exclusive_district)
 	keep STATEFP PLACEFP exclusive_district_place
@@ -164,7 +167,6 @@ restore
 merge m:1 leaid using `dist_max_int', keep(1 3) nogen
 
 
-merge m:1 leaid using `dist_max_int', keep(1 3) nogen
 preserve
 	keep GEOID samp_dest
 	keep if samp_dest == 1
@@ -265,101 +267,108 @@ merge m:1 cz using `dist_shared', assert(3) nogen
 bys PLACEFP STATEFP : egen avg_totenroll_place = mean(totenroll)
 
 // Fraction of white kids in 40-70
-g wtenroll_newmuni = wtenroll if samp_dest == 1
-g wtenroll_hasap = wtenroll if ap == 1
-g wtenroll_hasde = wtenroll if de == 1
-g wtenroll_hasgt = wtenroll if gt == 1
+//g wtenroll_newmuni = wtenroll if samp_dest == 1
+//g wtenroll_hasap = wtenroll if ap == 1
+//g wtenroll_hasde = wtenroll if de == 1
+//g wtenroll_hasgt = wtenroll if gt == 1
 
 
-lab var wtenroll_newmuni "White Enrollment if incorporated 1940-70"
-lab var wtenroll_hasap "White Enrollment if has AP program"
-lab var wtenroll_hasde "White Enrollment if has dual enrollment"
-lab var wtenroll_hasgt "White Enrollment if has gifted and talented"
+//lab var wtenroll_newmuni "White Enrollment if incorporated 1940-70"
+//lab var wtenroll_hasap "White Enrollment if has AP program"
+//lab var wtenroll_hasde "White Enrollment if has dual enrollment"
+//lab var wtenroll_hasgt "White Enrollment if has gifted and talented"
 
 // Segregation indices
 //drop if badmuni==1
-egen tot =rowtotal(blenroll wtenroll), m
-egen tot_a =rowtotal(blenroll wtasenroll), m
+/*
+preserve
+	drop PLACEFP STATEFP
+	ren PLACEFP_ncessch PLACEFP
+	ren STATEFP_ncessch STATEFP
+	egen tot=rowtotal(blenroll wtenroll), m
+	egen tot_a =rowtotal(blenroll wtasenroll), m
 
-foreach t in bl wt wtas tot{
-	bys cz : egen `t'enroll_cz = total(`t'enroll)
-	bys STATEFP PLACEFP : egen `t'enroll_place = total(`t'enroll)
-	
-}
-
-bys cz : egen tot_cz = total(tot)
-bys STATEFP PLACEFP : egen tot_place = total(tot)
-
-bys cz : egen tot_a_cz = total(tot_a)
-bys STATEFP PLACEFP : egen tot_a_place = total(tot_a)
-
-g exp1_cz = blenroll / blenroll_cz
-g exp1_place = blenroll / blenroll_place
-
-g exp2 = blenroll / tot
-g exp2_a = blenroll / tot_a
-g exp2_b = blenroll / totenroll
-
-g exp3_cz = exp1_cz * exp2
-g exp3_a_cz = exp1_cz * exp2_a
-g exp3_b_cz = exp1_cz * exp2_b
-
-g exp3_place = exp1_place * exp2
-g exp3_a_place = exp1_place * exp2_a
-g exp3_b_place = exp1_place * exp2_b
-
-bys cz : egen iso_cz = total(exp3_cz)
-bys STATEFP PLACEFP : egen iso_place = total(exp3_place)
-
-bys cz : egen iso_a_cz = total(exp3_a_cz)
-bys STATEFP PLACEFP : egen iso_a_place = total(exp3_a_place)
-
-bys cz : egen iso_b_cz = total(exp3_b_cz)
-bys STATEFP PLACEFP : egen iso_b_place = total(exp3_b_place)
-
-g P_blwt_cz = blenroll_cz / (blenroll_cz + wtenroll_cz)
-g P_blwtas_cz = blenroll_cz / (blenroll_cz + wtasenroll_cz)
-g P_bl_cz = blenroll_cz / (totenroll_cz)
-
-g P_blwt_place = blenroll_place / (blenroll_place + wtenroll_place)
-g P_blwtas_place = blenroll_place / (blenroll_place + wtenroll_place)
-g P_bl_place = blenroll_place / (totenroll_place)
-
-g vr_blwt_cz = (iso_cz - P_blwt_cz)/(1 - P_blwt_cz)
-g vr_blwtas_cz = (iso_a_cz - P_blwtas_cz)/(1 - P_blwtas_cz)
-g vr_bl_cz = (iso_b_cz - P_bl_cz)/(1 - P_bl_cz)
-
-g vr_blwt_place = (iso_place - P_blwt_place)/(1 - P_blwt_place)
-g vr_blwtas_place = (iso_a_place - P_blwtas_place)/(1 - P_blwtas_place)
-g vr_bl_place = (iso_b_place - P_bl_place)/(1 - P_bl_place)
-
-
-foreach level in cz place{
-	local levelvars = cond("`level'"=="cz", "cz", "STATEFP PLACEFP") 
-	foreach y in newmuni hasap hasde hasgt{
-		bys `levelvars' : egen wtenroll_`y'_`level' = total(100*wtenroll_`y'/wtenroll_`level')
+	foreach t in bl wt wtas tot{
+		bys cz : egen `t'enroll_cz = total(`t'enroll)
+		bys STATEFP PLACEFP : egen `t'enroll_place = total(`t'enroll)
 		
-		local lb : variable label wtenroll_`y'
-		lab var wtenroll_`y'_`level' "`lb', `level' percentage"
-
 	}
-}
 
-// Dissimilarity Index
-g num_blwt = tot * abs(exp2 - P_blwt_cz)
-g denom_blwt = 2 *(blenroll_cz + wtenroll_cz) *P_blwt_cz*(1-P_blwt_cz)
-bys cz : egen diss_blwt_cz =  total(0.5 *num_blwt/denom_blwt)
+	bys cz : egen tot_cz = total(tot)
+	bys STATEFP PLACEFP : egen tot_place = total(tot)
 
-g num_blwtas = (tot_a) * abs(exp2_a - P_blwtas_cz)
-g denom_blwtas = 2 *(blenroll_cz + wtasenroll_cz) *P_blwtas_cz*(1-P_blwtas_cz)
-bys cz : egen diss_blwtas_cz =  total(0.5 *num_blwtas/denom_blwtas)
+	bys cz : egen tot_a_cz = total(tot_a)
+	bys STATEFP PLACEFP : egen tot_a_place = total(tot_a)
 
-g num_bl = totenroll * abs(exp2_b - P_bl_cz)
-g denom_bl = 2 *totenroll_cz *P_bl_cz*(1-P_bl_cz)
-bys cz : egen diss_bl_cz =  total(0.5 *num_bl/denom_bl)
+	g exp1_cz = blenroll / blenroll_cz
+	g exp1_place = blenroll / blenroll_place
 
-drop exp1* exp2* exp3* iso_* P_* tot_*  num_* denom_*
+	g exp2 = blenroll / tot
+	g exp2_a = blenroll / tot_a
+	g exp2_b = blenroll / totenroll
 
+	g exp3_cz = exp1_cz * exp2
+	g exp3_a_cz = exp1_cz * exp2_a
+	g exp3_b_cz = exp1_cz * exp2_b
+
+	g exp3_place = exp1_place * exp2
+	g exp3_a_place = exp1_place * exp2_a
+	g exp3_b_place = exp1_place * exp2_b
+
+	bys cz : egen iso_cz = total(exp3_cz)
+	bys STATEFP PLACEFP : egen iso_place = total(exp3_place)
+
+	bys cz : egen iso_a_cz = total(exp3_a_cz)
+	bys STATEFP PLACEFP : egen iso_a_place = total(exp3_a_place)
+
+	bys cz : egen iso_b_cz = total(exp3_b_cz)
+	bys STATEFP PLACEFP : egen iso_b_place = total(exp3_b_place)
+
+	g P_blwt_cz = blenroll_cz / (blenroll_cz + wtenroll_cz)
+	g P_blwtas_cz = blenroll_cz / (blenroll_cz + wtasenroll_cz)
+	g P_bl_cz = blenroll_cz / (totenroll_cz)
+
+	g P_blwt_place = blenroll_place / (blenroll_place + wtenroll_place)
+	g P_blwtas_place = blenroll_place / (blenroll_place + wtenroll_place)
+	g P_bl_place = blenroll_place / (totenroll_place)
+
+	g vr_blwt_cz = (iso_cz - P_blwt_cz)/(1 - P_blwt_cz)
+	g vr_blwtas_cz = (iso_a_cz - P_blwtas_cz)/(1 - P_blwtas_cz)
+	g vr_bl_cz = (iso_b_cz - P_bl_cz)/(1 - P_bl_cz)
+
+	g vr_blwt_place = (iso_place - P_blwt_place)/(1 - P_blwt_place)
+	g vr_blwtas_place = (iso_a_place - P_blwtas_place)/(1 - P_blwtas_place)
+	g vr_bl_place = (iso_b_place - P_bl_place)/(1 - P_bl_place)
+
+
+	foreach level in cz place{
+		local levelvars = cond("`level'"=="cz", "cz", "STATEFP PLACEFP") 
+		foreach y in newmuni hasap hasde hasgt{
+			bys `levelvars' : egen wtenroll_`y'_`level' = total(100*wtenroll_`y'/wtenroll_`level')
+			
+			local lb : variable label wtenroll_`y'
+			lab var wtenroll_`y'_`level' "`lb', `level' percentage"
+
+		}
+	}
+
+	// Dissimilarity Index
+	g num_blwt = tot * abs(exp2 - P_blwt_cz)
+	g denom_blwt = 2 *(blenroll_cz + wtenroll_cz) *P_blwt_cz*(1-P_blwt_cz)
+	bys cz : egen diss_blwt_cz =  total(0.5 *num_blwt/denom_blwt)
+
+	g num_blwtas = (tot_a) * abs(exp2_a - P_blwtas_cz)
+	g denom_blwtas = 2 *(blenroll_cz + wtasenroll_cz) *P_blwtas_cz*(1-P_blwtas_cz)
+	bys cz : egen diss_blwtas_cz =  total(0.5 *num_blwtas/denom_blwtas)
+
+	g num_bl = totenroll * abs(exp2_b - P_bl_cz)
+	g denom_bl = 2 *totenroll_cz *P_bl_cz*(1-P_bl_cz)
+	bys cz : egen diss_bl_cz =  total(0.5 *num_bl/denom_bl)
+
+	drop exp1* exp2* exp3* iso_* P_* tot_*  num_* denom_*
+	
+restore
+*/
 // Interactions
 
 foreach var of varlist v2_sumshares_urban coastal transpo_cost_1920 reg2 reg3 reg4{
@@ -368,21 +377,21 @@ foreach var of varlist v2_sumshares_urban coastal transpo_cost_1920 reg2 reg3 re
 	lab var `var'_samp_dest "`lb' X Incorporated 1940-70"
 }
 
-
+/*
 // AP Gini
 preserve
 	keep if school_level == 3
-	keep cz crdc_id totenroll totenroll_cz n_ap 
-	drop if mi(crdc_id) | mi(totenroll) | mi(n_ap) | n_ap == 0
+	keep cz ncessch totenroll totenroll_cz n_ap 
+	drop if mi(ncessch) | mi(totenroll) | mi(n_ap) | n_ap == 0
 
 	expand totenroll
 	
 	ren n_ap y_i
-	bys cz (y_i crdc_id) : g i = _n
-	bys cz (y_i crdc_id) : g n = _N
+	bys cz (y_i ncessch) : g i = _n
+	bys cz (y_i ncessch) : g n = _N
 	
-	bys cz (y_i crdc_id ) : egen num = total( (n + 1 - i) * y_i ) 
-	bys cz (y_i crdc_id) : egen denom = total( y_i )
+	bys cz (y_i ncessch ) : egen num = total( (n + 1 - i) * y_i ) 
+	bys cz (y_i ncessch) : egen denom = total( y_i )
 	g innerterm = num / denom
 	g ap_gini_cz = (1/n)*(n + 1 - 2 * innerterm)
 	keep ap_gini_cz cz
@@ -393,7 +402,7 @@ restore
 
 merge m:1 cz using `ap_gini_cz', assert(3) nogen
 
-
+*/
 
 merge m:1 STATEFP PLACEFP using "$INTDATA/other/alltransit_data", keep(1 3) nogen
 
@@ -409,7 +418,7 @@ preserve
 	save `avg_alltransit_cz'
 restore 
 
-merge m:1 cz using `avg_alltransit_cz', assert(3) nogen
+merge m:1 cz using `avg_alltransit_cz', keep(1 3) nogen
 
 // QGIS OUTPUT
 
@@ -425,14 +434,14 @@ merge m:1 STATEFP PLACEFP using "$INTDATA/other/center_edge", keep(1 3) nogen
 
 
 // Number of schools
-bys STATEFP PLACEFP : egen n_schools = nvals(crdc_id) if crdc_id != ""
-replace n_schools = 0 if n_schools == .
+//bys STATEFP PLACEFP : egen n_schools = nvals(ncessch) if ncessch != ""
+//replace n_schools = 0 if n_schools == .
 
 
 // Race popc
 ren STATEFP statefips
 ren PLACEFP placefips
-merge m:1 statefips placefips using "$CLEANDATA/place_race_pop.dta", keep(3) nogen
+merge m:1 statefips placefips using "$CLEANDATA/place_race_pop.dta", keep(1 3) nogen
 ren statefips STATEFP
 ren placefips PLACEFP
 
@@ -441,8 +450,8 @@ g prop_white2010 = place_wpop2010 / place_pop2010
 g prop_black1970 = place_bpop1970 / place_pop1970
 g prop_black2010 = place_bpop2010 / place_pop2010
 
-merge m:1 cz using "$INTDATA/census/cz_race_pop1970", keep(1 3) nogen keepusing(cz_prop_white1970)
-merge m:1 cz using "$INTDATA/census/cz_race_pop", keep(1 3) nogen keepusing(cz_prop_white2010)
+merge m:1 cz using "$INTDATA/census/cz_race_pop1970", keep(1 3) nogen keepusing(cz_prop_white1970 )
+merge m:1 cz using "$INTDATA/census/cz_race_pop", keep(1 3) nogen keepusing(cz_prop_white2010 cz_prop_black2010)
 
 preserve
 	use "$INTDATA/cgoodman/cgoodman_place_county_geog.dta", clear
@@ -455,7 +464,7 @@ restore
 
 merge m:1 STATEFP PLACEFP using `place_land', keep(1 3) nogen
 
-merge m:1 cz using "$INTDATA/cog/special_districts_employment", keep(3) nogen
+//merge m:1 cz using "$INTDATA/cog/special_districts_employment", keep(3) nogen
 
 merge m:1 STATEFP PLACEFP using "$INTDATA/census/2010_hh_incomes", keep(1 3) nogen
 merge m:1 STATEFP PLACEFP using "$INTDATA/census/1970_hh_incomes_hv", keep(1 3) nogen
@@ -466,7 +475,7 @@ bys cz (mean_hh_inc_cz) : replace mean_hh_inc_cz = mean_hh_inc_cz[1] if mi(mean_
 bys cz (agg_fam_inc_cz1970) : replace agg_fam_inc_cz1970 = agg_fam_inc_cz1970[1] if mi(agg_fam_inc_cz1970)
 bys cz (agg_house_value_cz1970) : replace agg_house_value_cz1970 = agg_house_value_cz1970[1] if mi(agg_house_value_cz1970)
 
-// Labels
+/* Labels
 lab var st_ratio_leaid "Student Teacher Ratio"
 lab var n_ap "Number of AP Classes, NCES"
 lab var n_ap_w75 "Number of AP Classes, District of 75pc white, NCES"
@@ -481,7 +490,7 @@ lab var ap_mean "Prop of schools with AP classes, place level, NCES"
 lab var de_mean "Prop of schools with dual enrollment, place level, NCES"
 lab var n_ap_mean "Mean number of AP classes, place level, NCES"
 lab var n_ap_var "Variance of number of AP classes, place level, NCES"
-
+*/
 lab var weight_full "WRLURI Weight"
 lab var weight_metro "WRLURI Metro weight"
 
@@ -503,7 +512,7 @@ lab var pct_rev_debt "Outstanding debt as a percentage of revenues"
 
 lab var touching "Municipality Touches Principle City"
 
-lab var n_schools "Number of Schools in Muni"
+//lab var n_schools "Number of Schools in Muni"
 
 lab var len_edge_edge "Length to center city (edge-edge)"
 lab var len_center_edge "Length to center city (center-edge)"

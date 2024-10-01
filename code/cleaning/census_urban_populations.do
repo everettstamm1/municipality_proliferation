@@ -259,31 +259,24 @@ save "$INTDATA/census/urb_pop_2010.dta", replace
 // collapse (sum) pop2010 popc2010, by(cz)
 
 // 2010 max city pop
-use "$RAWDATA/census/usa_00054.dta", clear
-drop if city==0
-bys city : egen maxcitypop2010 = sum(perwt)
 
-collapse (max) maxcitypop2010 , by(stateicp countyicp year)
+import delimited "$RAWDATA/census/nhgis0038_csv/nhgis0038_ds172_2010_place.csv", clear
+ren placea PLACEFP
+ren statea STATEFP
+merge 1:1 STATEFP PLACEFP using "$XWALKS/cz_place_xwalk", keep(1 3) nogen
+// Some spot fixes
+replace cz = 18000 if gisjoin == "G36074183"
+replace cz = 12701 if gisjoin == "G09074260"
+replace cz = 12701 if gisjoin == "G09077270"
+replace cz = 16400 if gisjoin == "G39007454"
+replace cz = 11302 if gisjoin == "G24070530"
 
-ren stateicp icpsrst
-ren countyicp icpsrcty
-replace year = year - 10
-merge 1:m year icpsrst icpsrcty using "$XWALKS/consistent_1990", keepusing(weight nhgisst_1990 nhgiscty_1990) keep(3) nogen
-replace year = year+10
+merge m:1 cz using "$INTDATA/dcourt/original_130_czs", keep(3) nogen
 
-	
-ren nhgisst_1990 statefip
-ren nhgiscty_1990 countyfip
-
-g cty_fips = statefip*100+countyfip/10
-
-merge m:1 cty_fips using "$XWALKS/cw_cty_czone", keep(1 3) nogen
-ren cty_fips fips
-ren czone cz
-ren year decade
-
-collapse (max) maxcitypop2010, by(cz)
-
-
+bys cz : egen maxcitypop2010 = max(h7v001)
+keep if maxcitypop2010 == h7v001
+ren name maxcity_name
+keep cz maxcity_name PLACEFP STATEFP maxcitypop2010
 save "$INTDATA/census/maxcitypop_2010.dta", replace
+
 

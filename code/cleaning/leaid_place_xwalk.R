@@ -22,7 +22,7 @@ for (pkg in packages) {
 }
 
 # Get paths
-paths <- read.csv("../../paths.csv")
+paths <- read.csv("paths.csv")
 RAWDATA <- paths[paths$global == "RAWDATA",2]
 INTDATA <- paths[paths$global == "INTDATA",2]
 CLEANDATA <- paths[paths$global == "CLEANDATA",2]
@@ -31,6 +31,7 @@ XWALKS <- paths[paths$global == "XWALKS",2]
 
 
 #### Geographies ----
+districts <- st_read(paste0(RAWDATA,"/nces/EDGE_SCHOOLDISTRICT_TL23_SY2233/EDGE_SCHOOLDISTRICT_TL23_SY2233/EDGE_SCHOOLDISTRICT_TL_23_SY2223.shp")) 
 
 munis <- st_read(paste0(CLEANDATA,"/other/municipal_shapefile/municipal_shapefile_v2.shp")) 
 crs <- st_crs(munis) # NAD 83

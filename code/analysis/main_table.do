@@ -78,6 +78,9 @@ foreach controls in b extra w_b w_extra{
 	}
 }
 	
+	
+main_table_long, endog(GM_raw_pp) exog(`inst') controls(`b_controls' `extra_controls') weight(popc1940) path("$TABS/final/main_effect_long.tex")
+	
 // Core Result
 main_table, endog(GM_raw_pp) exog(`inst') controls(`b_controls') weight(popc1940) path("$TABS/final/main_effect.tex") deplab(n)
 
@@ -117,8 +120,6 @@ main_table, endog(GM_raw_pp) exog(`inst') controls(`b_controls') weight(popc1940
 main_table, endog(GM_raw_pp) exog(`inst') controls(`b_controls' `extra_controls') weight(popc1940) path("$TABS/final/main_effect_quad_new_ctrl.tex") deplab(n) endog2(GM_raw_pp_2) exog2(`inst'_2)
 
 // Above median enclosedness split
-
-
 local b_controls_X `b_controls'
 local extra_controls_X `extra_controls'
 local w_b_controls_X `w_b_controls'
