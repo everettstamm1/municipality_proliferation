@@ -114,3 +114,25 @@ file write myfile "\end{tabular}" _n
 // Step 6: Close the file
 file close myfile
 
+// Total pop
+use "$RAWDATA/census/usa_00055.dta", clear
+
+drop if stateicp == 41 | ///
+		stateicp == 42 | ///
+		stateicp == 43 | ///
+		stateicp == 44 | ///
+		stateicp == 51 | ///
+		stateicp == 45 | ///
+		stateicp == 46 | ///
+		stateicp == 47 | ///
+		stateicp == 53 | ///
+		stateicp == 48 | ///
+		stateicp == 54 | ///
+		stateicp == 49 | ///
+		stateicp == 40 | ///
+		stateicp == 58 | ///
+		stateicp == 81 | ///
+		stateicp == 82 
+		
+		
+94.825.128 after that

@@ -22,7 +22,7 @@ foreach l of local levels{
 						(scatter order namepos if above_x_med==`l', ms(none) mlabel(cz_name) mlabpos(9) mlabsize(2) mlabcol("`rgb'"))
 }
 local colpos = `i'*3+1
- `base', yla(none) yti("") legend(cols(1) order(1 "1940-1970 Newly Incorporated Municipalities"  2 "CZ Total" 4 "Below Median Values of Instrument" 5 "Above Median Values of Instrument")) ///
+ `base', yla(none) yti("") legend(cols(1) order(1 "1940-1970 Newly Incorporated Municipalities"  2 "CZ Total" 4 "Below Median Values of GM" 5 "Above Median Values of GM") position(7) ring(0) symxsize(2.5) size(2.8)) ///
 		 xtitle("Proportion of Population White, 1970") ysize(9) xscale(range(65 100)) xla(65(5)100) graphregion(color(white))
 graph export "$FIGS/pcarrow_figure_GM.pdf", replace as(pdf)
 

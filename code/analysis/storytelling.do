@@ -321,7 +321,7 @@ esttab using "$TABS/implications/achievement_gaps.tex", replace nolabel title("S
 	// New achievement
 	use "$CLEANDATA/cz_pooled", clear
 	
-	merge 1:1 cz using "$INTDATA/nces/cz_acheivement", keep(3) nogen
+	merge 1:1 cz using "$INTDATA/nces/cz_achievement_segregation", keep(3) nogen
 	lab var n_schdist_ind_cz_pc "New Ind. Sch. Dists., P.C. (total)"
 
 	ivreg2 n_gen_muni_cz_pc (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 v2_sumshares_urban coastal transpo_cost_1920 [aw = popc1940], r

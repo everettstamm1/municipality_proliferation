@@ -97,11 +97,11 @@ foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 
 	// Getting full sample values
 	// RF
-	reg n_`outcome'_cz_pc GM_hat_raw `b_controls'  [aw=popc1940], r
+	reg n_`outcome'_cz_pc GM_hat_raw `b_controls' `extra_controls' [aw=popc1940], r
 	local b_rf = _b[GM_hat_raw]
 	local se_rf = _se[GM_hat_raw]
 	
-	ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw) `b_controls'  [aw=popc1940], r
+	ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_hat_raw) `b_controls' `extra_controls' [aw=popc1940], r
 	local b_iv = _b[GM_raw_pp]
 	local se_iv = _se[GM_raw_pp]
 	levelsof cz, local(czs)

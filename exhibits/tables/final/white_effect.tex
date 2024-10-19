@@ -1,30 +1,30 @@
- \begin{tabular}{l*{8}{c}} \toprule
+ \begin{tabularx}{.9\hsize}{l*{6}{>{\centering\arraybackslash}X}} \toprule
 &\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}
 &\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}
 &\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\
 \cmidrule(lr){1-7}
 \multicolumn{6}{l}{Panel A: First Stage}\\
 \cmidrule(lr){1-7}
-GM\_8\_hat\_raw    &   -0.472***&   -0.472***&   -0.472***&   -0.472***&   -0.472***&   -0.472***\\
-                &  (0.171)   &  (0.171)   &  (0.171)   &  (0.171)   &  (0.171)   &  (0.171)   \\
+$\widehat{WM}$  &    0.542** &    0.542** &    0.542** &    0.542** &    0.542** &    0.542** \\
+                &  (0.228)   &  (0.228)   &  (0.228)   &  (0.228)   &  (0.228)   &  (0.228)   \\
 \cmidrule(lr){1-7}
 \multicolumn{6}{l}{Panel B: OLS}\\
 \cmidrule(lr){1-7}
-WM\_raw\_pp       &   -0.004*  &   -0.007***&   -0.423***&   -0.017***&    0.028***&    0.882***\\
-                &  (0.002)   &  (0.002)   &  (0.077)   &  (0.004)   &  (0.006)   &  (0.107)   \\
+WM              &   -0.004*  &   -0.007***&   -0.431***&   -0.017***&    0.028***&    0.872***\\
+                &  (0.002)   &  (0.002)   &  (0.078)   &  (0.004)   &  (0.007)   &  (0.112)   \\
 \cmidrule(lr){1-7}
 \multicolumn{6}{l}{Panel C: Reduced Form}\\
 \cmidrule(lr){1-7}
-GM\_8\_hat\_raw    &    0.001   &   -0.002   &    0.077   &   -0.001   &    0.016   &    0.373*  \\
-                &  (0.005)   &  (0.006)   &  (0.193)   &  (0.007)   &  (0.010)   &  (0.199)   \\
+$\widehat{WM}$  &   -0.002   &   -0.006   &    0.114   &   -0.003   &    0.017   &    0.525*  \\
+                &  (0.005)   &  (0.007)   &  (0.200)   &  (0.010)   &  (0.012)   &  (0.315)   \\
 \cmidrule(lr){1-7}
 \multicolumn{6}{l}{Panel D: 2SLS}\\
 \cmidrule(lr){1-7}
-WM\_raw\_pp       &    0.001   &   -0.004   &    0.474   &   -0.002   &    0.032   &    0.758***\\
-                &  (0.010)   &  (0.012)   &  (1.742)   &  (0.013)   &  (0.020)   &  (0.284)   \\
+WM              &   -0.004   &   -0.010   &    0.642   &   -0.006   &    0.032   &    0.968** \\
+                &  (0.009)   &  (0.012)   &  (1.914)   &  (0.016)   &  (0.022)   &  (0.389)   \\
 \midrule
-First Stage F-Stat&     7.62   &     7.62   &     7.62   &     7.62   &     7.62   &     7.62   \\
+First Stage F-Stat&     5.66   &     5.66   &     5.66   &     5.66   &     5.66   &     5.66   \\
 Dep. Var. Mean  &    -0.26   &    -0.33   &   -12.95   &    -0.57   &     0.64   &    -3.37   \\
 1940 Dep. Var. Mean&     1.49   &     1.61   &    14.09   &     2.29   &     0.89   &    32.86   \\
 Observations    &      130   &      130   &      118   &      130   &      130   &      130   \\
- \bottomrule \end{tabular}
+ \bottomrule \end{tabularx}

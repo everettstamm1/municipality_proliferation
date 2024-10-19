@@ -119,7 +119,7 @@ preserve
 			(subcat == "race" & subgroup == "wbg") | ///
 			(subcat == "ecd" & subgroup == "ecd") | ///
 			(subcat == "ecd" & subgroup == "nec") | ///
-			(subcat == "ecd" & subgroup == "neg") // neg the gap nec - ecd (not disadvantaged - advantaged)
+			(subcat == "ecd" & subgroup == "neg") // neg the gap nec - ecd (not disadvantaged - disadvantaged)
 	keep sedalea subgroup cs_mn_avg_ol cs_mn_avg_eb sedaleaname
 	replace subgroup = "_"+subgroup
 	reshape wide cs_mn_avg_ol cs_mn_avg_eb, i(sedalea) j(subgroup) string
@@ -138,6 +138,7 @@ foreach var of varlist rev_state_outlay_capital_debt outlay_capital_total debt_i
 	g pe_`var' = `var'/ totenroll
 }
 */
+
 merge 1:m leaid using "$XWALKS/leaid_county_xwalk", keep(1 3) nogen
 
 forv step=0/30{
@@ -185,12 +186,13 @@ makeVR , gen(stu_vr_bl_cz) mingroup(blenroll_leaid) majgroup(totenroll_leaid) id
 makeVR , gen(stu_vr_blwt_cz) mingroup(blenroll_leaid) majgroup(wtenroll_leaid) id(leaid) agg_id(cz)
 
 makeRCO, gen(stu_RCO_blwt_cz) mingroup(blenroll_leaid) majgroup(wtenroll_leaid) id(leaid) area(area) agg_id(cz) 
-
 makeAtkinson, gen(stu_A_05_blwt_cz) mingroup(blenroll_leaid) majgroup(wtenroll_leaid) id(leaid) agg_id(cz) b(0.5)
 
 makeAtkinson, gen(stu_A_01_blwt_cz) mingroup(blenroll_leaid) majgroup(wtenroll_leaid) id(leaid) agg_id(cz) b(0.1)
 
 makeAtkinson, gen(stu_A_09_blwt_cz) mingroup(blenroll_leaid) majgroup(wtenroll_leaid) id(leaid) agg_id(cz) b(0.9)
+
+
 
 
 ren leaid GEOID
@@ -199,19 +201,79 @@ makeSP, gen(stu_SP_touch_blwt_cz)  mingroup(blenroll_leaid) majgroup(wtenroll_le
 makeSP, gen(stu_SP_nexpd_blwt_cz)  mingroup(blenroll_leaid) majgroup(wtenroll_leaid) agg_id(cz) distances("$CLEANDATA/other/touching_dist_schools.dta") id(GEOID) nexpd
 ren GEOID leaid
 ren  cz cz_leaid
+// SD, interquartile range, enrollment of top school districts, diss for achievement, GINI for 
 
+bys cz : egen achievement_var_cz = var(cs_mn_avg_ol_all)
+bys cz: egen achievement_iqr = iqr(cs_mn_avg_ol_all)
 
+bys cz: egen achievement_p75 = pctile(cs_mn_avg_ol_all), p(75)
+bys cz: egen achievement_p90 = pctile(cs_mn_avg_ol_all), p(90)
+bys cz: egen achievement_p95 = pctile(cs_mn_avg_ol_all), p(95)
+bys cz: egen achievement_top = max(cs_mn_avg_ol_all)
+
+g temp = totenroll_leaid if cs_mn_avg_ol_all >= achievement_p75
+bys cz: egen totenroll_p75_cz = mean(temp)
+drop temp
+g temp = totenroll_leaid if cs_mn_avg_ol_all >= achievement_p90
+bys cz: egen totenroll_p90_cz = mean(temp)
+drop temp
+
+makeDissimilarity , gen(achievement_diss_blwt_cz) mingroup(cs_mn_avg_ol_blk) majgroup(cs_mn_avg_ol_wht) id(leaid) agg_id(cz)
+makeVR , gen(achievement_VR_blwt_cz) mingroup(cs_mn_avg_ol_blk) majgroup(cs_mn_avg_ol_wht) id(leaid) agg_id(cz)
+
+makeDissimilarity , gen(achievement_diss_bl_cz) mingroup(cs_mn_avg_ol_blk) majgroup(cs_mn_avg_ol_all) id(leaid) agg_id(cz) onegroup
+
+//g `num' = leaid_enrollment* abs(leaid_achievement - cz_achievement)
+//g `denom' = 2 * cz_enrollment * cz_achievement * (1 - cz_achievement)
 save "$INTDATA/nces/leaid_offerings", replace
 
 preserve 
-
 	collapse (mean) cs_mn_* [aw = totenroll_leaid], by(cz)
 	tempfile cz_acheivement
 	save `cz_acheivement'
 restore
 
-keep cz stu_*
+
+preserve 
+	collapse (mean) cs_mn_avg_ol_all [aw = blenroll_leaid], by(cz)
+	ren cs_mn_avg_ol_all black_exposure
+	tempfile black_achievement
+	save `black_achievement'
+restore
+
+preserve 
+	collapse (mean) cs_mn_avg_ol_all [aw = wtenroll_leaid], by(cz)
+	ren cs_mn_avg_ol_all white_exposure
+	tempfile white_achievement
+	save `white_achievement'
+restore
+
+
+preserve 
+	collapse (mean) cs_mn_avg_ol_blk [aw = blenroll_leaid], by(cz)
+	ren cs_mn_avg_ol_blk bblack_exposure
+	tempfile bblack_achievement
+	save `bblack_achievement'
+restore
+
+preserve 
+	collapse (mean) cs_mn_avg_ol_wht [aw = wtenroll_leaid], by(cz)
+	ren cs_mn_avg_ol_wht wwhite_exposure
+	tempfile wwhite_achievement
+	save `wwhite_achievement'
+restore
+
+drop if stu_RCO_blwt_cz == .
+keep cz stu_* achievement_diss_blwt_cz achievement_VR_blwt_cz totenroll_p90_cz totenroll_p75_cz achievement_iqr achievement_var_cz achievement_diss_bl_cz  
 duplicates drop
+
 merge 1:1 cz using `cz_acheivement', keep(1 3) nogen
+merge 1:1 cz using `white_achievement', keep(1 3) nogen
+merge 1:1 cz using `black_achievement', keep(1 3) nogen
+merge 1:1 cz using `wwhite_achievement', keep(1 3) nogen
+merge 1:1 cz using `bblack_achievement', keep(1 3) nogen
+
+g race_exp = white_exposure - black_exposure
+g race_self_exp = wwhite_exposure - bblack_exposure
 ren cz_leaid cz
 save "$INTDATA/nces/cz_achievement_segregation", replace

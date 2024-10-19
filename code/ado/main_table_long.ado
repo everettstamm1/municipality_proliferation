@@ -69,7 +69,7 @@ prog def main_table_long
 				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\" ///
 				"\cmidrule(lr){1-6}" ///
 				"\multicolumn{5}{l}{Panel A: First Stage}\\" "\cmidrule(lr){1-6}" ) ///
-		prehead( \begin{tabular}{l*{5}{c}} \toprule \setlength{\tabcolsep}{15pt}) ///
+		prehead( \begin{tabularx}{\textwidth}{l*{5}{>{\centering\arraybackslash}X}} \toprule \setlength{\tabcolsep}{15pt}) ///
 	 keep(`exog') 
 
 	// Panel B: OLS
@@ -112,7 +112,7 @@ prog def main_table_long
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(`endog' `endog2') ///
-		postfoot(	\bottomrule \end{tabular}) ///
+		postfoot(	\bottomrule \end{tabularx}) ///
 		stats(dep_var10 b_var Fs N, labels("1940-2010 Avg." "1940 Avg." "First State F-Stat" "Observations") fmt(2 2 2 0)) substitute("\midrule" "\cmidrule(lr){1-6}")
 
 	eststo clear

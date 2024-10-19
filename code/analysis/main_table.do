@@ -36,13 +36,20 @@ use "$CLEANDATA/cz_pooled", clear
 
 keep if dcourt == 1
 lab var `inst' "$\widehat{GM}$"
-lab var GM_raw_pp "GM"
+lab var GM_hat "Percentile $\widehat{GM}$"
+lab var GM "Percentile GM"
 
+lab var GM_raw_pp "GM"
+lab var WM_raw_pp "WM"
+lab var GM_8_hat_raw "$\widehat{WM}$"
 qui su GM_raw_pp, d
 g GM_raw_pp_recentered = GM_raw_pp - `r(mean)'
 
 g GM_raw_pp_2 = GM_raw_pp^2
 g GM_hat_raw_2 = GM_hat_raw^2
+lab var GM_raw_pp_2 "$\text{GM}^2$"
+lab var GM_hat_raw_2 "$\widehat{GM}^2$"
+
 qui su GM_hat_raw_pp, d
 g GM_hat_raw_pp_recentered = GM_hat_raw_pp - `r(mean)'
 lab var GM_hat_raw_pp_recentered "$\widehat{GM}$, recentered"
@@ -78,9 +85,12 @@ foreach controls in b extra w_b w_extra{
 	}
 }
 	
-	
+// New 1st table
 main_table_long, endog(GM_raw_pp) exog(`inst') controls(`b_controls' `extra_controls') weight(popc1940) path("$TABS/final/main_effect_long.tex")
 	
+// Townships table
+main_table_towns, endog(GM_raw_pp) exog(`inst') controls(`b_controls' `extra_controls') weight(popc1940) path("$TABS/final/main_effect_towns.tex") deplab(n)
+
 // Core Result
 main_table, endog(GM_raw_pp) exog(`inst') controls(`b_controls') weight(popc1940) path("$TABS/final/main_effect.tex") deplab(n)
 
@@ -109,9 +119,9 @@ main_table, endog(GM) exog(GM_hat) controls(`b_controls' `extra_controls') weigh
 
 
 // White migration
-main_table, endog(WM_raw_pp) exog(`winst') controls(`b_controls') weight(popc1940) path("$TABS/final/white_effect.tex") deplab(n)
+main_table, endog(WM_raw_pp) exog(`winst') controls(`w_b_controls') weight(popc1940) path("$TABS/final/white_effect.tex") deplab(n)
 
-main_table, endog(WM_raw_pp) exog(`winst') controls(`b_controls' `extra_controls') weight(popc1940) path("$TABS/final/white_effect_new_ctrl.tex") deplab(n)
+main_table, endog(WM_raw_pp) exog(`winst') controls(`w_b_controls' `w_extra_controls') weight(popc1940) path("$TABS/final/white_effect_new_ctrl.tex") deplab(n)
 	
 	
 // Quadratic Control

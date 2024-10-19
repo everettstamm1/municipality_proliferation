@@ -11,7 +11,8 @@
 \usepackage{threeparttable}
 \usepackage{algorithmic}
 \usepackage[margin=0.25in]{geometry}
-
+\usepackage{xtab}
+\usepackage{tabularx}
 
 \title{Full sample storytelling}
 
@@ -30,6 +31,7 @@
 \end{figure}
 \clearpage
 \begin{landscape}
+\
 \clearpage
 \input{tables/implications/richer_whiter.tex}
 \clearpage
@@ -75,6 +77,146 @@
 
 \input{tables/implications/student_segregation_table.tex}
 \clearpage
+
+\clearpage
+\input{tables/final/main_effect_eurmig_new_ctrl.tex}
+\clearpage
+\input{tables/final/main_effect_quad_new_ctrl.tex}
+\clearpage
+\input{tables/final/main_effect_pctile_new_ctrl.tex}
+\clearpage
+\input{tables/final/main_effect.tex}
+\clearpage
+\input{tables/final/main_effect_1950_1970_new_ctrl.tex}
+\clearpage
+\input{tables/balancetables/pretrends.tex}
+
+
+
+\begin{figure*}[htbp]
+    \centering
+    \caption{Overidentification IV Tests, Balanced Controls}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/D16_alt_inst_pooled_cgoodman_new_ctrls.pdf}
+        \label{fig:sub1}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/D16_alt_inst_pooled_gen_muni_new_ctrls.pdf}
+        \label{fig:sub2}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/D16_alt_inst_pooled_schdist_ind_new_ctrls.pdf}
+        \label{fig:sub3}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/D16_alt_inst_pooled_gen_town_new_ctrls.pdf}
+        \label{fig:sub4}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/D16_alt_inst_pooled_spdist_new_ctrls.pdf}
+        \label{fig:sub5}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/D16_alt_inst_pooled_totfrac_new_ctrls.pdf}
+        \label{fig:sub6}
+    \end{subfigure}
+    \label{fig:alt_inst}
+    \caption*{\scriptsize \emph{Notes:} Point estimates come from our baseline instrument and three alternative instruments, where all specifications include census region fixed effects and CZ-level controls for the sum of shares, coastal, and 1920 transportation cost in 1920, and are weighted by 1940 CZ urban population. Robust standard errors generate 95\% confidence intervals.} 
+\end{figure*}
+
+\clearpage
+
+
+\begin{figure*}[htbp]
+    \centering
+    \caption{Placebo Tests, Balanced Controls}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/D17_placebo_cgoodman_new_ctrls.pdf}
+        \label{fig:sub1}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests//D17_placebo_gen_muni_new_ctrls.pdf}
+        \label{fig:sub2}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/D17_placebo_schdist_ind_new_ctrls.pdf}
+        \label{fig:sub3}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/D17_placebo_gen_town_new_ctrls.pdf}
+        \label{fig:sub4}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/D17_placebo_spdist_new_ctrls.pdf}
+        \label{fig:sub5}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/D17_placebo_totfrac_new_ctrls.pdf}
+        \label{fig:sub6}
+    \end{subfigure}
+    \label{fig:placebo}
+    \caption*{\scriptsize \emph{Notes:} Regression results according to equations in the Empirical Strategy section, weighted by 1940 CZ urban population. All specifications include census region fixed effects and CZ-level controls for the sum of shares, coastal, and 1920 transportation cost in 1920. Each of the 1,000 instruments is constructed using randomly generated variation in Southern county-level shocks. Robust standard errors generate 95\% confidence intervals.} 
+\end{figure*}
+
+
+\clearpage
+\begin{figure*}[htbp]
+    \centering
+    \caption{Leave-one-out IV Tests, Balanced Controls}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/loo_iv_cgoodman_new_ctrls.pdf}
+        \label{fig:sub1}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/loo_iv_gen_muni_new_ctrls.pdf}
+        \label{fig:sub2}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/loo_iv_schdist_ind_new_ctrls.pdf}
+        \label{fig:sub3}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/loo_iv_gen_town_new_ctrls.pdf}
+        \label{fig:sub4}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/loo_iv_spdist_new_ctrls.pdf}
+        \label{fig:sub5}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/loo_iv_totfrac_new_ctrls.pdf}
+        \label{fig:sub6}
+    \end{subfigure}
+    \label{fig:loo_iv}
+    \caption*{\scriptsize \emph{Notes:} Regression results according to equations in the Empirical Strategy section, weighted by 1940 CZ urban population. All specifications include census region fixed effects and CZ-level controls for the sum of shares, coastal, and 1920 transportation cost in 1920. Each parameter estimate comes from a regression that drops one CZ at a time. Robust standard errors generate 95\% confidence intervals.} 
+\end{figure*}
+\clearpage
+\input{tables/implications/student_segregation_table.tex}
+\clearpage
+\input{tables/final/main_effect_towns.tex}
+\clearpage
+\input{tables/implications/pop_segregation_table.tex}
+\clearpage
+\input{tables/land_use_index/muni_outcomes_ols.tex}
+\clearpage
+\input{tables/land_use_index/touching_pct_rev_debt.tex}
+\clearpage
+\input{tables/final/segregation_table.tex}
+\clearpage
+\input{tables/final/segregation_table_ld.tex}
+\clearpage
 \end{landscape}
+
+
+\begin{figure}
+    \centering
+    \caption{Most incorporations in 1940-1970 are mostly White}\label{fig:pcarrow_figure}
+    \includegraphics[width = .55\textwidth]{figures/pcarrow_figure_GM_hat.pdf}
+    \caption*{\scriptsize \emph{Notes:} Share of White residents in 79 of 130 CZs of our data (those with sub-CZ racial data in 1970), depicted as circles, and the share of White residents in municipalities that were incorporated in 1940-1970, at the tip of the arrows. Some CZs are not shown in this figure because they either had no incorporations or were missing data on racial shares by municipality in those years. Newly incorporated municipalities have a lower share of White residents in only four of the 79 CZs for which we can conduct this exercise.}
+\end{figure}
+
+\clearpage
+
+
 
 \end{document}
