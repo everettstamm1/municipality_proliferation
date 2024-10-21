@@ -27,8 +27,12 @@
 //save "$INTDATA/nces/school_district_finance", replace
 
 use "$INTDATA/nces/school_ccd_directory", clear
-keep free_or_reduced_price_lunch school_type school_level school_status charter magnet virtual teachers_fte enrollment ncessch leaid 
+ren county_code cty_fips
+merge m:1 cty_fips using "$XWALKS/cw_cty_czone", keep(1 3) nogen
+ren czone cz
+keep free_or_reduced_price_lunch school_type school_level school_status charter magnet virtual teachers_fte enrollment ncessch leaid cz
 keep if school_level == 1 | school_level == 2 | school_level == 3 // All Schools
+//keep if school_level == 3
 keep if school_type == 1 // Normal Schools
 keep if school_status == 1 // Open schools 
 drop if charter == 1
@@ -88,7 +92,7 @@ preserve
 	save `race'
 restore
 
-merge 1:1 ncessch using `race',  nogen
+merge 1:1 ncessch using `race', keep(1 3) nogen
 
 // Student teacher ratio XXX try for ccd st_ratio
 replace teachers_fte = . if teachers_fte == 0
@@ -104,6 +108,11 @@ bys STATEFP PLACEFP : egen place_enroll = total(totenroll)
 bys STATEFP PLACEFP : egen place_teachers = total(teachers_fte)
 g st_ratio_mean = place_enroll / place_teachers
 
+
+makeDissimilarity , gen(sch_diss_blwt_cz) mingroup(blenroll) majgroup(wtenroll) id(ncessch) agg_id(cz)
+
+
+makeVR , gen(sch_vr_blwt_cz) mingroup(blenroll) majgroup(wtenroll) id(ncessch) agg_id(cz)
 
 save "$INTDATA/nces/offerings", replace
 
