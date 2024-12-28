@@ -7,8 +7,7 @@ packages <-
     'tigris',
     'stringr',
     'readxl',
-    'terra',
-    'ggpattern')
+    'terra')
 
 for (pkg in packages) {
   if (require(pkg, character.only = TRUE) == FALSE) {
@@ -47,14 +46,55 @@ shared_municipalities <- apply(shared, 1, function(x) sum(x) > 1)
 munis$shared <- munis$GEOID %in% c(1753377,1733435)
 bbox_shared <- st_bbox(munis[munis$GEOID %in% c(1753377,1733435),])
 
+# Subset to get only the shared municipalities
+shared_munis <- munis[munis$GEOID %in% c(1753377,1733435), ]
+
+# Find the corresponding school district(s)
+shared_districts <- districts[districts$GEOID == '1733720', ]
+
+# Calculate the intersection (overlap) between municipalities and school districts
+overlap <- st_intersection(shared_munis, shared_districts)
+
+grid_size <- 0.001
+bbox_overlap <- st_bbox(overlap)
+x_seq <- seq(bbox_overlap["xmin"], bbox_overlap["xmax"], by = grid_size)
+y_seq <- seq(bbox_overlap["ymin"], bbox_overlap["ymax"], by = grid_size)
+
+grid <- st_make_grid(overlap, cellsize = c(grid_size, grid_size), what = "polygons")
+hatch_grid <- grid[seq(1, length(grid), by = 2)]
+hatch_grid <- hatch_grid %>% 
+  st_make_valid() %>% 
+  st_intersection(st_make_valid(shared_districts))
+bbox_shared <- st_bbox(shared_munis)
+shift <- 0.0001
+ggplot() + 
+  geom_sf(data = munis, aes(fill = shared), col = 'black') +
+  scale_fill_manual(values = c("white", "#00BA38"), labels = c("Not shared", "Shared")) +
+  geom_sf(data = hatch_grid, fill = '#F8766D', alpha = 0.4) +
+  coord_sf(xlim = c(bbox_shared["xmin"]*(1+shift), bbox_shared["xmax"]*(1-shift)),
+           ylim = c(bbox_shared["ymin"]*(1-shift), bbox_shared["ymax"]*(1+shift)))+
+  theme_minimal()+
+  labs(title = "Map with Simulated Hatch Pattern for Shared Areas")+ 
+  theme(
+    axis.text = element_blank(),      # Remove the text labels
+    axis.ticks = element_blank(),     # Remove the tick marks
+    axis.title = element_blank(),     # Remove axis titles
+    panel.grid = element_blank()      # Remove the grid lines (optional)
+  )
+
 ggplot() +
-  geom_sf(data = munis, aes(fill = shared), color = "black", size = 0.5) +  # Municipalities with shared ones highlighted
-  geom_sf_pattern(data = districts[districts$GEOID == '1733720',], aes(geometry = geometry), 
-                  pattern = "stripe", pattern_fill = "black", pattern_angle = 45, 
-                  pattern_density = 0.1, pattern_spacing = 0.05, fill = NA) +
-  scale_fill_manual(values = c("white", "red"), labels = c("Not shared", "Shared")) +
-  theme_minimal() +
+  geom_sf(data = shared_districts, fill = "lightblue", color = NA, alpha = 0.4) +  # All school districts
+  geom_sf(data = munis, fill = "white", color = "black", size = 0.5) +   # All municipalities
+  geom_sf(data = overlap, fill = NA, color = "black", size = 0.5) +               # Outline for overlapping area
+  geom_sf(data = hatch_grid, fill = "black", color = NA, alpha = 0.2) +           # Hatch grid for the overlapping area
+  geom_sf(data = shared_munis, fill = "red", color = "black", size = 0.5) +       # Highlight shared municipalities
   coord_sf(xlim = c(bbox_shared["xmin"], bbox_shared["xmax"]),
-           ylim = c(bbox_shared["ymin"], bbox_shared["ymax"])) + 
-  labs(
-       fill = "Shared District")
+           ylim = c(bbox_shared["ymin"], bbox_shared["ymax"])) +                 # Zoom to shared municipalities
+  theme_minimal() +
+  labs(title = "Map with Simulated Hatch Pattern for Shared Areas") + 
+  theme(
+    axis.text = element_blank(),      # Remove the text labels
+    axis.ticks = element_blank(),     # Remove the tick marks
+    axis.title = element_blank(),     # Remove axis titles
+    panel.grid = element_blank()      # Remove the grid lines (optional)
+  )

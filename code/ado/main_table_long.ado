@@ -14,8 +14,8 @@ prog def main_table_long
 		local bv : di %6.2f r(mean)
 		
 		// First Stage
-		eststo fs_`outcome' : reg GM_raw_pp `exog' `ctrls' [aw=`weight'], r
-		test `exog'=0
+		eststo fs_`outcome' : reg GM_raw_pp `exog' `ctrls' if !mi(n_`outcome'_cz_pc) [aw=`weight'], r
+		test `exog'=0 
 		local F : di %6.2f r(F)
 
 		// OLS 1940-70
