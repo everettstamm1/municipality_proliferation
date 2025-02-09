@@ -10,25 +10,25 @@ if `use_sumshare' == 1 local b_controls reg2 reg3 reg4 v2_sumshares_urban
 
 if `use_sumshare' == 0 & `use_pct_inst' == 0 local extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
 if `use_sumshare' == 0 & `use_pct_inst' == 1 local extra_controls mfg_lfshare1940
-if `use_sumshare' == 1 & `use_pct_inst' == 0 local extra_controls coastal transpo_cost_1920  
-if `use_sumshare' == 1 & `use_pct_inst' == 1 local extra_controls coastal transpo_cost_1920  
+if `use_sumshare' == 1 & `use_pct_inst' == 0 local extra_controls coastal transpo_cost_1920 cz_popdens1940 mean_urban_income_1940 growth3040
+if `use_sumshare' == 1 & `use_pct_inst' == 1 local extra_controls coastal transpo_cost_1920 cz_popdens1940 mean_urban_income_1940 growth3040
 
 // Inst
 if `use_pct_inst' == 0 local inst GM_hat_raw_pp
 if `use_pct_inst' == 1 local inst GM_hat_raw
 
 // White inst
-if `use_pct_inst' == 0 local winst GM_8_hat_raw_pp
-if `use_pct_inst' == 1 local winst GM_8_hat_raw
+if `use_pct_inst' == 0 local winst GM_2w_hat_raw_pp
+if `use_pct_inst' == 1 local winst GM_2w_hat_raw
 
 // White controls
-if `use_sumshare' == 0 local w_b_controls reg2 reg3 reg4 v8_whitemig3539_share1940 
-if `use_sumshare' == 1 local w_b_controls reg2 reg3 reg4 v8_sumshares_urban 
+if `use_sumshare' == 0 local w_b_controls reg2 reg3 reg4 v2w_whitemig3539_share1940 
+if `use_sumshare' == 1 local w_b_controls reg2 reg3 reg4 v2w_sumshares_urban 
 
 if `use_sumshare' == 0 & `use_pct_inst' == 0 local w_extra_controls mfg_lfshare1940 transpo_cost_1920 m_rr_sqm_total
 if `use_sumshare' == 0 & `use_pct_inst' == 1 local w_extra_controls mfg_lfshare1940
-if `use_sumshare' == 1 & `use_pct_inst' == 0 local w_extra_controls coastal transpo_cost_1920  
-if `use_sumshare' == 1 & `use_pct_inst' == 1 local w_extra_controls coastal transpo_cost_1920  
+if `use_sumshare' == 1 & `use_pct_inst' == 0 local w_extra_controls coastal transpo_cost_1920 cz_popdens1940 mean_urban_income_1940 growth3040
+if `use_sumshare' == 1 & `use_pct_inst' == 1 local w_extra_controls coastal transpo_cost_1920 cz_popdens1940 mean_urban_income_1940 growth3040
 
 
 

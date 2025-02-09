@@ -5,7 +5,9 @@ local balance_cutoff = 0.10
 local samp = "urban"
 
 use "$CLEANDATA/cz_pooled", clear
-local covars avg_precip avg_temp coastal mfg_lfshare1940 m_rr_sqm_total p90_total p95_total transpo_cost_1920
+local covars avg_precip avg_temp coastal mfg_lfshare1940 m_rr_sqm_total p90_total p95_total transpo_cost_1920 cz_popdens1940 higrade hsgrad unigrad mean_urban_income_1940 growth3040
+
+
 local pooled_covars_`samp'  ""
 keep if dcourt == 1
 foreach covar in `covars' {
@@ -14,6 +16,8 @@ foreach covar in `covars' {
 	label var GM`covar' "`lab'"
 
 	qui eststo `covar': reg `covar' GM`covar' `b_controls' [aw=popc1940], r
+	
+	
 	local p =2*ttail(e(df_r),abs(_b[GM`covar']/_se[GM`covar']))
 	di "`covar' p value : `p'"
 	if `p'<=`balance_cutoff'{
@@ -22,19 +26,18 @@ foreach covar in `covars' {
 }
 
 eststo pooled_`samp' : appendmodels `covars'
-
-esttab pooled_`samp'  ///
+esttab pooled_`samp' `means' ///
 				using "$TABS/balancetables/balancetable.tex", ///
-				replace label se booktabs noconstant noobs compress nonumber frag mtitle("$\widehat{GM}$") ///
+				replace label se booktabs noconstant noobs compress nonumber frag mtitle("$\widehat{GM}$" "Mean") ///
 				b(%04.3f) se(%04.3f) //////
 				keep(GM*) ///
-				prehead( \begin{tabular}{l*{1}{c}} \toprule) ///
+				prehead( \begin{tabular}{l*{2}{c}} \toprule) ///
 		postfoot(	\bottomrule \end{tabular}) ///
 				starlevels( * 0.10 ** 0.05 *** 0.01) 
 
 					
 	
-
+mean (above/below median sample) - GM_raw -GM_hat -GM_hat with cenreg fe - GM_hat with cenreg fe and sumshares
 
 local b_controls reg2 reg3 reg4 v2_sumshares_urban
 local extra_controls transpo_cost_1920 coastal

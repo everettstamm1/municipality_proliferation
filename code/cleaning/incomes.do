@@ -1,38 +1,67 @@
 use "$XWALKS/consistent_1990", clear
 keep if year == 1940
 keep weight nhgisst_1990 nhgiscty_1990 icpsrst icpsrcty
-ren icpsrst stateicp
-ren icpsrcty countyicp
+
 
 tempfile consistent_xwalk
 save `consistent_xwalk'
 
-use city perwt stateicp countyicp incwage using "$RAWDATA/census/usa_00055.dta", clear
+use city valueh perwt stateicp countyicp incwage educd higrade using "$RAWDATA/census/usa_00064.dta", clear
 
 ren city citycode
 // 1900-30 include way more cities than 1940, so crosswalk to the cities we actually use
 merge m:1 citycode using "$INTDATA/dcourt/clean_city_population_census_1940_full.dta",  keep(1 3) keepusing(citycode)
 ren citycode city
 
+g perwtc = perwt if _merge == 3
+replace incwage = . if incwage > 5001
+replace valueh = . if valueh >= 9999998 | valueh == 0
 g incwagec = incwage if _merge==3
+g incwage_pos = incwage if !mi(incwage) & incwage != 0
+g incwagec_pos = incwagec if !mi(incwagec)
+
+replace higrade = . if higrade == 0 | higrade == 99
+replace higrade = higrade - 3
+replace higrade = 0 if higrade < 0
+replace higrade = 16 if higrade > 16
+
+g hsgrad = educd > 61
+g unigrad = educd > 100
+drop educd 
+
+g hsgradc = hsgrad if _merge == 3
+g higradec = higrade if _merge == 3
+g unigradc = unigrad if _merge == 3
+g valuehc = valueh if _merge == 3
 drop _merge
 
+ren stateicp icpsrst
+ren countyicp icpsrcty
 
-joinby  icpsrst icpsrcty using `consistent_xwalk', keepusing(weight nhgisst_1990 nhgiscty_1990) keep(3) nogen
+collapse (sum) perwt perwtc (mean) hsgradc higradec unigradc valueh valuehc incwage incwagec incwage_pos incwagec_pos hsgrad unigrad higrade, by(icpsrst icpsrcty)
+
+merge 1:m icpsrst icpsrcty using `consistent_xwalk', keep(3) nogen
 
 ren nhgisst_1990 statefip
 ren nhgiscty_1990 countyfip
 
-g cty_fips = nhgisst_1990*100+nhgiscty_1990/10
+g cty_fips = statefip*100+countyfip/10
 
 merge m:1 cty_fips using "$XWALKS/cw_cty_czone", keep(1 3) nogen
+g weightc = weight * perwtc
 
-collapse (median) incwage incwagec [w=weight], by(czone)
+replace weight = weight * perwt
+preserve
+	collapse (mean) hsgrad unigrad higrade valueh mean_income_1940=incwage  mean_pos_income_1940=incwage_pos   [w=weight], by(czone)
 
-ren valueh med_income_1940
-ren valueh med_urban_income_1940
+	save "$INTDATA/census/incomes_and_education_1940", replace
+restore
 
-save "$INTDATA/census/incomes", replace
+
+collapse (mean) hsgradc unigradc higradec valuehc mean_urban_income_1940 = incwagec mean_pos_urban_income_1940 = incwagec_pos [w=weightc], by(czone)
+
+save "$INTDATA/census/urban_incomes_and_education_1940", replace
+
 
 // 2010 Incomes
 

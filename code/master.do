@@ -15,10 +15,10 @@ if "`c(username)'"=="Everett Stamm"{
 	gl use_gzuse = 0
 }
 if "`c(username)'"=="edog9"{
-	gl DROPBOX `"D:\municipality_proliferation"'
+	gl DROPBOX `"F:\municipality_proliferation"'
 	gl REPO "/Users/edog9/Documents/Github/municipality_proliferation/"
 	gl FFMPEG "/Users/edog9/ffmpeg/bin/ffmpeg.exe"
-	gl Rterm_path `"C:/Program Files/R/R-4.3.1/bin/x64/Rterm.exe"'
+	gl Rterm_path `"C:/Program Files/R/R-4.4.2/bin/x64/Rterm.exe"'
 	gl Rterm_options `"--vanilla"'
 	gl use_gzuse = 0
 }

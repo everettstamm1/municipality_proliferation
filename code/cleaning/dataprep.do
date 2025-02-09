@@ -328,8 +328,8 @@ foreach level in cz {
 		
 		use "$CLEANDATA/dcourt/GM_`level'_final_dataset.dta", clear
 		g ne_ut = state_id == 31 | state_id == 49
-		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_* WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970 *_sumshares GM_hat_r* wpop* v2_black_proutmigpr
-		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970  *_sumshares GM_hat_r* wpop* v2_black_proutmigpr
+		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_* WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970 *_sumshares GM_hat_r* wpop* v2_black_proutmigpr v2w_white_proutmigpr v2w_whitemig3539_share1940 
+		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970  *_sumshares GM_hat_r* wpop* v2_black_proutmigpr v2w_white_proutmigpr v2w_whitemig3539_share1940 
 		
 
 
@@ -339,7 +339,7 @@ foreach level in cz {
 		if "`level'"=="msa"{
 			destring smsa, gen(msapmsa2000) 
 		}
-		
+
 		
 		merge m:1 cz using "$INTDATA/dcourt/original_130_czs"
 			
@@ -376,7 +376,7 @@ foreach level in cz {
 		merge 1:1 `levelvar' using "$INTDATA/counts/cgoodman_`level'", keep(1 3) nogen keepusing(n_cgoodman_`level' b_cgoodman_`level'*)
 
 		//merge 1:1 `levelvar' using "$INTDATA/cog_populations/`level'pop", keep(3) nogen
-		
+
 		if "`level'"=="cz"{
 			preserve
 				use "$RAWDATA/dcourt/US_place_point_2010_crosswalks.dta", clear
@@ -396,7 +396,7 @@ foreach level in cz {
 		replace frac_total = 0 if _merge==1
 		drop _merge decade
 		
-		
+
 		foreach geog in land total{
 			foreach tail in 90 95 {
 				qui su frac_`geog' if GM_raw_pp < .,d
@@ -406,13 +406,21 @@ foreach level in cz {
 			}
 		}
 		
+		// Population densities (relative to 2010 land size)
+		forv y=1940(10)1970{
+			g cz_popdens`y' = pop`y'/cz_land2010
+		}
+		
 		if "`level'" == "cz"{
 			
 			merge 1:1 cz using "$INTDATA/covariates/covariates.dta", keep(1 3) nogen
 			merge 1:1 cz using "$INTDATA/census/maxcitypop", keep(1 3) nogen
 			ren cz czone
 			merge 1:1 czone using "$INTDATA/census/home_values", keep(1 3) nogen
-			merge 1:1 czone using "$INTDATA/census/incomes", keep(1 3) nogen
+			//merge 1:1 czone using "$INTDATA/census/incomes", keep(1 3) nogen
+			merge 1:1 czone using "$INTDATA/census/incomes_and_education_1940", keep(1 3) nogen
+			merge 1:1 czone using "$INTDATA/census/urban_incomes_and_education_1940", keep(1 3) nogen
+
 			ren czone cz
 		}
 		// Missing dummies
@@ -688,7 +696,8 @@ foreach level in cz {
 		
 		su GM_raw_pp, d
 		g above_x_med = GM_raw_pp >= r(p50)
-		
+		g growth3040 = log(pop1940) - log(pop1930)
+
 		save "$CLEANDATA/`level'_pooled`outsamptab'", replace
 		
 	}

@@ -288,8 +288,10 @@ ren sumshares v`v'_sumshares
 		
 		* Version 8 of the instrument: 
 		*	1935-1940 white southern migrant location choice X total observed 1940-1970 white net-migration for southern counties,
-		foreach v in "8" {
-		merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/`v'_white_actmig_1940_1970_wide_xw.dta", keepusing(totwhitemigcity3539 white_actoutmigact* sumshares)
+		foreach v in "8" "2w"{
+					local type = cond("`v'"=="8","act","pr")
+
+		merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/`v'_white_`type'mig_1940_1970_wide_xw.dta", keepusing(totwhitemigcity3539 white_`type'outmig`type'* sumshares)
 		ren sumshares v`v'_sumshares
 		/* Drop cities for which there's no hope of getting predictions for black pop in 
 		1970 data for these cities. This set of cities will change depending on the 
@@ -301,7 +303,7 @@ ren sumshares v`v'_sumshares
 		to between 1935 and 1940. Results are robust to changing this criterion. 
 		Uncomment "keep if _merge==3" and run again. */
 		
-		foreach var of varlist white_actoutmigact*{
+		foreach var of varlist white_`type'outmig`type'*{
 		replace `var'=0 if `var'==.
 		rename `var' v`v'_`var'
 		}
@@ -421,8 +423,8 @@ ren sumshares v`v'_sumshares
 		//egen vre_mean = rowmean(vre*_black_proutmigpr)
 		//egen vr_mean = rowmean(vr*_black_proutmigpr)
 
-		g v2_black_proutmigpr_re = v2_black_proutmigpr - vre_mean
-		g v2_black_proutmigpr_r = v2_black_proutmigpr - vr_mean
+		//g v2_black_proutmigpr_re = v2_black_proutmigpr - vre_mean
+		//g v2_black_proutmigpr_r = v2_black_proutmigpr - vr_mean
 
 		save "$INTDATA/dcourt/GM_city_final_dataset.dta", replace
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
@@ -474,10 +476,11 @@ local do_resample = 0
 			}
 			
 			* Versions 8
-			foreach v in "8"{
+			foreach v in "8" "2w"{
+				local type = cond("`v'"=="8","act","pr")
 
-			g v`v'_wc_pred1940_1970=100*v`v'_white_actoutmigact/popc1940
-			g v`v'_wcpp_pred1940_1970=100*((v`v'_white_actoutmigact+wpopc1940)/(popc1940+ v`v'_white_actoutmigact) - wpopc1940/popc1940)
+			g v`v'_wc_pred1940_1970=100*v`v'_white_`type'outmig`type'/popc1940
+			g v`v'_wcpp_pred1940_1970=100*((v`v'_white_`type'outmig`type'+wpopc1940)/(popc1940+ v`v'_white_`type'outmig`type') - wpopc1940/popc1940)
 
 			g v`v'_whitemig3539_share1940=100*v`v'_totwhitemigcity3539/popc1940
 			}
@@ -599,7 +602,9 @@ local do_resample = 0
 			}	
 			
 			* Versions 8
-			foreach v in "8" {	
+			foreach v in "8" "2w"{	
+						local type = cond("`v'"=="8","act","pr")
+
 			xtile GM_`v'_hat = v`v'_wc_pred1940_1970, nq(100) 
 			}
 			
@@ -805,6 +810,10 @@ local do_resample = 0
 			ren v8_wcpp_pred1940_1970 GM_8_hat_raw_pp
 			
 			
+			ren v2w_wc_pred1940_1970 GM_2w_hat_raw
+			ren v2w_wcpp_pred1940_1970 GM_2w_hat_raw_pp
+			
+			
 			foreach v in 1940 r 7r{
 				ren v`v'_bcpp_pred1940_1970 GM_`v'_hat_raw_pp
 			}
@@ -820,13 +829,7 @@ local do_resample = 0
 			forv i=1(1)1000{	
 			ren vre`i'_bcpp_pred1940_1970 GM_hat_raw_re`i'
 			}	
-			
-			ren v2_bc_pred1940_1970_re_c GM_hat_raw_re_c
-			ren v2_bcpp_pred1940_1970_re_c GM_hat_raw_pp_re_c
-			ren v2_bc_pred1940_1970_re_cz GM_hat_raw_re_cz
-			ren v2_bcpp_pred1940_1970_re_cz GM_hat_raw_pp_re_cz
-			ren v2_bc_pred1940_1970_re_cz_t GM_hat_raw_re_cz_t
-			ren v2_bcpp_pred1940_1970_re_cz_t GM_hat_raw_pp_re_cz_t
+
 
 			
 			
