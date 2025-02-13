@@ -73,7 +73,7 @@ rename J fips_county_2002
 rename K fips_place_2002
 
 g ID_unit = substr(ID,7,9)
-drop ID
+//drop ID
 drop if census_id==""
 duplicates drop
 save "$XWALKS/cog_ID_fips_place_xwalk_02.dta", replace
@@ -390,3 +390,37 @@ label values type type
 label values subtype subtype
 
 save "$INTDATA/cog/master_2021.dta", replace
+
+
+
+
+
+// Historical Finance
+clear
+odbc query "City_Gov_Fin"
+odbc load, table("City_Govt_Finances")
+
+keep General_Expenditure Direct_General_Expend Total_Current_Expend Direct_Expenditure Total_Expenditure Total_IG_Expenditure Total_Prop_Sale var41 Total_IG_Revenue var28 Total_Taxes General_Revenue Total_Revenue Population Year_of_Data Name County_Code Type_Code State_Code GID_Compatible_ID ID Year4 Survey_Year Sort_Code
+
+
+rename State_Code ID_state
+rename Type_Code ID_type
+rename County_Code ID_county
+g ID_unit = substr(ID,7,9)
+
+merge m:1 ID using "$XWALKS/cog_ID_fips_place_xwalk_02.dta", keep(1 3) nogen
+
+
+g cty_fips = fips_state+fips_county_2002
+destring cty_fips, replace
+merge m:1 cty_fips using "$XWALKS/cw_cty_czone.dta", keep(1 3) nogen
+drop cty_fips
+
+// Destringing everything
+foreach var of varlist General_Expenditure Direct_General_Expend Total_Current_Expend Direct_Expenditure Total_Expenditure Total_IG_Expenditure Total_Prop_Sale var41 Total_IG_Revenue var28 Total_Taxes General_Revenue Total_Revenue Population{
+	replace `var' = . if `var' == -11111
+}
+
+
+save "$INTDATA/cog/city_gov_fin.dta", replace
+

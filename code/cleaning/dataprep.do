@@ -328,8 +328,8 @@ foreach level in cz {
 		
 		use "$CLEANDATA/dcourt/GM_`level'_final_dataset.dta", clear
 		g ne_ut = state_id == 31 | state_id == 49
-		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_* WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970 *_sumshares GM_hat_r* wpop* v2_black_proutmigpr v2w_white_proutmigpr v2w_whitemig3539_share1940 
-		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970  *_sumshares GM_hat_r* wpop* v2_black_proutmigpr v2w_white_proutmigpr v2w_whitemig3539_share1940 
+		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_* WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970 *_sumshares GM_hat_r* wpop* v2_black_proutmigpr v2w_white_proutmigpr v2w_whitemig3539_share1940 wpop1970 wpop1940 
+		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970  *_sumshares GM_hat_r* wpop* v2_black_proutmigpr v2w_white_proutmigpr v2w_whitemig3539_share1940 wpop1970 wpop1940 
 		
 
 
@@ -513,8 +513,9 @@ foreach level in cz {
 		
 		lab var blackmig3539_share "Urban Population Share of 1935-39 Black Migrants"
 
-	
-
+		
+		
+		
 		foreach y in 1940 1970{
 			//lab var bpop`y' "Total Black Population, `y'"
 			lab var bpopc`y' "Urban Black Population, `y'"
@@ -617,6 +618,66 @@ foreach level in cz {
 		
 		g change_enclosed4070 = (enclosed1970 - enclosed1940)/(total_length - enclosed1940)
 		
+		
+		// Add total black pop
+		preserve
+			use "$INTDATA/census/cz_race_data.dta", clear
+			keep year cz black 
+			keep if year >= 1940 & year <= 1970
+			ren black bpop
+			reshape wide bpop, i(cz) j(year)
+			tempfile bpop
+			save `bpop'
+		restore
+		
+		merge 1:1 cz using `bpop', keep(3) nogen
+		
+		// Touching Munis
+		// Merge in County Instruments
+		preserve
+			use "$INTDATA/dcourt/instrument/city_crosswalked/2wc_white_prmig_1940_1970_wide_xw.dta", clear
+			
+			ren sumshares v2wc_sumshares
+			
+			foreach var of varlist white_proutmigpr*{
+			replace `var'=0 if `var'==.
+			rename `var' v2wc_`var'
+			}
+			rename totwhitemigdest_fips3539 v2wc_totwhitemigdest_fips3539
+			
+			collapse (sum) v2wc_sumshares v2wc_totwhitemigdest_fips3539 v2wc_white_proutmigpr, by(cz)
+						
+			tempfile white_county
+			save `white_county'
+			
+			use "$INTDATA/dcourt/instrument/city_crosswalked/2c_black_prmig_1940_1970_wide_xw.dta", clear
+			
+			ren sumshares v2c_sumshares
+			
+			foreach var of varlist black_proutmigpr*{
+			replace `var'=0 if `var'==.
+			rename `var' v2c_`var'
+			}
+			rename totblackmigdest_fips3539 v2c_totblackmigdest_fips3539
+			
+			collapse (sum) v2c_sumshares v2c_totblackmigdest_fips3539 v2c_black_proutmigpr, by(cz)
+			ren czone cz
+			tempfile black_county
+			save `black_county'
+		restore 
+		
+		merge 1:1 cz using `white_county', keep(1 3) nogen
+		merge 1:1 cz using `black_county', keep(1 3) nogen
+		replace v2c_sumshares = 0 if mi(v2c_sumshares)
+		replace v2c_totblackmigdest_fips3539 = 0 if mi(v2c_totblackmigdest_fips3539)
+		replace v2c_black_proutmigpr = 0 if mi(v2c_black_proutmigpr)
+
+		g WM_raw_county=100*((wpop1970/pop1970)-(wpop1940/pop1940))
+		g WM_inst_county = 100*(v2wc_white_proutmigpr /pop1940)
+		
+		g GM_raw_county=100*((bpop1970/pop1970)-(bpop1940/pop1940))
+		g GM_inst_county = 100*(v2c_black_proutmigpr /pop1940)
+		
 		// New York causing problems but clearly fully enclosed by 1940
 		replace prop_enclosed1940 = 1 if cz==19400
 		replace prop_enclosed1970 = 1 if cz==19400
@@ -643,20 +704,6 @@ foreach level in cz {
 			ren *temporary* *schdist_ind*
 		}
 		
-		// Add total black pop
-		preserve
-			use "$INTDATA/census/cz_race_data.dta", clear
-			keep year cz black 
-			keep if year >= 1940 & year <= 1970
-			ren black bpop
-			reshape wide bpop, i(cz) j(year)
-			tempfile bpop
-			save `bpop'
-		restore
-		
-		merge 1:1 cz using `bpop', keep(3) nogen
-		
-		// Touching Munis
 		preserve
 			import excel using "$CLEANDATA/other/touching_munis.xlsx", clear first
 			keep cz GEOID_2 yr_ncrp
@@ -694,9 +741,19 @@ foreach level in cz {
 		g frac_unc1940 = ((pop1940 - popc1940)/pop1940)
 		g change_frac_unc = frac_unc1970 - frac_unc1940
 		
+		// Court Orders
+		ren cz czone
+		merge 1:1 czone using "$CLEANDATA/nces/cz_court_orders", keep(1 3) nogen
+		
 		su GM_raw_pp, d
 		g above_x_med = GM_raw_pp >= r(p50)
 		g growth3040 = log(pop1940) - log(pop1930)
+		
+		g GM_rawXco = GM_raw_pp * court_order
+		g GM_rawXfrac_co = GM_raw_pp * frac_court_ordered
+		g GM_hatXco = GM_hat_raw * court_order
+		g GM_hatXfrac_co = GM_hat_raw * frac_court_ordered
+
 
 		save "$CLEANDATA/`level'_pooled`outsamptab'", replace
 		

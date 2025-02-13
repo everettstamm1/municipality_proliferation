@@ -286,6 +286,37 @@ ren sumshares v`v'_sumshares
 		rename totblackmigcity3539 v`v'_totblackmigcity3539
 		}
 		
+		foreach v in "2ipw" "2ent" "2wipw" "2went"{
+			if "`v'" == "2ipw" local type = "b_ipw"
+			if "`v'" == "2wipw" local type = "w_ipw"
+			if "`v'" == "2ent" local type = "b_ent"
+			if "`v'" == "2went" local type = "w_ent"
+
+		merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/`v'_`type'_prmig_1940_1970_wide_xw.dta"
+ren sumshares v`v'_sumshares
+		/* Drop cities for which there's no hope of getting predictions for black pop in 
+		1970 data for these cities. This set of cities will change depending on the 
+		migration matrix used.*/
+		g samp_`v' = _merge==3
+		drop if _merge==2 
+		drop _merge
+		
+		/* Assume zero change in black pop for cities that black migrants did not move 
+		to between 1935 and 1940. Results are robust to changing this criterion. 
+		Uncomment "keep if _merge==3" and run again. */
+
+		foreach var of varlist `type'_proutmigpr*{
+			replace `var'=0 if `var'==.
+			rename `var' v`v'_`var'
+		}
+		rename tot`type'migcity3539 v`v'_tot`type'migcity3539
+		}
+	
+		* Version 7r of the instrument: 
+		*	1935-1940 black southern migrant location choice X total observed 1940-1970 net-migration for southern counties,
+		*	residualized on southern state fixed effects.
+		
+		
 		* Version 8 of the instrument: 
 		*	1935-1940 white southern migrant location choice X total observed 1940-1970 white net-migration for southern counties,
 		foreach v in "8" "2w"{
@@ -462,6 +493,21 @@ local do_resample = 0
 			g v`v'_blackmig3539_share1940=100*v`v'_totblackmigcity3539/popc1940
 			
 			g v`v'_bcpp_pred1940_1970=100*((v`v'_black_proutmigpr+bpopc1940)/(popc1940 + v`v'_black_proutmigpr) - bpopc1940/popc1940)
+
+			}
+			
+			
+			
+			foreach v in "2ipw" "2ent" "2wipw" "2went"{
+				if "`v'" == "2ipw" local type = "b_ipw"
+				if "`v'" == "2wipw" local type = "w_ipw"
+				if "`v'" == "2ent" local type = "b_ent"
+				if "`v'" == "2went" local type = "w_ent"
+				
+				g v`v'_bc_pred1940_1970=100*v`v'_`type'_proutmigpr/popc1940
+				
+				g v`v'_mig3539_share1940=100*v`v'_tot`type'migcity3539/popc1940
+				
 
 			}
 			
@@ -781,7 +827,7 @@ local do_resample = 0
 		*7. Create additional 1940 controls. 
 		*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 			
-			merge 1:1 cz using "$RAWDATA/dcourt/clean_cz_population_1940_1970", keep(1 3) keepusing(pop1940 pop1950 pop1960 pop1970) nogen
+			merge 1:1 cz using "$RAWDATA/dcourt/clean_cz_population_1940_1970", keep(1 3) keepusing(pop1940 pop1950 pop1960 pop1970 wpop1940 wpop1970) nogen
 			
 				*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 			*8. Label key variables and save final dataset. 

@@ -60,7 +60,8 @@ lab var weight_pop "Weighted by 1940 municipal population"
 preserve
 	use "$CLEANDATA/cz_pooled", clear
 	keep if dcourt == 1
-	keep cz cz_name popc1940 GM_raw_pp GM_hat_raw v2_sumshares_urban transpo_cost_1920 coastal n_schdist_ind_cz_pc pop1940
+	keep cz cz_name popc1940 GM_raw_pp GM_hat_raw v2_sumshares_urban transpo_cost_1920 coastal n_schdist_ind_cz_pc pop1940 cz_popdens1940 growth3040 mean_urban_income_1940
+	ren mean_urban_income_1940 mean_uninc1940
 	g schoolflag = n_schdist_ind_cz_pc < .
 	drop n_schdist_ind_cz_pc
 	qui su GM_raw_pp, d
@@ -264,7 +265,30 @@ merge m:1 cz using `muni_shared', assert(3) nogen
 merge m:1 cz using `dist_shared', assert(3) nogen
 
 // Average School Size
-bys PLACEFP STATEFP : egen avg_totenroll_place = mean(totenroll)
+bys PLACEFP STATEFP : egen avg_totenroll_place = mean(totenroll_leaid)
+
+
+// 1970 Finance
+preserve
+	use "$INTDATA/cog/city_gov_fin.dta", clear
+	ren fips_place_2002 PLACEFP
+	ren fips_state STATEFP
+	keep if Year4 == 1970
+	ren Total_Expenditure totexp1970
+	g totexp_pc1970 = totexp1970 / Population
+	g ltotexp_pc1970 = log(totexp_pc1970)
+	g ltotexp1970 = log(totexp1970)
+	keep PLACEFP STATEFP totexp1970 totexp_pc1970 ltotexp1970 ltotexp_pc1970
+	destring PLACEFP STATEFP, replace
+	drop if mi(PLACEFP)
+	duplicates drop
+	tempfile cityexp1970
+	save `cityexp1970'
+restore
+
+merge m:1 STATEFP PLACEFP using `cityexp1970', keep(1 3) nogen
+
+
 
 // Fraction of white kids in 40-70
 //g wtenroll_newmuni = wtenroll if samp_dest == 1
@@ -371,9 +395,11 @@ restore
 */
 // Interactions
 
-foreach var of varlist v2_sumshares_urban coastal transpo_cost_1920 reg2 reg3 reg4{
+foreach var of varlist v2_sumshares_urban coastal transpo_cost_1920 reg2 reg3 reg4 totexp1970 totexp_pc1970 ltotexp1970 ltotexp_pc1970 cz_popdens1940 mean_uninc1940 growth3040 {
 	local lb : variable label `var'
 	g `var'_samp_dest = `var'*samp_dest
+	g `var'_above_x_med = `var'*above_x_med
+	g `var'_both = `var'*above_x_med * samp_dest
 	lab var `var'_samp_dest "`lb' X Incorporated 1940-70"
 }
 
@@ -474,6 +500,8 @@ merge m:1 STATEFP PLACEFP using "$INTDATA/other/ai_zoning", keep(1 3) nogen
 bys cz (mean_hh_inc_cz) : replace mean_hh_inc_cz = mean_hh_inc_cz[1] if mi(mean_hh_inc_cz)
 bys cz (agg_fam_inc_cz1970) : replace agg_fam_inc_cz1970 = agg_fam_inc_cz1970[1] if mi(agg_fam_inc_cz1970)
 bys cz (agg_house_value_cz1970) : replace agg_house_value_cz1970 = agg_house_value_cz1970[1] if mi(agg_house_value_cz1970)
+
+	
 
 /* Labels
 lab var st_ratio_leaid "Student Teacher Ratio"
