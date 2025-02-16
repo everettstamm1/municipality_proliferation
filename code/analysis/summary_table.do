@@ -15,7 +15,7 @@ keep if dcourt == 1
 // Create groups of variables
 local panel_A_vars n_cgoodman_cz_pc n_gen_muni_cz_pc n_schdist_ind_cz_pc n_spdist_cz_pc  n_totfrac_cz_pc
 local panel_B_vars GM_raw_pp GM_hat_raw
-local panel_C_vars v2_sumshares_urban coastal transpo_cost_1920 
+local panel_C_vars v2_sumshares_urban coastal transpo_cost_1920 mean_urban_income_1940 cz_popdens1940 growth3040
 
 // Generate summary statistics using eststo and estpost
 eststo A: estpost summarize `panel_A_vars', d 

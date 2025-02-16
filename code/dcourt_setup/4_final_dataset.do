@@ -477,6 +477,7 @@ local do_resample = 0
 			g bcpp1940_1970=100*((bpopc1970/popc1970)-(bpopc1940/popc1940))
 			
 			g wcpp1940_1970=100*((wpopc1970/popc1970)-(wpopc1940/popc1940))
+			g wc1940_1970=100*((wpopc1970 -wpopc1940)/popc1940)
 
 			* Instrument by version
 			* Version 0
@@ -629,6 +630,7 @@ local do_resample = 0
 		*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 			* OLS
 			xtile GM = bc1940_1970, nq(100) 
+			xtile WM = wc1940_1970, nq(100) 
 
 			* Instrument by version
 			* Version 0
@@ -651,7 +653,7 @@ local do_resample = 0
 			foreach v in "8" "2w"{	
 						local type = cond("`v'"=="8","act","pr")
 
-			xtile GM_`v'_hat = v`v'_wc_pred1940_1970, nq(100) 
+						xtile GM_`v'_hat = v`v'_wc_pred1940_1970, nq(100) 
 			}
 			
 			if `do_placebo'==1{

@@ -1,11 +1,83 @@
 
+use "$RAWDATA/census/urban_1900_1930/usa_00067.dta/usa_00067", clear
+
+
+// 1900-30 include way more cities than 1940, so crosswalk to the cities we actually use
+ren city citycode
+merge m:1 citycode using "$INTDATA/dcourt/GM_city_final_dataset_split.dta",  keep(1 3) keepusing(citycode)
+ren citycode city
+
+replace age = . if age == 000
+replace lit = . if lit == 0
+g literate = lit == 4
+replace labforce = . if inlist(labforce,0,9)
+replace labforce = labforce - 1
+replace occscore = . if occscore == 0
+g black = race == 2
+
+g agec = age if _merge == 3
+g blackc = race == 2 & _merge == 3
+g literatec = literate if _merge == 3
+g occscorec = occscore if _merge == 3
+g labforcec = labforce if _merge == 3
+
+g pop = perwt
+g popc = perwt if _merge == 3
+
+foreach var of varlist age black  literate labforce occscore  popc agec blackc  literatec labforcec occscorec{
+	replace `var' = `var'*perwt
+}
+
+collapse (sum) pop popc age black  literate labforce occscore   agec blackc  literatec labforcec occscorec, by(stateicp countyicp year)
+
+ren stateicp icpsrst
+ren countyicp icpsrcty
+merge 1:m year icpsrst icpsrcty using "$XWALKS/consistent_1990", keepusing(weight nhgisst_1990 nhgiscty_1990) keep(3) nogen
+
+foreach var of varlist pop age black  literate labforce occscore  popc agec blackc  literatec labforcec occscorec{
+	replace `var' = `var'*weight
+}
+
+collapse (sum) pop age black  literate labforce occscore  popc agec blackc  literatec labforcec occscorec, by(year nhgisst_1990 nhgiscty_1990)
+
+ren nhgisst_1990 statefip
+ren nhgiscty_1990 countyfip
+
+g cty_fips = statefip*100+countyfip/10
+
+merge m:1 cty_fips using "$XWALKS/cw_cty_czone", keep(1 3) nogen
+ren cty_fips fips
+ren czone cz
+ren year decade
+
+
+preserve 
+	collapse (sum) pop popc age black  literate labforce occscore  agec blackc  literatec labforcec occscorec, by(cz decade)
+	// Convert from aggregates to averages
+	foreach var in age black  literate labforce occscore   {
+			replace `var' = `var'/pop
+			replace `var'c = `var'c/popc
+	}
+	save "$INTDATA/census/cz_urbanization_1900_1930.dta", replace
+restore
+
+	// Convert from aggregates to averages
+
+foreach var in age black  literate labforce occscore   {
+		replace `var' = `var'/pop
+		replace `var'c = `var'c/popc
+}
+save "$INTDATA/census/county_urbanization_1900_1930.dta", replace
+
+
+
 // Census Urban Populations
 local working_directory : pwd
 cd "$RAWDATA/census/urban_1900_1930"
 do usa_00045.do
 cd "`working_directory'"
 
-
+duplicates drop
 // 1900-30 include way more cities than 1940, so crosswalk to the cities we actually use
 ren city citycode
 merge m:1 citycode using "$INTDATA/dcourt/GM_city_final_dataset_split.dta",  keep(1 3) keepusing(citycode)

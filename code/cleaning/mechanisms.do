@@ -60,8 +60,8 @@ lab var weight_pop "Weighted by 1940 municipal population"
 preserve
 	use "$CLEANDATA/cz_pooled", clear
 	keep if dcourt == 1
-	keep cz cz_name popc1940 GM_raw_pp GM_hat_raw v2_sumshares_urban transpo_cost_1920 coastal n_schdist_ind_cz_pc pop1940 cz_popdens1940 growth3040 mean_urban_income_1940
-	ren mean_urban_income_1940 mean_uninc1940
+	keep cz cz_name popc1940 GM_raw_pp GM_hat_raw v2_sumshares_urban transpo_cost_1920 coastal n_schdist_ind_cz_pc pop1940 cz_popdens1940 growth3040 mean_urban_income_1940 frac_land frac_total cz_popdens1940
+	ren mean_urban_income_1940 mean_uninc1940 
 	g schoolflag = n_schdist_ind_cz_pc < .
 	drop n_schdist_ind_cz_pc
 	qui su GM_raw_pp, d
@@ -429,7 +429,7 @@ restore
 merge m:1 cz using `ap_gini_cz', assert(3) nogen
 
 */
-
+/*
 merge m:1 STATEFP PLACEFP using "$INTDATA/other/alltransit_data", keep(1 3) nogen
 
 
@@ -445,7 +445,7 @@ preserve
 restore 
 
 merge m:1 cz using `avg_alltransit_cz', keep(1 3) nogen
-
+*/
 // QGIS OUTPUT
 
 merge m:1 STATEFP PLACEFP using "$INTDATA/other/touching_munis", keep(1 3)
@@ -475,13 +475,16 @@ g prop_white1970 = place_wpop1970 / place_pop1970
 g prop_white2010 = place_wpop2010 / place_pop2010
 g prop_black1970 = place_bpop1970 / place_pop1970
 g prop_black2010 = place_bpop2010 / place_pop2010
+g prop_whas1970 = place_whaspop1970 / place_pop1970
+g prop_whas2010 = place_whaspop2010 / place_pop2010
+
 
 merge m:1 cz using "$INTDATA/census/cz_race_pop1970", keep(1 3) nogen keepusing(cz_prop_white1970 )
 merge m:1 cz using "$INTDATA/census/cz_race_pop", keep(1 3) nogen keepusing(cz_prop_white2010 cz_prop_black2010)
 
 preserve
 	use "$INTDATA/cgoodman/cgoodman_place_county_geog.dta", clear
-	keep PLACEFP STATEFP place_land
+	keep PLACEFP STATEFP place_land place_total
 	duplicates drop
 	destring PLACEFP STATEFP, replace
 	tempfile place_land

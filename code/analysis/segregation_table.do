@@ -74,27 +74,27 @@ predict schdist_ind_e if e(sample), resid
 
 eststo clear
 
-eststo stu_vr: ivreg2 sch_vr_blwt_cz (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 v2_sumshares_urban coastal transpo_cost_1920 [aw = popc1940], r
+eststo stu_vr: ivreg2 sch_vr_blwt_cz (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 v2_sumshares_urban coastal transpo_cost_1920 cz_popdens1940 mean_urban_income_1940 growth3040 [aw = popc1940], r
 su sch_vr_blwt_cz, d
 estadd scalar dv = r(mean)
 
-eststo stu_diss: ivreg2 sch_diss_blwt_cz (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 v2_sumshares_urban coastal transpo_cost_1920 [aw = popc1940], r
+eststo stu_diss: ivreg2 sch_diss_blwt_cz (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 v2_sumshares_urban coastal transpo_cost_1920 cz_popdens1940 mean_urban_income_1940 growth3040 [aw = popc1940], r
 su sch_diss_blwt_cz, d
 estadd scalar dv = r(mean)
 
-eststo stu_iqr : ivreg2 achievement_iqr (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 v2_sumshares_urban coastal transpo_cost_1920 [aw = popc1940], r
+eststo stu_iqr : ivreg2 achievement_iqr (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 v2_sumshares_urban coastal transpo_cost_1920 cz_popdens1940 mean_urban_income_1940 growth3040 [aw = popc1940], r
 su achievement_iqr, d
 estadd scalar dv = r(mean)
 
-eststo stu_var : ivreg2 achievement_var_cz (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 v2_sumshares_urban coastal transpo_cost_1920 [aw = popc1940], r
+eststo stu_var : ivreg2 achievement_var_cz (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 v2_sumshares_urban coastal transpo_cost_1920 cz_popdens1940 mean_urban_income_1940 growth3040 [aw = popc1940], r
 su achievement_var_cz, d
 estadd scalar dv = r(mean)
 
-eststo black_exposure: ivreg2 black_exposure (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 v2_sumshares_urban coastal transpo_cost_1920 [aw = popc1940], r
+eststo black_exposure: ivreg2 black_exposure (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 v2_sumshares_urban coastal transpo_cost_1920 cz_popdens1940 mean_urban_income_1940 growth3040 [aw = popc1940], r
 su black_exposure, d
 estadd scalar dv = r(mean)
 
-eststo white_exposure: ivreg2 white_exposure (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 v2_sumshares_urban coastal transpo_cost_1920 [aw = popc1940], r
+eststo white_exposure: ivreg2 white_exposure (GM_raw_pp = GM_hat_raw) reg2 reg3 reg4 v2_sumshares_urban coastal transpo_cost_1920 cz_popdens1940 mean_urban_income_1940 growth3040 [aw = popc1940], r
 su white_exposure, d
 estadd scalar dv = r(mean)
 

@@ -328,8 +328,8 @@ foreach level in cz {
 		
 		use "$CLEANDATA/dcourt/GM_`level'_final_dataset.dta", clear
 		g ne_ut = state_id == 31 | state_id == 49
-		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_* WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970 *_sumshares GM_hat_r* wpop* v2_black_proutmigpr v2w_white_proutmigpr v2w_whitemig3539_share1940 wpop1970 wpop1940 
-		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970  *_sumshares GM_hat_r* wpop* v2_black_proutmigpr v2w_white_proutmigpr v2w_whitemig3539_share1940 wpop1970 wpop1940 
+		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_* WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970 *_sumshares GM_hat_r* wpop* v2_black_proutmigpr v2w_white_proutmigpr v2w_whitemig3539_share1940 wpop1970 wpop1940 v2wipw* v2ipw* v2went* v2ent* GM_2w_hat WM
+		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970  *_sumshares GM_hat_r* wpop* v2_black_proutmigpr v2w_white_proutmigpr v2w_whitemig3539_share1940 wpop1970 wpop1940 v2wipw* v2ipw* v2went* v2ent* GM_2w_hat WM
 		
 
 
@@ -392,8 +392,10 @@ foreach level in cz {
 		// Incorporated land
 		g decade = 1940
 		merge 1:1 `levelvar' decade using "$INTDATA/cgoodman/`level'_geogs.dta", keep(1 3) 
-		replace frac_land = 0 if _merge==1
-		replace frac_total = 0 if _merge==1
+		replace frac_land = 0 if _merge == 1
+		replace frac_total = 0 if _merge == 1
+		replace land_incorp = 0 if _merge == 1
+		replace total_incorp = 0 if _merge == 1
 		drop _merge decade
 		
 
@@ -406,10 +408,6 @@ foreach level in cz {
 			}
 		}
 		
-		// Population densities (relative to 2010 land size)
-		forv y=1940(10)1970{
-			g cz_popdens`y' = pop`y'/cz_land2010
-		}
 		
 		if "`level'" == "cz"{
 			
@@ -442,8 +440,8 @@ foreach level in cz {
 		
 		preserve
 			use "$INTDATA/census/cz_urbanization_1900_1930", clear
-			keep pop cz decade
-			reshape wide pop, i(cz) j(decade)
+			keep pop age black  literate labforce occscore cz decade
+			reshape wide pop age black  literate labforce occscore, i(cz) j(decade)
 			tempfile oldpops
 			save `oldpops'
 		restore
@@ -488,6 +486,11 @@ foreach level in cz {
 				lab var n_`ds'_`level'_pcc "New `label', P.C. (urban)"
 				lab var n2_`ds'_`level'_pcc "New `label', P.C. (urban) 1950-70"
 				lab var ld_`ds'_`level'_pc "New `label', P.C. (urban) 1940-2010"
+				
+				foreach y in 50 60 70{
+					local y2 = `y'-10
+					g n`y2'`y'_`ds'_`level'_pc = b_`ds'_`level'19`y'/(pop19`y'/10000) - b_`ds'_`level'19`y2'/(pop19`y'/10000) 
+				}
 
 		}
 		
@@ -619,6 +622,13 @@ foreach level in cz {
 		g change_enclosed4070 = (enclosed1970 - enclosed1940)/(total_length - enclosed1940)
 		
 		
+		// Population densities (relative to 2010 land size)
+		
+		forv y=1940(10)1970{
+			g cz_popdens`y' = pop`y'/(cz_total2010/1000000)
+			lab var cz_popdens`y' "Population Density, `y'"
+		}
+		
 		// Add total black pop
 		preserve
 			use "$INTDATA/census/cz_race_data.dta", clear
@@ -632,7 +642,7 @@ foreach level in cz {
 		
 		merge 1:1 cz using `bpop', keep(3) nogen
 		
-		// Touching Munis
+		// Touching Munis
 		// Merge in County Instruments
 		preserve
 			use "$INTDATA/dcourt/instrument/city_crosswalked/2wc_white_prmig_1940_1970_wide_xw.dta", clear
@@ -744,17 +754,24 @@ foreach level in cz {
 		// Court Orders
 		ren cz czone
 		merge 1:1 czone using "$CLEANDATA/nces/cz_court_orders", keep(1 3) nogen
+		ren czone cz
 		
 		su GM_raw_pp, d
 		g above_x_med = GM_raw_pp >= r(p50)
-		g growth3040 = log(pop1940) - log(pop1930)
-		
+		//g growth3040 = log(pop1940) - log(pop1930)
+		g growth3040 = 100*(pop1940 - pop1930)/pop1930
 		g GM_rawXco = GM_raw_pp * court_order
 		g GM_rawXfrac_co = GM_raw_pp * frac_court_ordered
 		g GM_hatXco = GM_hat_raw * court_order
 		g GM_hatXfrac_co = GM_hat_raw * frac_court_ordered
 
-
+		
+		lab var higrade "Average years of education"
+		lab var hsgrad "Prop HS Grads"
+		lab var unigrad "Prop College Grads"
+		lab var mean_urban_income_1940 "1940 Income (Urban Areas)"
+		lab var growth3040 "1930-40 Population Growth Rate"
+		
 		save "$CLEANDATA/`level'_pooled`outsamptab'", replace
 		
 	}

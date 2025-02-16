@@ -34,12 +34,16 @@ foreach level in county cz{
 		}
 
 
-		keep `levelvar' frac_land19* frac_total19* `level'_land
+		keep `levelvar' frac_land19* frac_total19* `level'_land `level'_total land* total*
 
-		collapse (max) frac_land19* frac_total19* `level'_land, by(`levelvar')
+		collapse (max) land* total* frac_land19* frac_total19* `level'_land `level'_total, by(`levelvar')
 
-		reshape long frac_land frac_total , i(`levelvar') j(decade) 
+		reshape long frac_land frac_total land total, i(`levelvar') j(decade) 
 		ren `level'_land `level'_land2010
+		ren `level'_total `level'_total2010
+		ren land land_incorp
+		ren total total_incorp
+		
 		save "$INTDATA/cgoodman/`level'_geogs.dta", replace
 	restore
 }

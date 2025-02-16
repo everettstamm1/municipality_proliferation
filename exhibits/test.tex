@@ -24,39 +24,155 @@
 
 
 
-\section{MAIN}
+\section{Updated Tables}
+
+
 \input{tables/balancetables/balancetable.tex}
 \clearpage
-\input{tables/final/main_effect_new_ctrl}
+
+\begin{table}
+\footnotesize
+\centering
+\caption{The Effect of the Great Migration on Jurisdictions Per Capita using the Shift-Share Design}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/main_effect_long}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
 \clearpage
-\input{tables/final/white_effect_new_ctrl}
+
+\begin{landscape}
+\input{tables/land_use_index/muni_outcomes_ols.tex}
+\end{landscape}
 \clearpage
-\input{tables/final/main_effect_ld_new_ctrl}
+
+\begin{table}[htbp]
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi} 
+\centering
+\caption{Downstream: School Segregation and Achievement}\label{tab:seg}
+\begin{threeparttable}
+\footnotesize 
+\input{tables/implications/student_segregation_table_school.tex}
+    \end{threeparttable}
+    \end{table}
 \clearpage
-\input{tables/final/main_effect_1950_1970_new_ctrl}
+
+\begin{landscape}
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Summary statistics}
+\input{tables/summary.tex}
+ \end{threeparttable}
+\end{table}
+\end{landscape}
 \clearpage
-\input{tables/final/main_effect_eurmig_new_ctrl}
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{New Municipalities Pre-trends}
+\input{tables/balancetables/pretrends_new_ctrls.tex}
+\end{threeparttable}
+\end{table}
 \clearpage
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Effects, 1952-1972}
+\footnotesize
+\input{tables/final/main_effect_1950_1970_new_ctrl.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Effects, Percentile}
+\footnotesize
+\input{tables/final/main_effect_pctile_new_ctrl.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+%\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Effects, Quadratic Control}
+%\footnotesize
+%\input{tables/final/main_effect_quad_new_ctrl.tex}
+%\end{threeparttable}  \end{table}
+%\clearpage
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Effects, European Migration Control}
+\footnotesize
+\input{tables/final/main_effect_eurmig_new_ctrl.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{White Effects, Main Spec}
+\footnotesize
+\input{tables/final/white_effect_new_ctrl.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{White Effects, Percentage Point Spec}
+\footnotesize
+\input{tables/final/white_effect_pp_new_ctrl.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main effects, Township Outcome} \label{tab:main_effect_towns}
+\input{tables/final/main_effect_towns}
+ \end{threeparttable}
+ \end{table}
+
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  
+\caption{Municipalities Incorporated between 1940 and 1970: Additional variables}\label{tab:touching_pct_rev_debt}
+\begin{threeparttable}
+\scriptsize 
+    \input{tables/land_use_index/touching_pct_rev_debt}
+
+    \end{threeparttable}
+    \end{table}
+
+
+\section*{New Material}
+
+\clearpage
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main effects, County-to-county links} 
 \input{tables/final/main_effect_county}
+ \end{threeparttable}
+ \end{table}
 \clearpage
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{White effects, county-to-county links} 
 \input{tables/final/white_effect_county}
-\clearpage
+ \end{threeparttable}
+ \end{table}
 
+\clearpage
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Principal city had desegregation order} 
 \input{tables/final/main_effect_co_new_ctrl}
+ \end{threeparttable}
+ \end{table}
+
 \clearpage
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Proportion of students under desegregation order} 
 \input{tables/final/main_effect_frac_co_new_ctrl}
-\clearpage
+ \end{threeparttable}
+ \end{table}
 
 
-\begin{figure}
-    \centering
-    \caption{Most Incorporations in 1940-1970 are White}\label{fig:pcarrow_figure}
-    \includegraphics[width = .65\textwidth]{figures/pcarrow_figure_GM.pdf}
-\end{figure}
+
 \clearpage
 \begin{figure}
     \centering
-    \caption{Most Incorporations in 1940-1970 have Some HS}\label{fig:pcarrow_figure}
+    \caption{Incorporations in 1940-1970 by some HS education}\label{fig:pcarrow_figure}
     \includegraphics[width = .65\textwidth]{figures/pcarrow_figure_GM_somehs.pdf}
 \end{figure}
 \clearpage
@@ -64,15 +180,63 @@
 
 \begin{figure}
     \centering
-    \caption{Most Incorporations in 1940-1970 are College Grads}\label{fig:pcarrow_figure}
+    \caption{Incorporations in 1940-1970 by Four Years College}\label{fig:pcarrow_figure}
     \includegraphics[width = .65\textwidth]{figures/pcarrow_figure_GM_colgrad.pdf}
 \end{figure}
 \clearpage
-\begin{landscape}
-\input{tables/land_use_index/muni_outcomes_ols.tex}
+
+
+\subsection*{Other Pre-Trends}
+
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Population Pre-trends}
+\input{tables/balancetables/pretrends_pop.tex}
+\end{threeparttable}
+\end{table}
 \clearpage
-\input{tables/land_use_index/muni_outcomes_ols_policies.tex}
-\end{landscape}
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Age Pre-trends}
+\input{tables/balancetables/pretrends_age.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Black Pre-trends}
+\input{tables/balancetables/pretrends_black.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Literacy Pre-trends}
+\input{tables/balancetables/pretrends_literate.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{In-Labor Force Pre-trends}
+\input{tables/balancetables/pretrends_labforce.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{OCCSCORE Pre-trends}
+\input{tables/balancetables/pretrends_occscore.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
 
 
 \end{document}

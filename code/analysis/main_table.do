@@ -125,6 +125,12 @@ main_table, endog(WM_raw_pp) exog(`winst') controls(`w_b_controls') weight(popc1
 
 main_table, endog(WM_raw_pp) exog(`winst') controls(`w_b_controls' `w_extra_controls') weight(popc1940) path("$TABS/final/white_effect_new_ctrl.tex") deplab(n)
 	
+
+// White migration - old
+main_table, endog(WM_raw_pp) exog(GM_2w_hat_raw_pp) controls(`w_b_controls') weight(popc1940) path("$TABS/final/white_effect_pp.tex") deplab(n)
+
+main_table, endog(WM_raw_pp) exog(GM_2w_hat_raw_pp) controls(`w_b_controls' `w_extra_controls') weight(popc1940) path("$TABS/final/white_effect_pp_new_ctrl.tex") deplab(n)
+	
 	
 // Quadratic Control
 main_table, endog(GM_raw_pp) exog(`inst') controls(`b_controls') weight(popc1940) path("$TABS/final/main_effect_quad.tex") deplab(n) endog2(GM_raw_pp_2) exog2(`inst'_2)
@@ -132,7 +138,6 @@ main_table, endog(GM_raw_pp) exog(`inst') controls(`b_controls') weight(popc1940
 main_table, endog(GM_raw_pp) exog(`inst') controls(`b_controls' `extra_controls') weight(popc1940) path("$TABS/final/main_effect_quad_new_ctrl.tex") deplab(n) endog2(GM_raw_pp_2) exog2(`inst'_2)
 
 // Cort order het
-
 main_table, endog(GM_raw_pp) exog(`inst') controls(`b_controls' `extra_controls' court_order) weight(popc1940) path("$TABS/final/main_effect_co_new_ctrl.tex") deplab(n) endog2(GM_rawXco) exog2(GM_hatXco)
 
 
@@ -140,14 +145,12 @@ main_table, endog(GM_raw_pp) exog(`inst') controls(`b_controls' `extra_controls'
 
 
 // County Table
-drop GM_raw_county WM_raw_county
-g GM_raw_county = 100*(bpop1970 - bpop1940)/pop1940
-g WM_raw_county = 100*(wpop1970 - wpop1940)/pop1940
-
-main_table, endog(GM_raw_county) exog(GM_inst_county) controls(reg2 reg3 reg4 v2c_sumshares_total coastal transpo_cost_1920 mean_urban_income_1940 growth3040) weight(pop1940) path("$TABS/final/main_effect_county.tex") deplab(n) 
 
 
-main_table, endog(WM_raw_county) exog(WM_inst_county) controls(reg2 reg3 reg4 v2wc_sumshares_total coastal transpo_cost_1920 mean_urban_income_1940 growth3040) weight(pop1940) path("$TABS/final/white_effect_county.tex") deplab(n) 
+main_table, endog(GM_raw_county) exog(GM_inst_county) controls(reg2 reg3 reg4 v2c_sumshares_total coastal transpo_cost_1920 mean_urban_income_1940 cz_popdens1940 frac_land) weight(pop1940) path("$TABS/final/main_effect_county.tex") deplab(n) 
+
+
+main_table, endog(WM_raw_county) exog(WM_inst_county) controls(reg2 reg3 reg4 v2wc_sumshares_total coastal transpo_cost_1920 mean_urban_income_1940 cz_popdens1940 frac_land) weight(pop1940) path("$TABS/final/white_effect_county.tex") deplab(n) 
 
 
 // Above median enclosedness split

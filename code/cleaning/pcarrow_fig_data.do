@@ -144,10 +144,15 @@ import delimited using "$RAWDATA/census/nhgis0027_csv/nhgis0027_csv/nhgis0027_ts
 egen place_pop1970 = rowtotal(b18aa1970 b18ab1970 b18ac1970 b18ad1970)
 g place_wpop1970 = b18aa1970
 g place_bpop1970 = b18ab1970
+g place_apop1970 = b18ad1970
 
 egen place_pop2010 = rowtotal(b18aa2010 b18ab2010 b18ac2010 b18ad2010)
 g place_wpop2010 = b18aa2010
 g place_bpop2010 = b18ab2010
+g place_apop2010 = b18ad2010
+
+g place_whaspop1970 = place_wpop1970 + place_apop1970
+g place_whaspop2010 = place_wpop2010 + place_apop2010
 
 // Dropping duplicated unincorporated towns
 duplicates tag placea statefp, gen(dup)
