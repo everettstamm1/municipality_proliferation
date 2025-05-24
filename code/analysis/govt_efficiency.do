@@ -13,7 +13,7 @@ drop totexp19*  ltotexp19* ltotexp_pc19*
 g l_hv_1970 = log(agg_house_value_place1970)
 ren totexp_pc197* ltotexp_pc197*
 
-reghdfe l_hv_1970 ltotexp_pc1970 samp_dest above_x_med samp_destXabove_x_med ltotexp_pc1970_above_x_med ltotexp_pc1970_samp_dest ltotexp_pc1970_both reg2 reg3 reg4  v2_sumshares_urban coastal transpo_cost_1920  mean_uninc1940 cz_popdens1940 growth3040 [aw=weight_pop], vce(cl cz)
+reghdfe l_hv_1970 ltotexp_pc1970 samp_dest above_x_med samp_destXabove_x_med ltotexp_pc1970_above_x_med ltotexp_pc1970_samp_dest ltotexp_pc1970_both reg2 reg3 reg4  sumshare_base mean_income_1940 cz_popdens1940 mfg_lfshare1940 [aw=weight_pop], vce(cl cz)
 test ltotexp_pc1970_above_x_med + ltotexp_pc1970_both = 0
 local unincorp_below = _b[ltotexp_pc1970]
 local unincorp_above = _b[ltotexp_pc1970] + _b[ltotexp_pc1970_above_x_med]
@@ -34,7 +34,7 @@ g lmed_hv_place = log(med_hv_place)
 
 drop ltotexp_pc19*
 
-reghdfe lmed_hv_place ltotexp samp_dest above_x_med samp_destXabove_x_med ltotexp_samp_dest ltotexp_above_x_med ltotexp_both reg2 reg3 reg4 v2_sumshares_urban coastal transpo_cost_1920 [aw=weight_pop], vce(cl cz)
+reghdfe lmed_hv_place ltotexp samp_dest above_x_med samp_destXabove_x_med ltotexp_samp_dest ltotexp_above_x_med ltotexp_both reg2 reg3 reg4   mean_income_1940 cz_popdens1940 mfg_lfshare1940 [aw=weight_pop], vce(cl cz)
 test ltotexp_above_x_med + ltotexp_both = 0
 
 local unincorp_below = _b[ltotexp]

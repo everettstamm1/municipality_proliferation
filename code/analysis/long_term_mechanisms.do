@@ -1,7 +1,7 @@
 // IDEA: reghdfe med_hv_place exp_pc samp_dest above_x_med exp_pcXsamp_dest exp_pcXabove_x_med exp_pcXsamp_destXabove_x_med [aw=weight_pop], vce(cl cz)
 
-local b_controls reg2 reg3 reg4 v2_sumshares_urban
-local extra_controls coastal transpo_cost_1920 cz_popdens1940 mean_uninc1940 growth3040
+local b_controls reg2 reg3 reg4 sumshare_base
+local extra_controls mfg_lfshare1940 mean_income_1940 cz_popdens1940
 
 use "$CLEANDATA/mechanisms.dta", clear
 drop if badmuni==1 | mi(cz)
@@ -18,37 +18,18 @@ replace prop_black2010 = 100*prop_black2010
 replace prop_white2010 = 100*prop_white2010
 replace mean_hh_inc_place = mean_hh_inc_place / 1000
 replace place_total = log(place_total)
+
 foreach m in  ols{
 	if "`m'"=="rf" local mod "Reduced Form"
 	if "`m'"=="iv" local mod "IV"
 	if "`m'"=="ols" local mod "OLS"
 
 	eststo clear
-	foreach covar of varlist prop_white2010 place_total mean_hh_inc_place  pct_rev_sa  pct_rev_ff landuse_sfr landuse_apartment  exclusive_district_shape {
+	foreach covar of varlist prop_black2010 place_total mean_hh_inc_place  pct_rev_sa  pct_rev_ff landuse_sfr landuse_apartment  exclusive_district_shape {
 		local mname = subinstr("`covar'","landuse_", "",.)
 		lab var `covar' "`mname'"
-		if "`m'"=="iv"{
-			di "here1, m: `m', covar: `covar'"
-			su `covar' if above_x_med == 0
-			local bdv : di %6.2f r(mean)
-			su `covar' if above_x_med == 0 & samp_dest == 0 [aw = weight_pop]
-			local bdvw : di %6.2f r(mean)
-			 eststo `covar' : ivreghdfe `covar' samp_dest (above_x_med samp_destXabove_x_med = above_inst_med samp_destXabove_z_med) v2_sumshares_urban v2_sumshares_urban_samp_dest reg2_samp_dest reg3_samp_dest reg4_samp_dest  transpo_cost_1920 transpo_cost_1920_samp_dest coastal coastal_samp_dest  [aw=weight_pop], cl(cz)
-			 estadd scalar bdv = `bdv'
-			 estadd scalar bdvw = `bdvw
-
-		}
-		else if "`m'"=="rf"{
-						di "here2, m: `m', covar: `covar'"
-		su `covar' if above_z_med == 0
-		local bdv : di %6.2f r(mean)
-		su `covar' if above_z_med == 0 [aw = weight_pop]
-		local bdvw : di %6.2f r(mean)
-			 eststo `covar' : reghdfe `covar' samp_destXabove_z_med above_inst_med  samp_dest  v2_sumshares_urban v2_sumshares_urban_samp_dest reg2_samp_dest reg3_samp_dest reg4_samp_dest  transpo_cost_1920 transpo_cost_1920_samp_dest coastal coastal_samp_dest  [aw=weight_pop], vce(cl cz) absorb(region)
-			 estadd scalar bdv = `bdv'
-			 estadd scalar bdvw = `bdvw
-		}
-		else if "`m'"=="ols"{
+		
+		if "`m'"=="ols"{
 						di "here3, m: `m', covar: `covar'"
 
 		su `covar' if above_x_med == 0 & samp_dest == 0 [aw = weight_pop]
@@ -58,10 +39,10 @@ foreach m in  ols{
 		}
 	}
 
-	esttab prop_white2010 place_total mean_hh_inc_place  pct_rev_sa  pct_rev_ff landuse_sfr landuse_apartment  exclusive_district_shape ///
+	esttab prop_black2010 place_total mean_hh_inc_place  pct_rev_sa  pct_rev_ff landuse_sfr landuse_apartment  exclusive_district_shape ///
 				using "$TABS/land_use_index/muni_outcomes_`m'.tex", booktabs compress label replace lines se frag ///
 				 starlevels( * 0.10 ** 0.05 *** 0.01) ///
-				mtitles("\shortstack{Percentage \\ White}" "\shortstack{Log City \\ Area}" "\shortstack{2010 Household \\ Income}" "\shortstack{Special \\ Assessments}" "\shortstack{Fines and \\ Forfeitures}" "\shortstack{Single \\ Family}" "Apartments" "\shortstack{Exclusive \\ District}") ///
+				mtitles("\shortstack{Percentage \\ Black}" "\shortstack{Log City \\ Area}" "\shortstack{2010 Household \\ Income}" "\shortstack{Special \\ Assessments}" "\shortstack{Fines and \\ Forfeitures}" "\shortstack{Single \\ Family}" "Apartments" "\shortstack{Exclusive \\ District}") ///
 				mgroups("2010 Muni Characteristics" "\shortstack{Percentage of \\ Municipal Revenues}" "\shortstack{Percentage of \\ Municipal Land Uses}"  "\shortstack{Muni-District \\ Similarity}" ,pattern(1 0 0 1 0 1 0 1) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(samp_destXabove_?_med above_?_med samp_dest) b(%5.3f) se(%5.3f) ///
 				prehead( \begin{tabularx}{\linewidth}{l*{8}{>{\centering\arraybackslash}X}} \toprule) postfoot(	\bottomrule \end{tabularx}) stats(  bdvw N, labels( "Omitted Category Avg." "Observations") fmt(2 0))
 

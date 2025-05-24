@@ -60,8 +60,7 @@ lab var weight_pop "Weighted by 1940 municipal population"
 preserve
 	use "$CLEANDATA/cz_pooled", clear
 	keep if dcourt == 1
-	keep cz cz_name popc1940 GM_raw_pp GM_hat_raw v2_sumshares_urban transpo_cost_1920 coastal n_schdist_ind_cz_pc pop1940 cz_popdens1940 growth3040 mean_urban_income_1940 frac_land frac_total cz_popdens1940
-	ren mean_urban_income_1940 mean_uninc1940 
+	keep cz cz_name popc1940 GM_raw_pp GM_hat_raw v2_sumshares_urban transpo_cost_1920 coastal n_schdist_ind_cz_pc pop1940 cz_popdens1940 mean_income_1940 mfg_lfshare1940 shift_share_base sumshare_base
 	g schoolflag = n_schdist_ind_cz_pc < .
 	drop n_schdist_ind_cz_pc
 	qui su GM_raw_pp, d
@@ -395,7 +394,7 @@ restore
 */
 // Interactions
 
-foreach var of varlist v2_sumshares_urban coastal transpo_cost_1920 reg2 reg3 reg4 totexp1970 totexp_pc1970 ltotexp1970 ltotexp_pc1970 cz_popdens1940 mean_uninc1940 growth3040 {
+foreach var of varlist totexp1970 totexp_pc1970 ltotexp1970 ltotexp_pc1970 {
 	local lb : variable label `var'
 	g `var'_samp_dest = `var'*samp_dest
 	g `var'_above_x_med = `var'*above_x_med

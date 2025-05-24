@@ -87,6 +87,10 @@ STEPS:
 	drop if bpopc1940 ==. | bpopc1970 ==. | ///
 					popc1940 ==.  | popc1970 ==.
 	keep if popc1940 >=25000 | popc1970>=25000
+	
+	keep city citycode cz cz_name popc1940
+	bys cz : egen cz_popc1940 = total(popc1940)
+	save "$INTDATA/dcourt/xwalk_296_city_cz.dta", replace
 	keep cz cz_name
 	duplicates drop
 	save "$INTDATA/dcourt/original_130_czs", replace
@@ -243,6 +247,7 @@ STEPS:
 
 		foreach v in `varstubs2'{
 		merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/`v'_black_prmig_1940_1970_wide_xw.dta"
+		
 ren sumshares v`v'_sumshares
 		/* Drop cities for which there's no hope of getting predictions for black pop in 
 		1970 data for these cities. This set of cities will change depending on the 
@@ -317,9 +322,44 @@ ren sumshares v`v'_sumshares
 		*	residualized on southern state fixed effects.
 		
 		
-		* Version 8 of the instrument: 
-		*	1935-1940 white southern migrant location choice X total observed 1940-1970 white net-migration for southern counties,
-		foreach v in "8" "2w"{
+		* Version 2t of the instrument: 
+		*	1935-1940 total southern migrant location choice X total predicted 1940-1970 net-migration for southern counties,
+		foreach v in "2t" "2tint"{
+					local type = "pr"
+
+		merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/`v'_all_`type'mig_1940_1970_wide_xw.dta", keepusing(totallmigcity3539 all_`type'outmig`type'* sumshares)
+		ren sumshares v`v'_sumshares
+		/* Drop cities for which there's no hope of getting predictions for black pop in 
+		1970 data for these cities. This set of cities will change depending on the 
+		migration matrix used.*/
+		drop if _merge==2 
+		drop _merge
+
+		/* Assume zero change in black pop for cities that black migrants did not move 
+		to between 1935 and 1940. Results are robust to changing this criterion. 
+		Uncomment "keep if _merge==3" and run again. */
+		
+		foreach var of varlist all_`type'outmig`type'*{
+		replace `var'=0 if `var'==.
+		rename `var' v`v'_`var'
+		}
+		rename totallmigcity3539 v`v'_totallmigcity3539
+		}
+		foreach v in "2pp" "2wpp"{
+			local wcode =cond("`v'"=="2pp","black","white")
+
+			merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/`v'_`wcode'_prmig_1940_1970_wide_xw.dta", keepusing(tot`wcode'migcity3539 `wcode'_proutmigpr* sumshares)
+			ren sumshares v`v'_sumshares
+			drop if _merge==2 
+			drop _merge
+			foreach var of varlist `wcode'_proutmigpr*{
+				replace `var'=0 if `var'==.
+				rename `var' v`v'_`var'
+			}
+			rename tot`wcode'migcity3539 v`v'_tot`wcode'migcity3539
+		}
+		
+		foreach v in "8" "2w" "1940w"{
 					local type = cond("`v'"=="8","act","pr")
 
 		merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/`v'_white_`type'mig_1940_1970_wide_xw.dta", keepusing(totwhitemigcity3539 white_`type'outmig`type'* sumshares)
@@ -340,7 +380,6 @@ ren sumshares v`v'_sumshares
 		}
 		rename totwhitemigcity3539 v`v'_totwhitemigcity3539
 		}
-		
 		* Version 80 of the instrument: 
 		*	1935-1940 black southern migrant location choice X total observed 1940-1970 black net-migration for southern counties,
 		foreach v in "80" {
@@ -478,6 +517,8 @@ local do_resample = 0
 			
 			g wcpp1940_1970=100*((wpopc1970/popc1970)-(wpopc1940/popc1940))
 			g wc1940_1970=100*((wpopc1970 -wpopc1940)/popc1940)
+			
+			g tc1940_1970 = 100*((popc1970 - popc1940)/popc1940)
 
 			* Instrument by version
 			* Version 0
@@ -497,6 +538,14 @@ local do_resample = 0
 
 			}
 			
+			* Versions 1, 2, 1940
+			foreach v in "2t" "2tint"{
+			g v`v'_tc_pred1940_1970=100*v`v'_all_proutmigpr/popc1940
+			
+			g v`v'_allmig3539_share1940=100*v`v'_totallmigcity3539/popc1940
+			
+
+			}
 			
 			
 			foreach v in "2ipw" "2ent" "2wipw" "2went"{
@@ -523,7 +572,7 @@ local do_resample = 0
 			}
 			
 			* Versions 8
-			foreach v in "8" "2w"{
+			foreach v in "8" "2w" "1940w"{
 				local type = cond("`v'"=="8","act","pr")
 
 			g v`v'_wc_pred1940_1970=100*v`v'_white_`type'outmig`type'/popc1940
@@ -831,6 +880,26 @@ local do_resample = 0
 			
 			merge 1:1 cz using "$RAWDATA/dcourt/clean_cz_population_1940_1970", keep(1 3) keepusing(pop1940 pop1950 pop1960 pop1970 wpop1940 wpop1970) nogen
 			
+			*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
+			*7.5 Add real southern white
+			*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
+			merge 1:1 cz using "$INTDATA/census/southernpops_1940", keep(1 3) nogen keepusing(southern_black* southern_white* southern_black_urban* southern_white_urban*)
+			ren southern_* southern_*1940
+			merge 1:1 cz using "$INTDATA/census/southernpops_1970", keep(1 3) nogen keepusing(southern_black* southern_white* southern_black_urban* southern_white_urban*)
+			ren southern_* southern_*1970
+
+			g test1 = 100*(southern_white_urban1970/popc1970)
+			g test2 = 100*(southern_white_urban1940/popc1940)
+			g GM_sob_pp = 100*((southern_black_urban1970/popc1970) - (southern_black_urban1940/popc1940))
+			g GM_tot_sob_pp = 100*((southern_black1970/pop1970) - (southern_black1940/pop1940))
+			g WM_sob_pp = 100*((southern_white_urban1970/popc1970) - (southern_white_urban1940/popc1940))
+			g WM_tot_sob_pp = 100*((southern_white1970/pop1970) - (southern_white1940/pop1940))
+			
+			g GM_sob = 100*((southern_black_urban1970 - southern_black_urban1940)/popc1940)
+			g GM_tot_sob = 100*((southern_black1970 -southern_black1940)/pop1940)
+			g WM_sob = 100*((southern_white_urban1970 - southern_white_urban1940)/popc1940)
+			g WM_tot_sob = 100*((southern_white1970 - southern_white1940)/pop1940)
+			
 				*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 			*8. Label key variables and save final dataset. 
 			*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
@@ -850,7 +919,13 @@ local do_resample = 0
 			ren bc1940_1970 GM_raw
 			ren bcpp1940_1970 GM_raw_pp
 			ren wcpp1940_1970 WM_raw_pp
+			ren tc1940_1970 AM_raw
+			ren v2t_tc_pred1940_1970 AM_hat_raw
+			ren v2tint_tc_pred1940_1970 AM_int_hat_raw
 			
+			ren v2wpp_white_proutmigpr WM_hat_pp
+			ren v2pp_black_proutmigpr GM_hat_pp
+
 			ren v2_bc_pred1940_1970 GM_hat_raw
 			ren v2_bcpp_pred1940_1970 GM_hat_raw_pp
 			
@@ -861,8 +936,13 @@ local do_resample = 0
 			ren v2w_wc_pred1940_1970 GM_2w_hat_raw
 			ren v2w_wcpp_pred1940_1970 GM_2w_hat_raw_pp
 			
+			ren v1940w_wc_pred1940_1970 WM_sob_hat_raw
+			ren v1940w_wcpp_pred1940_1970 WM_sob_hat_raw_pp
+			ren v1940_bc_pred1940_1970 GM_sob_hat_raw
+			ren v1940_bcpp_pred1940_1970 GM_sob_hat_raw_pp
 			
-			foreach v in 1940 r 7r{
+			
+			foreach v in r 7r{
 				ren v`v'_bcpp_pred1940_1970 GM_`v'_hat_raw_pp
 			}
 			if `do_placebo'==1{

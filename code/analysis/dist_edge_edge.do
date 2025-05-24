@@ -1,12 +1,13 @@
 
 use "$CLEANDATA/mechanisms.dta", clear
-drop if badmuni==1
-g one_school = n_schools == 1
-g no_school = n_schools == 0
-g prop_white_students = wtenroll_place / totenroll_place
+drop if badmuni==1 | mi(cz)
 
-drop wtasenroll totenroll blenroll wtenroll n_ap n_ap_w75 gt de crdc_id wtenroll_hasap wtenroll_newmuni wtenroll_hasde wtenroll_hasgt ap gt de ncessch leaid  tot
+
+drop wtasenroll totenroll_leaid blenroll wtenroll   leaid   psum_*_dist pmax_*_dist min_hausdorff_dist dist_max_int dist_int_4070 *_leaid cs_mn_* number_of_schools pct_white fips sedaleaname area  stu_diss_bl_cz stu_diss_blwt_cz achievement_diss_blwt_cz achievement_diss_bl_cz stu_RCO_blwt_cz stu_A_05_blwt_cz stu_A_01_blwt_cz stu_A_09_blwt_cz stu_SP_touch_blwt_cz stu_SP_nexpd_blwt_cz stu_vr_bl_cz stu_vr_blwt_cz achievement_VR_blwt_cz achievement_* totenroll_*
+
 duplicates drop
+unique STATEFP PLACEFP
+assert _N == r(N)
 
 replace len_edge_edge = len_edge_edge/1610
 replace len_center_edge = len_center_edge/1610

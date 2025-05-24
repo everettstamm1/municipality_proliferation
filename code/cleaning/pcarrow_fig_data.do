@@ -217,16 +217,39 @@ preserve
 	ren PLACEFP placefips
 	ren STATEFP statefips
 	merge 1:1 cz statefips placefips using `incorps', keep(1 3) nogen
-	bys cz : egen cz_new_inc2010 = mean(mean_hh_inc_place) if (yr_incorp >= 1940 & yr_incorp <= 1970)
+	bys cz : egen cz_new_inc2010 = mean(mean_earnings_place) if (yr_incorp >= 1940 & yr_incorp <= 1970)
 	bys cz (cz_new_inc2010): replace cz_new_inc2010 = cz_new_inc2010[1]
-	ren mean_hh_inc_cz cz_inc2010
+	ren mean_earnings_cz cz_inc2010
 	keep cz cz_inc2010 cz_new_inc2010
 	duplicates drop
-	tempfile economic
-	save `economic'
+	tempfile economic2010
+	save `economic2010'
 restore 
 
-merge m:1 cz using `economic', keep(1 3) nogen
+merge m:1 cz using `economic2010', keep(1 3) nogen
+
+
+preserve
+	keep statefips placefips cz yr_incorp
+	tempfile incorps
+	save `incorps'
+	
+	use "$INTDATA/census/1970_hh_incomes_hv", clear
+	ren PLACEFP placefips
+	ren STATEFP statefips
+	merge 1:1 cz statefips placefips using `incorps', keep(1 3) nogen
+	bys cz : egen cz_new_inc1970 = mean(agg_fam_inc_place1970) if (yr_incorp >= 1940 & yr_incorp <= 1970)
+	bys cz (cz_new_inc1970): replace cz_new_inc1970 = cz_new_inc1970[1]
+	ren agg_fam_inc_cz1970 cz_inc1970
+	keep cz cz_inc1970 cz_new_inc1970
+	duplicates drop
+	tempfile economic1970
+	save `economic1970'
+restore 
+
+merge m:1 cz using `economic1970', keep(1 3) nogen
+
+
 keep cz cz_name cz_* GM_* above_x_med
 duplicates drop
 

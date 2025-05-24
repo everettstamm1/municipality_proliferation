@@ -328,8 +328,8 @@ foreach level in cz {
 		
 		use "$CLEANDATA/dcourt/GM_`level'_final_dataset.dta", clear
 		g ne_ut = state_id == 31 | state_id == 49
-		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_* WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970 *_sumshares GM_hat_r* wpop* v2_black_proutmigpr v2w_white_proutmigpr v2w_whitemig3539_share1940 wpop1970 wpop1940 v2wipw* v2ipw* v2went* v2ent* GM_2w_hat WM
-		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp GM_1940_hat_raw_pp GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970  *_sumshares GM_hat_r* wpop* v2_black_proutmigpr v2w_white_proutmigpr v2w_whitemig3539_share1940 wpop1970 wpop1940 v2wipw* v2ipw* v2went* v2ent* GM_2w_hat WM
+		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp  GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_* WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970 *_sumshares GM_hat_r* wpop* v2_black_proutmigpr v2w_white_proutmigpr v2w_whitemig3539_share1940 wpop1970 wpop1940 v2wipw* v2ipw* v2went* v2ent* GM_2w_hat WM AM* GM_hat_pp WM_hat_pp *sob* 
+		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp  GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970  *_sumshares GM_hat_r* wpop* v2_black_proutmigpr v2w_white_proutmigpr v2w_whitemig3539_share1940 wpop1970 wpop1940 v2wipw* v2ipw* v2went* v2ent* GM_2w_hat WM AM* GM_hat_pp WM_hat_pp *sob* 
 		
 
 
@@ -416,10 +416,12 @@ foreach level in cz {
 			ren cz czone
 			merge 1:1 czone using "$INTDATA/census/home_values", keep(1 3) nogen
 			//merge 1:1 czone using "$INTDATA/census/incomes", keep(1 3) nogen
-			merge 1:1 czone using "$INTDATA/census/incomes_and_education_1940", keep(1 3) nogen
-			merge 1:1 czone using "$INTDATA/census/urban_incomes_and_education_1940", keep(1 3) nogen
-
 			ren czone cz
+			merge 1:1 cz using "$INTDATA/census/incomes_and_education_1940", keep(1 3) nogen
+			//merge 1:1 czone using "$INTDATA/census/black_incomes_and_education_1940", keep(1 3) nogen
+			//drop mean_urban_income_1940 mean_pos_urban_income_1940
+			//merge 1:1 czone using "$INTDATA/census/urban_incomes_and_education_1940_scc", keep(1 3) nogen 
+
 		}
 		// Missing dummies
 		foreach var of varlist frac_land transpo_cost_1920 coastal has_port avg_precip avg_temp n_wells totfrac_in_main_city m_rr m_rr_sqm_land m_rr_sqm_total{
@@ -500,12 +502,15 @@ foreach level in cz {
 		}
 		
 		// Pretrends, cgoodman only
-		g n10_cgoodman_`level'_pc = b_cgoodman_cz1910/(pop1910/10000) -  b_cgoodman_cz1900/(pop1900/10000)
-		g n20_cgoodman_`level'_pc = b_cgoodman_cz1920/(pop1920/10000) -  b_cgoodman_cz1910/(pop1910/10000)
-		g n30_cgoodman_`level'_pc = b_cgoodman_cz1930/(pop1930/10000) -  b_cgoodman_cz1920/(pop1920/10000)
-		g n40_cgoodman_`level'_pc = b_cgoodman_cz1940/(pop1940/10000) -  b_cgoodman_cz1930/(pop1930/10000)
-		g pre_cgoodman_`level'_pc = b_cgoodman_cz1940/(pop1940/10000) -  b_cgoodman_cz1910/(pop1910/10000)
-		
+		g b190_cgoodman_`level'_pc = b_cgoodman_cz1900/(pop1900/10000)
+		forv y = 10(10)40{
+			local y1 = `y'-10
+			g b19`y'_cgoodman_`level'_pc = b_cgoodman_cz19`y'/(pop19`y'/10000)
+			g n`y'_cgoodman_`level'_pc = b19`y'_cgoodman_`level'_pc - b19`y1'_cgoodman_`level'_pc
+		}
+		ren b190_cgoodman_`level'_pc b1900_cgoodman_`level'_pc 
+		g pre_cgoodman_`level'_pc = b1940_cgoodman_cz_pc -  b1910_cgoodman_cz_pc
+
 		
 		lab var GM_raw_pp "Percentage Point Change in Urban Black Population"
 		lab var GM_hat_raw_pp "Predicted Percentage Point Change in Urban Black Population"
@@ -621,6 +626,7 @@ foreach level in cz {
 		
 		g change_enclosed4070 = (enclosed1970 - enclosed1940)/(total_length - enclosed1940)
 		
+		merge 1:1 cz using "$INTDATA/cgoodman/orig_geogs", keep(3) nogen
 		
 		// Population densities (relative to 2010 land size)
 		
@@ -629,6 +635,9 @@ foreach level in cz {
 			lab var cz_popdens`y' "Population Density, `y'"
 		}
 		
+		g orig_popdens1940 = popc1940/(orig_total/1000000)
+		g orig_popdenst1940 = popc1940/(orig_total/1000000)
+
 		// Add total black pop
 		preserve
 			use "$INTDATA/census/cz_race_data.dta", clear
@@ -645,6 +654,36 @@ foreach level in cz {
 		// Touching Munis
 		// Merge in County Instruments
 		preserve
+			use "$INTDATA/dcourt/instrument/city_crosswalked/2wcc_white_prmig_1940_1970_wide_xw.dta", clear
+
+			ren sumshares v2wcc_sumshares
+			
+			foreach var of varlist white_proutmigpr*{
+			replace `var'=0 if `var'==.
+			rename `var' v2wcc_`var'
+			}
+			rename totwhitemigdest_fips3539 v2wcc_totwhitemigdest_fips3539
+			
+			collapse (sum) v2wcc_sumshares v2wcc_totwhitemigdest_fips3539 v2wcc_white_proutmigpr, by(cz)
+						
+			tempfile white_county_county
+			save `white_county_county'
+			
+			use "$INTDATA/dcourt/instrument/city_crosswalked/2cc_black_prmig_1940_1970_wide_xw.dta", clear
+			ren czone cz
+			ren sumshares v2cc_sumshares
+			
+			foreach var of varlist black_proutmigpr*{
+			replace `var'=0 if `var'==.
+			rename `var' v2cc_`var'
+			}
+			rename totblackmigdest_fips3539 v2cc_totblackmigdest_fips3539
+			
+			collapse (sum) v2cc_sumshares v2cc_totblackmigdest_fips3539 v2cc_black_proutmigpr, by(cz)
+						
+			tempfile black_county_county
+			save `black_county_county'
+			
 			use "$INTDATA/dcourt/instrument/city_crosswalked/2wc_white_prmig_1940_1970_wide_xw.dta", clear
 			
 			ren sumshares v2wc_sumshares
@@ -678,10 +717,23 @@ foreach level in cz {
 		
 		merge 1:1 cz using `white_county', keep(1 3) nogen
 		merge 1:1 cz using `black_county', keep(1 3) nogen
+		merge 1:1 cz using `white_county_county', keep(1 3) nogen
+		merge 1:1 cz using `black_county_county', keep(1 3) nogen
 		replace v2c_sumshares = 0 if mi(v2c_sumshares)
 		replace v2c_totblackmigdest_fips3539 = 0 if mi(v2c_totblackmigdest_fips3539)
 		replace v2c_black_proutmigpr = 0 if mi(v2c_black_proutmigpr)
-
+		
+		replace v2cc_sumshares = 0 if mi(v2cc_sumshares)
+		replace v2cc_totblackmigdest_fips3539 = 0 if mi(v2cc_totblackmigdest_fips3539)
+		replace v2cc_black_proutmigpr = 0 if mi(v2cc_black_proutmigpr)
+		
+		replace v2wcc_sumshares = 0 if mi(v2wcc_sumshares)
+		replace v2wcc_totwhitemigdest_fips3539 = 0 if mi(v2wcc_totwhitemigdest_fips3539)
+		replace v2wcc_white_proutmigpr = 0 if mi(v2wcc_white_proutmigpr)
+		
+		g GM_hat_tot_sob = 100*(v2cc_black_proutmigpr/pop1940)
+		g WM_hat_tot_sob = 100*(v2wcc_white_proutmigpr/pop1940)
+	
 		g WM_raw_county=100*((wpop1970/pop1970)-(wpop1940/pop1940))
 		g WM_inst_county = 100*(v2wc_white_proutmigpr /pop1940)
 		
@@ -745,11 +797,22 @@ foreach level in cz {
 		
 		merge 1:1 cz using `incpop', keep(3) nogen
 		
+		
+		
 		g frac_uninc1970 = (pop1970 - incpop1970)/pop1970
 		g frac_uninc2010 = (pop2010 - incpop2010)/pop2010
 		g frac_unc1970 = ((pop1970- popc1970)/pop1970) 
 		g frac_unc1940 = ((pop1940 - popc1940)/pop1940)
 		g change_frac_unc = frac_unc1970 - frac_unc1940
+		
+		// Add in new sumshares
+		foreach version in base base_white county_black county_white white_sob black_sob black_notx white_notx{
+			merge 1:1 cz using "$INTDATA/ssaggregate_prep/dest_instrument_`version'", keep(3) nogen
+			ren shift_share shift_share_`version'
+			ren sumshare sumshare_`version'
+			replace shift_share_`version' = 100* shift_share_`version'
+		}
+		
 		
 		// Court Orders
 		ren cz czone
@@ -758,7 +821,6 @@ foreach level in cz {
 		
 		su GM_raw_pp, d
 		g above_x_med = GM_raw_pp >= r(p50)
-		//g growth3040 = log(pop1940) - log(pop1930)
 		g growth3040 = 100*(pop1940 - pop1930)/pop1930
 		g GM_rawXco = GM_raw_pp * court_order
 		g GM_rawXfrac_co = GM_raw_pp * frac_court_ordered
@@ -769,7 +831,8 @@ foreach level in cz {
 		lab var higrade "Average years of education"
 		lab var hsgrad "Prop HS Grads"
 		lab var unigrad "Prop College Grads"
-		lab var mean_urban_income_1940 "1940 Income (Urban Areas)"
+		//lab var mean_urban_income_1940 "1940 Income (Urban Areas)"
+		lab var mean_income_1940 "Average Income, 1940)"
 		lab var growth3040 "1930-40 Population Growth Rate"
 		
 		save "$CLEANDATA/`level'_pooled`outsamptab'", replace

@@ -29,7 +29,7 @@ foreach m in ols{
 		local bdv : di %6.2f r(mean)
 		su `covar' if above_x_med == 0 [aw = weight_pop]
 		local bdvw : di %6.2f r(mean)
-		eststo `covar' : reghdfe `covar' samp_destXabove_x_med above_x_med  samp_dest reg2 reg3 reg4  v2_sumshares_urban  coastal  transpo_cost_1920 mean_uninc1940 cz_popdens1940 growth3040 [aw=weight_pop], vce(cl cz) 
+		eststo `covar' : reghdfe `covar' samp_destXabove_x_med above_x_med  samp_dest reg2 reg3 reg4   cz_popdens1940 mean_income_1940 mfg_lfshare1940 [aw=weight_pop], vce(cl cz) 
 	 estadd scalar bdv = `bdv'
 	 estadd scalar bdvw = `bdvw'
 		}

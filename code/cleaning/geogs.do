@@ -1,3 +1,35 @@
+// Only 296 cities
+use "$INTDATA/cgoodman/cgoodman_place_county_geog.dta", clear
+
+collapse (mean) yr_incorp (sum) place_land place_total, by(STATEFP PLACEFP)
+
+g gisjoin = "G" + STATEFP + "0" + PLACEFP
+merge 1:1 gisjoin using "$RAWDATA/dcourt/US_place_point_2010_crosswalks.dta", keep(3) nogen
+
+merge 1:1 city using "$INTDATA/dcourt/xwalk_296_city_cz.dta", keep(2 3) nogen
+
+
+// Spot replcaements : https://www.census.gov/quickfacts/fact/table/uppermontclaircdpnewjersey,brookdalecdpnewjersey,bellevilletownshipessexcountynewjersey/PST045224
+replace place_land = 8546964.3 if city == "Belleville, NJ"
+replace place_total = 8650563.8 if city == "Belleville, NJ"
+
+
+replace place_land = 4143982.7  if city == "Brookdale, NJ"
+replace place_total = 4143982.7 if city == "Brookdale, NJ"
+
+
+replace place_land = 6164174.2 if city == "Upper Montclair, NJ"
+replace place_total = 6578572.5 if city == "Upper Montclair, NJ"
+
+
+replace place_land = 1853784800 if city == "Butte, MT"
+replace place_total = 1855079700 if city == "Butte, MT"
+
+collapse (sum) place_land place_total, by(cz)
+ren place_land orig_land
+ren place_total orig_total
+save "$INTDATA/cgoodman/orig_geogs.dta", replace
+
 // Incorp Split
 use "$INTDATA/cgoodman/cgoodman_place_county_geog.dta", clear
 

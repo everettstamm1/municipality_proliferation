@@ -621,6 +621,93 @@ STEPS:
 	do "$CODE/helper/bartik_generic.do"
 	
 	
+	
+*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
+* White with LASSO at county level, place of birth
+*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
+	
+	clear all
+	//set maxvar 120000
+		
+	global groups white // took out white
+	global origin_id origin_statefp
+	global origin_id_code origin_fips_code
+	global origin_sample origin_sample
+	global destination_id dest_fips
+	global destination_id_code dest_fips
+	global dest_sample dest_sample_county
+	global weights_data "$INTDATA/dcourt/3_lasso_boustan_predict_mig_state_white.dta"
+	global version 2wcc
+	global weight_types pr // took out act
+	global weight_var outmig
+	global start_year 1940
+	global panel_length 3
+	global shares_dir "$INTDATA/dcourt/shares" 
+	global sharesXweights_dir "$INTDATA/dcourt/instrument" 
+	
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
+	drop if dest_fips == . | origin_fips == .
+	replace origin_sample = bpl == 1 | ///
+							bpl == 5 | ///
+							bpl == 12 | ///
+							bpl == 13 | ///
+							bpl == 21 | ///
+							bpl == 22 | ///
+							bpl == 28 | ///
+							bpl == 37 | ///
+							bpl == 40 | ///
+							bpl == 45 | ///
+							bpl == 47 | ///
+							bpl == 48 | ///
+							bpl == 51 | ///
+							bpl == 54
+	g origin_statefp = bpl
+	do "$CODE/helper/bartik_generic.do"
+	
+	
+*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
+* Black with LASSO at county level, place of birth
+*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
+	
+	clear all
+	//set maxvar 120000
+		
+	global groups black // took out white
+	global origin_id origin_statefp
+	global origin_id_code origin_fips_code
+	global origin_sample origin_sample
+	global destination_id dest_fips
+	global destination_id_code dest_fips
+	global dest_sample dest_sample_county
+	global weights_data "$INTDATA/dcourt/3_lasso_boustan_predict_mig_state.dta"
+	global version 2cc
+	global weight_types pr // took out act
+	global weight_var outmig
+	global start_year 1940
+	global panel_length 3
+	global shares_dir "$INTDATA/dcourt/shares" 
+	global sharesXweights_dir "$INTDATA/dcourt/instrument" 
+	
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
+	drop if dest_fips == .
+	replace origin_sample = bpl == 1 | ///
+						bpl == 5 | ///
+						bpl == 12 | ///
+						bpl == 13 | ///
+						bpl == 21 | ///
+						bpl == 22 | ///
+						bpl == 28 | ///
+						bpl == 37 | ///
+						bpl == 40 | ///
+						bpl == 45 | ///
+						bpl == 47 | ///
+						bpl == 48 | ///
+						bpl == 51 | ///
+						bpl == 54
+	g origin_statefp = bpl
+	do "$CODE/helper/bartik_generic.do"
+	
+	
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 * White with LASSO selected push factors, entropy weights 
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
@@ -735,6 +822,67 @@ STEPS:
 	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
 	ren black_ipw b_ipw
 	do "$CODE/helper/bartik_weighted.do"
+	
+	
+*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
+* Black and White migration with LASSO selected push factors
+*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
+	
+	clear all
+	//set maxvar 120000
+		
+	global groups all // took out white
+	global origin_id origin_fips
+	global origin_id_code origin_fips_code
+	global origin_sample origin_sample
+	global destination_id city
+	global destination_id_code city_code
+	global dest_sample dest_sample
+	global weights_data "$INTDATA/dcourt/2_lasso_boustan_predict_mig_all.dta"
+	global version 2t
+	global weight_types pr // took out act
+	global weight_var outmig
+	global start_year 1940
+	global panel_length 3
+	global shares_dir "$INTDATA/dcourt/shares" 
+	global sharesXweights_dir "$INTDATA/dcourt/instrument" 
+	
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
+	
+	g all = black == 1 | white == 1
+
+	do "$CODE/helper/bartik_generic.do"
+	
+	
+*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
+* Black and White migration with LASSO selected push factors, black interaction
+*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
+	
+	clear all
+	//set maxvar 120000
+		
+	global groups all // took out white
+	global origin_id origin_fips
+	global origin_id_code origin_fips_code
+	global origin_sample origin_sample
+	global destination_id city
+	global destination_id_code city_code
+	global dest_sample dest_sample
+	global weights_data "$INTDATA/dcourt/2_lasso_boustan_predict_mig_all_bint.dta"
+	global version 2tint
+	global weight_types pr // took out act
+	global weight_var outmig
+	global start_year 1940
+	global panel_length 3
+	global shares_dir "$INTDATA/dcourt/shares" 
+	global sharesXweights_dir "$INTDATA/dcourt/instrument" 
+	
+	use "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", clear
+	
+	g all = black == 1 | white == 1
+
+	do "$CODE/helper/bartik_generic.do"
+	
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 *10. Clean and standardize city names and output final instrument measures at the city-level
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
@@ -830,11 +978,123 @@ STEPS:
 	}
 
 	* Versions 1, 2, 1940	
-	foreach v in "1" "2" "2c" "2ent" "2ipw" /*"2rm" "2nt" "2rmnt" "2rmsc" "2rmscnt"  "2scnt" */ "1940" "r"{
+	foreach v in /*"1" "2" "2c" "2cc" "2ent" "2ipw" "2rm" "2nt" "2rmnt" "2rmsc" "2rmscnt"  "2scnt" "1940" "r" "2t"*/ "2cc" {
 	
 		local origincode origin_fips
-		local dest_code = cond("`v'"=="2c","dest_fips","city")
-		local wcode = cond("`v'" == "2ipw","b_ipw", cond("`v'" == "2ent","b_ent","black"))
+		local dest_code = cond("`v'"=="2c" | "`v'" == "2cc","dest_fips","city")
+		local wcode = cond("`v'" == "2ipw","b_ipw", ///
+						cond("`v'" == "2ent","b_ent", ///
+						cond("`v'"=="1940w","white", ///
+						cond("`v'" == "2t","all","black"))))
+
+		
+		
+		if "`v'"=="1940" {
+		local origincode origin_state_fips
+		}
+		else if "`v'"=="2cc"{
+		local origincode origin_statefp
+		}
+		use "$INTDATA/dcourt/bartik/`v'_`wcode'`origincode'1940.dta", clear
+
+		order `wcode'* total*
+		egen tot`wcode'mig`dest_code'3539=rowmean(total_`wcode'`dest_code'*)
+		sum tot`wcode'mig`dest_code'3539
+		egen sumshares = rowtotal(`wcode'`origincode'*)
+		drop total_* `wcode'*
+		save "$INTDATA/dcourt/instrument/`v'_`dest_code'_`wcode'migshare3539.dta", replace
+		
+		use "$INTDATA/dcourt/bartik/`v'_`wcode'_proutmig`origincode'19401970_collapsed_wide.dta", clear
+		merge 1:1 `dest_code' using "$INTDATA/dcourt/instrument/`v'_`dest_code'_`wcode'migshare3539.dta", keep(3) nogenerate
+		
+		save "$INTDATA/dcourt/instrument/`v'_`wcode'_prmig_1940_1970_wide.dta", replace
+	
+		use "$INTDATA/dcourt/instrument/`v'_`wcode'_prmig_1940_1970_wide.dta", clear
+		if "`v'"!="2c" & "`v'" != "2cc"{
+			decode city, gen(city_str)
+			drop city 
+			rename city_str city
+			
+			*Standardize City Names
+				//A - fix spelling and formatting variations
+				split city, p(,) g(part)
+				replace city = proper(part1) + "," + upper(part2) 
+				drop part1 part2
+		}
+		
+		*** Initial cleaning done. Save at this point.
+		save "$INTDATA/dcourt/instrument/city_crosswalked/`v'_`wcode'_prmig_1940_1970_wide_preprocessed.dta", replace
+		
+		use "$INTDATA/dcourt/instrument/city_crosswalked/`v'_`wcode'_prmig_1940_1970_wide_preprocessed.dta", clear
+		if "`v'"!="2c" & "`v'" != "2cc" {
+			g city_original=city
+			
+			replace city = "St. Joseph, MO" if city == "Saint Joseph, MO" 
+			replace city = "St. Louis, MO" if city == "Saint Louis, MO" 
+			replace city = "St. Paul, MN" if city == "Saint Paul, MN" 
+			replace city = "McKeesport, PA" if city == "Mckeesport, PA" 
+			replace city = "Norristown, PA" if city == "Norristown Borough, PA"
+			replace city = "Shenandoah, PA" if city == "Shenandoah Borough, PA"
+			replace city = "Jamestown, NY" if city == "Jamestown , NY"
+			replace city = "Kensington, PA" if city == "Kensington,"
+			replace city = "Oak Park Village, IL" if city == "Oak Park Village,"
+			replace city = "Fond du Lac, WI" if city == "Fond Du Lac, WI"
+			replace city = "DuBois, PA" if city == "Du Bois, PA"
+			replace city = "McKees Rocks, PA" if city == "Mckees Rocks, PA"
+			replace city = "McKeesport, PA" if city == "Mckeesport, PA"
+			replace city = "Hamtramck, MI" if city == "Hamtramck Village, MI"
+			replace city = "Lafayette, IN" if city == "La Fayette, IN"
+			replace city = "Schenectady, NY" if city == "Schenectedy, NY"
+			replace city = "Wallingford Center, CT" if city == "Wallingford, CT"
+			replace city = "Oak Park, IL" if city == "Oak Park Village, IL"
+			replace city = "New Kensington, PA" if city == "Kensington, PA"
+		
+			//B - Replace city names with substitutes in the crosswalk when perfect match with crosswalk impossible
+			//B1 - the following cities overlap with their subsitutes
+			*replace city = "Silver Lake, NJ" if city == "Belleville, NJ"
+			replace city = "Brookdale, NJ" if city == "Bloomfield, NJ" 
+			replace city = "Upper Montclair, NJ" if city == "Montclair, NJ"
+		
+			//B2 - the following cities just share a border with their subsitutes but do not overlap
+			replace city = "Glen Ridge, NJ" if city == "Orange, NJ"
+			replace city = "Essex Fells, NJ" if city == "West Orange, NJ" 
+			replace city = "Bogota, NJ" if city == "Teaneck, NJ" 
+		
+			//B3 - the following cities do not share a border with their substitutes but are within a few miles
+			replace city = "Kenilworth, NJ" if city == "Irvington, NJ"  
+			replace city = "Wallington, NJ" if city == "Nutley, NJ" 
+			replace city = "Short Hills, NJ" if city == "South Orange, NJ"
+			replace city = "Lafayette, IN" if city == "Lafayette, IL"
+		   
+			*Merge with State Crosswalks
+			merge 1:1 city using "$RAWDATA/dcourt/US_place_point_2010_crosswalks.dta", keepusing(cz cz_name)
+			replace cz = 19600 if city=="Belleville, NJ"
+			replace cz_name = "Newark, NJ" if city=="Belleville, NJ"
+			*Resolve Unmerged Cities
+		tab _merge
+		
+		*Save
+		drop if _merge==2
+		drop _merge
+		}
+		else{
+			g cty_fips = dest_fips
+			merge 1:1 cty_fips using "$XWALKS/cw_cty_czone", keep(3) nogen
+			drop cty_fips
+
+		}
+		    
+		
+		save "$INTDATA/dcourt/instrument/city_crosswalked/`v'_`wcode'_prmig_1940_1970_wide_xw.dta", replace
+	}
+
+	
+	* Versions 2t
+	foreach v in "2t" "2tint"{
+	
+		local origincode origin_fips
+		local dest_code = "city"
+		local wcode = "all"
 		
 		if "`v'"=="1940" {
 		local origincode origin_state_fips
@@ -847,7 +1107,7 @@ STEPS:
 		egen tot`wcode'mig`dest_code'3539=rowmean(total_`wcode'`dest_code'*)
 		sum tot`wcode'mig`dest_code'3539
 		egen sumshares = rowtotal(`wcode'`origincode'*)
-		drop total* `wcode'*
+		drop total_* `wcode'*
 		save "$INTDATA/dcourt/instrument/`v'_`dest_code'_`wcode'migshare3539.dta", replace
 		
 		use "$INTDATA/dcourt/bartik/`v'_`wcode'_proutmig`origincode'19401970_collapsed_wide.dta", clear
@@ -1022,28 +1282,34 @@ STEPS:
 	}
 	
 	* Version 8	
-	foreach v in  "8" "2w" "2wc" "2wipw" "2went"{
+	foreach v in  "8" "2w" "2wc" "2wcc" "2wipw" "2went"{
 		local type = cond("`v'"=="8","act","pr")
-		local dest_code = cond("`v'"=="2wc","dest_fips","city")
+		local dest_code = cond("`v'"=="2wc" | "`v'" == "2wcc","dest_fips","city")
 		local wcode = cond("`v'" == "2wipw","w_ipw", cond("`v'" == "2went","w_ent","white"))
 
-		use "$INTDATA/dcourt/bartik/`v'_`wcode'origin_fips1940.dta", clear
+		if "`v'"=="2wcc"{
+		local origincode origin_statefp
+		}
+		else{
+		local origincode origin_fips		
+		}
+		use "$INTDATA/dcourt/bartik/`v'_`wcode'`origincode'1940.dta", clear
 		order `wcode'*  total*
 		egen tot`wcode'mig`dest_code'3539=rowmean(total_`wcode'`dest_code'*)
 		sum tot`wcode'mig`dest_code'3539
-		egen sumshares = rowtotal(`wcode'origin_fips*)
+		egen sumshares = rowtotal(`wcode'`origincode'*)
 
 		drop total* `wcode'*
 		save "$INTDATA/dcourt/instrument/`v'_`dest_code'_`wcode'migshare3539.dta", replace
 		
-		use "$INTDATA/dcourt/bartik/`v'_`wcode'_`type'outmigorigin_fips19401970_collapsed_wide.dta", clear
+		use "$INTDATA/dcourt/bartik/`v'_`wcode'_`type'outmig`origincode'19401970_collapsed_wide.dta", clear
 		merge 1:1 `dest_code' using "$INTDATA/dcourt/instrument/`v'_`dest_code'_`wcode'migshare3539.dta", keep(3) nogenerate
 		
 		save "$INTDATA/dcourt/instrument/`v'_`wcode'_`type'mig_1940_1970_wide.dta", replace
 	
 		use "$INTDATA/dcourt/instrument/`v'_`wcode'_`type'mig_1940_1970_wide.dta", clear
 		
-		if "`v'"!="2wc"{
+		if "`v'"!="2wc" & "`v'"!="2wcc"{
 			decode city, gen(city_str)
 		drop city 
 		rename city_str city
@@ -1057,7 +1323,8 @@ STEPS:
 	save "$INTDATA/dcourt/instrument/city_crosswalked/`v'_`wcode'_`type'mig_1940_1970_wide_preprocessed.dta", replace
 	
 	use "$INTDATA/dcourt/instrument/city_crosswalked/`v'_`wcode'_`type'mig_1940_1970_wide_preprocessed.dta", clear
-	if "`v'"!="2wc"{
+	
+	if "`v'"!="2wc" & "`v'"!="2wcc"{
 			g city_original=city
 			
 			replace city = "St. Joseph, MO" if city == "Saint Joseph, MO" 

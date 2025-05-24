@@ -27,8 +27,8 @@ STEPS:
 	g origin_sample=(origin_state=="Alabama" | origin_state=="Arkansas" | origin_state=="Florida" | origin_state=="Georgia" | origin_state=="Kentucky"| origin_state=="Louisiana" | origin_state=="Mississippi" | origin_state=="North Carolina" | origin_state=="Oklahoma" | origin_state=="South Carolina" | origin_state=="Tennessee" | origin_state=="Texas" | origin_state=="Virginia" | origin_state=="West Virginia")
 	
 	g origin_sample_rural = origin_sample==1 & migcity5==0
-	g origin_sample_notx = origin_sample==1 | origin_state=="Texas"
-	g origin_sample_rural_notx = (origin_sample==1 | origin_state=="Texas") & migcity5==0
+	g origin_sample_notx = origin_sample==1 & origin_state!="Texas"
+	g origin_sample_rural_notx = (origin_sample==1 & origin_state!="Texas") & migcity5==0
 
 	drop if migcounty==9999
 	
@@ -165,7 +165,7 @@ STEPS:
 	replace ind_cat = 99 if mi(ind_cat)
 	
 	g ind_cat_mi = ind_cat == 99
-	
+	/*
 	// Reweight
 	ebalance black occscore age grade_completed male grade_mi occscore_mi
 	ren _webal black_webal
@@ -181,5 +181,20 @@ STEPS:
 	predict pscore_white 
 	gen white_ipw = white/pscore_white + (1-white)/(1-pscore_white)
 	drop pscore_*
-	
+	*/
+	g origin_sample_sob = bpl == 1 | ///
+							bpl == 5 | ///
+							bpl == 12 | ///
+							bpl == 13 | ///
+							bpl == 21 | ///
+							bpl == 22 | ///
+							bpl == 28 | ///
+							bpl == 37 | ///
+							bpl == 40 | ///
+							bpl == 45 | ///
+							bpl == 47 | ///
+							bpl == 48 | ///
+							bpl == 51 | ///
+							bpl == 54
+	g all = black | white			
 	save "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", replace

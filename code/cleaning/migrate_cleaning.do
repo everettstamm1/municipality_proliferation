@@ -6,14 +6,22 @@ g statename = strtrim(substr(v1,11,20))
 g countyname = strtrim(substr(v1,27,27))
 g netbmig = substr(v1,3435,6) 
 g netwmig = substr(v1,3399,6) 
+g totwmig = substr(v1,3327,7)
+g totbmig = substr(v1,3362,7)
 g bpop_l = substr(v1,3341,7)
+g bpop = substr(v1,3348,7)
 g wpop_l = substr(v1, 3306,7)
-destring netbmig netwmig bpop_l wpop_l, replace
+g wpop = substr(v1, 3313,7)
+
+destring netbmig netwmig bpop_l wpop_l totbmig totwmig wpop bpop, replace
 
 replace netbmig = netbmig / 100
 replace netwmig = netwmig / 100
 drop if netbmig == .
-keep statename countyname netbmig netwmig countyicp bpop_l wpop_l
+
+g netmig = ((bpop_l*netbmig/100) + (wpop_l * netwmig/100) )/ (bpop_l + wpop_l)
+g pop_l = bpop_l + wpop_l
+keep statename countyname netbmig netwmig countyicp bpop_l wpop_l wpop bpop totbmig totwmig netmig pop_l
 
 duplicates drop
 
@@ -33,11 +41,20 @@ use"$RAWDATA/boustan/ICPSR_08493-V2/ICPSR_08493/DS0001/08493-0001-Data.dta", cle
 
 rename NAME statename
 rename CNTYNAME countyname 
+rename V685 netmig
 rename V688 netwmig 
 rename V691 netbmig
+rename V535 totwmig
+rename V538 totbmig
 rename V22 wpop_l
+//rename V202 wpop // the "real" total population, but not used
 rename V25 bpop_l
-keep statename countyname netwmig netbmig wpop_l bpop_l
+//rename V205 bpop // the "real" total population, but not used
+rename V19 pop_l
+
+rename V382 wpop // actually expected, but what was used to calculate migration rates
+rename V385 bpop // actually expected, but what was used to calculate migration rates
+keep statename countyname netwmig netbmig wpop_l bpop_l wpop bpop totbmig totwmig netmig pop_l
 
 drop if countyname == ""
 
@@ -57,11 +74,19 @@ use "$RAWDATA/boustan/ICPSR_08493-V2 (1)/ICPSR_08493/DS0002/08493-0002-Data.dta"
 
 rename NAME statename
 rename CNTYNAME countyname 
+rename V685 netmig
 rename V688 netwmig 
 rename V691 netbmig
+rename V535 totwmig
+rename V538 totbmig
+rename V19 pop_l
 rename V22 wpop_l
+//rename V202 wpop // the "real" total population, but not used
 rename V25 bpop_l
-keep statename countyname netwmig netbmig wpop_l bpop_l
+//rename V205 bpop // the "real" total population, but not used
+rename V382 wpop // actually expected, but what was used to calculate migration rates
+rename V385 bpop // actually expected, but what was used to calculate migration rates
+keep statename countyname netwmig netbmig wpop_l bpop_l wpop bpop totbmig totwmig netmig pop_l
 
 drop if countyname == ""
 replace statename = "LOUISIANA" if statename == "LOUISANA" // lol c'mon now

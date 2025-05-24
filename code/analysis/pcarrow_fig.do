@@ -197,8 +197,45 @@ foreach l of local levels{
 }
 local colpos = `i'*3+1
  `base', yla(none) yti("") legend(cols(1) order(1 "1940-1970 Newly Incorporated Municipalities"  2 "CZ Total" 4 "Below Median Values of Instrument" 5 "Above Median Values of Instrument")) ///
-		 xtitle("Average Household Income, 2010") ysize(9) xscale(range(0 150000)) xla(0(25000)150000) graphregion(color(white)) note("Above Median Average Difference: `abovediff'%" "Below Median Average Difference: `belowdif'%")
+		 xtitle("Average Household Income, 2010") ysize(12) xscale(range(0 150000)) xla(0(25000)150000) graphregion(color(white)) note("Above Median Average Difference: `abovediff'%" "Below Median Average Difference: `belowdif'%")
 graph export "$FIGS/pcarrow_figure_inc2010.pdf", replace as(pdf)
+
+		
+// 1970 Incomes
+use "$CLEANDATA/pcarrow_fig_data", clear
+gsort -cz_inc1970
+g order = _n
+labmask order, values(cz_name)
+
+g namepos = min(cz_inc1970, cz_new_inc1970)
+
+qui sum GM_raw_pp, d
+local cmin = r(min)
+local cmax = r(max)
+//g c255 = round(255*(GM_raw_pp - `cmin')/(`cmax' - `cmin'))
+
+g pctile_diff = 100*(cz_new_inc1970 - cz_inc1970)/cz_inc1970
+su pctile_diff if above_x_med == 0
+local belowdif : di %5.2f r(mean)
+su pctile_diff if above_x_med == 1
+local abovediff : di %5.2f r(mean)
+
+local base tw (pcarrow order cz_inc1970 order cz_new_inc1970,  mcol(black) lcol(black)) (scatter order cz_inc1970, ms(oh) barbsize(2) mlcol(black) mfcol(black)) (scatter order namepos, ms(none) mlabel(cz_name) mlabpos(9) mlabsize(2)) (function y=80, ra(80 80) lcol("`: di 0' 0 `: di 255'") lpat(solid) lw(*5)) (function y=80, ra(80 80) lcol("`: di 255' 0 `: di 0'") lpat(solid) lw(*5))
+levelsof above_x_med, local(levels)
+local i 0
+
+foreach l of local levels{
+	local i = `i'+1
+	local ll = mod(`l'+1,2)
+	local rgb = "`: di 255*`l'' 0 `: di `ll'*255'"
+	local base `base' (pcarrow order cz_inc1970 order cz_new_inc1970 if above_x_med==`l', mcol("`rgb'") lcol("`rgb'")) ///
+						(scatter order cz_inc1970 if above_x_med==`l', ms(oh) barbsize(2) mlcol("`rgb'") mfcol("`rgb'")) ///
+						(scatter order namepos if above_x_med==`l', ms(none) mlabel(cz_name) mlabpos(9) mlabsize(2) mlabcol("`rgb'"))
+}
+local colpos = `i'*3+1
+ `base', yla(none) yti("") legend(cols(1) order(1 "1940-1970 Newly Incorporated Municipalities"  2 "CZ Total" 4 "Below Median Values of GM" 5 "Above Median Values of GM")) ///
+		 xtitle("Average Household Income, 1970") ysize(12) xscale(range(0 20000)) xla(0(5000)20000) graphregion(color(white)) note("Above Median Average Difference: `abovediff'%" "Below Median Average Difference: `belowdif'%")
+graph export "$FIGS/pcarrow_figure_inc1970.pdf", replace as(pdf)
 
 
 // Education
@@ -216,6 +253,14 @@ local cmin = r(min)
 local cmax = r(max)
 g c255 = round(255*(GM_hat_raw - `cmin')/(`cmax' - `cmin'))
 
+
+g pctile_diff = 100*(cz_new_prop_somehs1970 - cz_prop_somehs1970)/cz_prop_somehs1970
+su pctile_diff if above_x_med == 0
+local belowdif : di %5.2f r(mean)
+su pctile_diff if above_x_med == 1
+local abovediff : di %5.2f r(mean)
+
+
 local base tw (pcarrow order cz_prop_somehs1970 order cz_new_prop_somehs1970,  mcol(black) lcol(black)) (scatter order cz_prop_somehs1970, ms(oh) barbsize(2) mlcol(black) mfcol(black)) (scatter order namepos, ms(none) mlabel(cz_name) mlabpos(9) mlabsize(2)) (function y=60, ra(60 60) lcol("`: di 0' 0 `: di 255'") lpat(solid) lw(*5)) (function y=60, ra(60 60) lcol("`: di 255' 0 `: di 0'") lpat(solid) lw(*5))
 levelsof above_x_med, local(levels)
 local i 0
@@ -229,7 +274,8 @@ foreach l of local levels{
 }
 local colpos = `i'*3+1
  `base', yla(none) yti("") legend(cols(1) order(1 "1940-1970 Newly Incorporated Municipalities"  2 "CZ Total" 4 "Below Median Values of GM" 5 "Above Median Values of GM") position(7) ring(0) symxsize(2.5) size(1.6)) ///
-		 xtitle("Proportion of Population With Some High School, 1970") ysize(9) xscale(range(20 100)) xla(20(20)100) graphregion(color(white))
+		 xtitle("Proportion of Population With Some High School, 1970") ysize(9) xscale(range(20 100)) xla(20(20)100) graphregion(color(white)) ///
+		 note("Above Median Average Difference: `abovediff'%" "Below Median Average Difference: `belowdif'%")
 graph export "$FIGS/pcarrow_figure_GM_somehs.pdf", replace as(pdf)
 
 	
@@ -247,6 +293,12 @@ local cmin = r(min)
 local cmax = r(max)
 g c255 = round(255*(GM_hat_raw - `cmin')/(`cmax' - `cmin'))
 
+g pctile_diff = 100*(cz_new_prop_colgrad1970 - cz_prop_colgrad1970)/cz_prop_colgrad1970
+su pctile_diff if above_x_med == 0
+local belowdif : di %5.2f r(mean)
+su pctile_diff if above_x_med == 1
+local abovediff : di %5.2f r(mean)
+
 local base tw (pcarrow order cz_prop_colgrad1970 order cz_new_prop_colgrad1970,  mcol(black) lcol(black)) (scatter order cz_prop_colgrad1970, ms(oh) barbsize(2) mlcol(black) mfcol(black)) (scatter order namepos, ms(none) mlabel(cz_name) mlabpos(9) mlabsize(2)) (function y=60, ra(40 40) lcol("`: di 0' 0 `: di 255'") lpat(solid) lw(*5)) (function y=60, ra(40 40) lcol("`: di 255' 0 `: di 0'") lpat(solid) lw(*5))
 levelsof above_x_med, local(levels)
 local i 0
@@ -260,7 +312,8 @@ foreach l of local levels{
 }
 local colpos = `i'*3+1
  `base', yla(none) yti("") legend(cols(1) order(1 "1940-1970 Newly Incorporated Municipalities"  2 "CZ Total" 4 "Below Median Values of GM" 5 "Above Median Values of GM") position(2) ring(0) symxsize(2.5) size(2.2)) ///
-		 xtitle("Proportion of Population With Four Years College, 1970") ysize(9) xscale(range(0 40)) xla(0(10)40) graphregion(color(white))
+		 xtitle("Proportion of Population With Four Years College, 1970") ysize(9) xscale(range(-5 40)) xla(0(10)40) graphregion(color(white)) ///
+		 note("Above Median Average Difference: `abovediff'%" "Below Median Average Difference: `belowdif'%")
 graph export "$FIGS/pcarrow_figure_GM_colgrad.pdf", replace as(pdf)
 
 

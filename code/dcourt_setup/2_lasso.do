@@ -386,7 +386,7 @@ STEPS:
 	drop _merge 
 	rename state_fips origin_state_fips
 	tostring origin_state_fips, replace
-	
+	g origin_statefp = origin_state_fips
 	save "$INTDATA/dcourt/3_lasso_boustan_predict_mig_state.dta", replace
 
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	

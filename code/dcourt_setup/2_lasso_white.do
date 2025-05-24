@@ -28,7 +28,7 @@ STEPS:
 	use "$RAWDATA/dcourt/south_county.dta", clear
 	//drop if netwmig==.
 	statastates, fips(state) nogen
-	merge m:1 year countyicp state_abbrev using "$INTDATA/south_migrate", keep(1 3) nogen keepusing(wpop_l netwmig)
+	merge m:1 year countyicp state_abbrev using "$INTDATA/south_migrate", keep(1 3) nogen keepusing(wpop_l netwmig netbmig)
 	drop if netwmig == .
 	/* Instructions for cleaning the data from Boustan (2016) replication files
 	are prefaced with "Boustan (2016)".
@@ -383,7 +383,7 @@ STEPS:
 	drop _merge 
 	rename state_fips origin_state_fips
 	tostring origin_state_fips, replace
-	
+	g origin_statefp = origin_state_fips // get short name
 	save "$INTDATA/dcourt/3_lasso_boustan_predict_mig_state_white.dta", replace
 
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
