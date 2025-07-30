@@ -25,18 +25,20 @@
 
 
 \section{Updated Tables}
-
-
+\input{tables/corr_matrix.tex}
+\clearpage
 \input{tables/balancetables/balancetable.tex}
 \clearpage
 
+
+\clearpage
 \begin{table}
 \footnotesize
 \centering
 \caption{The Effect of the Great Migration on Jurisdictions Per Capita using the Shift-Share Design}
 \begin{threeparttable}
 \footnotesize
-\input{tables/final/main_effect_long}
+\input{tables/final/black_ssaggregate_long}
 \end{threeparttable}
 \label{tab:main_effect}
 \end{table}
@@ -77,15 +79,11 @@
 
 \begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Effects, 1952-1972}
 \footnotesize
-\input{tables/final/main_effect_1950_1970_new_ctrl.tex}
+\input{tables/final/black_ssaggregate_5070.tex}
 \end{threeparttable}  \end{table}
 \clearpage
 
-\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Effects, Percentile}
-\footnotesize
-\input{tables/final/main_effect_pctile_new_ctrl.tex}
-\end{threeparttable}  \end{table}
-\clearpage
+
 
 
 %\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Effects, Quadratic Control}
@@ -97,30 +95,44 @@
 
 \begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Effects, European Migration Control}
 \footnotesize
-\input{tables/final/main_effect_eurmig_new_ctrl.tex}
+\input{tables/final/black_ssaggregate_eurmig.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Effects, No balanced controls}
+\footnotesize
+\input{tables/final/black_ssaggregate_nobal.tex}
 \end{threeparttable}  \end{table}
 \clearpage
 
 
 \begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{White Effects, Main Spec}
 \footnotesize
-\input{tables/final/white_effect_new_ctrl.tex}
+\input{tables/final/white_ssaggregate_long.tex}
 \end{threeparttable}  \end{table}
 \clearpage
 
-
-\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{White Effects, Percentage Point Spec}
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Effects, Percentile}
 \footnotesize
-\input{tables/final/white_effect_pp_new_ctrl.tex}
+\input{tables/final/main_effect_pctile.tex}
 \end{threeparttable}  \end{table}
 \clearpage
+
 
 \begin{table}[htbp]
 \footnotesize
 \centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main effects, Township Outcome} \label{tab:main_effect_towns}
-\input{tables/final/main_effect_towns}
+\input{tables/final/black_ssaggregate_towns}
  \end{threeparttable}
  \end{table}
+
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main effects, Court Order Het} \label{tab:main_effect_towns}
+\input{tables/final/main_effect_co_new_ctrl}
+ \end{threeparttable}
+ \end{table}
+
 
 \begin{table}[htbp]
 \footnotesize
@@ -151,21 +163,6 @@
  \end{threeparttable}
  \end{table}
 
-\clearpage
-\begin{table}[htbp]
-\footnotesize
-\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Principal city had desegregation order} 
-\input{tables/final/main_effect_co_new_ctrl}
- \end{threeparttable}
- \end{table}
-
-\clearpage
-\begin{table}[htbp]
-\footnotesize
-\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Proportion of students under desegregation order} 
-\input{tables/final/main_effect_frac_co_new_ctrl}
- \end{threeparttable}
- \end{table}
 
 
 \clearpage

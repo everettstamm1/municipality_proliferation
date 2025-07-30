@@ -282,7 +282,7 @@ foreach level in cz {
 	local lab: variable label yr_incorp
 	
 	g n = yr_incorp>=1940 & yr_incorp<=1970
-	forv d=1900(10)2010{
+	forv d=1700(10)2010{
 		local step = `d'+10
 		
 		g n`d' = yr_incorp<`d'
@@ -292,7 +292,10 @@ foreach level in cz {
 
 	collapse (sum) n*, by(`levelvar')
 	rename n n_muni_`level'
-	
+		rename n17?? b_muni_`level'17??
+
+	rename n18?? b_muni_`level'18??
+
 	rename n19?? b_muni_`level'19??
 	rename n20?? b_muni_`level'20??
 
@@ -329,7 +332,7 @@ foreach level in cz {
 		use "$CLEANDATA/dcourt/GM_`level'_final_dataset.dta", clear
 		g ne_ut = state_id == 31 | state_id == 49
 		if "`samp'"=="south" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp  GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp samp_* WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970 *_sumshares GM_hat_r* wpop* v2_black_proutmigpr v2w_white_proutmigpr v2w_whitemig3539_share1940 wpop1970 wpop1940 v2wipw* v2ipw* v2went* v2ent* GM_2w_hat WM AM* GM_hat_pp WM_hat_pp *sob* 
-		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp  GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970  *_sumshares GM_hat_r* wpop* v2_black_proutmigpr v2w_white_proutmigpr v2w_whitemig3539_share1940 wpop1970 wpop1940 v2wipw* v2ipw* v2went* v2ent* GM_2w_hat WM AM* GM_hat_pp WM_hat_pp *sob* 
+		if "`samp'"=="dcourt" keep `levelvar' GM GM_hat GM*raw GM*raw_pp GM*hat_raw GM*hat_raw_pp v2*blackmig3539_share1940 popc* bpopc* mfg_lfshare1940 reg*    GM_r_hat_raw_pp  GM_7r_hat_raw_pp v2_black_proutmigpr wt_instmig_avg wt_instmig_avg_pp WM_raw_pp ne_ut v8_whitemig3539_share1940 pop1940 pop1950 pop1960 pop1970  *_sumshares GM_hat_r* wpop* v2_black_proutmigpr v2w_white_proutmigpr v2w_whitemig3539_share1940 wpop1970 wpop1940 v2wipw* v2ipw* v2went* v2ent* GM_2w_hat WM AM* GM_hat_pp WM_hat_pp *sob* frac_all_upm1940
 		
 
 
@@ -443,7 +446,7 @@ foreach level in cz {
 		preserve
 			use "$INTDATA/census/cz_urbanization_1900_1930", clear
 			keep pop age black  literate labforce occscore cz decade
-			reshape wide pop age black  literate labforce occscore, i(cz) j(decade)
+			reshape wide pop age black  literate labforce occscore , i(cz) j(decade)
 			tempfile oldpops
 			save `oldpops'
 		restore
@@ -471,7 +474,8 @@ foreach level in cz {
 				g n_`ds'_`level'_pc = b_`ds'_`level'1970/(pop1970/10000) - b_`ds'_`level'1940/(pop1940/10000) 
 				g n2_`ds'_`level'_pc = b_`ds'_`level'1970/(pop1970/10000) - b_`ds'_`level'1950/(pop1950/10000) 
 				g ld_`ds'_`level'_pc = b_`ds'_`level'2010/(pop2010/10000) - b_`ds'_`level'1940/(pop1940/10000) 
-
+				g ld2_`ds'_`level'_pc = b_`ds'_`level'2010/(pop2010/10000) - b_`ds'_`level'1950/(pop1950/10000) 
+				
 				g n_`ds'_`level'_pcc = b_`ds'_`level'1970/(popc1970/10000) - b_`ds'_`level'1940/(popc1940/10000) 
 				g n2_`ds'_`level'_pcc = b_`ds'_`level'1970/(popc1970/10000) - b_`ds'_`level'1950/(popc1950/10000) 
 				
@@ -578,9 +582,13 @@ foreach level in cz {
 
 		// Total Fraction in main city outcomes, giving them unintuitive names so they can be ran properly in the table creation code, ignore the "n" and "pc"
 		g b_totfrac_cz1940_pc = 100* (maxcitypop1940/pop1940)
+		g b_totfrac_cz1950_pc = 100* (maxcitypop1950/pop1950)
+
 		g n_totfrac_cz_pc = 100*((maxcitypop1970/pop1970) - (maxcitypop1940/pop1940))
 		g n2_totfrac_cz_pc = 100*((maxcitypop1970/pop1970) - (maxcitypop1950/pop1950))
 		g ld_totfrac_cz_pc = 100*((maxcitypop2010/pop2010) - (maxcitypop1940/pop1940))
+		g ld2_totfrac_cz_pc = 100*((maxcitypop2010/pop2010) - (maxcitypop1950/pop1950))
+
 		g n_totfrac_cz_ld = log(maxcitypop2010) - log(maxcitypop1940)
 		g l_b_totfrac_cz1940 = log(maxcitypop1940/pop1940)
 		g l_b_totfrac_cz1970 = log(maxcitypop1970/pop1970)
@@ -819,6 +827,9 @@ foreach level in cz {
 		merge 1:1 czone using "$CLEANDATA/nces/cz_court_orders", keep(1 3) nogen
 		ren czone cz
 		
+		merge 1:1 cz using "$INTDATA/other/streams", keep(1 3) nogen
+		lab var n_streams "Number of Streams"
+		
 		su GM_raw_pp, d
 		g above_x_med = GM_raw_pp >= r(p50)
 		g growth3040 = 100*(pop1940 - pop1930)/pop1930
@@ -832,9 +843,13 @@ foreach level in cz {
 		lab var hsgrad "Prop HS Grads"
 		lab var unigrad "Prop College Grads"
 		//lab var mean_urban_income_1940 "1940 Income (Urban Areas)"
-		lab var mean_income_1940 "Average Income, 1940)"
+		lab var mean_income_1940 "Average Income, 1940"
 		lab var growth3040 "1930-40 Population Growth Rate"
+		lab var shift_share_base "$\hat{GM}$"
 		
+		lab var shift_share_base_white "$\hat{WM}$"
+
+		lab var WM_raw_pp "WM"
 		save "$CLEANDATA/`level'_pooled`outsamptab'", replace
 		
 	}

@@ -5,8 +5,10 @@ local balance_cutoff = 0.10
 local samp = "urban"
 
 use "$CLEANDATA/cz_pooled", clear
-local covars avg_precip avg_temp coastal mfg_lfshare1940 m_rr_sqm_total transpo_cost_1920 frac_total  hsgrad unigrad mean_income_1940 cz_popdens1940 growth3040
-local means avg_precip_mean avg_temp_mean coastal_mean mfg_lfshare1940_mean m_rr_sqm_total_mean transpo_cost_1920_mean frac_total_mean  hsgrad_mean unigrad_mean mean_income_1940_mean cz_popdens1940_mean growth3040_mean 
+
+local covars avg_precip avg_temp n_streams coastal mfg_lfshare1940 m_rr_sqm_total transpo_cost_1920 frac_total  hsgrad unigrad mean_income_1940 cz_popdens1940 growth3040
+local means avg_precip_mean avg_temp_mean n_streams_mean coastal_mean mfg_lfshare1940_mean m_rr_sqm_total_mean transpo_cost_1920_mean frac_total_mean  hsgrad_mean unigrad_mean mean_income_1940_mean cz_popdens1940_mean growth3040_mean 
+local covars_nss avg_precip_nss avg_temp_nss n_streams_nss coastal_nss mfg_lfshare1940_nss m_rr_sqm_total_nss transpo_cost_1920_nss frac_total_nss  hsgrad_nss unigrad_nss mean_income_1940_nss cz_popdens1940_nss growth3040_nss
 
 local pooled_covars_`samp'  ""
 keep if dcourt == 1
@@ -16,6 +18,7 @@ foreach covar in `covars' {
 	label var GM`covar' "`lab'"
 
 	eststo `covar': reg `covar' GM`covar' `b_controls' [aw=popc1940], r
+	eststo `covar'_nss: reg `covar' GM`covar' reg2 reg3 reg4 [aw=popc1940], r
 	replace GM`covar' = 1
 	qui eststo `covar'_mean : reg `covar' GM`covar' [aw=popc1940], nocons
 	
@@ -27,13 +30,16 @@ foreach covar in `covars' {
 }
 
 eststo pooled_`samp' : appendmodels `covars'
+eststo pooled_`samp'_nss : appendmodels `covars_nss'
 eststo pooled_`samp'_means : appendmodels `means'
 // GO DELETE THE MEAN STARS YOURSELF BC YOU CANT FIGURE IT OUT
-esttab pooled_`samp' pooled_`samp'_means ///
+esttab pooled_`samp'_nss pooled_`samp' pooled_`samp'_means ///
 				using "$TABS/balancetables/balancetable.tex", ///
-				replace label  booktabs noconstant noobs compress nonumber frag mtitle("$\widehat{GM}$" "Mean") ///
+				replace label nomtitles booktabs noconstant noobs compress nonumber frag  ///
 				keep(GM*) ///
-				prehead( \begin{tabular}{l*{4}{c}} \toprule) ///
+				prehead( "\begin{tabular}{l*{3}{c}} \toprule" ///
+				"&\multicolumn{2}{c}{$\widehat{GM}$}&\multicolumn{1}{c}{Mean}\\\cmidrule(lr){2-3}\cmidrule(lr){4-4}" ///
+				"&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}\\") ///
 				postfoot(	\bottomrule \end{tabular}) ///
 				b(%04.3f) se(%04.3f) //////
 				starlevels( * 0.10 ** 0.05 *** 0.01) 
@@ -95,23 +101,33 @@ esttab tsls_`samp' rf_`samp' ///
 
 
 
-local b_controls reg2 reg3 reg4 v2_sumshares_urban
-local extra_controls transpo_cost_1920 coastal mean_urban_income_1940 cz_popdens1940 growth3040
+local b_controls reg2 reg3 reg4 sumshare_base
+local extra_controls cz_popdens1940 mean_income_1940 mfg_lfshare1940
  
 foreach t in pop age black literate labforce occscore{
 	eststo clear
 	use "$CLEANDATA/cz_pooled", clear
 	ren bpop1940 black1940
+	//g t1900 = log(pop1910) - log(pop1900)
+	//replace pop1910 = log(pop1920) - log(pop1910)
+	//replace pop1920 = log(pop1930) - log(pop1920)
+	//replace pop1930 = log(pop1940) - log(pop1930)
 	
+	g t1900 = 100*(pop1910 - pop1900) / pop1900
+	g t1910 = 100*(pop1920 - pop1910) / pop1910
+	g t1920 = 100*(pop1930 - pop1920) / pop1920
+	g t1930 = 100*(pop1940 - pop1930) / pop1930
+	drop pop19??
+	rename t19?? pop19??
 	local vars `t'1900 `t'1910 `t'1920 `t'1930
-		keep if dcourt == 1
+	keep if dcourt == 1
 
 	foreach var in `vars' {
 		local lab : variable label `var'
 		g GM`var' = GM_raw_pp
 		label var GM`var' "`lab'"
 
-		eststo `var': ivreg2 `var' (GM`var' = GM_hat_raw) `b_controls' `extra_controls' [aw=popc1940], r
+		eststo `var': ivreg2 `var' (GM`var' = shift_share_base) `b_controls' `extra_controls' [aw=popc1940], r
 		
 		drop GM`var'
 		
@@ -121,7 +137,7 @@ foreach t in pop age black literate labforce occscore{
 
 	foreach var in `vars' {
 		local lab : variable label `var'
-		g GM`var' = GM_hat_raw
+		g GM`var' = shift_share_base
 		label var GM`var' "`lab'"
 
 		eststo `var': reg `var' GM`var' `b_controls' `extra_controls' [aw=popc1940], r

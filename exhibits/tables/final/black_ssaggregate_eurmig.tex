@@ -1,30 +1,37 @@
- \begin{tabularx}{.9\hsize}{l*{6}{>{\centering\arraybackslash}X}} \toprule \setlength{\tabcolsep}{15pt}
-&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}
-&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}
-&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\
-\cmidrule(lr){1-7}
-\multicolumn{6}{l}{Panel A: First Stage}\\
-\cmidrule(lr){1-7}
-$\widehat{GM}$  &    1.292***&    1.292***&    1.227***&    1.292***&    1.292***&    1.292***\\
-                &  (0.323)   &  (0.323)   &  (0.356)   &  (0.323)   &  (0.323)   &  (0.323)   \\
-\cmidrule(lr){1-7}
-\multicolumn{6}{l}{Panel B: OLS}\\
-\cmidrule(lr){1-7}
-GM              &    0.003   &    0.007   &   -0.104   &    0.012*  &   -0.009   &   -0.877***\\
-                &  (0.004)   &  (0.005)   &  (0.109)   &  (0.007)   &  (0.012)   &  (0.264)   \\
-\cmidrule(lr){1-7}
-\multicolumn{6}{l}{Panel C: Reduced Form}\\
-\cmidrule(lr){1-7}
-$\widehat{GM}$  &    0.013   &    0.019   &   -0.009   &    0.053** &    0.022   &   -2.436***\\
-                &  (0.010)   &  (0.012)   &  (0.288)   &  (0.020)   &  (0.037)   &  (0.541)   \\
-\cmidrule(lr){1-7}
-\multicolumn{6}{l}{Panel D: 2SLS}\\
-\cmidrule(lr){1-7}
-GM              &    0.010***&    0.015***&   -0.007   &    0.041***&    0.017*  &   -1.885***\\
-                &  (0.004)   &  (0.005)   &  (0.106)   &  (0.007)   &  (0.009)   &  (0.146)   \\
+ \begin{tabularx}{\textwidth}{l*{5}{>{\centering\arraybackslash}X}} \toprule \setlength{\tabcolsep}{15pt}
+&\multicolumn{1}{c}{C. Goodman}&\multicolumn{3}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-5}\cmidrule(lr){6-6}
+&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Special Districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-4}\cmidrule(lr){5-5}\cmidrule(lr){6-6}
+&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel A: First Stage}\\
+\cmidrule(lr){1-6}
+$\widehat{GM}$  &    1.292***&    1.292***&    1.227***&    1.292***&    1.292***\\
+                &  (0.323)   &  (0.323)   &  (0.356)   &  (0.323)   &  (0.323)   \\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel B: OLS 1940-1970}\\
+\cmidrule(lr){1-6}
+GM              &    0.003   &    0.007   &   -0.104   &   -0.009   &   -0.877***\\
+                &  (0.004)   &  (0.005)   &  (0.109)   &  (0.012)   &  (0.264)   \\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel C: 2SLS 1940-1970}\\
+\cmidrule(lr){1-6}
+GM              &    0.010***&    0.015***&   -0.007   &    0.017*  &   -1.885***\\
+                &  (0.004)   &  (0.005)   &  (0.106)   &  (0.009)   &  (0.146)   \\
 \midrule
-First Stage F-Stat&    15.98   &    15.98   &    11.90   &    15.98   &    15.98   &    15.98   \\
-Dep. Var. Mean  &    -0.26   &    -0.33   &   -12.95   &    -0.57   &     0.64   &    -3.37   \\
-1940 Dep. Var. Mean&     1.49   &     1.61   &    14.09   &     2.29   &     0.89   &    32.86   \\
-Observations    &      130   &      130   &      118   &      130   &      130   &      130   \\
+1940-70 Avg.    &    -0.26   &    -0.33   &   -12.95   &     0.64   &    -3.37   \\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel D: OLS 1940-2010}\\
+\cmidrule(lr){1-6}
+GM              &    0.004   &    0.006   &   -0.106   &   -0.000   &   -0.936***\\
+                &  (0.006)   &  (0.007)   &  (0.110)   &  (0.012)   &  (0.324)   \\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel E: 2SLS 1940-2010}\\
+\cmidrule(lr){1-6}
+GM              &    0.011** &    0.014** &   -0.009   &    0.039***&   -2.074***\\
+                &  (0.005)   &  (0.006)   &  (0.108)   &  (0.009)   &  (0.206)   \\
+\cmidrule(lr){1-6}
+1940-2010 Avg.  &    -0.39   &    -0.49   &   -13.31   &     1.04   &    -7.96   \\
+1940 Avg.       &     1.49   &     1.61   &    14.09   &     0.89   &    32.86   \\
+First State F-Stat&    15.98   &    15.98   &    11.90   &    15.98   &    15.98   \\
+Observations    &      130   &      130   &      118   &      130   &      130   \\
  \bottomrule \end{tabularx}

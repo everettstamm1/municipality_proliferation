@@ -8,14 +8,15 @@ lab var n_gen_town_cz_pc  "$\Delta_{1940-70}$ Number of Townships, Per Capita"
 lab var n_spdist_cz_pc  "$\Delta_{1940-70}$ Number of Special Districts, Per Capita"
 lab var n_gen_muni_cz_pc  "$\Delta_{1940-70}$ Number of Municipalities, Per Capita (CoG)"
 lab var n_totfrac_cz_pc "$\Delta_{1940-70}$ Main City Share"
-lab var GM_hat_raw_pp "$\widehat{GM}$"
+lab var shift_share_base "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
+lab var sumshare_base "Sum of shares control"
 
 keep if dcourt == 1
 // Create groups of variables
 local panel_A_vars n_cgoodman_cz_pc n_gen_muni_cz_pc n_schdist_ind_cz_pc n_spdist_cz_pc  n_totfrac_cz_pc
-local panel_B_vars GM_raw_pp GM_hat_raw
-local panel_C_vars v2_sumshares_urban coastal transpo_cost_1920 mean_urban_income_1940 cz_popdens1940 growth3040
+local panel_B_vars GM_raw_pp shift_share_base
+local panel_C_vars sumshare_base  mfg_lfshare1940  mean_income_1940 cz_popdens1940 
 
 // Generate summary statistics using eststo and estpost
 eststo A: estpost summarize `panel_A_vars', d 

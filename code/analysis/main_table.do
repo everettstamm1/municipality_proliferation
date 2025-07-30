@@ -87,36 +87,45 @@ foreach controls in b extra w_b w_extra{
 	}
 }
 
-	
-// Quadratic Control
-main_table, endog(GM_raw_pp) exog(`inst') controls(`b_controls') weight(popc1940) path("$TABS/final/main_effect_quad.tex") deplab(n) endog2(GM_raw_pp_2) exog2(`inst'_2)
-
-main_table, endog(GM_raw_pp) exog(`inst') controls(`b_controls' `extra_controls') weight(popc1940) path("$TABS/final/main_effect_quad_new_ctrl.tex") deplab(n) endog2(GM_raw_pp_2) exog2(`inst'_2)
-
 // Cort order het
-main_table, endog(GM_raw_pp) exog(`inst') controls(`b_controls' `extra_controls' court_order) weight(popc1940) path("$TABS/final/main_effect_co_new_ctrl.tex") deplab(n) endog2(GM_rawXco) exog2(GM_hatXco)
+main_table, endog(GM_raw_pp) exog(`inst') controls(`b_controls' `extra_controls' court_order) weight(popc1940) path("$TABS/final/main_effect_co_new_ctrl.tex")  endog2(GM_rawXco) exog2(GM_hatXco) deplab(ld)
 
 
-// Generic Main Table
-main_table_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' `extra_controls') weight(popc1940) path("$TABS/final/black_ssaggregate.tex") deplab(n)	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
+// Main Table
+main_table_long_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' `extra_controls') weight(popc1940) path("$TABS/final/black_ssaggregate_long.tex") 	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
 
 // European Migration Control
 
-main_table_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' `extra_controls' wt_instmig_avg_pp) weight(popc1940) path("$TABS/final/black_ssaggregate_eurmig.tex") deplab(n)	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
+main_table_long_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' `extra_controls' wt_instmig_avg_pp) weight(popc1940) path("$TABS/final/black_ssaggregate_eurmig.tex") 	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
 
 // 1950-70 diff
-main_table_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' `extra_controls') weight(popc1940) path("$TABS/final/black_ssaggregate_5070.tex") deplab(n2)	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
+main_table_long_ssaggregate2, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' `extra_controls') weight(popc1940) path("$TABS/final/black_ssaggregate_5070.tex") 	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
 
 
 // No imbalanced
-main_table_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' ) weight(popc1940) path("$TABS/final/black_ssaggregate_nobal.tex") deplab(n)	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
+main_table_long_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' ) weight(popc1940) path("$TABS/final/black_ssaggregate_nobal.tex") 	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
 
-// Long Main Table
-main_table_long_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' `extra_controls') weight(popc1940) path("$TABS/final/black_ssaggregate_long.tex") 	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
+
+// White
+main_table_long_ssaggregate, endog(WM_raw_pp) exog(shift_share_base_white) controls(`b_controls' `extra_controls') weight(popc1940) path("$TABS/final/white_ssaggregate_long.tex") 	version("base_white")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
+
 
 
 // Townships
-main_table_towns_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' `extra_controls') weight(popc1940) path("$TABS/final/black_ssaggregate_towns.tex") deplab(n) version("base") share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
+main_table_towns_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' `extra_controls') weight(popc1940) path("$TABS/final/black_ssaggregate_towns.tex")  version("base") share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
+
+
+// Original Instrument
+main_table_long, endog(GM) exog(GM_hat) controls(`b_controls' mfg_lfshare1940 frac_all_upm1940 sumshare_base) weight(popc1940) path("$TABS/final/main_effect_pctile.tex")
+g dumwt = 1
+
+
+// Quadratic Control
+
+main_table_long, endog(GM_raw_pp) exog(`inst') controls(`b_controls' `extra_controls') weight(popc1940) path("$TABS/final/main_effect_quad_new_ctrl.tex")  endog2(GM_raw_pp_2) exog2(`inst'_2)
+
+
+
 
 
 // New 1st table

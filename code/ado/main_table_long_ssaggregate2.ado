@@ -1,16 +1,16 @@
-cap prog drop main_table_long_ssaggregate
-prog def main_table_long_ssaggregate
+cap prog drop main_table_long_ssaggregate2
+prog def main_table_long_ssaggregate2
 	syntax, endog(varname) controls(varlist) exog(varname) weight(varname) path(string) version(string) share_folder(string) origin_id(string)  [endog2(varlist) exog2(varlist) cgoodman(varlist) gen_muni(varlist) schdist_ind(varlist) gen_town(varlist) spdist(varlist) totfrac(varlist)]
 	
 	eststo clear
 	foreach outcome in cgoodman schdist_ind gen_muni spdist totfrac {
 		local ctrls `controls' ``outcome''
 
-		su n_`outcome'_cz_pc 
+		su n2_`outcome'_cz_pc 
 		local dv70_`outcome' : di %6.2f r(mean)
-		su ld_`outcome'_cz_pc 
+		su ld2_`outcome'_cz_pc 
 		local dv10_`outcome' : di %6.2f r(mean)
-		su b_`outcome'_cz1940_pc 
+		su b_`outcome'_cz1950_pc 
 		local bv_`outcome' : di %6.2f r(mean)
 		
 		// First Stage
@@ -19,29 +19,29 @@ prog def main_table_long_ssaggregate
 		local F_`outcome' : di %6.2f r(F)
 
 		// OLS 1940-70
-		eststo ols70_`outcome' : reg n_`outcome'_cz_pc `endog' `endog2' `ctrls' [aw = `weight'], r
+		eststo ols70_`outcome' : reg n2_`outcome'_cz_pc `endog' `endog2' `ctrls' [aw = `weight'], r
 		
 			
 		
 
 		// OLS 1940-2010
-		eststo ols10_`outcome' : reg ld_`outcome'_cz_pc `endog' `endog2' `ctrls' [aw = `weight'], r
+		eststo ols10_`outcome' : reg ld2_`outcome'_cz_pc `endog' `endog2' `ctrls' [aw = `weight'], r
 		local N_`outcome' = e(N)
 
 	}
 	
 	preserve 
-		ssaggregate n_cgoodman_cz_pc n_totfrac_cz_pc n_gen_muni_cz_pc n_spdist_cz_pc ld_cgoodman_cz_pc ld_totfrac_cz_pc ld_gen_muni_cz_pc ld_spdist_cz_pc `endog' [aw=`weight'], n(`origin_id') l(cz) sfile("`share_folder'/shares_`version'.dta") controls("`ctrls'") s(share)
+		ssaggregate n2_cgoodman_cz_pc n2_totfrac_cz_pc n2_gen_muni_cz_pc n2_spdist_cz_pc ld2_cgoodman_cz_pc ld2_totfrac_cz_pc ld2_gen_muni_cz_pc ld2_spdist_cz_pc `endog' [aw=`weight'], n(`origin_id') l(cz) sfile("`share_folder'/shares_`version'.dta") controls("`ctrls'") s(share)
 		
 		merge 1:1 `origin_id' using "`share_folder'/shock_instrument_`version'.dta", keep(1 3) nogen
 		replace shift = 0 if mi(shift)
 		lab var shift "`xlab'"
 		
 		foreach outcome in cgoodman  spdist gen_muni totfrac {
-			eststo iv70_`outcome': ivreg2 n_`outcome'_cz_pc (`endog' `endog2' = shift) [aw = s_n]
+			eststo iv70_`outcome': ivreg2 n2_`outcome'_cz_pc (`endog' `endog2' = shift) [aw = s_n]
 			
 			estadd scalar dep_var70 = `dv70_`outcome''
-			eststo iv10_`outcome': ivreg2 ld_`outcome'_cz_pc (`endog' `endog2' = shift) [aw = s_n]
+			eststo iv10_`outcome': ivreg2 ld2_`outcome'_cz_pc (`endog' `endog2' = shift) [aw = s_n]
 			
 			estadd scalar dep_var10 = `dv10_`outcome''
 			estadd scalar Fs = `F_`outcome''
@@ -51,17 +51,17 @@ prog def main_table_long_ssaggregate
 	restore
 	
 	preserve 
-		ssaggregate n_schdist_ind_cz_pc ld_schdist_ind_cz_pc `endog' [aw=`weight'], n(`origin_id') l(cz) sfile("`share_folder'/shares_`version'.dta") controls("`ctrls'") s(share)
+		ssaggregate n2_schdist_ind_cz_pc ld2_schdist_ind_cz_pc `endog' [aw=`weight'], n(`origin_id') l(cz) sfile("`share_folder'/shares_`version'.dta") controls("`ctrls'") s(share)
 		
 		merge 1:1 `origin_id' using "`share_folder'/shock_instrument_`version'.dta", keep(1 3) nogen
 		replace shift = 0 if mi(shift)
 		lab var shift "`xlab'"
 		
 		foreach outcome in schdist_ind {
-			eststo iv70_`outcome': ivreg2 n_`outcome'_cz_pc (`endog' `endog2' = shift) [aw = s_n]
+			eststo iv70_`outcome': ivreg2 n2_`outcome'_cz_pc (`endog' `endog2' = shift) [aw = s_n]
 			
 			estadd scalar dep_var70 = `dv70_`outcome''
-			eststo iv10_`outcome': ivreg2 ld_`outcome'_cz_pc (`endog' `endog2' = shift) [aw = s_n]
+			eststo iv10_`outcome': ivreg2 ld2_`outcome'_cz_pc (`endog' `endog2' = shift) [aw = s_n]
 			
 			estadd scalar dep_var10 = `dv10_`outcome''
 			estadd scalar Fs = `F_`outcome''

@@ -1,7 +1,7 @@
 // IDEA: reghdfe med_hv_place exp_pc samp_dest above_x_med exp_pcXsamp_dest exp_pcXabove_x_med exp_pcXsamp_destXabove_x_med [aw=weight_pop], vce(cl cz)
 
-local b_controls reg2 reg3 reg4 sumshare_base
-local extra_controls mfg_lfshare1940 mean_income_1940 cz_popdens1940
+local b_controls reg2 reg3 reg4 
+local extra_controls 
 
 use "$CLEANDATA/mechanisms.dta", clear
 drop if badmuni==1 | mi(cz)
@@ -25,7 +25,7 @@ foreach m in  ols{
 	if "`m'"=="ols" local mod "OLS"
 
 	eststo clear
-	foreach covar of varlist prop_black2010 place_total mean_hh_inc_place  pct_rev_sa  pct_rev_ff landuse_sfr landuse_apartment  exclusive_district_shape {
+	foreach covar of varlist prop_white2010 place_land mean_hh_inc_place  pct_rev_sa  pct_rev_ff landuse_sfr landuse_apartment  exclusive_district_shape {
 		local mname = subinstr("`covar'","landuse_", "",.)
 		lab var `covar' "`mname'"
 		
@@ -39,10 +39,10 @@ foreach m in  ols{
 		}
 	}
 
-	esttab prop_black2010 place_total mean_hh_inc_place  pct_rev_sa  pct_rev_ff landuse_sfr landuse_apartment  exclusive_district_shape ///
+	esttab prop_white2010 place_land mean_hh_inc_place  pct_rev_sa  pct_rev_ff landuse_sfr landuse_apartment  exclusive_district_shape ///
 				using "$TABS/land_use_index/muni_outcomes_`m'.tex", booktabs compress label replace lines se frag ///
 				 starlevels( * 0.10 ** 0.05 *** 0.01) ///
-				mtitles("\shortstack{Percentage \\ Black}" "\shortstack{Log City \\ Area}" "\shortstack{2010 Household \\ Income}" "\shortstack{Special \\ Assessments}" "\shortstack{Fines and \\ Forfeitures}" "\shortstack{Single \\ Family}" "Apartments" "\shortstack{Exclusive \\ District}") ///
+				mtitles("\shortstack{Percentage \\ White}" "\shortstack{Land Area}" "\shortstack{2010 Household \\ Income}" "\shortstack{Special \\ Assessments}" "\shortstack{Fines and \\ Forfeitures}" "\shortstack{Single \\ Family}" "Apartments" "\shortstack{Exclusive \\ District}") ///
 				mgroups("2010 Muni Characteristics" "\shortstack{Percentage of \\ Municipal Revenues}" "\shortstack{Percentage of \\ Municipal Land Uses}"  "\shortstack{Muni-District \\ Similarity}" ,pattern(1 0 0 1 0 1 0 1) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(samp_destXabove_?_med above_?_med samp_dest) b(%5.3f) se(%5.3f) ///
 				prehead( \begin{tabularx}{\linewidth}{l*{8}{>{\centering\arraybackslash}X}} \toprule) postfoot(	\bottomrule \end{tabularx}) stats(  bdvw N, labels( "Omitted Category Avg." "Observations") fmt(2 0))
 

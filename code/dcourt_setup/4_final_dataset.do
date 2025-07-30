@@ -1,4 +1,4 @@
-local do_placebo = 1
+local do_placebo = 0
 local do_resample = 0
 /*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 
@@ -501,7 +501,7 @@ ren sumshares v`v'_sumshares
 	*3. Construct measure of black urban pop change and instrument for black urban in-migration at CZ level.
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 	
-		local do_placebo = 1
+		//local do_placebo = 1
 local do_resample = 0
 			use "$INTDATA/dcourt/GM_city_final_dataset.dta", clear
 			local levelvar cz
@@ -668,6 +668,9 @@ local do_resample = 0
 			merge 1:1 cz using "$INTDATA/dcourt/clean_cz_snq_european_immigration_instrument.dta", keep(1 3) nogen
 			// mfg_lfshare1940
 			merge 1:1 cz using "$INTDATA/dcourt/clean_cz_industry_employment_1940_1970.dta", keep(1 3) nogen
+
+			// frac_all_upm1940
+			merge 1:1 cz using "$RAWDATA/dcourt/clean_cz_mobility_1900_2015.dta", keep(1 3) nogen keepusing(frac_all_upm1940)
 
 			
 			
@@ -905,7 +908,7 @@ local do_resample = 0
 			*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 		
 			
-			//la var frac_all_upm1940 "Edu. Upward Mobility 1940"
+			la var frac_all_upm1940 "Edu. Upward Mobility 1940"
 			la var v2_blackmig3539_share1940 "Black Southern Mig 1935-1940"
 			la var reg2 "Midwest"
 			la var reg3 "South"

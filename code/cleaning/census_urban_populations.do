@@ -9,7 +9,7 @@ ren citycode city
 
 replace age = . if age == 000
 replace lit = . if lit == 0
-g literate = lit == 4
+g literate = lit == 4 if lit < .
 replace labforce = . if inlist(labforce,0,9)
 replace labforce = labforce - 1
 replace occscore = . if occscore == 0
@@ -37,7 +37,7 @@ merge 1:m year icpsrst icpsrcty using "$XWALKS/consistent_1990", keepusing(weigh
 foreach var of varlist pop age black  literate labforce occscore  popc agec blackc  literatec labforcec occscorec{
 	replace `var' = `var'*weight
 }
-
+keep pop age black  literate labforce occscore  popc agec blackc  literatec labforcec occscorec year nhgisst_1990 nhgiscty_1990
 collapse (sum) pop age black  literate labforce occscore  popc agec blackc  literatec labforcec occscorec, by(year nhgisst_1990 nhgiscty_1990)
 
 ren nhgisst_1990 statefip

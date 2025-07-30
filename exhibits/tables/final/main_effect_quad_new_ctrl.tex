@@ -1,39 +1,49 @@
- \begin{tabularx}{.9\hsize}{l*{6}{>{\centering\arraybackslash}X}} \toprule
-&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}
-&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}
-&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\
-\cmidrule(lr){1-7}
-\multicolumn{6}{l}{Panel A: First Stage}\\
-\cmidrule(lr){1-7}
-$\widehat{GM}$  &    1.771***&    1.771***&    1.841***&    1.771***&    1.771***&    1.771***\\
-                &  (0.315)   &  (0.315)   &  (0.330)   &  (0.315)   &  (0.315)   &  (0.315)   \\
-\cmidrule(lr){1-7}
-\multicolumn{6}{l}{Panel B: OLS}\\
-\cmidrule(lr){1-7}
-GM              &   -0.001   &    0.003   &    0.609*  &    0.004   &   -0.023   &   -0.614** \\
-                &  (0.006)   &  (0.007)   &  (0.316)   &  (0.011)   &  (0.020)   &  (0.273)   \\
+ \begin{tabularx}{\textwidth}{l*{5}{>{\centering\arraybackslash}X}} \toprule \setlength{\tabcolsep}{15pt}
+&\multicolumn{1}{c}{C. Goodman}&\multicolumn{3}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-5}\cmidrule(lr){6-6}
+&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Special Districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-4}\cmidrule(lr){5-5}\cmidrule(lr){6-6}
+&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel A: First Stage}\\
+\cmidrule(lr){1-6}
+$\widehat{GM}$  &    1.771***&    1.771***&    1.841***&    1.771***&    1.771***\\
+                &  (0.315)   &  (0.315)   &  (0.330)   &  (0.315)   &  (0.315)   \\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel B: OLS 1940-1970}\\
+\cmidrule(lr){1-6}
+GM              &   -0.001   &    0.003   &    0.609*  &   -0.023   &   -0.614** \\
+                &  (0.006)   &  (0.007)   &  (0.316)   &  (0.020)   &  (0.273)   \\
 \addlinespace
-$\text{GM}^2$   &    0.000   &    0.000   &   -0.018*  &    0.000   &    0.001   &   -0.010   \\
-                &  (0.000)   &  (0.000)   &  (0.011)   &  (0.000)   &  (0.001)   &  (0.007)   \\
-\cmidrule(lr){1-7}
-\multicolumn{6}{l}{Panel C: Reduced Form}\\
-\cmidrule(lr){1-7}
-$\widehat{GM}$  &    0.028*  &    0.033** &    1.885***&    0.096***&    0.040   &   -4.099***\\
-                &  (0.014)   &  (0.016)   &  (0.525)   &  (0.031)   &  (0.056)   &  (0.708)   \\
+$\text{GM}^2$   &    0.000   &    0.000   &   -0.018*  &    0.001   &   -0.010   \\
+                &  (0.000)   &  (0.000)   &  (0.011)   &  (0.001)   &  (0.007)   \\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel C: 2SLS 1940-1970}\\
+\cmidrule(lr){1-6}
+GM              &    0.012   &    0.012   &    1.970***&    0.018   &   -1.355***\\
+                &  (0.009)   &  (0.010)   &  (0.639)   &  (0.029)   &  (0.462)   \\
 \addlinespace
-$\widehat{GM}^2$&   -0.001   &   -0.001   &   -0.147***&   -0.002*  &   -0.001   &    0.091** \\
-                &  (0.001)   &  (0.001)   &  (0.040)   &  (0.001)   &  (0.003)   &  (0.038)   \\
-\cmidrule(lr){1-7}
-\multicolumn{6}{l}{Panel D: 2SLS}\\
-\cmidrule(lr){1-7}
-GM              &    0.012   &    0.012   &    1.970***&    0.035*  &    0.018   &   -1.355***\\
-                &  (0.009)   &  (0.010)   &  (0.639)   &  (0.020)   &  (0.029)   &  (0.462)   \\
-\addlinespace
-$\text{GM}^2$   &   -0.000   &   -0.000   &   -0.058***&   -0.000   &   -0.000   &   -0.006   \\
-                &  (0.000)   &  (0.000)   &  (0.021)   &  (0.000)   &  (0.001)   &  (0.012)   \\
+$\text{GM}^2$   &   -0.000   &   -0.000   &   -0.058***&   -0.000   &   -0.006   \\
+                &  (0.000)   &  (0.000)   &  (0.021)   &  (0.001)   &  (0.012)   \\
 \midrule
-First Stage F-Stat&    31.55   &    31.55   &    31.18   &    31.55   &    31.55   &    31.55   \\
-Dep. Var. Mean  &    -0.26   &    -0.33   &   -12.95   &    -0.57   &     0.64   &    -3.37   \\
-1940 Dep. Var. Mean&     1.49   &     1.61   &    14.09   &     2.29   &     0.89   &    32.86   \\
-Observations    &      130   &      130   &      118   &      130   &      130   &      130   \\
+1940-70 Avg.    &    -0.26   &    -0.33   &   -12.95   &     0.64   &    -3.37   \\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel D: OLS 1940-2010}\\
+\cmidrule(lr){1-6}
+GM              &    0.008   &    0.012   &    0.628*  &   -0.032   &   -1.100***\\
+                &  (0.008)   &  (0.010)   &  (0.321)   &  (0.020)   &  (0.367)   \\
+\addlinespace
+$\text{GM}^2$   &   -0.000   &   -0.000   &   -0.019*  &    0.001   &   -0.001   \\
+                &  (0.000)   &  (0.000)   &  (0.011)   &  (0.001)   &  (0.009)   \\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel E: 2SLS 1940-2010}\\
+\cmidrule(lr){1-6}
+GM              &    0.022*  &    0.020   &    2.001***&    0.005   &   -2.509***\\
+                &  (0.013)   &  (0.014)   &  (0.643)   &  (0.032)   &  (0.580)   \\
+\addlinespace
+$\text{GM}^2$   &   -0.000   &   -0.000   &   -0.059***&    0.000   &    0.017   \\
+                &  (0.000)   &  (0.000)   &  (0.021)   &  (0.001)   &  (0.016)   \\
+\cmidrule(lr){1-6}
+1940-2010 Avg.  &    -0.39   &    -0.49   &   -13.31   &     1.04   &    -7.96   \\
+1940 Avg.       &     1.49   &     1.61   &    14.09   &     0.89   &    32.86   \\
+First State F-Stat&    31.55   &    31.55   &    31.18   &    31.55   &    31.55   \\
+Observations    &      130   &      130   &      118   &      130   &      130   \\
  \bottomrule \end{tabularx}
