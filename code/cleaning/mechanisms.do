@@ -493,6 +493,20 @@ restore
 merge m:1 STATEFP PLACEFP using `place_land', keep(1 3) nogen
 
 //merge m:1 cz using "$INTDATA/cog/special_districts_employment", keep(3) nogen
+preserve
+	use "$INTDATA/cog/4_1_general_purpose_govts.dta", clear
+	drop if ID_type == 1
+	ren fips_state STATEFP
+	ren fips_place_2002 PLACEFP
+	g council_manager = form_government == "5" 
+	bys STATEFP PLACEFP (council_manager): replace council_manager = council_manager[_N]
+	keep STATEFP PLACEFP council_manager
+	duplicates drop
+	tempfile managers
+	save `managers'
+restore
+
+merge m:1 STATEFP PLACEFP using `managers', keep(1 3) nogen
 
 merge m:1 STATEFP PLACEFP using "$INTDATA/census/2010_hh_incomes", keep(1 3) nogen
 merge m:1 STATEFP PLACEFP using "$INTDATA/census/1970_hh_incomes_hv", keep(1 3) nogen

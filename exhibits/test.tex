@@ -11,6 +11,7 @@
 \usepackage{threeparttable}
 \usepackage{algorithmic}
 \usepackage{tabularx}
+\usepackage{amsmath}
 
 \title{Simple Tables for Municipality Proliferation}
 
@@ -25,9 +26,199 @@
 
 
 \section{Updated Tables}
+
+
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Controlling for Recent Black Migrant Income Differences}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/black_ssaggregate_long_bincdiff}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Controlling for Black Migrants 1930 Occscore}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/black_ssaggregate_long_b30occscore}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Interacted on Above Median Enclosedness}
+\begin{threeparttable}
+\footnotesize
+\input{tables/above_med_enclosed_interaction}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Interacted on Above median 35-39 income differences}
+\begin{threeparttable}
+\footnotesize
+\input{tables/bmiginc_interaction}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Interacted on Above median 35-39 income differences, by CZ}
+\begin{threeparttable}
+\footnotesize
+\input{tables/bmiginc_cz_interaction}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Interacted on Above median 1930 black migrant occupational scores}
+\begin{threeparttable}
+\footnotesize
+\input{tables/occscore_links_interaction}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Interacted on Fraction of districts with C.O.}
+\begin{threeparttable}
+\footnotesize
+\input{tables/frac_co_interaction}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Interacted if CZ had any court orders}
+\begin{threeparttable}
+\footnotesize
+\input{tables/co_interaction}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Split on whether CZ had over 10\% of their 2000 enrollment Court Ordered}
+\begin{threeparttable}
+\footnotesize
+\input{tables/above_co_25p_interaction}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Quadratic Instrument}
+\begin{threeparttable}
+\footnotesize
+\input{tables/quad_table}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+
+\begin{table}
+\footnotesize
+\centering
+\caption{Completely original percentile}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/main_effect_pctile}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+
+\begin{table}
+\footnotesize
+\centering
+\caption{Percentile, weights}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/main_effect_pctile_wt}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+\begin{table}
+\footnotesize
+\centering
+\caption{Percentile, weights, our controls}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/main_effect_pctile_outctrl}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+\begin{table}
+\footnotesize
+\centering
+\caption{Percentile, weights, no controls}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/main_effect_pctile_noctrl}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Levels}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/black_ssaggregate_long_levels}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+\clearpage
 \input{tables/corr_matrix.tex}
 \clearpage
 \input{tables/balancetables/balancetable.tex}
+\clearpage
+
+\input{tables/balancetables/balancetable_pctile.tex}
 \clearpage
 
 
@@ -243,5 +434,52 @@
 \clearpage
 
 
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Population Pre-trends}
+\input{tables/balancetables/pretrends_popc.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Age Pre-trends}
+\input{tables/balancetables/pretrends_agec.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Black Pre-trends}
+\input{tables/balancetables/pretrends_blackc.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Literacy Pre-trends}
+\input{tables/balancetables/pretrends_literatec.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{In-Labor Force Pre-trends}
+\input{tables/balancetables/pretrends_labforcec.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{OCCSCORE Pre-trends}
+\input{tables/balancetables/pretrends_occscorec.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
 
 \end{document}

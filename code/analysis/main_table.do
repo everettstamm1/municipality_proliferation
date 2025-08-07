@@ -58,15 +58,11 @@ lab var GM_hat_raw_pp_recentered "$\widehat{GM}$, recentered"
 lab var GM_raw_pp_recentered "GM, recentered"
 g order = frac_total^2
 
-qui su prop_enclosed1940, d
-g above_med_enclosed = prop_enclosed1940 >= `r(p50)'
-g below_med_enclosed = -above_med_enclosed
+
 
 g GM_X_above_med_enclosed = GM_raw_pp * above_med_enclosed
 g GM_hat_X_above_med_enclosed = `inst' * above_med_enclosed
 
-g GM_X_below_med_enclosed = GM_raw_pp * below_med_enclosed
-g GM_hat_X_below_med_enclosed = `inst' * below_med_enclosed
 
 
 g GM_X_prop_enclosed1940 = GM_raw_pp * prop_enclosed1940
@@ -86,10 +82,27 @@ foreach controls in b extra w_b w_extra{
 		local `controls'_controls_X ``controls'_controls_X' `var'_X_ame
 	}
 }
+replace mean_income_1940_bmig = 0 if mi(mean_income_1940_bmig)
+g mi_bmig_income = mean_income_1940_bmig == 0
+replace bmig_income_diff = 0 if mi(bmig_income_diff)
+g mi_bmig_income_diff = bmig_income_diff == 0
+replace bmig_income_diff_cz = 0 if mi(bmig_income_diff_cz)
+g mi_bmig_income_diff_cz = bmig_income_diff_cz == 0
+replace occscore_black_3040_linked = 0 if mi(occscore_black_3040_linked)
+g mi_occscore_black_3040_linked = occscore_black_3040_linked == 0
 
-// Cort order het
-main_table, endog(GM_raw_pp) exog(`inst') controls(`b_controls' `extra_controls' court_order) weight(popc1940) path("$TABS/final/main_effect_co_new_ctrl.tex")  endog2(GM_rawXco) exog2(GM_hatXco) deplab(ld)
+// Main Table, black income diff control
+main_table_long_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' `extra_controls' bmig_income_diff_cz mi_bmig_income_diff_cz) weight(popc1940) path("$TABS/final/black_ssaggregate_long_bincdiff.tex") 	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
 
+// Main Table, 1930 black mig occscore control
+main_table_long_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' `extra_controls' occscore_black_3040_linked mi_occscore_black_3040_linked) weight(popc1940) path("$TABS/final/black_ssaggregate_long_b30occscore.tex") 	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
+
+
+// White
+main_table_long_ssaggregate, endog(WM_raw_pp) exog(shift_share_base_white) controls(reg2 reg3 reg4 sumshare_base_white growth3040 mean_income_1940 hsgrad frac_total mfg_lfshare1940 coastal) weight(popc1940) path("$TABS/final/white_ssaggregate_long.tex") 	version("base_white")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
+
+// Main Table, levels
+//main_table_long_ssagg_levels, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' mfg_lfshare1940) weight(popc1940) path("$TABS/final/black_ssaggregate_long_levels.tex") 	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
 
 // Main Table
 main_table_long_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' `extra_controls') weight(popc1940) path("$TABS/final/black_ssaggregate_long.tex") 	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
@@ -106,9 +119,6 @@ main_table_long_ssaggregate2, endog(GM_raw_pp) exog(shift_share_base) controls(`
 main_table_long_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' ) weight(popc1940) path("$TABS/final/black_ssaggregate_nobal.tex") 	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
 
 
-// White
-main_table_long_ssaggregate, endog(WM_raw_pp) exog(shift_share_base_white) controls(`b_controls' `extra_controls') weight(popc1940) path("$TABS/final/white_ssaggregate_long.tex") 	version("base_white")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
-
 
 
 // Townships
@@ -116,8 +126,11 @@ main_table_towns_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`
 
 
 // Original Instrument
-main_table_long, endog(GM) exog(GM_hat) controls(`b_controls' mfg_lfshare1940 frac_all_upm1940 sumshare_base) weight(popc1940) path("$TABS/final/main_effect_pctile.tex")
+main_table_long, endog(GM) exog(GM_hat) controls(`b_controls' mfg_lfshare1940 frac_all_upm1940 sumshare_base) weight(popc1940) path("$TABS/final/main_effect_pctile_wt.tex")
 g dumwt = 1
+main_table_long, endog(GM) exog(GM_hat) controls(`b_controls' mfg_lfshare1940 frac_all_upm1940 sumshare_base) weight(dumwt) path("$TABS/final/main_effect_pctile.tex")
+main_table_long, endog(GM) exog(GM_hat) controls(`b_controls') weight(popc1940) path("$TABS/final/main_effect_pctile_noctrl.tex")
+main_table_long, endog(GM) exog(GM_hat) controls(`b_controls' `extra_controls') weight(popc1940) path("$TABS/final/main_effect_pctile_outctrl.tex")
 
 
 // Quadratic Control

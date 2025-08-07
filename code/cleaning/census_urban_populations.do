@@ -24,7 +24,7 @@ g labforcec = labforce if _merge == 3
 g pop = perwt
 g popc = perwt if _merge == 3
 
-foreach var of varlist age black  literate labforce occscore  popc agec blackc  literatec labforcec occscorec{
+foreach var of varlist age black  literate labforce occscore  agec blackc  literatec labforcec occscorec{
 	replace `var' = `var'*perwt
 }
 

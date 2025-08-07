@@ -1,8 +1,9 @@
 	use "$RAWDATA/dcourt/IPUMS_1940_extract_to_construct_migration_weights.dta", clear
-	
+	keep if race == 2
 	decode migplac5, gen(origin_state)
 	g origin_sample=(origin_state=="Alabama" | origin_state=="Arkansas" | origin_state=="Florida" | origin_state=="Georgia" | origin_state=="Kentucky"| origin_state=="Louisiana" | origin_state=="Mississippi" | origin_state=="North Carolina" | origin_state=="Oklahoma" | origin_state=="South Carolina" | origin_state=="Tennessee" | origin_state=="Texas" | origin_state=="Virginia" | origin_state=="West Virginia")
-	
+	keep if origin_sample == 1
+
 	
 	tostring statefip, gen(statefip_str) 
 	replace statefip_str=statefip_str+"0"
@@ -17,7 +18,8 @@
 	replace countyicp_str="0050" if countyicp_str=="0053" & statefip==22 // Possible typo with Jefferson Davis county coded as 53 instead of 50 in IPUMS Census extract. Recoded as 50.
 	gen gisjoin2_str = statefip_str + countyicp_str
 	
-	merge m:1 gisjoin2_str using "$RAWDATA/dcourt/county1940_crosswalks.dta", keepusing(fips state_name county_name)
+	merge m:1 gisjoin2_str using "$RAWDATA/dcourt/county1940_crosswalks.dta", keepusing(fips state_name county_name) nogen
+	
 	
 	ren city citycode
 	replace citycode = 3540 if citycode == 3521 // Lebanon, PA rename
@@ -25,22 +27,10 @@
 	
 	merge m:1 cz using "$INTDATA/dcourt/original_130_czs", keep(3) nogen
 	
-	replace higrade = . if higrade <= 3 | higrade == 99
-	replace higrade = higrade - 3
-	g hsgrad = educ >=6 & educ != 99
-	g colgrad = educ >= 10 & educ != 99
-	replace incwage = . if incwage == 999998
-	g incwage_pos = incwage if incwage > 0
-	replace occscore = . if occscore == 0
-	drop if race > 2
-	g n = 1
-	keep if origin_sample == 1
+	replace incwage = . if incwage == 999998 | incwage == 0
 	
-	bys cz : egen cz_incwage_pos = mean(incwage_pos)
-	bys cz : egen cz_higrade = mean(higrade)
+	egen mean_income_1940_bmig_all = mean(incwage)
 	
-	g diff_incwage_pos = incwage_pos - cz_incwage_pos
-	g diff_higrade_pos = higrade - cz_higrade
-	collapse (mean) diff_incwage_pos diff_higrade_pos, by(race)
+	collapse (max) mean_income_1940_bmig_all (mean) mean_income_1940_bmig = incwage, by(cz)
 	
-	collapse (mean) mean_incwage_pos = incwage_pos mean_higrade = higrade mean_hsgrad = hsgrad mean_colgrad = colgrad mean_occscore = occscore mean_incwage = incwage mean_incnowg = incnonwg (p50) median_incwage_pos = incwage_pos  median_occscore = occscore median_incwage = incwage median_higrade = higrade, by(race)
+	save "$INTDATA/census/bmig_incomes", replace

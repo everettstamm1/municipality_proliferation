@@ -28,7 +28,9 @@ STEPS:
 	use "$RAWDATA/dcourt/south_county.dta", clear
 	//drop if netwmig==.
 	statastates, fips(state) nogen
-	merge m:1 year countyicp state_abbrev using "$INTDATA/south_migrate", keep(1 3) nogen keepusing(wpop_l netwmig netbmig)
+
+
+	merge m:1 year countyicp state_abbrev using "$INTDATA/south_migrate", keep(1 3) nogen keepusing( wpop_l netwmig netbmig)
 	drop if netwmig == .
 	/* Instructions for cleaning the data from Boustan (2016) replication files
 	are prefaced with "Boustan (2016)".
@@ -186,11 +188,11 @@ STEPS:
 	/* Predict county-level net migration rate, decade by decade with southern 
 	variables chosen by LASSO. Predict net migration rate ("netwmig_pred") based on 
 	these vars alone. */
-	reg netwmig percot perten perag peragtob tob warfac_pc permin perminot ot if year==1950
+	reg netwmig percot perten perag peragtob tob warfac_pc permin perminot ot [aw=wpop_l] if year==1950
 	predict netwmig_pred if year==1950
-	reg netwmig percot perten perag peragtob tob warfac_pc permin perminot ot if year==1960
+	reg netwmig percot perten perag peragtob tob warfac_pc permin perminot ot [aw=wpop_l] if year==1960
 	predict netwmig_pred01 if year==1960
-	reg netwmig percot perten perag peragtob tob warfac_pc permin perminot ot if year==1970
+	reg netwmig percot perten perag peragtob tob warfac_pc permin perminot ot [aw=wpop_l] if year==1970
 	predict netwmig_pred02 if year==1970	
 	
 	replace netwmig_pred=netwmig_pred01 if year==1960
@@ -218,7 +220,7 @@ STEPS:
 	label var proutmig "predicted out migration, by county-year, south"
 	
 	/* Merge with 1940 crosswalks data file. */
-	
+	drop _merge
 	merge m:1 stateicp countyicp using "$RAWDATA/dcourt/county1940_crosswalks.dta", keepusing(fips state_name county_name)
 	drop if _merge==2 
 	g origin_fips=fips
@@ -262,11 +264,11 @@ STEPS:
 	these vars alone.
 	...it's just the same vars */
 
-	reg netwmig percot perten perag peragtob tob warfac_pc permin perminot ot if year==1950
+	reg netwmig percot perten perag peragtob tob warfac_pc permin perminot ot if year==1950 
 	predict netwmig_pred if year==1950
-	reg netwmig percot perten perag peragtob tob warfac_pc permin perminot ot if year==1960
+	reg netwmig percot perten perag peragtob tob warfac_pc permin perminot ot if year==1960 
 	predict netwmig_pred01 if year==1960
-	reg netwmig percot perten perag peragtob tob warfac_pc permin perminot ot if year==1970
+	reg netwmig percot perten perag peragtob tob warfac_pc permin perminot ot if year==1970 
 	predict netwmig_pred02 if year==1970	
 	
 	replace netwmig_pred=netwmig_pred01 if year==1960
@@ -341,7 +343,7 @@ STEPS:
 		  51840 |          1        5.88       88.24
 	
 	*/
-
+	drop _merge
 	merge m:1 stateicp countyicp using "$RAWDATA/dcourt/county1940_crosswalks.dta", keepusing(fips state_name county_name)
 	drop if _merge==2 
 	g origin_fips=fips
@@ -469,11 +471,11 @@ STEPS:
 	/* Predict county-level net migration rate, decade by decade with southern 
 	variables chosen by LASSO. Predict net migration rate ("netwmig_pred") based on 
 	these vars alone. */
-	reg netwmig percot perten perag peragtob tob warfac_pc permin perminot ot if year==1950
+	reg netwmig percot perten perag peragtob tob warfac_pc permin perminot ot if year==1950 [aw=wpop_l]
 	predict netwmig_pred if year==1950
-	reg netwmig percot perten perag peragtob tob warfac_pc permin perminot ot if year==1960
+	reg netwmig percot perten perag peragtob tob warfac_pc permin perminot ot if year==1960 [aw=wpop_l]
 	predict netwmig_pred01 if year==1960
-	reg netwmig percot perten perag peragtob tob warfac_pc permin perminot ot if year==1970
+	reg netwmig percot perten perag peragtob tob warfac_pc permin perminot ot if year==1970 [aw=wpop_l]
 	predict netwmig_pred02 if year==1970	
 	
 	replace netwmig_pred=netwmig_pred01 if year==1960

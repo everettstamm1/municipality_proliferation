@@ -446,12 +446,24 @@ foreach level in cz {
 		preserve
 			use "$INTDATA/census/cz_urbanization_1900_1930", clear
 			keep pop age black  literate labforce occscore cz decade
+			
 			reshape wide pop age black  literate labforce occscore , i(cz) j(decade)
 			tempfile oldpops
 			save `oldpops'
 		restore
 		
 		merge 1:1 cz using `oldpops', keep(1 3) nogen
+		
+		preserve
+			use "$INTDATA/census/cz_urbanization_1900_1930", clear
+			keep  popc agec blackc  literatec labforcec occscorec cz decade
+
+			reshape wide popc agec blackc  literatec labforcec occscorec , i(cz) j(decade)
+			tempfile oldpopsc
+			save `oldpopsc'
+		restore
+		
+		merge 1:1 cz using `oldpopsc', keep(1 3) nogen
 		
 		// Adding labels
 		foreach ds in  gen_muni schdist_ind all_local gen_subcounty spdist  gen_town cgoodman schdist schdist_ind_m1 schdist_m2{
@@ -582,6 +594,10 @@ foreach level in cz {
 
 		// Total Fraction in main city outcomes, giving them unintuitive names so they can be ran properly in the table creation code, ignore the "n" and "pc"
 		g b_totfrac_cz1940_pc = 100* (maxcitypop1940/pop1940)
+		g b_totfrac_cz1940 = 100* (maxcitypop1940/pop1940)
+		g b_totfrac_cz1970 = 100* (maxcitypop1970/pop1970)
+		g b_totfrac_cz2010 = 100* (maxcitypop2010/pop2010)
+
 		g b_totfrac_cz1950_pc = 100* (maxcitypop1950/pop1950)
 
 		g n_totfrac_cz_pc = 100*((maxcitypop1970/pop1970) - (maxcitypop1940/pop1940))
@@ -633,6 +649,10 @@ foreach level in cz {
 		g prop_enclosed1970 = enclosed1970/total_length
 		
 		g change_enclosed4070 = (enclosed1970 - enclosed1940)/(total_length - enclosed1940)
+		
+		su prop_enclosed1940, d
+		g above_med_enclosed = prop_enclosed1940 >= r(p50)
+		
 		
 		merge 1:1 cz using "$INTDATA/cgoodman/orig_geogs", keep(3) nogen
 		
@@ -814,7 +834,7 @@ foreach level in cz {
 		g change_frac_unc = frac_unc1970 - frac_unc1940
 		
 		// Add in new sumshares
-		foreach version in base base_white county_black county_white white_sob black_sob black_notx white_notx{
+		foreach version in base base_quad base_white county_black county_white white_sob black_sob black_notx white_notx{
 			merge 1:1 cz using "$INTDATA/ssaggregate_prep/dest_instrument_`version'", keep(3) nogen
 			ren shift_share shift_share_`version'
 			ren sumshare sumshare_`version'
@@ -826,18 +846,55 @@ foreach level in cz {
 		ren cz czone
 		merge 1:1 czone using "$CLEANDATA/nces/cz_court_orders", keep(1 3) nogen
 		ren czone cz
+		replace frac_court_ordered = 100*frac_court_ordered
 		
+		
+		su frac_court_ordered, d
+		g above_co_med = frac_court_ordered > r(p50)
+		su frac_enroll_court_ordered, d
+		g above_co_enroll_med = frac_enroll_court_ordered > r(p50)
+		g above_co_enroll_10p = frac_enroll_court_ordered > 10
+		g above_co_enroll_25p = frac_enroll_court_ordered > 25
+		
+		g growth0010 = 100*(popc1910 - popc1900) / popc1900
+		g growth1020 = 100*(popc1920 - popc1910) / popc1910
+		g growth2030 = 100*(popc1930 - popc1920) / popc1920
+		foreach var of varlist blackc* literatec* labforcec*{
+			replace `var' = 100*`var'
+		}
+		// Black linked income differences
+		merge 1:1 cz using "$INTDATA/census/black_linked_chars.dta", keep(1 3) nogen
+		foreach t in farm unemp_rate valueh rent occscore{
+			su `t'_black_3040_linked, d
+			g above_med_`t'_links = `t'_black_3040_linked >= r(p50) if !mi(`t'_black_3040_linked)
+		}
+		// Black mig income differences
+		merge 1:1 cz using "$INTDATA/census/bmig_incomes", keep(1 3) nogen
+
+		// Difference from CZ average
+		g bmig_income_diff_cz = (mean_income_1940_bmig - mean_income_1940) / mean_income_1940
+		su bmig_income_diff_cz, d
+		g above_bmig_diff_cz = bmig_income_diff_cz >= r(p50) if !mi(mean_income_1940_bmig)
+		
+		// Difference from all black migrants
+		g bmig_income_diff = (mean_income_1940_bmig - mean_income_1940_bmig_all) / mean_income_1940_bmig_all
+		su bmig_income_diff, d
+		g above_bmig_diff = bmig_income_diff >= r(p50)  if !mi(mean_income_1940_bmig)
+
 		merge 1:1 cz using "$INTDATA/other/streams", keep(1 3) nogen
 		lab var n_streams "Number of Streams"
 		
 		su GM_raw_pp, d
 		g above_x_med = GM_raw_pp >= r(p50)
 		g growth3040 = 100*(pop1940 - pop1930)/pop1930
+		g growth4070 = 100*(pop1970 - pop1940)/pop1940
+		g growth4010 = 100*(pop2010 - pop1940)/pop1940
+
 		g GM_rawXco = GM_raw_pp * court_order
 		g GM_rawXfrac_co = GM_raw_pp * frac_court_ordered
 		g GM_hatXco = GM_hat_raw * court_order
 		g GM_hatXfrac_co = GM_hat_raw * frac_court_ordered
-
+		g GM_raw_pp_quad = GM_raw_pp^2
 		
 		lab var higrade "Average years of education"
 		lab var hsgrad "Prop HS Grads"

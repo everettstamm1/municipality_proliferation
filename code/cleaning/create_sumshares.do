@@ -10,6 +10,17 @@ create_sumshare, ///
 	out_path("$INTDATA/ssaggregate_prep/") ///
 	type("black")
 	
+// Base^2
+create_sumshare_quad, ///
+	version("base_quad") ///
+	main_path("$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta") ///
+	shift_path("$INTDATA/dcourt/2_lasso_boustan_predict_mig.dta") ///
+	origin_id("origin_fips") ///
+	dest_id("city") ///
+	origin_sample("origin_sample") ///
+	out_path("$INTDATA/ssaggregate_prep/") ///
+	type("black")
+	
 // Base white
 create_sumshare, ///
 	version("base_white") ///
