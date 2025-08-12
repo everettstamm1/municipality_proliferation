@@ -51,7 +51,8 @@ foreach outcome in cgoodman  spdist gen_muni totfrac schdist_ind{
 	local b_ols70_x_int_`outcome' = string(e(b)[1,2],"%9.3f")
 	local se_ols70_x_`outcome' =string( e(V)[1,1]^0.5,"%9.3f")
 	local se_ols70_x_int_`outcome' =string( e(V)[2,2]^0.5,"%9.3f")
-	
+	local nobs_`outcome' = string( e(N),"%9.0f")
+
 	
 	ivreg2 y (x x_int=z z_int) `controls' [aw=popc1940], r
 	cap drop eps
@@ -314,7 +315,7 @@ file write fh "                &  (`se_iv10_x_int_cgoodman')  &  (`se_iv10_x_int
 file write fh "\cmidrule(lr){1-6}" _n
 
 
-file write fh "Observations    &      130   &      130   &      118   &      130   &      130   \\" _n
+file write fh "Observations    &      `nobs_cgoodman'   &      `nobs_gen_muni'   &      `nobs_schdist_ind'   &      `nobs_spdist'   &      `nobs_totfrac'   \\" _n
 file write fh "\bottomrule \end{tabularx}" _n
 
 file close fh

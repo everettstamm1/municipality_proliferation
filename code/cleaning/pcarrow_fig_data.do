@@ -140,6 +140,20 @@ save "$CLEANDATA/place_education.dta", replace
 
 
 // Place racepop
+import delimited using "$RAWDATA/census/nhgis0044_csv/nhgis0044_csv/nhgis0044_ds94_1970_place.csv", clear
+egen place_pop1970 = rowtotal(cbw*)
+g place_wpop1970 = cbw001
+g place_bpop1970 = cbw002
+
+ren placea placefips
+ren statea statefips
+keep place_* placefips statefips
+
+
+merge 1:1 placefips statefips using `incorps', keep(1 3) 
+g in_cgoodman_data = _merge == 3
+
+
 import delimited using "$RAWDATA/census/nhgis0027_csv/nhgis0027_csv/nhgis0027_ts_nominal_place.csv", clear
 egen place_pop1970 = rowtotal(b18aa1970 b18ab1970 b18ac1970 b18ad1970)
 g place_wpop1970 = b18aa1970
@@ -238,8 +252,10 @@ preserve
 	ren PLACEFP placefips
 	ren STATEFP statefips
 	merge 1:1 cz statefips placefips using `incorps', keep(1 3) nogen
-	bys cz : egen cz_new_inc1970 = mean(agg_fam_inc_place1970) if (yr_incorp >= 1940 & yr_incorp <= 1970)
-	bys cz (cz_new_inc1970): replace cz_new_inc1970 = cz_new_inc1970[1]
+	replace agg_fam_inc_place1970 = . if (yr_incorp < 1940 & yr_incorp > 1970)
+	replace famcount = . if (yr_incorp < 1940 & yr_incorp > 1970)
+	collapse (sum) agg_fam_inc_place1970 famcount, by(cz agg_fam_inc_cz1970)
+	g cz_new_inc1970 = agg_fam_inc_place1970 / famcount
 	ren agg_fam_inc_cz1970 cz_inc1970
 	keep cz cz_inc1970 cz_new_inc1970
 	duplicates drop
@@ -260,5 +276,6 @@ merge 1:1 cz using "$INTDATA/census/cz_race_pop", keep(3) nogen
 //keep if cz_new_prop_white1970 != . 
 replace cz_name = "Louisville, KY/IN" if cz==13101
 
-
+replace cz_new_inc1970 = . if mi(cz_new_wpop1970)
+replace cz_inc1970 = . if mi(cz_new_wpop1970)
 save "$CLEANDATA/pcarrow_fig_data", replace

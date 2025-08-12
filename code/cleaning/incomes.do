@@ -210,8 +210,7 @@ ren placea census_place
 merge 1:1 state census_place using"$XWALKS/census_place_fips_xwalk.dta", keep(3) nogen
 
 collapse (sum) c1k001 famcount, by(state fips_place)
-g agg_fam_inc_place1970 = c1k001/famcount
-drop c1k001 famcount
+rename c1k001 agg_fam_inc_place1970 
 ren state STATEFP
 ren fips_place PLACEFP
 

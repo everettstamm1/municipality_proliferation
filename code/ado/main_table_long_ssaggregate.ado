@@ -129,7 +129,7 @@ prog def main_table_long_ssaggregate
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(`endog' `endog2') ///
 		postfoot(	\bottomrule \end{tabularx}) ///
-		stats(dep_var10 b_var Fs nobs, labels("1940-2010 Avg." "1940 Avg." "First State F-Stat" "Observations") fmt(2 2 2 0)) substitute("\midrule" "\cmidrule(lr){1-6}")
+		stats(dep_var10 b_var Fs nobs, labels("1940-2010 Avg." "1940 Avg." "First Stage F-Stat" "Observations") fmt(2 2 2 0)) substitute("\midrule" "\cmidrule(lr){1-6}")
 
 	eststo clear
 end

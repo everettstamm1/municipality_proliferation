@@ -1,5 +1,4 @@
 use "$RAWDATA/census/usa_00072.dta/usa_00072.dta", clear
-
 	// keep people who lived in south in 1930
 	decode stateicp, gen(origin_state)
 
@@ -23,10 +22,9 @@ use "$RAWDATA/census/usa_00072.dta/usa_00072.dta", clear
 	replace empstat = . if empstat == 0
 	g unemp_rate = empstat - 1 if inlist(empstat,1,2) // 1 if unemployed, 0 if employed, missing if not in labor force
 	replace farm = farm - 1
+
+	collapse (mean)  occscore, by(cz)
 	
-	collapse (mean) farm unemp_rate valueh rent30 occscore, by(cz)
-	rename rent30 rent
+	rename occscore occscore_black_3040_linked
 	
-	rename * *_black_3040_linked
-	rename cz_black_3040_linked cz
 	save "$INTDATA/census/black_linked_chars.dta", replace

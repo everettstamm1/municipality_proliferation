@@ -43,7 +43,8 @@ foreach outcome in cgoodman  spdist gen_muni totfrac schdist_ind{
 	local b_ols70_x_quad_`outcome' = string(e(b)[1,2],"%9.3f")
 	local se_ols70_x_`outcome' =string( e(V)[1,1]^0.5,"%9.3f")
 	local se_ols70_x_quad_`outcome' =string( e(V)[2,2]^0.5,"%9.3f")
-	
+	local nobs_`outcome' = string( e(N),"%9.0f")
+
 	
 	ivreg2 y (x x_quad=z z_quad) `controls' [aw=popc1940], r
 	cap drop eps
@@ -270,7 +271,7 @@ file write fh "\cmidrule(lr){1-6}" _n
 file write fh "F-Stat & `F1_cgoodman' & `F1_gen_muni' & `F1_schdist_ind' & `F1_spdist' & `F1_totfrac' \\" _n
 file write fh "\cmidrule(lr){1-6}" _n
 
-file write fh "\multicolumn{5}{l}{Panel B: First Stage $\widehat{GM}$ X C.O.}\\" _n
+file write fh "\multicolumn{5}{l}{Panel B: First Stage $\widehat{GM}^2$}\\" _n
 file write fh "\cmidrule(lr){1-6}" _n
 file write fh  "$\widehat{GM}$  &    `b_fs2_x_cgoodman' &    `b_fs2_x_gen_muni' &    `b_fs2_x_schdist_ind' &    `b_fs2_x_spdist' &    `b_fs2_x_totfrac' \\" _n
 file write fh "                &  (`se_fs2_x_cgoodman')  &  (`se_fs2_x_gen_muni')  &  (`se_fs2_x_schdist_ind')  &  (`se_fs2_x_spdist')  &  (`se_fs2_x_totfrac')  \\" _n
@@ -316,7 +317,7 @@ file write fh "                &  (`se_iv10_x_quad_cgoodman')  &  (`se_iv10_x_qu
 file write fh "\cmidrule(lr){1-6}" _n
 
 
-file write fh "Observations    &      130   &      130   &      118   &      130   &      130   \\" _n
+file write fh "Observations    &      `nobs_cgoodman'   &      `nobs_gen_muni'   &      `nobs_schdist_ind'   &      `nobs_spdist'   &      `nobs_totfrac'   \\" _n
 file write fh "\bottomrule \end{tabularx}" _n
 
 file close fh

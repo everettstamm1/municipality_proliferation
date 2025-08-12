@@ -395,12 +395,15 @@ foreach level in cz {
 		// Incorporated land
 		g decade = 1940
 		merge 1:1 `levelvar' decade using "$INTDATA/cgoodman/`level'_geogs.dta", keep(1 3) 
+		
 		replace frac_land = 0 if _merge == 1
 		replace frac_total = 0 if _merge == 1
 		replace land_incorp = 0 if _merge == 1
 		replace total_incorp = 0 if _merge == 1
 		drop _merge decade
 		
+		su frac_total , d
+		g above_med_frac_total = frac_total >= r(p50)
 
 		foreach geog in land total{
 			foreach tail in 90 95 {
@@ -594,9 +597,9 @@ foreach level in cz {
 
 		// Total Fraction in main city outcomes, giving them unintuitive names so they can be ran properly in the table creation code, ignore the "n" and "pc"
 		g b_totfrac_cz1940_pc = 100* (maxcitypop1940/pop1940)
-		g b_totfrac_cz1940 = 100* (maxcitypop1940/pop1940)
-		g b_totfrac_cz1970 = 100* (maxcitypop1970/pop1970)
-		g b_totfrac_cz2010 = 100* (maxcitypop2010/pop2010)
+		g b_totfrac_cz1940 = maxcitypop1940
+		g b_totfrac_cz1970 = maxcitypop1970
+		g b_totfrac_cz2010 = maxcitypop2010
 
 		g b_totfrac_cz1950_pc = 100* (maxcitypop1950/pop1950)
 
@@ -863,11 +866,11 @@ foreach level in cz {
 			replace `var' = 100*`var'
 		}
 		// Black linked income differences
-		merge 1:1 cz using "$INTDATA/census/black_linked_chars.dta", keep(1 3) nogen
-		foreach t in farm unemp_rate valueh rent occscore{
-			su `t'_black_3040_linked, d
-			g above_med_`t'_links = `t'_black_3040_linked >= r(p50) if !mi(`t'_black_3040_linked)
-		}
+		merge 1:1 cz using "$INTDATA/census/black_linked_chars.dta", keep(1 3) nogen keepusing(cz occscore_black_3040_linked)
+		su occscore_black_3040_linked, d
+		g above_med_occscore_3040 = occscore_black_3040_linked >= r(p50) if !mi(occscore_black_3040_linked)
+		
+		
 		// Black mig income differences
 		merge 1:1 cz using "$INTDATA/census/bmig_incomes", keep(1 3) nogen
 

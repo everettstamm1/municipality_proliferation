@@ -495,10 +495,11 @@ merge m:1 STATEFP PLACEFP using `place_land', keep(1 3) nogen
 //merge m:1 cz using "$INTDATA/cog/special_districts_employment", keep(3) nogen
 preserve
 	use "$INTDATA/cog/4_1_general_purpose_govts.dta", clear
-	drop if ID_type == 1
+	drop if ID_type == 1 | mi(form_government)
 	ren fips_state STATEFP
 	ren fips_place_2002 PLACEFP
 	g council_manager = form_government == "5" 
+	keep STATEFP PLACEFP council_manager survey_year
 	bys STATEFP PLACEFP (council_manager): replace council_manager = council_manager[_N]
 	keep STATEFP PLACEFP council_manager
 	duplicates drop
@@ -509,13 +510,10 @@ restore
 merge m:1 STATEFP PLACEFP using `managers', keep(1 3) nogen
 
 merge m:1 STATEFP PLACEFP using "$INTDATA/census/2010_hh_incomes", keep(1 3) nogen
-merge m:1 STATEFP PLACEFP using "$INTDATA/census/1970_hh_incomes_hv", keep(1 3) nogen
 merge m:1 STATEFP PLACEFP using "$INTDATA/other/ai_zoning", keep(1 3) nogen
 
 // Filling some missings
 bys cz (mean_hh_inc_cz) : replace mean_hh_inc_cz = mean_hh_inc_cz[1] if mi(mean_hh_inc_cz)
-bys cz (agg_fam_inc_cz1970) : replace agg_fam_inc_cz1970 = agg_fam_inc_cz1970[1] if mi(agg_fam_inc_cz1970)
-bys cz (agg_house_value_cz1970) : replace agg_house_value_cz1970 = agg_house_value_cz1970[1] if mi(agg_house_value_cz1970)
 
 	
 

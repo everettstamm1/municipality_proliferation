@@ -51,7 +51,7 @@ prog def main_table_towns_ssaggregate
 		}
 	restore
 	
-	local stats `"Fs dep_var b_var nobs, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0)"'
+	local stats `"dep_var10 b_var Fs nobs, labels( "1940-2010 Avg." "1940 Avg." "First Stage F-Stat" "Observations") fmt(2 2 2 0)"'
 	// Panel A: First Stage
 	esttab fs_gen_town      ///
 		using "`path'", ///

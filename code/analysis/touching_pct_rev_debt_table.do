@@ -20,7 +20,7 @@ foreach m in ols{
 	if "`m'"=="ols" local mod "OLS"
 
 	eststo clear
-	foreach covar of varlist touching len_edge_edge EI min_hausdorff_muni psum_shared_boundary_muni pct_rev_debt council_manager {
+	foreach covar of varlist touching   pct_rev_debt council_manager {
 		local mname = subinstr("`covar'","landuse_", "",.)
 		lab var `covar' "`mname'"
 		
@@ -36,11 +36,11 @@ foreach m in ols{
 	}
 	
 
-	esttab touching len_edge_edge EI min_hausdorff_muni psum_shared_boundary_muni pct_rev_debt council_manager ///
+	esttab touching  pct_rev_debt council_manager ///
 				using "$TABS/land_use_index/touching_pct_rev_debt.tex", booktabs compress label replace lines se frag ///
 				 starlevels( * 0.10 ** 0.05 *** 0.01) ///
-				mtitles("\shortstack{Adjacent to \\ Principle City}" "\shortstack{Distance to \\ Main City}" "\shortstack{Equivalence Index \\ to School District}" "\shortstack{Hausdorff Distance \\ to School District}" "\shortstack{Prop. Shared Boundary \\ with School District}" "\shortstack{Outstanding Debt as  \\ Pct of Municipal Revenues}" "\shortstack{Council Manager \\ Gov't}") ///
+				mtitles("\shortstack{Adjacent to \\ Principle City}" "\shortstack{Outstanding Debt as  \\ Pct of Municipal Revenues}" "\shortstack{City Manager \\ Gov't}") ///
 				keep(samp_destXabove_?_med above_?_med samp_dest) b(%05.3f) se(%05.3f) ///
-				prehead( \begin{tabular}{l*{8}{c}} \toprule) postfoot(	\bottomrule \end{tabular}) stats(  bdvw N, labels( "Below Median Avg." "Observations") fmt(3 0))
+				prehead( \begin{tabular}{l*{4}{c}} \toprule) postfoot(	\bottomrule \end{tabular}) stats(  bdvw N, labels( "Below Median Avg." "Observations") fmt(3 0))
 
 }

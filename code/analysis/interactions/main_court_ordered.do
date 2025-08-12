@@ -51,7 +51,10 @@ foreach outcome in cgoodman  spdist gen_muni totfrac schdist_ind{
 	local b_ols70_x_int_`outcome' = string(e(b)[1,2],"%9.3f")
 	local se_ols70_x_`outcome' =string( e(V)[1,1]^0.5,"%9.3f")
 	local se_ols70_x_int_`outcome' =string( e(V)[2,2]^0.5,"%9.3f")
-	
+	local nobs_`outcome' = string( e(N),"%9.0f")
+
+	su y if `intvar' == 0
+	local mean70_`outcome' = string(r(mean),"%9.3f")
 	
 	ivreg2 y (x x_int=z z_int) `controls' [aw=popc1940], r
 	cap drop eps
@@ -145,6 +148,9 @@ foreach outcome in cgoodman  spdist gen_muni totfrac schdist_ind{
 	local b_ols10_x_int_`outcome' = string(e(b)[1,2],"%9.3f")
 	local se_ols10_x_`outcome' =string( e(V)[1,1]^0.5,"%9.3f")
 	local se_ols10_x_int_`outcome' =string( e(V)[2,2]^0.5,"%9.3f")
+	
+	su y if `intvar' == 0
+	local mean10_`outcome' = string(r(mean),"%9.3f")
 	
 	ivreg2 y (x x_int=z z_int) `controls' [aw=popc1940], r
 	cap drop eps
@@ -313,8 +319,10 @@ file write fh  "GM X C.O.  &    `b_iv10_x_int_cgoodman' &    `b_iv10_x_int_gen_m
 file write fh "                &  (`se_iv10_x_int_cgoodman')  &  (`se_iv10_x_int_gen_muni')  &  (`se_iv10_x_int_schdist_ind')  &  (`se_iv10_x_int_spdist')  &  (`se_iv10_x_int_totfrac')  \\" _n
 file write fh "\cmidrule(lr){1-6}" _n
 
+file write fh "Non-C.O. 1940-70 Avg. &      `mean70_cgoodman'   &      `mean70_gen_muni'   &      `mean70_schdist_ind'   &      `mean70_spdist'   &      `mean70_totfrac'   \\" _n
+file write fh "Non-C.O. 1940-2010 Avg. &      `mean10_cgoodman'   &      `mean10_gen_muni'   &      `mean10_schdist_ind'   &      `mean10_spdist'   &      `mean10_totfrac'   \\" _n
 
-file write fh "Observations    &      130   &      130   &      118   &      130   &      130   \\" _n
+file write fh "Observations    &      `nobs_cgoodman'   &      `nobs_gen_muni'   &      `nobs_schdist_ind'   &      `nobs_spdist'   &      `nobs_totfrac'   \\" _n
 file write fh "\bottomrule \end{tabularx}" _n
 
 file close fh
