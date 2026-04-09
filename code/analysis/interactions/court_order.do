@@ -45,6 +45,8 @@ foreach outcome in cgoodman  spdist gen_muni totfrac schdist_ind{
 	test z_int = 0
 	local F2_`outcome' : di %6.2f r(F)
 	
+	local F_`outcome' = min(`F1_`outcome'',`F2_`outcome'')
+
 	// OLS 1940-70
 	reg y x x_int `controls' [aw = popc1940], r
 	local b_ols70_x_`outcome' =  string(e(b)[1,1],"%9.3f")
@@ -266,8 +268,6 @@ file write fh "                &  (`se_fs1_x_cgoodman')  &  (`se_fs1_x_gen_muni'
 file write fh  "$\widehat{GM}$ X C.O.  &    `b_fs1_x_int_cgoodman' &    `b_fs1_x_int_gen_muni' &    `b_fs1_x_int_schdist_ind' &    `b_fs1_x_int_spdist' &    `b_fs1_x_int_totfrac' \\" _n
 file write fh "                &  (`se_fs1_x_int_cgoodman')  &  (`se_fs1_x_int_gen_muni')  &  (`se_fs1_x_int_schdist_ind')  &  (`se_fs1_x_int_spdist')  &  (`se_fs1_x_int_totfrac')  \\" _n
 file write fh "\cmidrule(lr){1-6}" _n
-file write fh "F-Stat & `F1_cgoodman' & `F1_gen_muni' & `F1_schdist_ind' & `F1_spdist' & `F1_totfrac' \\" _n
-file write fh "\cmidrule(lr){1-6}" _n
 
 file write fh "\multicolumn{5}{l}{Panel B: First Stage $\widehat{GM}$ X C.O.}\\" _n
 file write fh "\cmidrule(lr){1-6}" _n
@@ -276,8 +276,7 @@ file write fh "                &  (`se_fs2_x_cgoodman')  &  (`se_fs2_x_gen_muni'
 file write fh  "$\widehat{GM}$ X C.O.  &    `b_fs2_x_int_cgoodman' &    `b_fs2_x_int_gen_muni' &    `b_fs2_x_int_schdist_ind' &    `b_fs2_x_int_spdist' &    `b_fs2_x_int_totfrac' \\" _n
 file write fh "                &  (`se_fs2_x_int_cgoodman')  &  (`se_fs2_x_int_gen_muni')  &  (`se_fs2_x_int_schdist_ind')  &  (`se_fs2_x_int_spdist')  &  (`se_fs2_x_int_totfrac')  \\" _n
 file write fh "\cmidrule(lr){1-6}" _n
-file write fh "\cmidrule(lr){1-6}" _n
-file write fh "F-Stat & `F2_cgoodman' & `F2_gen_muni' & `F2_schdist_ind' & `F2_spdist' & `F2_totfrac' \\" _n
+file write fh "F-Stat & `F_cgoodman' & `F_gen_muni' & `F_schdist_ind' & `F_spdist' & `F_totfrac' \\" _n
 file write fh "\cmidrule(lr){1-6}" _n
 
 file write fh "\multicolumn{5}{l}{Panel C: OLS 1940-1970}\\" _n

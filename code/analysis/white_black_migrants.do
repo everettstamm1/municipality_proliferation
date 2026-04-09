@@ -39,7 +39,7 @@
 	bys cz : egen cz_incwage_pos = mean(incwage_pos)
 	bys cz : egen cz_higrade = mean(higrade)
 	
-	g diff_incwage_pos = incwage_pos - cz_incwage_pos
+	g diff_incwage_pos = 100*(incwage_pos - cz_incwage_pos)/cz_incwage_pos
 	g diff_higrade_pos = higrade - cz_higrade
 	collapse (mean) diff_incwage_pos diff_higrade_pos, by(race)
 	

@@ -52,10 +52,6 @@ g GM_hat_raw_2 = GM_hat_raw^2
 lab var GM_raw_pp_2 "$\text{GM}^2$"
 lab var GM_hat_raw_2 "$\widehat{GM}^2$"
 
-qui su GM_hat_raw_pp, d
-g GM_hat_raw_pp_recentered = GM_hat_raw_pp - `r(mean)'
-lab var GM_hat_raw_pp_recentered "$\widehat{GM}$, recentered"
-lab var GM_raw_pp_recentered "GM, recentered"
 g order = frac_total^2
 
 

@@ -979,7 +979,7 @@ STEPS:
 
 	* Versions 1, 2, 1940	
 	foreach v in /*"1" "2" "2c" "2cc" "2ent" "2ipw" "2rm" "2nt" "2rmnt" "2rmsc" "2rmscnt"  "2scnt" "1940" "r" "2t"*/ "2cc" {
-	
+		local v 2
 		local origincode origin_fips
 		local dest_code = cond("`v'"=="2c" | "`v'" == "2cc","dest_fips","city")
 		local wcode = cond("`v'" == "2ipw","b_ipw", ///

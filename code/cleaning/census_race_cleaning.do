@@ -1,8 +1,43 @@
 
-// 1910-1940
+// 1850-1880
 
-forv d=49/52{
+foreach d in 76 77 79 80{
 	gz7, filepath("$RAWDATA/census") filename("usa_000`d'.dta.gz")
+	keep perwt stateicp countyicp race city
+
+	g pop = perwt 
+	g bpop = perwt if race == 2
+	g popc = perwt if city!=0
+	g bpopc = perwt if city!=0 & race == 2
+
+	collapse (sum) popc pop bpop bpopc, by(stateicp countyicp)
+	merge 1:1 stateicp countyicp using "$RAWDATA/dcourt/county1940_crosswalks", keepusing(statefip countyfip cz smsa state_name county_name) keep(1 3) nogen
+	ren county_name county
+	ren state_name state
+	if "`d'" == "76"{
+		g year = 1880
+	}
+	if "`d'" == "77"{
+		g year = 1870
+	}
+	if "`d'" == "79"{
+		g year = 1850
+	}
+	if "`d'" == "80"{
+		g year = 1860
+	}
+	
+	tempfile r`d'
+	save `r`d''
+
+}
+
+
+// 1900-1940
+
+foreach d in 49 50 51 52 55{
+	gz7, filepath("$RAWDATA/census") filename("usa_000`d'.dta.gz")
+	keep perwt stateicp countyicp race city
 	
 	g pop = perwt 
 	g bpop = perwt if race == 2
@@ -10,10 +45,26 @@ forv d=49/52{
 	g bpopc = perwt if city!=0 & race == 2
 
 	collapse (sum) popc pop bpop bpopc, by(stateicp countyicp)
-	g year = `d'
-	merge 1:1 stateicp countyicp using "$DCOURT/data/crosswalks/county1940_crosswalks", keepusing(statefip countyfip cz smsa state_name county_name) keep(1 3) nogen
+	merge 1:1 stateicp countyicp using "$RAWDATA/dcourt/county1940_crosswalks", keepusing(statefip countyfip cz smsa state_name county_name) keep(1 3) nogen
 	ren county_name county
 	ren state_name state
+	
+	
+	if "`d'" == "49"{
+		g year = 1900
+	}
+	if "`d'" == "50"{
+		g year = 1910
+	}
+	if "`d'" == "51"{
+		g year = 1920
+	}
+	if "`d'" == "52"{
+		g year = 1930
+	}
+	if "`d'" == "55"{
+		g year = 1940
+	}
 	tempfile r`d'
 	save `r`d''
 }
@@ -31,7 +82,7 @@ egen black = rowtotal(b3p003 b3p007)
 g fips = (1000*statefip) + countyfip
 keep year state county fips stateicp countyicp pop black
 
-merge 1:1 fips using "$DCOURT/data/crosswalks/county1940_crosswalks", keepusing(smsa cz) keep(1 3) nogen
+merge 1:1 fips using "$RAWDATA/dcourt/county1940_crosswalks", keepusing(smsa cz) keep(1 3) nogen
 
 tempfile r1950
 save `r1950'
@@ -47,7 +98,7 @@ egen black = rowtotal(b5s002 b5s009)
 g fips = (1000*statefip) + countyfip
 keep year state county fips stateicp countyicp pop black
 
-merge 1:1 fips using "$DCOURT/data/crosswalks/county1940_crosswalks", keepusing(smsa cz) keep(1 3) nogen
+merge 1:1 fips using "$RAWDATA/dcourt/county1940_crosswalks", keepusing(smsa cz) keep(1 3) nogen
 tempfile r1960
 save `r1960'
 
@@ -62,7 +113,7 @@ g black = b18ab
 g fips = (1000*statefip) + countyfip
 
 keep year state county fips pop black
-merge m:1 fips using "$DCOURT/data/crosswalks/county1940_crosswalks", keepusing(smsa cz) keep(1 3) nogen
+merge m:1 fips using "$RAWDATA/dcourt/county1940_crosswalks", keepusing(smsa cz) keep(1 3) nogen
 
 tempfile r1970
 save `r1970'
@@ -101,7 +152,7 @@ tempfile r1980
 save `r1980'
 */
 clear 
-forv d=1900(10)1970{
+foreach d in 76 77 79 80 49 50 51 52 55 1950 1960 1970 {
 	append using `r`d''
 }
 

@@ -11,9 +11,13 @@ local cmin = r(min)
 local cmax = r(max)
 g c255 = round(255*(GM_hat_raw - `cmin')/(`cmax' - `cmin'))
 
+keep if cz_new_prop_white1970 < .
+drop above_x_med
+su GM_raw_pp, d
+g above_x_med = GM_raw_pp >= r(p50)
 
 g pctile_diff = 100*(cz_new_prop_white1970 - cz_prop_white1970)/cz_prop_white1970
-su pctile_diff if above_x_med == 0
+su pctile_diff if above_x_med == 0 
 local belowdif : di %5.2f r(mean)
 su pctile_diff if above_x_med == 1
 local abovediff : di %5.2f r(mean)
@@ -31,7 +35,7 @@ foreach l of local levels{
 }
 local colpos = `i'*3+1
  `base', yla(none) yti("") legend(cols(1) order(1 "1940-1970 Newly Incorporated Municipalities"  2 "CZ Total" 4 "Below Median Values of GM" 5 "Above Median Values of GM") position(7) ring(0) symxsize(2.5) size(2.8)) ///
-		 ysize(12) xscale(range(65 100)) xla(65(5)100) graphregion(color(white)) note("Above median average difference: `abovediff'%" "Below median average difference: `belowdif'%")
+		 xtitle("Proportion of Population White, 1970") ysize(12) xscale(range(65 100)) xla(65(5)100) graphregion(color(white)) note("Above median average difference: `abovediff'%" "Below median average difference: `belowdif'%")
 graph export "$FIGS/pcarrow_figure_GM.pdf", replace as(pdf)
 
 	
@@ -48,6 +52,11 @@ qui sum GM_raw_pp, d
 local cmin = r(min)
 local cmax = r(max)
 //g c255 = round(255*(GM_raw_pp - `cmin')/(`cmax' - `cmin'))
+drop above_x_med
+keep if cz_new_prop_white1970 < .
+su GM_raw_pp, d
+g above_x_med = GM_raw_pp >= r(p50)
+
 
 g pctile_diff = 100*(cz_new_inc1970 - cz_inc1970)/cz_inc1970
 su pctile_diff if above_x_med == 0
@@ -69,7 +78,7 @@ foreach l of local levels{
 }
 local colpos = `i'*3+1
  `base', yla(none) yti("")  ///
-		ysize(12) xscale(range(6900 15000)) xla(7500(2500)15000) graphregion(color(white)) note("Above median average difference: `abovediff'%" "Below median average difference: `belowdif'%") legend(off)
+		 xtitle("Average Household Income, 1970") ysize(12) xscale(range(6900 15000)) xla(7500(2500)15000) graphregion(color(white)) note("Above median average difference: `abovediff'%" "Below median average difference: `belowdif'%") legend(off)
 graph export "$FIGS/pcarrow_figure_inc1970.pdf", replace as(pdf)
 
 

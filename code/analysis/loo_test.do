@@ -9,7 +9,6 @@ foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
 	if "`outcome'"=="spdist" local outlab "Special districts" 
 	if "`outcome'"=="totfrac" local outlab "Main City Share" 
 	
-	local siglevel 90
 	local siglevel 95
 	
 	use "$CLEANDATA/cz_pooled", clear

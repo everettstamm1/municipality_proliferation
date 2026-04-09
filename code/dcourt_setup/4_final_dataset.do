@@ -17,79 +17,85 @@ STEPS:
 *last updated: 12/29/2019
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/	
 
-	// 0. Create list of 130 CZs for later reference
 	use "$RAWDATA/dcourt/clean_city_population_census_1940.dta", clear // 711 cities in non-South
+	keep city citycode popc1940 bpopc1940 cz cz_name south
 	
+	merge 1:1 city using "$RAWDATA/dcourt/clean_city_population_ccdb_1944_1977.dta", keepusing(pop1940 bpop1970 bpop1960 pop1960 pop1970) 
+	rename bpop1970  bpopc1970
+	rename bpop1960 bpopc1960
+	rename pop1960 popc1960
+	rename pop1970 popc1970
+	/*
+	* Analysis of non-matches
+	not matched                           789
+				from master                       273  (_merge==1) // 273 cities from 1940 census city file do not match
+				from using                        516  (_merge==2) // 516 cities from CCDB file do not match because they are Southern or they are non-Southern but do not appear in 1940 Census
+	
+	Here are the cities that do not appear in 1940 census, are non-southern, and have non-missing data for black pop in 1970: Boise city, ID; East Providence, RI: Huntington Park CA; West
+	Haven CT; and Warwick, RI 
+	
+	Here are the cities that do not appear in 1940 census, are non-southern, and are missing data for black pop in 1970:
+	Ardmore, PA
+	Arlington, MA
+	Arlington, VA
+	Belmont, MA
+	Belvedere, CA
+	Bogota, NJ
+	Brookline, MA
+	Clarksburg, WV
+	Drexel Hill, PA
+	Haverford College, PA
+	Newport, KY
+	Secaucus, NJ
+	Watertown, MA
+	West Hartford, CT
+	Woodbridge, NJ
 
-	merge 1:1 city using "$RAWDATA/dcourt/clean_city_population_ccdb_1944_1977.dta", keepusing(bpop1970 bpop1960 nwhtpop1950 nwhtpop1960 pop1940 pop1950 pop1960 pop1970)
-
-	foreach var of varlist bpop1960 nwhtpop1950 nwhtpop1960{
-		ren `var' `var'_ccdb
-	}
-	ren _merge ccdb_merge
+		matched                               438  (_merge==3)
+	
+	*/
+	
 	/* Keep cities large enough (25k+) to appear in CCDB in 1940 and 1970. Results are 
-		robust to changing this criterion.*/
-		rename bpop1970 bpopc1970 // rename so it is clear these numbers correspond to city populations
-		rename pop1970 popc1970 // rename so it is clear these numbers correspond to city populations
-		rename pop1950 popc1950 // rename so it is clear these numbers correspond to city populations
-
-		/* Butte, MT and Amsterdam, NY received southern black migrants between 1935 and 1940, but are just below pop cutoff for CCDB. 
-		Keep them in sample by retrieving 1970 black pop info from Census for these cities */
-		replace bpopc1970=38 if city=="Butte, MT" // see Table 27 of published 1970 Census: https://www.census.gov/content/dam/Census/library/working-papers/2005/demo/POP-twps0076.pdf
-		replace popc1970=23368 if city=="Butte, MT" // see Table 27 of published 1970 Census: https://www.census.gov/content/dam/Census/library/working-papers/2005/demo/POP-twps0076.pdf
-		//replace wpopc1970= 23013 if city=="Butte, MT"
-		
-		replace bpopc1970=140 if city=="Amsterdam, NY" // see Table 27 of published 1970 Census: https://www2.census.gov/prod2/decennial/documents/1970a_ny1-02.pdf
-		replace popc1970=25524 if city=="Amsterdam, NY" // see Table 27 of published 1970 Census: https://www2.census.gov/prod2/decennial/documents/1970a_ny1-02.pdf
-		//replace wpopc1970= 25346 if city=="Amsterdam, NY"
-		
-		keep if  bpopc1970!=. & pop1940!=.
-		
-		/* The following non-southern cities are missing Black population data in 1970 though they have total population data for that year
-		city
-		Bolingbrook, IL
-		Burbank, IL
-		Burton, MI
-		Farmington Hills, MI
-		Grosse Pointe Woods, MI
-		Irvine, CA
-		Rancho Palos Verdes, CA
-		Romulus, MI
-		*/	
-		
-		drop if ccdb_merge==2 // Dropping cities in CCDB that do not appear in the 1940 Census list of non-southern cities, see analysis of non-matches above. 
-		drop ccdb_merge
-		
-	merge 1:1 city using "$INTDATA/dcourt/census_1950_1960_racepop_cz", keepusing(pop1950 bpop1950 nwhtpop1950)
-	foreach var of varlist pop1950 bpop1950 nwhtpop1950 {
-		ren `var' `var'_census
-	}
-	ren _merge census_merge
+	robust to changing this criterion.*/
+	//rename bpop1970 bpopc1970 // rename so it is clear these numbers correspond to city populations
+	//rename pop1970 popc1970 // rename so it is clear these numbers correspond to city populations
 	
+	/* Butte, MT and Amsterdam, NY received southern black migrants between 1935 and 1940, but are just below pop cutoff for CCDB. 
+	Keep them in sample by retrieving 1970 black pop info from Census for these cities */
+	replace bpopc1970=38 if city=="Butte, MT" // see Table 27 of published 1970 Census: https://www.census.gov/content/dam/Census/library/working-papers/2005/demo/POP-twps0076.pdf
+	replace popc1970=23368 if city=="Butte, MT" // see Table 27 of published 1970 Census: https://www.census.gov/content/dam/Census/library/working-papers/2005/demo/POP-twps0076.pdf
+	replace bpopc1970=140 if city=="Amsterdam, NY" // see Table 27 of published 1970 Census: https://www2.census.gov/prod2/decennial/documents/1970a_ny1-02.pdf
+	replace popc1970=25524 if city=="Amsterdam, NY" // see Table 27 of published 1970 Census: https://www2.census.gov/prod2/decennial/documents/1970a_ny1-02.pdf
+	//keep if bpopc1970!=. & pop1940!=.
+	keep if bpopc1970!=. & pop1940 != .
+	drop pop1940 // the CCDB pop we filter on
+	/* The following non-southern cities are missing Black population data in 1970 though they have total population data for that year
+	city
+	Bolingbrook, IL
+	Burbank, IL
+	Burton, MI
+	Farmington Hills, MI
+	Grosse Pointe Woods, MI
+	Irvine, CA
+	Rancho Palos Verdes, CA
+	Romulus, MI
+	*/	
+	merge 1:1 city using "$INTDATA/dcourt/census_1950_racepop_cz", keepusing(pop bpop) nogen
+	rename pop popc1950
+	rename bpop bpopc1950
 	
-	// Imputing Black urban population 1950 as close to CCDB data we can
-	// First by multiplying CCDB nonwhite population by ratio of Black to nonwhite population from census
-	g adjust = bpop1950_census/nwhtpop1950_census
-	g bpop1950_ccdb = nwhtpop1950_ccdb * adjust
-	// For cities with missing values of adjust, instead adjust by nationwide mean ratio
-	qui su adjust,d
-	replace bpop1950_ccdb = nwhtpop1950_ccdb * `r(mean)' if bpop1950_ccdb==.
-	
-	// If still missing, just use census urban Black population
-	g bpopc1950 = cond(bpop1950_ccdb<.,bpop1950_ccdb,bpop1950_census)
-	drop adjust
-
-	drop *_ccdb *_census*
-	
-	//keep if popc1940 >=25000 | popc1970>=25000
+	drop if bpopc1940 ==. | bpopc1950 ==. | bpopc1960 ==. | bpopc1970 ==. | ///
+					popc1940 ==. | popc1950 ==. | popc1960 ==. | popc1970 ==.
+	keep if popc1940 >=25000 | popc1970>=25000
 	drop *_merge
-
-	drop if bpopc1940 ==. | bpopc1970 ==. | ///
-					popc1940 ==.  | popc1970 ==.
 	keep if popc1940 >=25000 | popc1970>=25000
 	
-	keep city citycode cz cz_name popc1940
-	bys cz : egen cz_popc1940 = total(popc1940)
+	keep city citycode cz cz_name popc*
+	
+	forv y = 1940(10)1970{
+		bys cz : egen cz_popc`y' = total(popc`y')
+
+	}
 	save "$INTDATA/dcourt/xwalk_296_city_cz.dta", replace
 	keep cz cz_name
 	duplicates drop

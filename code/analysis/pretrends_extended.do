@@ -9,7 +9,14 @@ lab var shift_share_base "$\widehat{GM}$"
 
 	eststo clear
 
-foreach outcome in n growth agec blackc literatec labforcec occscorec{
+	
+	
+forv y=1910(10)1950{
+	local y1 = `y' - 10
+	g p_occscorec`y' = (occscorec`y' - occscorec`y1')/occscorec`y1'
+	g growth`y' = (pop`y' - pop`y1')/pop`y1'
+}
+foreach outcome in n growth p_occscorec{
 	
 	if "`outcome'"=="n" local ylab "Change in Municipalities Per Capita"
 	if "`outcome'"=="growth" local ylab "Population Growth"
@@ -31,11 +38,11 @@ foreach outcome in n growth agec blackc literatec labforcec occscorec{
 		if "`t'" != "10" local t1 = `t'-10
 		if "`t'" == "10" local t1 = "00"
 
-		if "`outcome'" == "n" local y  n`t'_cgoodman_cz_pc
+		if "`outcome'" == "n" local y  n19`t'_cgoodman_cz_pc
 
-		if "`outcome'" == "growth" local y  growth`t1'`t'
+		if "`outcome'" == "growth" local y  growth19`t'
 
-		if !inlist("`outcome'","n","growth") local y  `outcome'19`t1'
+		if !inlist("`outcome'","n","growth") local y  `outcome'19`t'
 
 		su `y'
 		local bmean : di %6.2f r(mean)
@@ -52,7 +59,7 @@ foreach outcome in n growth agec blackc literatec labforcec occscorec{
 
 
 esttab mod10_n mod20_n mod30_n mod40_n    ///
-		using "$TABS/balancetables/pretrends_extended.tex", ///
+		using "$TABS/balancetables/pretrends_extended_update.tex", ///
 		replace se booktabs noconstant noobs compress frag label nomtitles nonum ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
@@ -66,7 +73,7 @@ esttab mod10_n mod20_n mod30_n mod40_n    ///
 	 
 	// Panel B: OLS
 esttab mod10_growth mod20_growth mod30_growth mod40_growth  ///
-		using "$TABS/balancetables/pretrends_extended.tex", ///
+		using "$TABS/balancetables/pretrends_extended_update.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
 		posthead("\midrule" "\multicolumn{4}{l}{Panel B: Population Growth}\\" "\cmidrule(lr){1-5}" ) ///
 		b(%04.3f) se(%04.3f) ///
@@ -74,8 +81,8 @@ esttab mod10_growth mod20_growth mod30_growth mod40_growth  ///
 		keep(shift_share_base) stats(basemean basesd , labels( "Dep. var. mean" "Dep. Var. Std Dev") fmt(2 2))
 		
 		// Panel E: 2SLS
-esttab  mod10_occscorec mod20_occscorec mod30_occscorec mod40_occscorec ///
-		using "$TABS/balancetables/pretrends_extended.tex", ///
+esttab  mod10_p_occscorec mod20_p_occscorec mod30_p_occscorec mod40_p_occscorec ///
+		using "$TABS/balancetables/pretrends_extended_update.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
 		posthead("\midrule" "\multicolumn{5}{l}{Panel C: Occupation Scores}\\" "\cmidrule(lr){1-5}" ) ///
 		b(%04.3f) se(%04.3f) ///

@@ -277,11 +277,11 @@ foreach level in cz {
 	merge m:1 cty_fips using "$XWALKS/county_pmsa_xwalk.dta", nogen keep(1 3)
 	ren czone cz 
 	ren cty_fips fips
-	replace yr_incorp = yr_incorp-2
+	//replace yr_incorp = yr_incorp-2
 	keep `levelvar' yr_incorp muniname
 	local lab: variable label yr_incorp
 	
-	g n = yr_incorp>=1940 & yr_incorp<=1970
+	g n = yr_incorp>=1940 & yr_incorp<1970
 	forv d=1700(10)2010{
 		local step = `d'+10
 		
@@ -445,7 +445,7 @@ foreach level in cz {
 
 		merge 1:1 cz using "$INTDATA/census/urb_pop_2010.dta", keep(1 3) nogen keepusing(pop2010)
 
-		
+		/*
 		preserve
 			use "$INTDATA/census/cz_urbanization_1900_1930", clear
 			keep pop age black  literate labforce occscore cz decade
@@ -468,6 +468,164 @@ foreach level in cz {
 		
 		merge 1:1 cz using `oldpopsc', keep(1 3) nogen
 		
+		*/
+		
+		preserve
+			use "$INTDATA/census/cz_pop_occscore.dta", clear
+			
+			//drop pop
+			reshape wide pop popc bpop bpopc occscore occscorec , i(cz) j(year)
+			drop pop1940 pop1950 popc1940 popc1950 bpop1940 bpop1950 bpopc1940 bpopc1950
+			tempfile oldpops
+			save `oldpops'
+		restore
+		merge 1:1 cz using `oldpops', keep(1 3) nogen
+		
+		//drop pop19* 
+
+		preserve
+			import delimited using "$RAWDATA/census/nhgis0046_csv/nhgis0046_csv/nhgis0046_ts_nominal_county.csv", clear
+			ren a00aa* pop*
+			ren statenh nhgisst
+			ren countynh nhgiscty
+			//keep pop* nhgisst nhgiscty
+			reshape long pop, i(nhgisst nhgiscty) j(year)
+			drop if mi(pop)
+			replace nhgiscty = nhgiscty / 10 if year == 2010 // Weird but ok
+			merge 1:m year nhgisst nhgiscty using "$XWALKS/consistent_1990", keepusing(weight nhgisst_1990 nhgiscty_1990) keep(1 3)
+			
+			g fixed = 0
+			// Alexandria City dropped in 1900?
+			replace nhgisst_1990 = 510 if year == 1900 & gisjoin == "G5105100" 
+			replace nhgiscty_1990 = 5100 if year == 1900 & gisjoin == "G5105100"
+			replace weight = 1 if year == 1900 & gisjoin == "G5105100"
+			replace fixed = 1 if year == 1900 & gisjoin == "G5105100"
+
+			// Shannon dropped in 1910?
+			replace nhgisst_1990 = 460 if year == 1910 & gisjoin == "G4601130"
+			replace nhgiscty_1990 = 1130 if year == 1910 & gisjoin == "G4601130"
+			replace weight = 1 if year == 1910 & gisjoin == "G4601130"
+			replace fixed = 1 if year == 1910 & gisjoin == "G4601130"
+
+			// Washington dropped in 1910? Becomes Shannon
+			replace nhgisst_1990 = 460 if year == 1910 & gisjoin == "G4601330"
+			replace nhgiscty_1990 = 1130 if year == 1910 & gisjoin == "G4601330"
+			replace weight = 1 if year == 1910 & gisjoin == "G4601330"
+			replace fixed = 1 if year == 1910 & gisjoin == "G4601330"
+
+			// Armstrong dropped in 1900? Becomes Dewey
+			replace nhgisst_1990 = 460 if year == 1900 & gisjoin == "G4600010"
+			replace nhgiscty_1990 = 410 if year == 1900 & gisjoin == "G4600010"
+			replace weight = 1 if year == 1900 & gisjoin == "G4600010"
+			replace fixed = 1 if year == 1900 & gisjoin == "G4600010"
+
+			// Apache/San Carlos Reservation misnamed.
+			replace nhgisst_1990 = 40 if year == 1900 & gisjoin == "G0459155"
+			replace nhgiscty_1990 = 10 if year == 1900 & gisjoin == "G0459155"
+			replace weight = 1 if year == 1900 & gisjoin == "G0459155"
+			replace fixed = 1 if year == 1900 & gisjoin == "G0459155"
+		
+		
+			// All 1990 are missing as that's base year
+			replace nhgisst_1990 = nhgisst if year == 1990
+			replace nhgiscty_1990 = nhgiscty if year == 1990
+			replace weight = 1 if year == 1990
+			replace fixed = 1 if year == 1990
+			
+			// 2020 is missing but we don't need it anyway
+			drop if year == 2020
+		 
+			keep if _merge == 3 | fixed == 1 
+			
+			foreach var of varlist pop {
+				replace `var' = `var'*weight
+			}
+			collapse (sum) pop , by(year nhgisst_1990 nhgiscty_1990)
+			
+			ren nhgisst_1990 statefip
+			ren nhgiscty_1990 countyfip
+				
+			g cty_fips = statefip*100+countyfip/10
+
+			merge m:1 cty_fips using "$XWALKS/cw_cty_czone", keep(1 3) nogen
+			ren cty_fips fips
+			ren czone cz
+			
+			collapse (sum) pop, by(year cz)
+			reshape wide pop, i(cz) j(year)
+				
+			tempfile nhgispops
+			save `nhgispops'
+		restore
+		merge 1:1 cz using `nhgispops', keep(1 3) nogen
+		
+		preserve
+			import delimited using "$RAWDATA/census/nhgis0046_csv/nhgis0046_csv/nhgis0046_ts_nominal_county.csv", clear
+			ren a00aa* pop*
+			ren statenh nhgisst
+			ren countynh nhgiscty
+			//keep pop* nhgisst nhgiscty
+			reshape long pop, i(nhgisst nhgiscty) j(year)
+			drop if mi(pop)
+			
+			ren nhgisst statefip
+			ren nhgiscty countyfip
+				
+			g cty_fips = statefip*100+countyfip/10
+
+			merge m:1 cty_fips using "$XWALKS/cw_cty_czone", keep(1 3) nogen
+			ren cty_fips fips
+			ren czone cz
+			
+			collapse (sum) pop, by(year cz)
+			//keep if year >= 1980
+			//rename pop* nhgis_pop*
+			reshape wide pop, i(cz) j(year)
+				
+			tempfile nhgispops
+			save `nhgispops'
+		restore
+		//merge 1:1 cz using `nhgispops', keep(1 3) nogen
+
+		
+		
+		preserve
+			import delimited "$RAWDATA/census/nhgis0047_csv/nhgis0047_csv/nhgis0047_ts_nominal_place.csv", clear
+			
+			keep nhgiscode av0aa* place state
+			rename nhgiscode gisjoin
+			replace gisjoin = "G18036003" if gisjoin == "G18036010" // Need to combine indianapolis city
+			replace gisjoin = "G34067650" if gisjoin == "G34004690" // Belleville to silver lake
+			replace gisjoin = "G34008110" if gisjoin == "G34006250" // Bloomfield to Brookdale
+			replace gisjoin = "G34075020" if gisjoin == "G34047490" // Combine Montclair
+			replace gisjoin = "G34067650" if gisjoin == "G34067590" // Combine silver lake
+			
+			merge m:1 gisjoin using "$RAWDATA/dcourt/US_place_point_2010_crosswalks.dta", keepusing(city) keep(3) nogen
+			replace city =  "Belleville, NJ" if city == "Silver Lake, NJ" 
+			replace city = "Bloomfield, NJ" if city == "Bloomfield, NJ" 
+			replace city = "Upper Montclair, NJ" if city == "Montclair, NJ"
+			merge m:1 city using "$INTDATA/dcourt/GM_city_final_dataset.dta", keep(3) nogen keepusing(cz cz_name popc1970)
+			ren av0aa* new_popc*
+			bys city : egen city_popc1970 = total(new_popc1970)
+			order new_popc1970 popc1970 city_popc1970 city cz_name
+
+			collapse (sum) new_popc*, by(cz)
+			tempfile popc
+			save `popc'
+		restore
+		//merge 1:1 cz using `popc', keep(1 3) nogen
+		
+		//g apdiff = abs(popc1970 - new_popc1970)/popc1970
+		
+		
+		ren mfg_lfshare1940 og_mfg_lfshare1940
+		
+		merge 1:1 cz using "$INTDATA/census/cz_mfg.dta", keep(3) nogen
+		ren mfg_lfshare* new_mfg_lfshare*
+		ren og_mfg_lfshare1940 mfg_lfshare1940
+		
+		merge 1:1 cz using "$INTDATA/dcourt/clean_cz_industry_employment_1940_1970.dta", keep(1 3) nogen keepusing(mfg_lfshare1950 mfg_lfshare1960 mfg_lfshare1970)
+
 		// Adding labels
 		foreach ds in  gen_muni schdist_ind all_local gen_subcounty spdist  gen_town cgoodman schdist schdist_ind_m1 schdist_m2{
 				local label : variable label n_`ds'_`level'
@@ -489,6 +647,8 @@ foreach level in cz {
 				g n_`ds'_`level'_pc = b_`ds'_`level'1970/(pop1970/10000) - b_`ds'_`level'1940/(pop1940/10000) 
 				g n2_`ds'_`level'_pc = b_`ds'_`level'1970/(pop1970/10000) - b_`ds'_`level'1950/(pop1950/10000) 
 				g ld_`ds'_`level'_pc = b_`ds'_`level'2010/(pop2010/10000) - b_`ds'_`level'1940/(pop1940/10000) 
+				g ld_`ds'_`level' = b_`ds'_`level'2010 - b_`ds'_`level'1940
+				
 				g ld2_`ds'_`level'_pc = b_`ds'_`level'2010/(pop2010/10000) - b_`ds'_`level'1950/(pop1950/10000) 
 				
 				g n_`ds'_`level'_pcc = b_`ds'_`level'1970/(popc1970/10000) - b_`ds'_`level'1940/(popc1940/10000) 
@@ -501,6 +661,15 @@ foreach level in cz {
 				g l_b_`ds'_`level'1950 = log(b_`ds'_`level'1950)
 				g l_b_`ds'_`level'1960 = log(b_`ds'_`level'1960)
 				g l_b_`ds'_`level'1970 = log(b_`ds'_`level'1970)
+				g l_b_`ds'_`level'2010 = log(b_`ds'_`level'2010)
+
+				g logdiff_`ds'_`level' = l_b_`ds'_`level'1970 - l_b_`ds'_`level'1940
+				g logdiff_long_`ds'_`level' = l_b_`ds'_`level'2010 - l_b_`ds'_`level'1940
+
+				g pct_`ds'_`level'_pc = (b_`ds'_`level'1970 - b_`ds'_`level'1940)/(pop1940/10000)
+				g pct_long_`ds'_`level'_pc = (b_`ds'_`level'2010 - b_`ds'_`level'1940)/(pop1940/10000)
+				g decomp_`ds'_`level'_pc = (-1) * (b_`ds'_`level'1970/(pop1970/10000)) * ((pop1970 - pop1940) / pop1940)
+				g decomp_long_`ds'_`level'_pc = (-1) * (b_`ds'_`level'2010/(pop2010/10000)) * ((pop2010 - pop1940) / pop1940)
 
 				//g n3_`ds'_`level'_pc = (b_`ds'_`level'- b_`ds'_`level'1940)/(pop1940/10000) 
 				lab var n_`ds'_`level'_pc "New `label', P.C. (total)"
@@ -508,12 +677,14 @@ foreach level in cz {
 				lab var n2_`ds'_`level'_pcc "New `label', P.C. (urban) 1950-70"
 				lab var ld_`ds'_`level'_pc "New `label', P.C. (urban) 1940-2010"
 				
-				foreach y in 50 60 70{
-					local y2 = `y'-10
-					g n`y2'`y'_`ds'_`level'_pc = b_`ds'_`level'19`y'/(pop19`y'/10000) - b_`ds'_`level'19`y2'/(pop19`y'/10000) 
-				}
+				//foreach y in 50 60 70{
+				//	local y2 = `y'-10
+				//	g n`y2'`y'_`ds'_`level'_pc = b_`ds'_`level'19`y'/(pop19`y'/10000) - b_`ds'_`level'19`y2'/(pop19`y'/10000) 
+				//}
 
 		}
+		
+		
 		
 		forv y=1940(10)1970{
 			g l_pop`y' = log(pop`y')
@@ -521,16 +692,43 @@ foreach level in cz {
 		}
 		
 		// Pretrends, cgoodman only
-		g b190_cgoodman_`level'_pc = b_cgoodman_cz1900/(pop1900/10000)
-		forv y = 10(10)40{
-			local y1 = `y'-10
-			g b19`y'_cgoodman_`level'_pc = b_cgoodman_cz19`y'/(pop19`y'/10000)
-			g n`y'_cgoodman_`level'_pc = b19`y'_cgoodman_`level'_pc - b19`y1'_cgoodman_`level'_pc
+		
+		// Add total pop
+		//preserve
+		//	use "$INTDATA/census/cz_race_data.dta", clear
+		//	keep year cz pop 
+		//	keep if (year >= 1980 & year <= 2000) | (year < 1900)
+		//	reshape wide pop , i(cz) j(year)
+		//	tempfile pop
+		//	save `pop'
+		//restore
+		//
+		//merge 1:1 cz using `pop', keep(3) nogen
+		
+		
+		//g b1850_cgoodman_`level'_pc = b_cgoodman_cz1850/(pop1850/10000)
+		g b1900_cgoodman_`level'_pc = b_cgoodman_cz1900/(pop1900/10000)
+
+		forv y = 1910(10)2010{
+			if !inlist(`y',1890,1900){
+				local y1 = `y'-10
+				g b`y'_cgoodman_`level'_pc = b_cgoodman_cz`y'/(pop`y'/10000)
+				g n`y'_cgoodman_`level'_pc = b`y'_cgoodman_`level'_pc - b`y1'_cgoodman_`level'_pc
+				g np`y'_cgoodman_`level'_pc = (b_cgoodman_cz`y' - b_cgoodman_cz`y1')/(pop`y1'/10000)
+				g decomp`y'_cgoodman_`level'_pc = (-1)*(b_cgoodman_cz`y' / (pop`y'/10000)) * ((pop`y' - pop`y1') / pop`y1')
+				
+			}
+			if `y' == 1900{
+				local y1 = `y'-20
+
+				g b`y'_cgoodman_`level'_pc = b_cgoodman_cz`y'/(pop`y'/10000)
+				g n`y'_cgoodman_`level'_pc = 0.5*(b`y'_cgoodman_`level'_pc - b`y1'_cgoodman_`level'_pc)
+				g np`y'_cgoodman_`level'_pc = 0.5*(b_cgoodman_cz`y' - b_cgoodman_cz`y1')/(pop`y1'/10000)
+			}
 		}
-		ren b190_cgoodman_`level'_pc b1900_cgoodman_`level'_pc 
 		g pre_cgoodman_`level'_pc = b1940_cgoodman_cz_pc -  b1910_cgoodman_cz_pc
 
-		
+
 		lab var GM_raw_pp "Percentage Point Change in Urban Black Population"
 		lab var GM_hat_raw_pp "Predicted Percentage Point Change in Urban Black Population"
 		lab var GM_raw "Percentage Change in Urban Black Population"
@@ -580,10 +778,10 @@ foreach level in cz {
 		lab var avg_temp "Average temperature"
 		
 		
-		lab var n10_cgoodman_cz_pc  "New municipalities per capita, 1900-10"
-		lab var n20_cgoodman_cz_pc  "New municipalities per capita, 1910-20"
-		lab var n30_cgoodman_cz_pc  "New municipalities per capita, 1920-30"
-		lab var n40_cgoodman_cz_pc  "New municipalities per capita, 1930-40"
+		lab var n1910_cgoodman_cz_pc  "New municipalities per capita, 1900-10"
+		lab var n1920_cgoodman_cz_pc  "New municipalities per capita, 1910-20"
+		lab var n1930_cgoodman_cz_pc  "New municipalities per capita, 1920-30"
+		lab var n1940_cgoodman_cz_pc  "New municipalities per capita, 1930-40"
 		lab var pre_cgoodman_cz_pc "New municipalities per capita, 1910-40"
 		
 		forv i=2/5{
@@ -597,11 +795,14 @@ foreach level in cz {
 
 		// Total Fraction in main city outcomes, giving them unintuitive names so they can be ran properly in the table creation code, ignore the "n" and "pc"
 		g b_totfrac_cz1940_pc = 100* (maxcitypop1940/pop1940)
+		g b_totfrac_cz1950_pc = 100* (maxcitypop1950/pop1950)
+		g b_totfrac_cz1960_pc = 100* (maxcitypop1960/pop1960)
+		g b_totfrac_cz1970_pc = 100* (maxcitypop1970/pop1970)
+
 		g b_totfrac_cz1940 = maxcitypop1940
 		g b_totfrac_cz1970 = maxcitypop1970
 		g b_totfrac_cz2010 = maxcitypop2010
 
-		g b_totfrac_cz1950_pc = 100* (maxcitypop1950/pop1950)
 
 		g n_totfrac_cz_pc = 100*((maxcitypop1970/pop1970) - (maxcitypop1940/pop1940))
 		g n2_totfrac_cz_pc = 100*((maxcitypop1970/pop1970) - (maxcitypop1950/pop1950))
@@ -611,6 +812,16 @@ foreach level in cz {
 		g n_totfrac_cz_ld = log(maxcitypop2010) - log(maxcitypop1940)
 		g l_b_totfrac_cz1940 = log(maxcitypop1940/pop1940)
 		g l_b_totfrac_cz1970 = log(maxcitypop1970/pop1970)
+		g l_b_totfrac_cz2010 = log(maxcitypop1970/pop1970)
+
+		g logdiff_totfrac_cz = l_b_totfrac_cz1970 - l_b_totfrac_cz1940
+		g logdiff_long_totfrac_cz = l_b_totfrac_cz2010 - l_b_totfrac_cz1940
+		g pct_totfrac_cz_pc = 100*((maxcitypop1970 - maxcitypop1940)/pop1940)
+		g pct_long_totfrac_cz_pc = 100*((maxcitypop2010 - maxcitypop1940)/pop1940)
+
+		g decomp_totfrac_cz_pc = -100*(maxcitypop1970/pop1970) * ((pop1970-pop1940)/pop1940)
+		
+		g decomp_long_totfrac_cz_pc = -100*(maxcitypop2010/pop2010) * ((pop2010-pop1940)/pop1940)
 
 		// Adding measure of enclosedness
 		preserve	
@@ -661,7 +872,7 @@ foreach level in cz {
 		
 		// Population densities (relative to 2010 land size)
 		
-		forv y=1940(10)1970{
+		forv y=1900(10)2010{
 			g cz_popdens`y' = pop`y'/(cz_total2010/1000000)
 			lab var cz_popdens`y' "Population Density, `y'"
 		}
@@ -675,7 +886,7 @@ foreach level in cz {
 			keep year cz black 
 			keep if year >= 1940 & year <= 1970
 			ren black bpop
-			reshape wide bpop, i(cz) j(year)
+			reshape wide bpop , i(cz) j(year)
 			tempfile bpop
 			save `bpop'
 		restore
@@ -843,8 +1054,30 @@ foreach level in cz {
 			ren sumshare sumshare_`version'
 			replace shift_share_`version' = 100* shift_share_`version'
 		}
+		preserve
+			use "$INTDATA/ssaggregate_prep/dest_instrument_panel_base", clear
+			ren shift_share shift_share_panel_
+			ren sumshare sumshare_panel_
+			reshape wide shift_share_panel_ sumshare_panel_, i(cz) j(year)
+			tempfile sumshare_panel
+			save `sumshare_panel'
+		restore
 		
+		merge 1:1 cz using `sumshare_panel', keep(1 3) nogen
 		
+		preserve
+			foreach y in 1940 1950 1960{
+				use "$INTDATA/ssaggregate_prep/dest_instrument_panel_`y'_base", clear
+				ren shift_share shift_share_split_`y'
+				ren sumshare sumshare_split_`y'
+				tempfile sumshare_split_`y'
+				save `sumshare_split_`y''
+			}
+		restore
+		merge 1:1 cz using `sumshare_split_1940', keep(1 3) nogen
+		merge 1:1 cz using `sumshare_split_1950', keep(1 3) nogen
+		merge 1:1 cz using `sumshare_split_1960', keep(1 3) nogen
+
 		// Court Orders
 		ren cz czone
 		merge 1:1 czone using "$CLEANDATA/nces/cz_court_orders", keep(1 3) nogen
@@ -859,17 +1092,28 @@ foreach level in cz {
 		g above_co_enroll_10p = frac_enroll_court_ordered > 10
 		g above_co_enroll_25p = frac_enroll_court_ordered > 25
 		
-		g growth0010 = 100*(popc1910 - popc1900) / popc1900
-		g growth1020 = 100*(popc1920 - popc1910) / popc1910
-		g growth2030 = 100*(popc1930 - popc1920) / popc1920
-		foreach var of varlist blackc* literatec* labforcec*{
-			replace `var' = 100*`var'
-		}
+		//g growth0010 = 100*(popc1910 - popc1900) / popc1900
+		//g growth1020 = 100*(popc1920 - popc1910) / popc1910
+		//g growth2030 = 100*(popc1930 - popc1920) / popc1920
+		//foreach var of varlist blackc* literatec* labforcec*{
+		//	replace `var' = 100*`var'
+		//}
 		// Black linked income differences
 		merge 1:1 cz using "$INTDATA/census/black_linked_chars.dta", keep(1 3) nogen keepusing(cz occscore_black_3040_linked)
-		su occscore_black_3040_linked, d
-		g above_med_occscore_3040 = occscore_black_3040_linked >= r(p50) if !mi(occscore_black_3040_linked)
 		
+		g bmig_occscore_diff = occscore_black_3040_linked - occscore1930 if !mi(occscore_black_3040_linked)	
+		g bmig_occscorec_diff = occscore_black_3040_linked - occscorec1930 if !mi(occscore_black_3040_linked)	
+		
+		su occscore_black_3040_linked, d
+		g above_med_occscore_3040 = occscore_black_3040_linked >= r(p50) if !mi(occscore_black_3040_linked)		
+		
+		su bmig_occscore_diff, d
+		g above_med_occscore_diff = bmig_occscore_diff >= r(p50) if !mi(occscore_black_3040_linked)	
+		g pos_occscore_diff = bmig_occscore_diff > 0 if !mi(occscore_black_3040_linked)	
+		
+		su bmig_occscorec_diff, d
+		g above_med_occscorec_diff = bmig_occscorec_diff >= r(p50) if !mi(occscore_black_3040_linked)	
+		g pos_occscorec_diff = bmig_occscorec_diff > 0 if !mi(occscore_black_3040_linked)	
 		
 		// Black mig income differences
 		merge 1:1 cz using "$INTDATA/census/bmig_incomes", keep(1 3) nogen
@@ -887,9 +1131,22 @@ foreach level in cz {
 		merge 1:1 cz using "$INTDATA/other/streams", keep(1 3) nogen
 		lab var n_streams "Number of Streams"
 		
+		
+		forv y = 1950(10)1970{
+			local y1 = `y'-10
+
+			foreach outcome in gen_muni schdist_ind spdist totfrac {
+				g n`y'_`outcome'_`level'_pc = b_`outcome'_cz`y'_pc - b_`outcome'_cz`y1'_pc
+
+			}
+		}
+		
+		// Split panel
+		merge 1:1 cz using "$CLEANDATA/dcourt/GM_final_dataset_split.dta", keep(3) nogen
+		
 		su GM_raw_pp, d
 		g above_x_med = GM_raw_pp >= r(p50)
-		g growth3040 = 100*(pop1940 - pop1930)/pop1930
+		//g growth3040 = 100*(pop1940 - pop1930)/pop1930
 		g growth4070 = 100*(pop1970 - pop1940)/pop1940
 		g growth4010 = 100*(pop2010 - pop1940)/pop1940
 
@@ -904,7 +1161,7 @@ foreach level in cz {
 		lab var unigrad "Prop College Grads"
 		//lab var mean_urban_income_1940 "1940 Income (Urban Areas)"
 		lab var mean_income_1940 "Average Income, 1940"
-		lab var growth3040 "1930-40 Population Growth Rate"
+		//lab var growth3040 "1930-40 Population Growth Rate"
 		lab var shift_share_base "$\hat{GM}$"
 		
 		lab var shift_share_base_white "$\hat{WM}$"
