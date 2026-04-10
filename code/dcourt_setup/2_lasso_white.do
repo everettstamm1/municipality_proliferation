@@ -1,3 +1,11 @@
+// Municipal Proliferation
+// This file is amended from 2_lasso.do in the Derenoncourt (2022) replication files.
+// This conducts lasso shift-share covariate selection for white southern migration, as the original file did for black southern migration.
+
+
+
+
+
 /*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 
 2. Predict netmigration from the South between 1940 and 1970.

@@ -1,6 +1,6 @@
 cap prog drop create_sumshare
 prog def create_sumshare
-	syntax, version(string) main_path(string) shift_path(string) origin_id(string) dest_id(string) origin_sample(string) out_path(string) type(string)
+	syntax, version(string) main_path(string) shift_path(string) origin_id(string) dest_id(string) origin_sample(string) out_path(string) type(string) shift_name(string)
 	// Version is an ID you'll create
 	// Main path is where your population data is linked and will have destination 
 	// and origin variables
@@ -10,7 +10,7 @@ prog def create_sumshare
 	// Get shifts, collapse all years 
 	use "`shift_path'", clear
 	
-	ren proutmig shift_num
+	ren `shift_name' shift_num
 	collapse (sum) shift_num, by(`origin_id')
 	replace shift_num = -shift_num // outflows to inflows
 	cap destring `origin_id', replace

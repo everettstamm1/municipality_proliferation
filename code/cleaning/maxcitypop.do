@@ -20,3 +20,24 @@ ren pop1950 maxcitypop1950
 ren pop1940 maxcitypop1940
 
 save "$INTDATA/census/maxcitypop_ccdb", replace
+
+
+import delimited "$RAWDATA/census/nhgis0038_csv/nhgis0038_ds172_2010_place.csv", clear
+ren placea PLACEFP
+ren statea STATEFP
+merge 1:1 STATEFP PLACEFP using "$XWALKS/cz_place_xwalk", keep(1 3) nogen
+// Some spot fixes
+replace cz = 18000 if gisjoin == "G36074183"
+replace cz = 12701 if gisjoin == "G09074260"
+replace cz = 12701 if gisjoin == "G09077270"
+replace cz = 16400 if gisjoin == "G39007454"
+replace cz = 11302 if gisjoin == "G24070530"
+
+merge m:1 cz using "$INTDATA/dcourt/original_130_czs", keep(3) nogen
+
+bys cz : egen maxcitypop2010 = max(h7v001)
+keep if maxcitypop2010 == h7v001
+ren name maxcity_name
+keep cz maxcity_name PLACEFP STATEFP maxcitypop2010
+save "$INTDATA/census/maxcitypop_2010.dta", replace
+
