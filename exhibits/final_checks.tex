@@ -13,7 +13,7 @@
 \usepackage{tabularx}
 \usepackage{amsmath}
 
-\title{New Exhibits for AEJ Revisions}
+\title{Final Ref Comments}
 
 \begin{document}
 \maketitle
@@ -23,19 +23,71 @@
 \listoftables}
 \clearpage
 
-\section{Overview}
 
-\section*{Exhibits}
 
-\input{tables/final/inst_table.tex}
+\section*{Dependent Variable Specifications}
+
+
 \clearpage
 \begin{table}
 \footnotesize
 \centering
-\caption{Pretrends, no balance controls}
+\caption{Main Table}
 \begin{threeparttable}
 \footnotesize
-\input{tables/balancetables/pretrends_extended_update_1.tex}
+\input{tables/final/black_ssaggregate_long.tex}
+\end{threeparttable}
+\label{tab:log_effect}
+\end{table}
+\clearpage
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Ref Request 1: Log Differences}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/refspec_1.tex}
+\end{threeparttable}
+\label{tab:log_effect}
+\end{table}
+\clearpage
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Ref Request 1: Log Differences + popgrowth control}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/refspec_1_popgrowth.tex}
+\end{threeparttable}
+\label{tab:log_effect}
+\end{table}
+\clearpage
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Ref Request 2: Pct Outcome}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/refspec_2.tex}
+\end{threeparttable}
+\label{tab:log_effect}
+\end{table}
+\clearpage
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Ref Request 2: Pct on Pct}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/refspec_2_pct.tex}
 \end{threeparttable}
 \label{tab:log_effect}
 \end{table}
@@ -46,10 +98,24 @@
 \begin{table}
 \footnotesize
 \centering
-\caption{Pretrends, decadal balance controls}
+\caption{Raw Differences}
 \begin{threeparttable}
 \footnotesize
-\input{tables/balancetables/pretrends_extended_update_2.tex}
+\input{tables/final/rawdiff.tex}
+\end{threeparttable}
+\label{tab:log_effect}
+\end{table}
+\clearpage
+
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{1970 P.C. Outcome}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/b70_pc.tex}
 \end{threeparttable}
 \label{tab:log_effect}
 \end{table}
@@ -59,13 +125,92 @@
 \begin{table}
 \footnotesize
 \centering
-\caption{Pretrends, 1940 balance controls}
+\caption{1970 Outcome}
 \begin{threeparttable}
 \footnotesize
-\input{tables/balancetables/pretrends_extended_update_3.tex}
+\input{tables/final/b70.tex}
 \end{threeparttable}
 \label{tab:log_effect}
 \end{table}
 \clearpage
 
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{1970 Outcome, Popgrowth Control}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/b70_growth.tex}
+\end{threeparttable}
+\label{tab:log_effect}
+\end{table}
+\clearpage
+
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Poisson}
+\begin{threeparttable}
+\footnotesize
+\input{tables/poisson/poisson_table_base.tex}
+\end{threeparttable}
+\label{tab:log_effect}
+\end{table}
+\clearpage
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Poisson, popgrowth control}
+\begin{threeparttable}
+\footnotesize
+\input{tables/poisson/poisson_table_base_popgrowth.tex}
+\end{threeparttable}
+\label{tab:log_effect}
+\end{table}
+\clearpage
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Poisson, 1970 Population exposure}
+\begin{threeparttable}
+\footnotesize
+\input{tables/poisson/poisson_table_exposure.tex}
+\end{threeparttable}
+\label{tab:log_effect}
+\end{table}
+\clearpage
+
+
+\section*{Event Studies}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\textwidth]{figures/RR3/es_ssaggregate_nhgis_full_6.png}
+	\caption{1940 Imbalanced Controls}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\textwidth]{figures/RR3/es_ssaggregate_nhgis_full_2.png}
+	\caption{Baseline Controls}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\textwidth]{figures/RR3/es_ssaggregate_nhgis_full_4.png}
+	\caption{1940 Mean Income, Lab. Force. Mfg and Popdens Varying}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	\includegraphics[width=0.7\textwidth]{figures/RR3/es_ssaggregate_nhgis_full_8.png}
+	\caption{Lab. Force. Mfg and Popdens Varying}
+\end{figure}
 \end{document}

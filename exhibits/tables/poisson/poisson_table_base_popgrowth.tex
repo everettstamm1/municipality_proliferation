@@ -1,0 +1,37 @@
+ \begin{tabularx}{\textwidth}{l*{4}{>{\centering\arraybackslash}X}} \toprule \setlength{\tabcolsep}{15pt}
+&\multicolumn{1}{c}{C. Goodman}&\multicolumn{3}{c}{Census of Governments}\\\cmidrule(lr){2-2}\cmidrule(lr){3-5}
+&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Special Districts}\\\cmidrule(lr){2-3}\cmidrule(lr){4-4}\cmidrule(lr){5-5}
+&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+\cmidrule(lr){1-5}
+\multicolumn{4}{l}{Panel A: First Stage}\\
+\cmidrule(lr){1-5}
+$\hat{GM}$      &    1.493***&    1.470***&    1.667***&    1.718***\\
+                &  (0.313)   &  (0.306)   &  (0.294)   &  (0.305)   \\
+\cmidrule(lr){1-5}
+\multicolumn{4}{l}{Panel B: OLS 1940-1970}\\
+\cmidrule(lr){1-5}
+GM              &    0.016***&    0.016***&    0.054***&    0.038*  \\
+                &  (0.006)   &  (0.006)   &  (0.016)   &  (0.021)   \\
+\cmidrule(lr){1-5}
+\multicolumn{4}{l}{Panel C: 2SLS 1940-1970}\\
+\cmidrule(lr){1-5}
+GM              &    0.016*  &    0.017*  &    0.011   &    0.032   \\
+                &  (0.010)   &  (0.010)   &  (0.023)   &  (0.031)   \\
+\midrule
+1940-70 Avg.    &     7.22   &     5.39   &  -320.96   &    52.42   \\
+\cmidrule(lr){1-5}
+\multicolumn{4}{l}{Panel D: OLS 1940-2010}\\
+\cmidrule(lr){1-5}
+GM              &    0.014** &    0.013*  &    0.055***&    0.016   \\
+                &  (0.007)   &  (0.007)   &  (0.015)   &  (0.012)   \\
+\cmidrule(lr){1-5}
+\multicolumn{4}{l}{Panel E: 2SLS 1940-2010}\\
+\cmidrule(lr){1-5}
+GM              &    0.016   &    0.017   &    0.011   &    0.042*  \\
+                &  (0.012)   &  (0.011)   &  (0.022)   &  (0.024)   \\
+\cmidrule(lr){1-5}
+1940-2010 Avg.  &    10.34   &     7.67   &  -327.23   &    93.10   \\
+1940 Avg.       &    48.87   &    52.96   &   381.55   &    31.32   \\
+First Stage F-Stat&    22.69   &    23.13   &    32.10   &    31.62   \\
+Observations    &      130   &      130   &      117   &      130   \\
+ \bottomrule \end{tabularx}

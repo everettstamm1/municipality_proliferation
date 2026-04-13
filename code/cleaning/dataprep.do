@@ -182,16 +182,18 @@
 	merge 1:1 cz using "$INTDATA/census/urb_pop_2010.dta", keep(1 3) nogen keepusing(pop2010)
 	
 	preserve
-		use "$INTDATA/census/cz_pop_occscore.dta", clear
+		use "$INTDATA/census/cz_pop_occscore_mfg.dta", clear
 		
 		//drop pop
-		reshape wide pop popc bpop bpopc occscore occscorec , i(cz) j(year)
-		drop pop1940 pop1950 popc1940 popc1950 bpop1940 bpop1950 bpopc1940 bpopc1950
+		reshape wide pop popc bpop bpopc occscore occscorec mfg_lfshare, i(cz) j(year)
+		drop pop1940 popc1940 bpop1940 bpopc1940
 		tempfile oldpops
 		save `oldpops'
 	restore
 	merge 1:1 cz using `oldpops', keep(1 3) nogen
 	
+	merge 1:1 cz using "$INTDATA/census/cz_mfg_1980_2000.dta", keep(1 3) nogen
+
 	//drop pop19* 
 
 	preserve
@@ -272,10 +274,10 @@
 		
 	
 	
-	merge 1:1 cz using "$INTDATA/census/cz_mfg.dta", keep(3) nogen
-	ren mfg_lfshare* new_mfg_lfshare*
+	//merge 1:1 cz using "$INTDATA/census/cz_mfg.dta", keep(3) nogen
+	//ren mfg_lfshare* new_mfg_lfshare*
 	
-	merge 1:1 cz using "$INTDATA/dcourt/clean_cz_industry_employment_1940_1970.dta", keep(1 3) nogen keepusing(mfg_lfshare1940 mfg_lfshare1950 mfg_lfshare1960 mfg_lfshare1970)
+	merge 1:1 cz using "$INTDATA/dcourt/clean_cz_industry_employment_1940_1970.dta", keep(1 3) nogen keepusing(mfg_lfshare1950 mfg_lfshare1960 mfg_lfshare1970)
 	
 	
 	// Outcome transformations
@@ -289,7 +291,8 @@
 			g b_`ds'_cz1950_pc = b_`ds'_cz1950/(pop1950/10000) 
 			g b_`ds'_cz1960_pc = b_`ds'_cz1960/(pop1960/10000) 
 			g b_`ds'_cz1970_pc = b_`ds'_cz1970/(pop1970/10000) 
-			
+			g b_`ds'_cz2010_pc = b_`ds'_cz2010/(pop2010/10000) 
+
 			// Main outcomes
 			g n_`ds'_cz_pc = b_`ds'_cz1970/(pop1970/10000) - b_`ds'_cz1940/(pop1940/10000) 
 			g ld_`ds'_cz_pc = b_`ds'_cz2010/(pop2010/10000) - b_`ds'_cz1940/(pop1940/10000) 
@@ -309,6 +312,10 @@
 			// Population dilution term
 			g decomp_`ds'_cz_pc = (-1) * (b_`ds'_cz1970/(pop1970/10000)) * ((pop1970 - pop1940) / pop1940)
 			g decomp_ld_`ds'_cz_pc = (-1) * (b_`ds'_cz2010/(pop2010/10000)) * ((pop2010 - pop1940) / pop1940)
+			
+			// Raw Differences
+			g n_`ds'_cz1970 = b_`ds'_cz1970 - b_`ds'_cz1940
+			g n_`ds'_cz2010 = b_`ds'_cz2010 - b_`ds'_cz1940
 
 			// Labels
 			lab var n_`ds'_cz_pc "Change in `label', P.C. 1940-1970"

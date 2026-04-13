@@ -1,0 +1,37 @@
+ \begin{tabularx}{\textwidth}{l*{5}{>{\centering\arraybackslash}X}} \toprule \setlength{\tabcolsep}{15pt}
+&\multicolumn{1}{c}{C. Goodman}&\multicolumn{3}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-5}\cmidrule(lr){6-6}
+&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Special Districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-4}\cmidrule(lr){5-5}\cmidrule(lr){6-6}
+&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel A: First Stage}\\
+\cmidrule(lr){1-6}
+$\hat{GM}$      &    0.432   &    0.432   &    0.367   &    0.432   &    0.432   \\
+                &  (0.294)   &  (0.294)   &  (0.346)   &  (0.294)   &  (0.294)   \\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel B: OLS 1940-1970}\\
+\cmidrule(lr){1-6}
+Percentage Change in Urban Black Population&   -0.004** &   -0.002   &    0.038   &    0.007   &   58.479   \\
+                &  (0.002)   &  (0.002)   &  (0.091)   &  (0.018)   & (54.331)   \\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel C: 2SLS 1940-1970}\\
+\cmidrule(lr){1-6}
+Percentage Change in Urban Black Population&    0.008   &    0.026** &    0.797   &    0.211** & -1.3e+03***\\
+                &  (0.007)   &  (0.011)   &  (0.565)   &  (0.098)   &(482.842)   \\
+\midrule
+1940-70 Avg.    &     0.16   &     0.11   &   -12.40   &     1.40   &  1722.81   \\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel D: OLS 1940-2010}\\
+\cmidrule(lr){1-6}
+Percentage Change in Urban Black Population&   -0.006** &   -0.005*  &    0.034   &   -0.002   &  107.667   \\
+                &  (0.003)   &  (0.003)   &  (0.092)   &  (0.028)   &(129.110)   \\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel E: 2SLS 1940-2010}\\
+\cmidrule(lr){1-6}
+Percentage Change in Urban Black Population&    0.006   &    0.016   &    0.759   &    0.459** & -2.7e+03** \\
+                &  (0.010)   &  (0.013)   &  (0.552)   &  (0.198)   &(1074.699)   \\
+\cmidrule(lr){1-6}
+1940-2010 Avg.  &     0.24   &     0.15   &   -12.66   &     2.87   &  3449.08   \\
+1940 Avg.       &     1.48   &     1.61   &    14.08   &     0.88   &  3282.25   \\
+First Stage F-Stat&     2.15   &     2.15   &     1.13   &     2.15   &     2.15   \\
+Observations    &      130   &      130   &      118   &      130   &      130   \\
+ \bottomrule \end{tabularx}

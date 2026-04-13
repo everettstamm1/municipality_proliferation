@@ -1,4 +1,5 @@
 clear all
+set seed 20260409     	
 
 // Flag to run
 local run = 1

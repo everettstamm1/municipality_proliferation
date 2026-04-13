@@ -4,12 +4,11 @@ local b_controls reg2 reg3 reg4 sumshare_base
 
 use "$CLEANDATA/cz_pooled", clear
 
-drop new_mfg_lfshare1940
-ren new_mfg_lfshare* mfg_lfshare*
-ren pre_cgoodman_cz_pc npre_cgoodman_cz_pc
+//drop new_mfg_lfshare1940
+//ren new_mfg_lfshare* mfg_lfshare*
 lab var shift_share_base "$\widehat{GM}$"
-g occscore1960 = occscore1950
-g occscore1970 = occscore1950
+//g occscore1960 = occscore1950
+//g occscore1970 = occscore1950
 
 		
 /*
@@ -33,15 +32,13 @@ reghdfe y evt_* `b_controls' `extra_controls', absorb(cz year) cluster(cz)
 coefplot, keep(evt_*) vertical xline(0)
 */
 
-forv y=1910(10)2010{
-	g diff`y'_cgoodman_cz_pc = b`y'_cgoodman_cz_pc - b1940_cgoodman_cz_pc
-}
+
 
 
 //keep if !inlist(cz,34901,35001,35100)
 
 
-forv spec=1/6{
+forv spec=1/8{
 	forv y=1910(10)2010{
 		local y1 = `y' - 10
 		local ystub = mod(`y',100)
@@ -56,6 +53,8 @@ forv spec=1/6{
 			if "`spec'" == "4" ssaggregate  diff`y'_cgoodman_cz_pc GM_raw_pp [aw=popc1940], n("origin_fips") l(cz) sfile("$INTDATA/ssaggregate_prep/shares_base.dta") controls("`b_controls'  mfg_lfshare`y1' mean_income_1940 cz_popdens`y1' ") s(share)
 			if "`spec'" == "5" ssaggregate  n`y'_cgoodman_cz_pc GM_raw_pp [aw=popc1940], n("origin_fips") l(cz) sfile("$INTDATA/ssaggregate_prep/shares_base.dta") controls("`b_controls' mfg_lfshare1940 mean_income_1940 cz_popdens1940") s(share)
 			if "`spec'" == "6" ssaggregate  diff`y'_cgoodman_cz_pc GM_raw_pp [aw=popc1940], n("origin_fips") l(cz) sfile("$INTDATA/ssaggregate_prep/shares_base.dta") controls("`b_controls'  mfg_lfshare1940 mean_income_1940 cz_popdens1940 ") s(share)
+			if "`spec'" == "7" ssaggregate  n`y'_cgoodman_cz_pc GM_raw_pp [aw=popc1940], n("origin_fips") l(cz) sfile("$INTDATA/ssaggregate_prep/shares_base.dta") controls("`b_controls' mfg_lfshare`y1' cz_popdens`y1'") s(share)
+			if "`spec'" == "8" ssaggregate  diff`y'_cgoodman_cz_pc GM_raw_pp [aw=popc1940], n("origin_fips") l(cz) sfile("$INTDATA/ssaggregate_prep/shares_base.dta") controls("`b_controls'  mfg_lfshare`y1' cz_popdens`y1' ") s(share)
 			merge 1:1 origin_fips using "$INTDATA/ssaggregate_prep/shock_instrument_base.dta", keep(1 3) nogen
 			replace shift = 0 if mi(shift)
 			lab var shift "`xlab'"
@@ -66,8 +65,8 @@ forv spec=1/6{
 			g year = .
 			g yearlab = ""
 			
-			if inlist("`spec'","1","3","5") ivreg2 n`y'_cgoodman_cz_pc (GM_raw_pp = shift) [aw=s_n]
-			if inlist("`spec'","2","4","6") ivreg2 diff`y'_cgoodman_cz_pc (GM_raw_pp = shift) [aw=s_n]
+			if inlist("`spec'","1","3","5","7") ivreg2 n`y'_cgoodman_cz_pc (GM_raw_pp = shift) [aw=s_n]
+			if inlist("`spec'","2","4","6","8") ivreg2 diff`y'_cgoodman_cz_pc (GM_raw_pp = shift) [aw=s_n]
 
 			local b = e(b)[1,1]
 			local sd = e(V)[1,1]^(0.5)

@@ -1,5 +1,6 @@
 
-foreach d in 108 109 110 111 114{
+foreach d in 108 109 110 111 114 115{
+	
 	if "`d'" == "98" use "$RAWDATA/census/usa_000`d'.dta/usa_000`d'.dta", clear
 	if "`d'" != "98" use "$RAWDATA/census/usa_00`d'.dta/usa_00`d'.dta", clear
 
@@ -33,7 +34,7 @@ ren citycode city
 
 
 clear 
-foreach d in 108 109 110 111 114{
+foreach d in 108 109 110 111  115{
 	append using "$INTDATA/census/cz_pop_occscore_mfg_`d'"
 }
 
