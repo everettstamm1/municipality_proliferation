@@ -9,7 +9,7 @@ g namepos = min(cz_prop_white1970, cz_new_prop_white1970)
 qui sum GM_raw_pp, d
 local cmin = r(min)
 local cmax = r(max)
-g c255 = round(255*(GM_hat_raw - `cmin')/(`cmax' - `cmin'))
+g c255 = round(255*(shift_share_base - `cmin')/(`cmax' - `cmin'))
 
 keep if cz_new_prop_white1970 < .
 drop above_x_med

@@ -262,42 +262,48 @@
 	merge m:1 cty_fips using "$XWALKS/county_pmsa_xwalk.dta", nogen keep(1 3)
 	ren czone cz 
 	ren cty_fips fips
-	//replace yr_incorp = yr_incorp-2
-	keep cz yr_incorp muniname
-	local lab: variable label yr_incorp
-	
-	g n = yr_incorp>=1940 & yr_incorp<1970
-	forv d=1700(10)2010{
-		local step = `d'+10
-		
-		g n`d' = yr_incorp<`d'
+	g yr_incorp_exact = yr_incorp
+	replace yr_incorp = yr_incorp-2
+	foreach yr in "" "_exact"{
+		preserve
+			
+			keep cz yr_incorp`yr' muniname
+			local lab: variable label yr_incorp
+			
+			g n = yr_incorp`yr'>=1940 & yr_incorp`yr'<1970
+			forv d=1700(10)2010{
+				local step = `d'+10
+				
+				g n`d' = yr_incorp`yr'<`d'
 
+			}
+
+
+			collapse (sum) n*, by(cz)
+			rename n n_cgoodman`yr'_cz
+			rename n17?? b_cgoodman`yr'_cz17??
+
+			rename n18?? b_cgoodman`yr'_cz18??
+
+			rename n19?? b_cgoodman`yr'_cz19??
+			rename n20?? b_cgoodman`yr'_cz20??
+
+			
+			forv d=1700(10)2010{
+				
+				if "`yr'" == "" local dlab = `d' + 2
+				if "`yr'" == "_exact" local dlab = `d' 
+
+				label var b_cgoodman`yr'_cz`d' "Base `lab' `dlab'"
+
+			}
+			
+
+			label var n_cgoodman`yr'_cz "`lab'"
+
+			
+			save "$INTDATA/counts/cgoodman`yr'_cz", replace
+		restore
 	}
-
-
-	collapse (sum) n*, by(cz)
-	rename n n_muni_cz
-		rename n17?? b_muni_cz17??
-
-	rename n18?? b_muni_cz18??
-
-	rename n19?? b_muni_cz19??
-	rename n20?? b_muni_cz20??
-
 	
-
-	label var b_muni_cz1940 "Base `lab' 1940"
-	label var b_muni_cz1950 "Base `lab' 1950"
-	label var b_muni_cz1960 "Base `lab' 1960"
-	label var b_muni_cz1970 "Base `lab' 1970"
-	label var b_muni_cz1980 "Base `lab' 1980"
-	label var b_muni_cz1990 "Base `lab' 1990"
-	label var b_muni_cz2000 "Base `lab' 2000"
-	label var b_muni_cz2010 "Base `lab' 2010"
-
-	label var n_muni_cz "`lab'"
-
-	
-	ren *muni* *cgoodman*
-	save "$INTDATA/counts/cgoodman_cz", replace
 	

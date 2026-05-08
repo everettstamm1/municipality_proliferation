@@ -11,7 +11,7 @@
 	drop _merge
 	
 	
-	merge 1:1 city using "$RAWDATA/dcourt/clean_city_population_ccdb_1944_1977.dta", keepusing(bpop1970 bpop1960 nwhtpop1950 nwhtpop1960 pop1960 whtpop1970 pop1950 pop1940 pop1970)
+	merge 1:1 city using "$RAWDATA/dcourt/clean_city_population_ccdb_1944_1977.dta", keepusing(bpop1970 bpop1960 nwhtpop1950 nwhtpop1960 pop1960 whtpop1970 pop1950 pop1940 pop1970 land_area1940 land_area1970)
 	ren whtpop1970 wpopc1970
 	foreach var of varlist bpop1960 nwhtpop1950 nwhtpop1960  pop1960{
 	ren `var' `var'_ccdb
@@ -130,7 +130,8 @@
 	rename *schdist_m2* *schdist_ind*
 	
 	merge 1:1 cz using "$INTDATA/counts/cgoodman_cz", keep(1 3) nogen keepusing(n_cgoodman_cz b_cgoodman_cz*)
-	
+	merge 1:1 cz using "$INTDATA/counts/cgoodman_exact_cz", keep(1 3) nogen keepusing(n_cgoodman_exact_cz b_cgoodman_exact_cz*)
+
 	merge 1:1 cz using "$INTDATA/census/maxcitypop_ccdb", keep(1 3) nogen keepusing(maxcitypop1940 maxcitypop1950 maxcitypop1960 maxcitypop1970)
 	merge 1:1 cz using "$INTDATA/census/maxcitypop_2010", keep(1 3) nogen keepusing(maxcitypop2010)
 
@@ -158,10 +159,15 @@
 	//merge 1:1 czone using "$INTDATA/census/home_values", keep(1 3) nogen
 	//merge 1:1 czone using "$INTDATA/census/incomes", keep(1 3) nogen
 	ren czone cz
-	merge 1:1 cz using "$INTDATA/census/incomes_and_education_1940", keep(1 3) nogen
+	//merge 1:1 cz using "$INTDATA/census/incomes_and_education_1940", keep(1 3) nogen
+	//merge 1:1 cz using "$INTDATA/census/incomes_and_education_1940_new", keep(1 3) nogen
+	merge 1:1 cz using "$INTDATA/census/incomes_1940", keep(1 3) nogen
+	merge 1:1 cz using "$INTDATA/census/education_1940", keep(1 3) nogen
+
 	//merge 1:1 czone using "$INTDATA/census/black_incomes_and_education_1940", keep(1 3) nogen
 	//drop mean_urban_income_1940 mean_pos_urban_income_1940
 	//merge 1:1 czone using "$INTDATA/census/urban_incomes_and_education_1940_scc", keep(1 3) nogen 
+	merge 1:1 cz using "$INTDATA/cz_incumbent_land_changes.dta", keep(3) nogen
 
 	
 	// Missing dummies
@@ -186,7 +192,7 @@
 		
 		//drop pop
 		reshape wide pop popc bpop bpopc occscore occscorec mfg_lfshare, i(cz) j(year)
-		drop pop1940 popc1940 bpop1940 bpopc1940
+		drop  popc1940  bpopc1940
 		tempfile oldpops
 		save `oldpops'
 	restore
@@ -266,7 +272,7 @@
 		
 		collapse (sum) pop, by(year cz)
 		reshape wide pop, i(cz) j(year)
-			
+		drop pop1940 
 		tempfile nhgispops
 		save `nhgispops'
 	restore
@@ -275,13 +281,13 @@
 	
 	
 	//merge 1:1 cz using "$INTDATA/census/cz_mfg.dta", keep(3) nogen
-	//ren mfg_lfshare* new_mfg_lfshare*
+	drop mfg_lfshare1940
 	
-	merge 1:1 cz using "$INTDATA/dcourt/clean_cz_industry_employment_1940_1970.dta", keep(1 3) nogen keepusing(mfg_lfshare1950 mfg_lfshare1960 mfg_lfshare1970)
+	merge 1:1 cz using "$INTDATA/dcourt/clean_cz_industry_employment_1940_1970.dta", keep(1 3) nogen keepusing(mfg_lfshare1940 mfg_lfshare1950 mfg_lfshare1960 mfg_lfshare1970)
 	
 	
 	// Outcome transformations
-	foreach ds in  gen_muni schdist_ind all_local gen_subcounty spdist  gen_town cgoodman  totfrac{
+	foreach ds in  gen_muni schdist_ind all_local gen_subcounty spdist  gen_town cgoodman cgoodman_exact totfrac{
 			local label : variable label n_`ds'_cz
 			lab var n_`ds'_cz "New Govs, `label'"
 			lab var b_`ds'_cz1940 "Base Govs 1940, `label'"
@@ -335,18 +341,36 @@
 
 	}
 	
-	
+	// Fixing totfrac scale
+	foreach var of varlist b_totfrac_cz* n_totfrac_cz_pc n_totfrac_cz_ld pct_totfrac_cz_pc pct_ld_totfrac_cz_pc decomp_totfrac_cz_pc decomp_ld_totfrac_cz_pc ld_totfrac* n2_totfrac_cz_pc ld2_totfrac_cz_pc{
+		replace `var' = `var'/100
+	}
 	// Decadal changes for cgoodman data
 	
 	g b1900_cgoodman_cz_pc = b_cgoodman_cz1900/(pop1900/10000)
+	g b1900_cgoodman_exact_cz_pc = b_cgoodman_exact_cz1900/(pop1900/10000)
+	
 	g b1940_cgoodman_cz_pc = b_cgoodman_cz1940/(pop1940/10000)
+	g b1940_cgoodman_exact_cz_pc = b_cgoodman_exact_cz1940/(pop1940/10000)
 
 	forv y = 1910(10)2010{
 		local y1 = `y'-10
+		
 		cap g b`y'_cgoodman_cz_pc = b_cgoodman_cz`y'/(pop`y'/10000)
 		g n`y'_cgoodman_cz_pc = b`y'_cgoodman_cz_pc - b`y1'_cgoodman_cz_pc
 		g diff`y'_cgoodman_cz_pc = b`y'_cgoodman_cz_pc - b1940_cgoodman_cz_pc
+		g diff`y'_cgoodman_cz = b`y'_cgoodman_cz - b1940_cgoodman_cz
+		g diff`y'_pop_cz = 100*(pop`y' - pop1940)/pop1940
+		
+		cap g b`y'_cgoodman_exact_cz_pc = b_cgoodman_exact_cz`y'/(pop`y'/10000)
+		g n`y'_cgoodman_exact_cz_pc = b`y'_cgoodman_exact_cz_pc - b`y1'_cgoodman_exact_cz_pc
+		g diff`y'_cgoodman_exact_cz_pc = b`y'_cgoodman_exact_cz_pc - b1940_cgoodman_exact_cz_pc
+		g diff`y'_cgoodman_exact_cz = b_cgoodman_exact_cz`y' - b_cgoodman_exact_cz1940
+
+
 	}
+	g pre_cgoodman_cz_pc = b1940_cgoodman_cz_pc - b1910_cgoodman_cz_pc
+	g pre_cgoodman_exact_cz_pc = b1940_cgoodman_exact_cz_pc - b1910_cgoodman_exact_cz_pc
 
 	// Adding measure of enclosedness
 	preserve	
@@ -409,6 +433,12 @@
 	forv y=1900(10)2010{
 		g cz_popdens`y' = pop`y'/(cz_total2010/1000000)
 		lab var cz_popdens`y' "Population Density, `y'"
+		local y1 = `y' - 10
+		g growth`y1' = (pop`y' - pop`y1')/pop`y1'
+		
+		local ylab = mod(`y',100)
+		local lab = "`y1'-`ylab'"
+		label variable growth`y1' "`lab' Population Growth Rate"
 	}
 	
 	g orig_popdens1940 = popc1940/(orig_total/1000000)
@@ -462,14 +492,21 @@
 		ren sumshare sumshare_`version'
 		replace shift_share_`version' = 100* shift_share_`version'
 	}
-	
+	/*
 	// Add in placebo instruments
 	forv i=1/1000{
-		merge 1:1 cz using "$INTDATA/ssaggregate_prep/placebo/dest_instrument_base_placebo_`i'", keep(3) nogen
-		ren shift_share shift_share_placebo_`i'
-		ren sumshare sumshare_placebo_`i'
-		replace shift_share_placebo_`i' = 100* shift_share_placebo_`i'
+		if mod(`i',100) == 0 di "At placebo `i'"
+		//qui merge 1:1 cz using "$INTDATA/ssaggregate_prep/placebo/dest_instrument_base_placebo_`i'", keep(3) nogen
+		//ren shift_share shift_share_placebo_`i'
+		//ren sumshare sumshare_placebo_`i'
+		//replace shift_share_placebo_`i' = 100* shift_share_placebo_`i'
+		
+		// Add in dcourt placebo instruments
+		qui merge 1:1 cz using "$INTDATA/ssaggregate_prep/placebo/dcourt_placebo_`i'", keep(3) nogen
+
 	}
+	*/
+		
 	// Panel Instrument
 	preserve
 		use "$INTDATA/ssaggregate_prep/dest_instrument_panel_base", clear
@@ -545,7 +582,9 @@
 	merge 1:1 cz using "$INTDATA/other/streams", keep(1 3) nogen
 	lab var n_streams "Number of Streams"
 	
-	
+	// Upward mobility
+	merge 1:1 cz using "$RAWDATA/dcourt/clean_cz_mobility_1900_2015.dta", keep(1 3) nogen keepusing(frac_all_upm1940)
+
 	su GM_raw_pp, d
 	g above_x_med = GM_raw_pp >= r(p50)
 
@@ -605,9 +644,14 @@
 	
 	
 	
-	lab var higrade "Average years of education"
+	//lab var higrade "Average years of education"
 	lab var hsgrad "Prop HS Grads"
 	lab var unigrad "Prop College Grads"
+		
+
+	lab var hsgrad_25 "Prop HS Grads, (25+)"
+	lab var unigrad_25 "Prop College Grads, (25+)"
+		
 	//lab var mean_urban_income_1940 "1940 Income (Urban Areas)"
 	lab var mean_income_1940 "Average Income, 1940"
 	//lab var growth3040 "1930-40 Population Growth Rate"
@@ -617,4 +661,20 @@
 
 	lab var WM_raw_pp "WM"
 	
+		
+	// New Table: Disincorporations/Amalgamations
+	g disincorp_4070 = (b_cgoodman_cz1970 - b_cgoodman_cz1940) - (b_gen_muni_cz1970 - b_gen_muni_cz1940)
+	g n_dead_cz_pc = disincorp_4070/(pop1940/10000)
+	g disincorp_4010 = (b_cgoodman_cz2010 - b_cgoodman_cz1940) - (b_gen_muni_cz2010 - b_gen_muni_cz1940)
+	g ld_dead_cz_pc = disincorp_4010/(pop1940/10000)
+	g n_dead_w_cz_pc = max(n_dead_cz_pc,0)
+	g ld_dead_w_cz_pc = max(ld_dead_cz_pc,0)
+
+	// New Table: Annexations
+	ren lchange_incumbent_land_4070 n_inc_annex_cz_pc
+	ren lchange_incumbent_land_4010 ld_inc_annex_cz_pc
+	ren prop_incumbent_land_change4070 n_pinc_annex_cz_pc
+	ren prop_incumbent_land_change4010 ld_pinc_annex_cz_pc
+	ren prop_incumbent_land_4070 n_pinc_cz_pc
+	ren prop_incumbent_land_4010 ld_pinc_cz_pc
 	save "$CLEANDATA/cz_pooled", replace

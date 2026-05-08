@@ -5,13 +5,14 @@ local balance_cutoff = 0.10
 local samp = "urban"
 
 use "$CLEANDATA/cz_pooled", clear
-
-local covars avg_precip avg_temp n_streams coastal mfg_lfshare1940 m_rr_sqm_total transpo_cost_1920 frac_total  hsgrad unigrad mean_income_1940 cz_popdens1940 growth3040
-local means avg_precip_mean avg_temp_mean n_streams_mean coastal_mean mfg_lfshare1940_mean m_rr_sqm_total_mean transpo_cost_1920_mean frac_total_mean  hsgrad_mean unigrad_mean mean_income_1940_mean cz_popdens1940_mean growth3040_mean 
-local covars_nss avg_precip_nss avg_temp_nss n_streams_nss coastal_nss mfg_lfshare1940_nss m_rr_sqm_total_nss transpo_cost_1920_nss frac_total_nss  hsgrad_nss unigrad_nss mean_income_1940_nss cz_popdens1940_nss growth3040_nss
+drop hsgrad unigrad
+ren hsgrad_18 hsgrad
+ren unigrad_18 unigrad
+local covars avg_precip avg_temp n_streams coastal mfg_lfshare1940 m_rr_sqm_total transpo_cost_1920 frac_total  hsgrad unigrad mean_income_1940 cz_popdens1940 growth1930
+local means avg_precip_mean avg_temp_mean n_streams_mean coastal_mean mfg_lfshare1940_mean m_rr_sqm_total_mean transpo_cost_1920_mean frac_total_mean  hsgrad_mean unigrad_mean mean_income_1940_mean cz_popdens1940_mean growth1930_mean 
+local covars_nss avg_precip_nss avg_temp_nss n_streams_nss coastal_nss mfg_lfshare1940_nss m_rr_sqm_total_nss transpo_cost_1920_nss frac_total_nss  hsgrad_nss unigrad_nss mean_income_1940_nss cz_popdens1940_nss growth1930_nss
 
 local pooled_covars_`samp'  ""
-keep if dcourt == 1
 foreach covar in `covars' {
 	local lab : variable label `covar'
 	g GM`covar' = shift_share_base
@@ -50,13 +51,14 @@ local balance_cutoff = 0.10
 local samp = "urban"
 
 use "$CLEANDATA/cz_pooled", clear
-
-local covars avg_precip avg_temp n_streams coastal mfg_lfshare1940 m_rr_sqm_total transpo_cost_1920 frac_total  hsgrad unigrad mean_income_1940 cz_popdens1940 growth3040
-local means avg_precip_mean avg_temp_mean n_streams_mean coastal_mean mfg_lfshare1940_mean m_rr_sqm_total_mean transpo_cost_1920_mean frac_total_mean  hsgrad_mean unigrad_mean mean_income_1940_mean cz_popdens1940_mean growth3040_mean 
-local covars_nss avg_precip_nss avg_temp_nss n_streams_nss coastal_nss mfg_lfshare1940_nss m_rr_sqm_total_nss transpo_cost_1920_nss frac_total_nss  hsgrad_nss unigrad_nss mean_income_1940_nss cz_popdens1940_nss growth3040_nss
+drop hsgrad unigrad
+ren hsgrad_18 hsgrad
+ren unigrad_18 unigrad
+local covars avg_precip avg_temp n_streams coastal mfg_lfshare1940 m_rr_sqm_total transpo_cost_1920 frac_total  hsgrad unigrad mean_income_1940 cz_popdens1940 growth1930
+local means avg_precip_mean avg_temp_mean n_streams_mean coastal_mean mfg_lfshare1940_mean m_rr_sqm_total_mean transpo_cost_1920_mean frac_total_mean  hsgrad_mean unigrad_mean mean_income_1940_mean cz_popdens1940_mean growth1930_mean 
+local covars_nss avg_precip_nss avg_temp_nss n_streams_nss coastal_nss mfg_lfshare1940_nss m_rr_sqm_total_nss transpo_cost_1920_nss frac_total_nss  hsgrad_nss unigrad_nss mean_income_1940_nss cz_popdens1940_nss growth1930_nss
 
 local pooled_covars_`samp'  ""
-keep if dcourt == 1
 foreach covar in `covars' {
 	local lab : variable label `covar'
 	g GM`covar' = shift_share_base_white

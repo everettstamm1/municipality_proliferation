@@ -1,12 +1,11 @@
 
-foreach d in 108 109 110 111 114 115{
+foreach d in 116{
 	
-	if "`d'" == "98" use "$RAWDATA/census/usa_000`d'.dta/usa_000`d'.dta", clear
-	if "`d'" != "98" use "$RAWDATA/census/usa_00`d'.dta/usa_00`d'.dta", clear
+	use perwt stateicp countyicp race city occscore year ind1950 using "$RAWDATA/census/usa_00`d'.dta/usa_00`d'.dta", clear
+ 	ren city citycode
 
-	keep perwt stateicp countyicp race city occscore year ind1950
-	
-	ren city citycode
+	replace citycode = 3540 if citycode == 3521 // Lebanon, PA rename
+
 	merge m:1 citycode using "$INTDATA/dcourt/GM_city_final_dataset.dta",  keep(1 3) keepusing(citycode)
 ren citycode city
 	
@@ -34,7 +33,7 @@ ren citycode city
 
 
 clear 
-foreach d in 108 109 110 111  115{
+foreach d in 108 109 110 111 116 118{
 	append using "$INTDATA/census/cz_pop_occscore_mfg_`d'"
 }
 

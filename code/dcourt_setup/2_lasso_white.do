@@ -34,7 +34,6 @@ STEPS:
 	
 	
 	use "$RAWDATA/dcourt/south_county.dta", clear
-	//drop if netwmig==.
 	statastates, fips(state) nogen
 
 

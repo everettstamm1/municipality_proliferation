@@ -2,7 +2,7 @@ cap prog drop poisson_table_long
 
 prog def poisson_table_long
 
-	syntax, endog(varlist) controls(varlist) exog(varlist) weight(varname) path(string)  exposure(varname) [endog2(varlist) exog2(varlist) cgoodman(varlist) gen_muni(varlist) schdist_ind(varlist) gen_town(varlist) spdist(varlist)] 
+	syntax, endog(varlist) controls(varlist) exog(varlist) weight(varname) path(string) exposure_70(varname) exposure_10(varname) [  endog2(varlist) exog2(varlist) cgoodman(varlist) gen_muni(varlist) schdist_ind(varlist) gen_town(varlist) spdist(varlist) cgoodman_exposure(varlist) gen_muni_exposure(varlist) schdist_ind_exposure(varlist) gen_town_exposure(varlist) spdist_exposure(varlist)] 
 
 	local useinst : word 1 of `exog' 
 	eststo clear 
@@ -18,18 +18,33 @@ prog def poisson_table_long
 		eststo fs_`outcome' : reg GM_raw_pp `exog' `ctrls' [pw=`weight'], r 
 		test `useinst'=0 
 		local F : di %6.2f r(F) 
+		tempvar structural_offset70
+		tempvar structural_offset10
+
+		quietly gen double `structural_offset70' = log(`exposure_70') 
+		quietly gen double `structural_offset10' = log(`exposure_10') 
+		
+		cap confirm var ``outcome'_exposure'
+		if _rc == 0 {
+			replace `structural_offset70' = `structural_offset70' + log(``outcome'_exposure')
+			replace `structural_offset10' = `structural_offset10' + log(``outcome'_exposure')
+
+		}
 		// OLS 
-		eststo ols70_`outcome' : poisson b_`outcome'_cz1970 `endog' `endog2' `ctrls'  [pw = `weight'], r exposure(`exposure')
-		eststo ols10_`outcome' : poisson b_`outcome'_cz2010 `endog' `endog2' `ctrls'  [pw = `weight'], r  exposure(`exposure')
+		qui eststo ols70_`outcome' : poisson b_`outcome'_cz1970 `endog' `endog2' `ctrls'  [pw = `weight'], r offset(`structural_offset70')
+		qui eststo ols10_`outcome' : poisson b_`outcome'_cz2010 `endog' `endog2' `ctrls'  [pw = `weight'], r  offset(`structural_offset10')
 		local N_`outcome' = e(N) 
+		
+		
 		// 2SLS 
-		eststo iv70_`outcome': ivpoisson gmm b_`outcome'_cz1970 (`endog' = `exog') `ctrls'  [aw=`weight'], vce(r)  exposure(`exposure')
+		eststo iv70_`outcome': ivpoisson cfunction b_`outcome'_cz1970 (`endog' = `exog') `ctrls'  [aw=`weight'], vce(r)  offset(`structural_offset70')
 		estadd scalar dep_var70 = `dv70_`outcome'' 
-		eststo iv10_`outcome': ivpoisson gmm b_`outcome'_cz2010 (`endog' = `exog') `ctrls'  [aw=`weight'], vce(r)   exposure(`exposure')
+		eststo iv10_`outcome': ivpoisson cfunction b_`outcome'_cz2010 (`endog' = `exog') `ctrls'  [aw=`weight'], vce(r)   offset(`structural_offset10')
 		estadd scalar Fs = `F' 
 		estadd scalar dep_var10 = `dv10_`outcome'' 
 		estadd scalar b_var = `bv_`outcome'' 
 		estadd scalar nobs = `N_`outcome'' 
+		
 		} 
 	// Panel A: First Stage 
 	esttab fs_cgoodman fs_gen_muni fs_schdist_ind fs_spdist /// 

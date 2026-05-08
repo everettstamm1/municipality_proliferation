@@ -59,15 +59,14 @@ lab var weight_pop "Weighted by 1940 municipal population"
 // Getting CZ level variables
 preserve
 	use "$CLEANDATA/cz_pooled", clear
-	keep if dcourt == 1
-	keep cz cz_name popc1940 GM_raw_pp GM_hat_raw v2_sumshares_urban transpo_cost_1920 coastal n_schdist_ind_cz_pc pop1940 cz_popdens1940 mean_income_1940 mfg_lfshare1940 shift_share_base sumshare_base
+	keep cz cz_name popc1940 GM_raw_pp sumshare_base n_schdist_ind_cz_pc pop1940 cz_popdens1940 mean_income_1940 mfg_lfshare1940 shift_share_base sumshare_base
 	g schoolflag = n_schdist_ind_cz_pc < .
 	drop n_schdist_ind_cz_pc
 	qui su GM_raw_pp, d
 	g above_x_med = GM_raw_pp >= `r(p50)'
 
-	qui su GM_hat_raw, d
-	g above_inst_med = GM_hat_raw >= `r(p50)'
+	qui su shift_share_base, d
+	g above_inst_med = shift_share_base >= `r(p50)'
 	tempfile inst
 	save `inst'
 restore
@@ -80,7 +79,7 @@ merge m:1 cz using `inst', keep(3) nogen
 g samp_destXabove_x_med = samp_dest * above_x_med
 g samp_destXabove_z_med = samp_dest * above_inst_med
 g samp_destXGM = samp_dest * GM_raw_pp
-g samp_destXGM_hat = samp_dest * GM_hat_raw
+g samp_destXGM_hat = samp_dest * shift_share_base
 
 lab var above_inst_med "Above Median $\widehat{GM}$"
 lab var samp_destXabove_z_med "Above Median $\widehat{GM}$ X Inc. 1940-70"
@@ -483,7 +482,12 @@ merge m:1 cz using "$INTDATA/census/cz_race_pop", keep(1 3) nogen keepusing(cz_p
 
 preserve
 	use "$INTDATA/cgoodman/cgoodman_place_county_geog.dta", clear
-	keep PLACEFP STATEFP place_land place_total
+	drop if STATEFP == "36" & PLACEFP == "51000" & COUNTYFP != "005"
+	g gisjoin = "G" + STATEFP + "0" + PLACEFP
+
+	merge 1:1 gisjoin using "$RAWDATA/dcourt/US_place_point_2010_crosswalks.dta", keep(1 3) nogen keepusing(city)
+
+	keep PLACEFP STATEFP place_land place_total city
 	duplicates drop
 	destring PLACEFP STATEFP, replace
 	tempfile place_land
@@ -515,7 +519,44 @@ merge m:1 STATEFP PLACEFP using "$INTDATA/other/ai_zoning", keep(1 3) nogen
 // Filling some missings
 bys cz (mean_hh_inc_cz) : replace mean_hh_inc_cz = mean_hh_inc_cz[1] if mi(mean_hh_inc_cz)
 
+
+merge m:1 city using "$RAWDATA/dcourt/clean_city_population_ccdb_1944_1977.dta", keepusing(pct_same_house1970) keep(1 3) nogen
+
+preserve
+	import delimited using "$RAWDATA/census/nhgis0052_csv/nhgis0052_csv/nhgis0052_ds99_1970_place.csv", clear
+	drop state
+	ren placea census_place
+	ren statea state 
+	merge 1:1 census_place state using "$XWALKS/census_place_fips_xwalk.dta", keep(3) nogen
 	
+	ren state STATEFP
+	ren fips_place PLACEFP
+	
+	egen t1tot = rowtotal(c1500*)
+	g wf_county1970 = 100*c15002/t1tot
+	g wf_state1970 = 100*(c15002 + c15003)/t1tot
+	g wf_rev1970 = 100*c15001 / t1tot
+	egen t2tot = rowtotal(c1600*)
+	g wf_cc1970 = 100*c16002/t2tot
+	g wf_smsa1970 = 100*(c16002 + c16003)/t2tot
+	g wf_smsarev1970 = 100*c16001 / t2tot
+	
+	
+	egen wt1tot = rowtotal(c15aa00*)
+	g wwf_county1970 = 100*c15aa002/wt1tot
+	g wwf_state1970 = 100*(c15aa002 + c15aa003)/wt1tot
+	g wwf_rev1970 = 100*c15aa001 / wt1tot
+	egen wt2tot = rowtotal(c16aa00*)
+	g wwf_cc1970 = 100*c16aa002/wt2tot
+	g wwf_smsa1970 = 100*(c16aa002 + c16aa003)/wt2tot
+	g wwf_smsarev1970 = 100*c16aa001 / wt2tot
+
+	keep STATEFP PLACEFP wf_county1970 wf_state1970 wf_cc1970 wf_smsa1970 wf_smsarev1970 wf_rev1970 wwf_county1970 wwf_state1970 wwf_cc1970 wwf_smsa1970 wwf_smsarev1970 wwf_rev1970
+	tempfile wf
+	save `wf'
+restore
+merge m:1 STATEFP PLACEFP using `wf', keep(1 3) nogen
+
 
 /* Labels
 lab var st_ratio_leaid "Student Teacher Ratio"

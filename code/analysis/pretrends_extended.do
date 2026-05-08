@@ -14,7 +14,7 @@ lab var shift_share_base "$\widehat{GM}$"
 forv y=1910(10)1950{
 	local y1 = `y' - 10
 	g p_occscorec`y' = (occscorec`y' - occscorec`y1')/occscorec`y1'
-	g growth`y' = (pop`y' - pop`y1')/pop`y1'
+	//g growth`y' = (pop`y' - pop`y1')/pop`y1'
 }
 foreach outcome in n growth p_occscorec{
 	
@@ -75,7 +75,7 @@ esttab mod10_n mod20_n mod30_n mod40_n    ///
 esttab mod10_growth mod20_growth mod30_growth mod40_growth  ///
 		using "$TABS/balancetables/pretrends_extended_update.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\midrule" "\multicolumn{4}{l}{Panel B: Population Growth}\\" "\cmidrule(lr){1-5}" ) ///
+		posthead("\midrule" "\multicolumn{4}{l}{Panel B: \%$\Delta$ Population}\\" "\cmidrule(lr){1-5}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(shift_share_base) stats(basemean basesd , labels( "Dep. var. mean" "Dep. Var. Std Dev") fmt(2 2))

@@ -1,5 +1,5 @@
 // Alt Inst tests
-local b_controls reg2 reg3 reg4 sumshare_base
+local b_controls reg2 reg3 reg4 
 local extra_controls mfg_lfshare1940 mean_income_1940 cz_popdens1940
 
 use "$CLEANDATA/cz_pooled", clear
@@ -12,13 +12,13 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 	if "`outcome'"=="spdist" local outlab "Special districts" 
 	if "`outcome'"=="totfrac" local outlab "Main City Share" 
 	preserve
-		ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_sob_hat_raw GM_7r_hat_raw GM_r_hat_raw shift_share_base) `b_controls' [aw = popc1940], r partial(reg2 reg3 reg4)
+		ivreg2 n_`outcome'_cz_pc (GM_raw_pp = shift_share_black_sob shift_share_base_stres shift_share_base_rur shift_share_base) `b_controls' sumshare_base sumshare_base_stres sumshare_black_sob sumshare_base_rur [aw = popc1940], r partial(reg2 reg3 reg4)
 		local hansenj : di %4.2f e(jp)
 		
-		global spec1 (GM_raw_pp = GM_hat_raw)  `b_controls'
-		global spec2 (GM_raw_pp = GM_7r_hat_raw)  `b_controls'
-		global spec3 (GM_raw_pp = GM_r_hat_raw) `b_controls'
-		global spec4 (GM_raw_pp = GM_sob_hat_raw)  `b_controls'
+		global spec1 (GM_raw_pp = shift_share_base)  `b_controls' sumshare_base 
+		global spec2 (GM_raw_pp = shift_share_base_stres)  `b_controls' sumshare_base_stres 
+		global spec3 (GM_raw_pp = shift_share_base_rur) `b_controls' sumshare_base_rur
+		global spec4 (GM_raw_pp = shift_share_black_sob)  `b_controls' sumshare_black_sob 
 		
 		forval spec=1(1)4{
 			tempfile spec`spec'
@@ -60,13 +60,13 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 	if "`outcome'"=="spdist" local outlab "Special districts" 
 	if "`outcome'"=="totfrac" local outlab "Main City Share" 
 	preserve
-		ivreg2 n_`outcome'_cz_pc (GM_raw_pp = GM_sob_hat_raw GM_7r_hat_raw GM_r_hat_raw GM_hat_raw) `b_controls' `extra_controls' [aw = popc1940], r partial(reg2 reg3 reg4)
+		ivreg2 n_`outcome'_cz_pc (GM_raw_pp = shift_share_black_sob shift_share_base_stres shift_share_base_rur shift_share_base) `b_controls' `extra_controls' sumshare_base sumshare_base_stres sumshare_black_sob sumshare_base_rur [aw = popc1940], r partial(reg2 reg3 reg4)
 		local hansenj : di %4.2f e(jp)
 		
-		global spec1 (GM_raw_pp = GM_hat_raw)  `b_controls'  `extra_controls'
-		global spec2 (GM_raw_pp = GM_7r_hat_raw)  `b_controls' `extra_controls'
-		global spec3 (GM_raw_pp = GM_r_hat_raw) `b_controls' `extra_controls'
-		global spec4 (GM_raw_pp = GM_sob_hat_raw)  `b_controls' `extra_controls'
+		global spec1 (GM_raw_pp = shift_share_base)  `b_controls'  `extra_controls' sumshare_base 
+		global spec2 (GM_raw_pp = shift_share_base_stres)  `b_controls' `extra_controls' sumshare_base_stres 
+		global spec3 (GM_raw_pp = shift_share_base_rur) `b_controls' `extra_controls'   sumshare_base_rur
+		global spec4 (GM_raw_pp = shift_share_black_sob)  `b_controls' `extra_controls' sumshare_black_sob
 		
 		forval spec=1(1)4{
 			tempfile spec`spec'

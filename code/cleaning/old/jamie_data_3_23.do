@@ -1,8 +1,7 @@
 use "$CLEANDATA/cz_pooled", clear
 
 
-keep cz cz_name *pop* shift_share_base sumshare_base shift_share_base_white sumshare_base_white  GM_raw_pp WM_raw_pp reg2 reg3 reg4 n_cgoodman* n_schdist_ind* n_gen_muni* n_spdist* n_totfrac*  b_cgoodman* b_schdist_ind* b_gen_muni* b_spdist* b_totfrac* frac_total age* black* literate* labforce* occscore* prop_enclosed1940 avg_temp avg_precip has_port coastal m_rr_sqm_total transpo_cost_1920 maxcitypop  cz_popdens1940 mean_income_1940 mean_hv_1940 cz_popdens1940 court_order frac_court_ordered above_x_med growth3040 mfg_lfshare1940 hsgrad unigrad
-drop blackmig3539_share *_pcc *_ld l_*0 *0_2 *0_3 *0_4 *0_5 orig_* maxcitypop2010
+keep cz cz_name *pop* shift_share_base sumshare_base shift_share_base_white sumshare_base_white  GM_raw_pp WM_raw_pp reg2 reg3 reg4 n_cgoodman* n_schdist_ind* n_gen_muni* n_spdist* n_totfrac*  b_cgoodman* b_schdist_ind* b_gen_muni* b_spdist* b_totfrac* frac_total  occscore* prop_enclosed1940 avg_temp avg_precip has_port coastal m_rr_sqm_total transpo_cost_1920 maxcitypop  cz_popdens1940 mean_income_1940 mean_hv_1940 cz_popdens1940 court_order frac_court_ordered above_x_med growth1930 mfg_lfshare1940 hsgrad unigrad
 g any_court_ordered = frac_court_ordered > 0
 
 lab var prop_enclosed1940 "Proportion of main city enclosed"
@@ -10,21 +9,21 @@ lab var WM_raw_pp "Percentage Point Change in Urban White Population Share"
 lab var maxcitypop "Largest City Population"
 lab var mean_hv_1940 "Mean Home Value, 1940"
 forv y=1900(10)1930{
-	lab var labforce`y' "Proportion in Labor Force, `y'"
+	//lab var labforce`y' "Proportion in Labor Force, `y'"
 	lab var b_cgoodman_cz`y' "Base Earliest Year of Municipal Incorporation `y'"
 }
 forv y=1940(10)1970{
 	lab var popc`y' "Urban Population, `y'"
 	lab var bpopc`y' "Urban Black Population, `y'"
 	lab var pop`y' "Total Population, `y'"
-	lab var bpop`y' "Total Black Population, `y'"
+	cap lab var bpop`y' "Total Black Population, `y'"
 	lab var b_cgoodman_cz`y'_pc "Base Earliest Year of Municipal Incorporation P.C. `y'"
 
 }
 lab var wpopc1940 "Urban White Population, 1940"
 lab var wpopc1970 "Urban White Population, 1970"
-lab var wpop1940 "Total White Population, 1940"
-lab var wpop1970 "Total White Population, 1970"
+cap lab var wpop1940 "Total White Population, 1940"
+cap lab var wpop1970 "Total White Population, 1970"
 
 
 forv y=1940(10)1970{
@@ -45,9 +44,9 @@ lab var sumshare_base "\hat{GM} sum of shares"
 lab var sumshare_base_white "\hat{WM} sum of shares"
 lab var above_x_med "Above Median GM"
 
-save "$CLEANDATA/jamie_data_3_23", replace
+save "$CLEANDATA/jamie_data_4_13", replace
 
-
+asdf
 use jamie_data_3_23, clear
 
 local b_controls sumshare_base reg2 reg3 reg4 

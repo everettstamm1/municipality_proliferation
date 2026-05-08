@@ -188,8 +188,7 @@ merge 1:1 placefips statefips using "$CLEANDATA/place_education", nogen
 keep if in_cgoodman_data == 1
 
 ren czone cz
-merge m:1 cz using "$CLEANDATA/cz_pooled", keep(3) nogen keepusing(above_x_med dcourt cz cz_name GM_hat_raw_pp GM_raw_pp)
-keep if dcourt == 1
+merge m:1 cz using "$CLEANDATA/cz_pooled", keep(3) nogen keepusing(above_x_med cz cz_name GM_raw_pp shift_share_base)
 
 bys cz : egen cz_new_edpop1970 = total(place_edpop1970) if yr_incorp >=1940 & yr_incorp<=1970
 bys cz : egen cz_new_somehs1970 = total(place_somehs1970) if yr_incorp >=1940 & yr_incorp<=1970
@@ -231,9 +230,9 @@ preserve
 	ren PLACEFP placefips
 	ren STATEFP statefips
 	merge 1:1 cz statefips placefips using `incorps', keep(1 3) nogen
-	bys cz : egen cz_new_inc2010 = mean(mean_earnings_place) if (yr_incorp >= 1940 & yr_incorp <= 1970)
+	bys cz : egen cz_new_inc2010 = mean(mean_hh_inc_place) if (yr_incorp >= 1940 & yr_incorp <= 1970)
 	bys cz (cz_new_inc2010): replace cz_new_inc2010 = cz_new_inc2010[1]
-	ren mean_earnings_cz cz_inc2010
+	ren mean_hh_inc_cz cz_inc2010
 	keep cz cz_inc2010 cz_new_inc2010
 	duplicates drop
 	tempfile economic2010
@@ -266,7 +265,7 @@ restore
 merge m:1 cz using `economic1970', keep(1 3) nogen
 
 
-keep cz cz_name cz_* GM_* above_x_med
+keep cz cz_name cz_* GM_* above_x_med shift_share_base
 duplicates drop
 
 merge 1:1 cz using "$INTDATA/census/cz_education1970", keep(3) nogen

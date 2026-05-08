@@ -1,5 +1,5 @@
 
-local intvar above_med_occscorec_diff
+local intvar above_med_occscore_diff
 local controls reg2 reg3 reg4 mfg_lfshare1940 cz_popdens1940 mean_income_1940 sumshare_base sumshare_base_int `intvar'
 /* Now interacted with the chosen variable */
 // Generate interacted shares
@@ -257,7 +257,7 @@ foreach m in fs1 fs2 ols70 ols10 iv70 iv10{
 
 
 capture file close fh
-file open fh using "$TABS/RR/occscorec_diffs_interaction.tex", write replace
+file open fh using "$TABS/RR/occscore_diffs_interaction.tex", write replace
 file write fh "\begin{tabularx}{\textwidth}{l*{5}{>{\centering\arraybackslash}X}} \toprule \setlength{\tabcolsep}{15pt}" _n
 
  

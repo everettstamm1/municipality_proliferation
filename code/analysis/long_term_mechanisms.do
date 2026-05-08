@@ -1,7 +1,5 @@
 // IDEA: reghdfe med_hv_place exp_pc samp_dest above_x_med exp_pcXsamp_dest exp_pcXabove_x_med exp_pcXsamp_destXabove_x_med [aw=weight_pop], vce(cl cz)
 
-local b_controls reg2 reg3 reg4 
-local extra_controls 
 
 use "$CLEANDATA/mechanisms.dta", clear
 drop if badmuni==1 | mi(cz)
@@ -19,24 +17,22 @@ replace prop_white2010 = 100*prop_white2010
 replace mean_hh_inc_place = mean_hh_inc_place / 1000
 replace place_total = log(place_total)
 
-foreach m in  ols{
-	if "`m'"=="rf" local mod "Reduced Form"
-	if "`m'"=="iv" local mod "IV"
-	if "`m'"=="ols" local mod "OLS"
-
+foreach m in base imbal{
+	if "`m'" == "imbal" local ctrls reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940
+	if "`m'" == "base" local ctrls reg2 reg3 reg4
 	eststo clear
 	foreach covar of varlist prop_white2010 place_land mean_hh_inc_place  pct_rev_sa  pct_rev_ff landuse_sfr landuse_apartment  exclusive_district_shape {
 		local mname = subinstr("`covar'","landuse_", "",.)
 		lab var `covar' "`mname'"
 		
-		if "`m'"=="ols"{
+		
 						di "here3, m: `m', covar: `covar'"
 
 		su `covar' if above_x_med == 0 & samp_dest == 0 [aw = weight_pop]
 		local bdvw : di %6.2f r(mean)
-			 eststo `covar' : reghdfe `covar' samp_destXabove_x_med above_x_med  samp_dest  `b_controls' `extra_controls' [aw=weight_pop], vce(cl cz) 
-			 estadd scalar bdvw = `bdvw'
-		}
+		 eststo `covar' : reghdfe `covar' samp_destXabove_x_med above_x_med  samp_dest  `ctrls' [aw=weight_pop], vce(cl cz) 
+		 estadd scalar bdvw = `bdvw'
+		
 	}
 
 	esttab prop_white2010 place_land mean_hh_inc_place  pct_rev_sa  pct_rev_ff landuse_sfr landuse_apartment  exclusive_district_shape ///
@@ -47,7 +43,7 @@ foreach m in  ols{
 				prehead( \begin{tabularx}{\linewidth}{l*{8}{>{\centering\arraybackslash}X}} \toprule) postfoot(	\bottomrule \end{tabularx}) stats(  bdvw N, labels( "Omitted Category Avg." "Observations") fmt(2 0))
 
 }
-
+/*
 // Version for presentation
 use "$CLEANDATA/mechanisms.dta", clear
 drop if badmuni==1 | mi(cz)
@@ -86,3 +82,5 @@ esttab   pct_rev_sa  pct_rev_ff landuse_sfr landuse_apartment  exclusive_distric
 				mtitles("\shortstack{Special \\ Assessments}" "\shortstack{Fines and \\ Forfeitures}" "\shortstack{Single \\ Family}" "Apartments" "\shortstack{Exclusive \\ District}") ///
 				mgroups("\shortstack{Percentage of \\ Municipal Revenues}" "\shortstack{Percentage of \\ Municipal Land Uses}"  "\shortstack{Muni-District \\ Similarity}" ,pattern(1 0 1 0 1) prefix(\multicolumn{@span}{c}{) suffix(}) span erepeat(\cmidrule(lr){@span})) keep(samp_destXabove_?_med above_?_med samp_dest) b(%05.3f) se(%05.3f) ///
 				prehead( \begin{tabularx}{\textwidth}{l*{5}{>{\centering\arraybackslash}X}} \toprule) postfoot(	\bottomrule \end{tabularx}) stats(  bdvw N, labels( "Omitted Category Avg." "Observations") fmt(2 0))
+				
+				*/

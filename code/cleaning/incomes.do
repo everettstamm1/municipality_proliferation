@@ -22,30 +22,19 @@ foreach f in mo_il in_ne nv_sc sd_wy{
 
 save "$XWALKS/blockgroup_place_xwalk.dta", replace
 
-use city perwt stateicp countyicp incwage educd higrade using "$RAWDATA/census/usa_00064.dta", clear
+use city perwt stateicp countyicp incwage using "$RAWDATA/census/usa_00118.dta/usa_00118.dta" if incwage > 0 & incwage <=5000, clear
 
 ren city citycode
 
 replace citycode = 3540 if citycode == 3521 // Lebanon, PA rename
 
-merge m:1 citycode using "$INTDATA/dcourt/GM_city_final_dataset.dta",  keep(3) keepusing(citycode cz_name cz) nogen
+merge m:1 citycode using "$INTDATA/dcourt/GM_city_final_dataset.dta",  keep(3) keepusing(citycode cz_name cz) 
 ren citycode city
 
-replace incwage = . if incwage > 5001 | incwage == 0
 
-replace higrade = . if higrade == 0 | higrade == 99
-replace higrade = higrade - 3
-replace higrade = 0 if higrade < 0
-replace higrade = 16 if higrade > 16
+collapse (mean)  mean_income_1940=incwage , by(cz)
 
-g hsgrad = educd > 61
-g unigrad = educd > 100
-drop educd 
-
-
-collapse (mean)  hsgrad unigrad higrade mean_income_1940=incwage , by(cz)
-
-save "$INTDATA/census/incomes_and_education_1940", replace
+save "$INTDATA/census/incomes_1940", replace
 
 
 // 2010 Incomes

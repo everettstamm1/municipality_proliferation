@@ -92,7 +92,7 @@ prog def main_table_long_ssaggregate2
 	esttab ols70_cgoodman ols70_gen_muni ols70_schdist_ind ols70_spdist ols70_totfrac  ///
 		using "`path'", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel B: OLS 1940-1970}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel B: OLS 1950-1970}\\" "\cmidrule(lr){1-6}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(`endog' `endog2')
@@ -103,17 +103,17 @@ prog def main_table_long_ssaggregate2
 	esttab iv70_cgoodman iv70_gen_muni iv70_schdist_ind iv70_spdist iv70_totfrac ///
 		using "`path'", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel C: 2SLS 1940-1970}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel C: 2SLS 1950-1970}\\" "\cmidrule(lr){1-6}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(`endog' `endog2') ///
-		stats(dep_var70, labels("1940-70 Avg.") fmt(2))
+		stats(dep_var70, labels("1950-70 Avg.") fmt(2))
 		
 		// Panel D: OLS
 	esttab ols10_cgoodman ols10_gen_muni ols10_schdist_ind ols10_spdist ols10_totfrac ///
 		using "`path'", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel D: OLS 1940-2010}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel D: OLS 1950-2010}\\" "\cmidrule(lr){1-6}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(`endog' `endog2')
@@ -124,12 +124,12 @@ prog def main_table_long_ssaggregate2
 	esttab iv10_cgoodman iv10_gen_muni iv10_schdist_ind iv10_spdist iv10_totfrac ///
 		using "`path'", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel E: 2SLS 1940-2010}\\" "\cmidrule(lr){1-6}" ) ///
+		posthead("\cmidrule(lr){1-6}" "\multicolumn{5}{l}{Panel E: 2SLS 1950-2010}\\" "\cmidrule(lr){1-6}" ) ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
 		keep(`endog' `endog2') ///
 		postfoot(	\bottomrule \end{tabularx}) ///
-		stats(dep_var10 b_var Fs nobs, labels("1940-2010 Avg." "1940 Avg." "First Stage F-Stat" "Observations") fmt(2 2 2 0)) substitute("\midrule" "\cmidrule(lr){1-6}")
+		stats(dep_var10 b_var Fs nobs, labels("1950-2010 Avg." "1950 Avg." "First Stage F-Stat" "Observations") fmt(2 2 2 0)) substitute("\midrule" "\cmidrule(lr){1-6}")
 
 	eststo clear
 end

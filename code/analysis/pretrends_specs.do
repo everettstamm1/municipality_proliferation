@@ -1,22 +1,27 @@
 
 local b_controls reg2 reg3 reg4 sumshare_base
-local extra_controls cz_popdens1940 mean_income_1940 mfg_lfshare1940
- 
+local extra_controls mean_income_1940 cz_popdens1940 mfg_lfshare1940 
 
 use "$CLEANDATA/cz_pooled", clear
-ren pre_cgoodman_cz_pc npre_cgoodman_cz_pc
 lab var shift_share_base "$\widehat{GM}$"
 
-	eststo clear
 
-drop new_mfg_lfshare1940
-ren new_mfg_lfshare* mfg_lfshare*
+
+eststo clear
+
 	
 	
 forv y=1910(10)1950{
 	local y1 = `y' - 10
-	g p_occscorec`y' = (occscorec`y' - occscorec`y1')/occscorec`y1'
-	g growth`y' = (pop`y' - pop`y1')/pop`y1'
+	g p_occscore`y' = (occscore`y' - occscore`y1')/occscore`y1'
+	g p_occscorec`y' = 100*(occscorec`y' - occscorec`y1')/occscorec`y1'
+	//g p_occscorec`y' = (occscorec`y' - occscorec`y1')
+
+	//g p_occscorec`y' = occscorec`y1'
+	drop growth`y'
+	g growth`y' = 100*(popc`y' - popc`y1')/popc`y1'
+	//g growth`y' = log(popc`y') - log(popc`y1')
+	
 }
 forv spec = 1/3{
 		
@@ -42,7 +47,7 @@ forv spec = 1/3{
 			if "`t'" != "10" local t1 = `t'-10
 			if "`t'" == "10" local t1 = "00"
 
-			if "`outcome'" == "n" local y  n19`t'_cgoodman_cz_pc
+			if "`outcome'" == "n" local y  n19`t'_cgoodman_exact_cz_pc
 
 			if "`outcome'" == "growth" local y  growth19`t'
 
@@ -52,7 +57,6 @@ forv spec = 1/3{
 			local bmean : di %6.2f r(mean)
 			local bsd : di %6.2f r(sd)
 			
-			di"here"
 			if "`spec'" == "1" eststo mod`t'_`outcome' : reg `y' shift_share_base `b_controls'  [aw=popc1940], r
 			if "`spec'" == "2" eststo mod`t'_`outcome' : reg `y' shift_share_base `b_controls' mfg_lfshare19`t1' cz_popdens19`t1' mean_income_1940 [aw=popc1940], r
 			if "`spec'" == "3" eststo mod`t'_`outcome' : reg `y' shift_share_base `b_controls' `extra_controls' [aw=popc1940], r
@@ -75,23 +79,23 @@ forv spec = 1/3{
 					"\midrule" ///
 					"\multicolumn{4}{l}{Panel A: $\Delta$ Municipalities Per Capita}\\" "\cmidrule(lr){1-5}" ) ///
 			prehead( \begin{tabularx}{\textwidth}{l*{5}{>{\centering\arraybackslash}X}} \toprule ) ///
-		 keep(shift_share_base)  stats(basemean basesd , labels( "Dep. var. mean" "Dep. Var. Std Dev") fmt(2 2))
+		 keep(shift_share_base)  stats(basemean basesd N, labels( "Dep. var. mean" "Dep. Var. Std Dev" "Observations") fmt(2 2 0))
 		 
 		 
 		// Panel B: OLS
 	esttab mod10_growth mod20_growth mod30_growth mod40_growth  ///
 			using "$TABS/balancetables/pretrends_extended_update_`spec'.tex", ///
 			se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-			posthead("\midrule" "\multicolumn{4}{l}{Panel B: Population Growth}\\" "\cmidrule(lr){1-5}" ) ///
+			posthead("\midrule" "\multicolumn{4}{l}{Panel B: \%$\Delta$ Urban Population}\\" "\cmidrule(lr){1-5}" ) ///
 			b(%04.3f) se(%04.3f) ///
 			starlevels( * 0.10 ** 0.05 *** 0.01) ///
-			keep(shift_share_base) stats(basemean basesd , labels( "Dep. var. mean" "Dep. Var. Std Dev") fmt(2 2))
+			keep(shift_share_base) stats(basemean basesd N, labels( "Dep. var. mean" "Dep. Var. Std Dev" "Observations") fmt(2 2 0))
 			
 			// Panel E: 2SLS
-	esttab  mod10_p_occscorec mod20_p_occscorec mod30_p_occscorec mod40_p_occscorec ///
+	esttab  mod10_p_occscorec mod20_p_occscorec mod30_p_occscorec mod40_p_occscorec  ///
 			using "$TABS/balancetables/pretrends_extended_update_`spec'.tex", ///
 			se booktabs noconstant compress frag append noobs nonum nomtitle label ///
-			posthead("\midrule" "\multicolumn{5}{l}{Panel C: Occupation Scores}\\" "\cmidrule(lr){1-5}" ) ///
+			posthead("\midrule" "\multicolumn{4}{l}{Panel C: \%$\Delta$ Average Occupation Scores}\\" "\cmidrule(lr){1-5}" ) ///
 			b(%04.3f) se(%04.3f) ///
 			starlevels( * 0.10 ** 0.05 *** 0.01) ///
 			keep(shift_share_base) ///

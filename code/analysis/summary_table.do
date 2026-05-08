@@ -12,7 +12,7 @@ lab var shift_share_base "$\widehat{GM}$"
 lab var GM_raw_pp "GM"
 lab var sumshare_base "Sum of shares control"
 
-keep if dcourt == 1
+replace sumshare_base = 100 * sumshare_base
 // Create groups of variables
 local panel_A_vars n_cgoodman_cz_pc n_gen_muni_cz_pc n_schdist_ind_cz_pc n_spdist_cz_pc  n_totfrac_cz_pc
 local panel_B_vars GM_raw_pp shift_share_base
