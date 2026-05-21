@@ -1,5 +1,5 @@
 
-foreach d in 116{
+foreach d in 108 109 110 111 116 118{
 	
 	use perwt stateicp countyicp race city occscore year ind1950 using "$RAWDATA/census/usa_00`d'.dta/usa_00`d'.dta", clear
  	ren city citycode

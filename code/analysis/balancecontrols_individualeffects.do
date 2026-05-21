@@ -48,7 +48,7 @@ foreach outcome in cgoodman  spdist gen_muni totfrac schdist_ind{
 	
 	preserve
 	
-		ssaggregate n_`outcome'_cz_pc GM_raw_pp [aw=popc1940], n(origin_fips) l(cz) sfile("$INTDATA/ssaggregate_prep//shares_base.dta") controls("`controls' `covars'") s(share)
+		ssaggregate n_`outcome'_cz_pc GM_raw_pp [aw=popc1940], n(origin_fips) l(cz) sfile("$INTDATA/ssaggregate_prep//shares_base.dta") controls("`controls' `covars' n_streams_mi") s(share)
 		merge 1:1 origin_fips using "$INTDATA/ssaggregate_prep//shock_instrument_base.dta", keep(1 3) nogen
 		replace shift = 0 if mi(shift)
 		

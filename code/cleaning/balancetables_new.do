@@ -209,7 +209,7 @@ capture file close fh
 file open fh using "$TABS/balancetables/balancetable_pctile.tex", write replace
 file write fh "\begin{tabular}{l*{3}{c}} \toprule" _n
 
- file write fh "&\multicolumn{2}{c}{$\widehat{Percentile GM}$}&\multicolumn{1}{c}{Mean}\\\cmidrule(lr){2-3}\cmidrule(lr){4-4}"  _n
+ file write fh "&\multicolumn{2}{c}{Percentile  $\widehat{GM}$}&\multicolumn{1}{c}{Mean}\\\cmidrule(lr){2-3}\cmidrule(lr){4-4}"  _n
  
  file write fh "&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}\\" _n
  file write fh "\midrule " _n

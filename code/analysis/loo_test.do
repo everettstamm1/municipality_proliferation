@@ -1,7 +1,7 @@
 local b_controls reg2 reg3 reg4 sumshare_base
 local extra_controls mfg_lfshare1940 mean_income_1940 cz_popdens1940
 
-foreach outcome in spdist cgoodman gen_muni schdist_ind gen_town spdist totfrac{
+foreach outcome in  schdist_ind gen_town spdist totfrac spdist cgoodman gen_muni{
 	if "`outcome'"=="cgoodman" local outlab "C. Goodman municipalities" 
 	if "`outcome'"=="gen_muni" local outlab "CoG municipalities" 
 	if "`outcome'"=="schdist_ind" local outlab "School districts" 
@@ -11,6 +11,7 @@ foreach outcome in spdist cgoodman gen_muni schdist_ind gen_town spdist totfrac{
 	
 	
 	use "$CLEANDATA/cz_pooled", clear
+	keep if !mi(n_`outcome'_cz_pc)
 	labmask cz, values(cz_name)
 
 	// Getting full sample values

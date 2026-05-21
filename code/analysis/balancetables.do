@@ -105,7 +105,6 @@ local means avg_precip_mean avg_temp_mean n_streams_mean coastal_mean mfg_lfshar
 local covars_nss avg_precip_nss avg_temp_nss n_streams_nss coastal_nss mfg_lfshare1940_nss m_rr_sqm_total_nss transpo_cost_1920_nss frac_total_nss  hsgrad_nss unigrad_nss mean_income_1940_nss cz_popdens1940_nss growth3040_nss
 
 local pooled_covars_`samp'  ""
-keep if dcourt == 1
 foreach covar in `covars' {
 	local lab : variable label `covar'
 	g GM`covar' = GM_hat
