@@ -27,8 +27,8 @@ STEPS:
 	g origin_sample=(origin_state=="Alabama" | origin_state=="Arkansas" | origin_state=="Florida" | origin_state=="Georgia" | origin_state=="Kentucky"| origin_state=="Louisiana" | origin_state=="Mississippi" | origin_state=="North Carolina" | origin_state=="Oklahoma" | origin_state=="South Carolina" | origin_state=="Tennessee" | origin_state=="Texas" | origin_state=="Virginia" | origin_state=="West Virginia")
 	
 	g origin_sample_rural = origin_sample==1 & migcity5==0
-	g origin_sample_notx = origin_sample==1 | origin_state=="Texas"
-	g origin_sample_rural_notx = (origin_sample==1 | origin_state=="Texas") & migcity5==0
+	g origin_sample_notx = origin_sample==1 & origin_state!="Texas"
+	g origin_sample_rural_notx = (origin_sample==1 & origin_state!="Texas") & migcity5==0
 
 	drop if migcounty==9999
 	
@@ -57,7 +57,7 @@ STEPS:
 	replace southcountyicp_str="0050" if southcountyicp_str=="0053" & migplac5==22 // Possible typo with Jefferson Davis county coded as 53 instead of 50 in IPUMS Census extract. Recoded as 50.
 	gen gisjoin2_str = southstatefip_str + southcountyicp_str
 	
-	merge m:1 gisjoin2_str using "$XWALKS/county1940_crosswalks.dta", keepusing(fips state_name county_name)
+	merge m:1 gisjoin2_str using "$RAWDATA/dcourt/county1940_crosswalks.dta", keepusing(fips state_name county_name)
 	drop if _merge==2 // Drop counties that had no 1935-1940 migrants (1,162 total).
 	rename fips origin_fips
 	rename state_name origin_state_name
@@ -82,7 +82,7 @@ STEPS:
 	replace countyicp_str="0050" if countyicp_str=="0053" & statefip==22 // Possible typo with Jefferson Davis county coded as 53 instead of 50 in IPUMS Census extract. Recoded as 50.
 	gen gisjoin2_str = statefip_str + countyicp_str
 	
-	merge m:1 gisjoin2_str using "$XWALKS/county1940_crosswalks.dta", keepusing(fips state_name county_name)
+	merge m:1 gisjoin2_str using "$RAWDATA/dcourt/county1940_crosswalks.dta", keepusing(fips state_name county_name)
 	drop if _merge==2 // Drop counties that had no 1935-1940 migrants (1,162 total).
 	rename fips dest_fips
 	rename state_name dest_state_name
@@ -94,6 +94,8 @@ STEPS:
 	replace dest_state_name=proper(dest_state_name)
 	g dest_sample=1
 	replace dest_sample=0  if (dest_state_name=="Alabama" | dest_state_name=="Arkansas" | dest_state_name=="Florida" | dest_state_name=="Georgia" | dest_state_name=="Kentucky"| dest_state_name=="Louisiana" | dest_state_name=="Mississippi" | dest_state_name=="North Carolina" | dest_state_name=="Oklahoma" | dest_state_name=="South Carolina" | dest_state_name=="Tennessee" | dest_state_name=="Texas" | dest_state_name=="Virginia" | dest_state_name=="West Virginia")
+	g dest_sample_county = dest_sample if !mi(dest_fips)
+	
 	replace dest_sample=0 if city==9999
 	
 	g dest_sample_allcities = city!=9999 // Use with origin_sample_rural and origin_sample_rural_notx
@@ -142,4 +144,57 @@ STEPS:
 	g awh=(white==1 & age25plus==1 & grade_completed>=9)
 	g awl=(white==1 & age25plus==1 & grade_completed<9)	
 	
+	
+	g incwage_mi = incwage == 999998
+	replace grade_completed = 99 if mi(grade_completed)
+	g grade_mi = grade_completed == 99
+	g occscore_mi = occscore == 0
+	// Ind recode
+	g ind_cat = 1 if ind >=1 & ind <4 // Agriculture, Forestry, and Fishery
+	replace ind_cat = 2 if ind>=4 & ind <11 // Mining
+	replace ind_cat = 3 if ind == 11 // Construction
+	replace ind_cat = 4 if ind >=12 & ind < 73 // Manufacturing
+	replace ind_cat = 5 if ind >= 73 & ind < 90 // Transportation, Communication, Utilities
+	replace ind_cat = 6 if ind >= 90 & ind < 111 // Wholesale and retail
+	replace ind_cat = 7 if ind >=111 & ind < 114 // Finance, Insurance, Real Estate
+	replace ind_cat = 8 if ind >= 114 & ind < 118 // Business and Repair
+	replace ind_cat = 9 if ind >= 118 & ind < 122 // Personal Services
+	replace ind_cat = 10 if ind >= 122 & ind < 124 // Amusement
+	replace ind_cat = 11 if ind >= 124 & ind < 128 // Professional
+	replace ind_cat = 12 if ind >= 128 & ind < 132 // Government
+	replace ind_cat = 99 if mi(ind_cat)
+	
+	g ind_cat_mi = ind_cat == 99
+	/*
+	// Reweight
+	ebalance black occscore age grade_completed male grade_mi occscore_mi
+	ren _webal black_webal
+	
+	ebalance white occscore age grade_completed male grade_mi occscore_mi
+	ren _webal white_webal
+	
+	logit black occscore age grade_completed male grade_mi occscore_mi
+	predict pscore_black 
+	gen black_ipw = black/pscore_black + (1-black)/(1-pscore_black)
+	
+	logit white occscore age grade_completed male grade_mi occscore_mi
+	predict pscore_white 
+	gen white_ipw = white/pscore_white + (1-white)/(1-pscore_white)
+	drop pscore_*
+	*/
+	g origin_sample_sob = bpl == 1 | ///
+							bpl == 5 | ///
+							bpl == 12 | ///
+							bpl == 13 | ///
+							bpl == 21 | ///
+							bpl == 22 | ///
+							bpl == 28 | ///
+							bpl == 37 | ///
+							bpl == 40 | ///
+							bpl == 45 | ///
+							bpl == 47 | ///
+							bpl == 48 | ///
+							bpl == 51 | ///
+							bpl == 54
+	g all = black | white			
 	save "$INTDATA/dcourt/clean_IPUMS_1935_1940_extract_to_construct_migration_weights.dta", replace

@@ -1,0 +1,113 @@
+\documentclass{article}
+\usepackage{blindtext}
+\usepackage{booktabs}
+\usepackage[margin=0.25in]{geometry}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage{tikz}
+\usepackage{threeparttable}
+\usepackage{algorithmic}
+\usepackage{tabularx}
+
+\title{New ssaggregate tables}
+
+\begin{document}
+\maketitle
+\tableofcontents
+{\footnotesize 
+\listoffigures
+\listoftables}
+\clearpage
+
+\section{Main Updates}
+\begin{landscape}
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Total Black Balance}
+\footnotesize
+\input{tables/balancetables/balancetable_black.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Results, Black}
+\footnotesize
+\input{tables/final/black_ssaggregate.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{2010 Results, Black}
+\footnotesize
+\input{tables/final/black_ssaggregate_ld.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\linewidth]{figures/base_shifts.png}
+\end{figure}
+\clearpage
+
+\section{White Instrument}
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Total White  Balance}
+\footnotesize
+\input{tables/balancetables/balancetable_white.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Results, White}
+\footnotesize
+\input{tables/final/white_ssaggregate.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{2010 Results, White}
+\footnotesize
+\input{tables/final/white_ssaggregate_ld.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+
+\begin{figure}
+	\centering
+	\includegraphics[width=0.9\linewidth]{figures/base_white_shifts.png}
+\end{figure}
+\clearpage
+
+
+\section{Dropping Texas}
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Black Balance, No Texas}
+\footnotesize
+\input{tables/balancetables/balancetable_black_notx.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{White Balance, No Texas}
+\footnotesize
+\input{tables/balancetables/balancetable_white_notx.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Results, Black, Texas Dropped}
+\footnotesize
+\input{tables/final/black_notx_ssaggregate.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Results, White, Texas Dropped}
+\footnotesize
+\input{tables/final/white_notx_ssaggregate.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+\end{landscape}
+\end{document}

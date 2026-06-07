@@ -1,4 +1,45 @@
 
+import delimited using "$RAWDATA/census/nhgis0041_csv/nhgis0041_csv/nhgis0041_ts_nominal_county.csv", clear
+drop if statefp == 2 | statefp == 15 // drop alaska hawaii
+drop if statefp == 55 & countyfp == 1 & mi(b69aa1970)
+
+replace statefp = statefp*10
+replace countyfp = countyfp*10
+
+egen edpop = rowtotal(b69aa1970 b69ab1970 b69ac1970)
+egen somehs = rowtotal(b69ab1970 b69ac1970)
+g colgrad = b69ac1970
+g year = 1970
+
+keep year statefp countyfp edpop somehs colgrad
+
+ren statefp nhgisst
+ren countyfp nhgiscty
+
+
+merge 1:m year nhgisst nhgiscty using "$XWALKS/consistent_1940_1970", keep(3) nogen
+g cz_edpop1970 = edpop*weight
+g cz_somehs1970 = somehs*weight
+g cz_colgrad1970 = colgrad*weight
+
+
+collapse (sum) cz_edpop1970 cz_somehs1970 cz_colgrad1970, by(year nhgisst_1990 nhgiscty_1990)
+ren nhgisst_1990 statefip
+ren nhgiscty_1990 countyfip
+
+g cty_fips = statefip*100+countyfip/10
+
+merge m:1 cty_fips using "$XWALKS/cw_cty_czone", keep(3) nogen
+ren cty_fips fips
+ren czone cz
+
+drop if cz_edpop1970 ==.
+collapse (sum) cz_edpop1970 cz_somehs1970 cz_colgrad1970, by(cz)
+g cz_prop_somehs1970 = 100*(cz_somehs1970 / cz_edpop1970)
+g cz_prop_colgrad1970 = 100*(cz_colgrad1970 / cz_edpop1970)
+save "$INTDATA/census/cz_education1970", replace
+
+
 import delimited using "$RAWDATA/census/nhgis0019_csv/nhgis0019_ds94_1970_county.csv", clear
 drop if statea == 2 | statea == 15 // drop alaska hawaii
 
@@ -74,14 +115,58 @@ replace yr_incorp = yr_incorp-2
 tempfile incorps
 save `incorps'
 
+// Place education
+import delimited using "$RAWDATA/census/nhgis0041_csv/nhgis0041_csv/nhgis0041_ts_nominal_place.csv", clear
+
+egen place_edpop1970 = rowtotal(b69aa1970 b69ab1970 b69ac1970)
+egen place_somehs1970 = rowtotal(b69ab1970 b69ac1970)
+g place_colgrad1970 = b69ac1970
+
+
+duplicates tag placea statefp, gen(dup)
+drop if dup == 1 & regexm(name1970,"(U)")
+drop if placea == 625 & statefp == 12 // duplicate, from Florida so not used for us anyway
+drop if placea == 3052 & statefp == 27 & name1970 == "" // duplicate, dropping the one missing the name in 1970
+drop if placea== 1990 & statefp == 34 & name1980 == "GORDON@S CORNER %CDP<"
+keep place_* placea statefp
+ren placea placefips
+ren statefp statefips
+
+merge 1:1 placefips statefips using `incorps', keep(1 3) 
+g in_cgoodman_data = _merge == 3
+drop _merge
+
+save "$CLEANDATA/place_education.dta", replace
+
+
+// Place racepop
+import delimited using "$RAWDATA/census/nhgis0044_csv/nhgis0044_csv/nhgis0044_ds94_1970_place.csv", clear
+egen place_pop1970 = rowtotal(cbw*)
+g place_wpop1970 = cbw001
+g place_bpop1970 = cbw002
+
+ren placea placefips
+ren statea statefips
+keep place_* placefips statefips
+
+
+merge 1:1 placefips statefips using `incorps', keep(1 3) 
+g in_cgoodman_data = _merge == 3
+
+
 import delimited using "$RAWDATA/census/nhgis0027_csv/nhgis0027_csv/nhgis0027_ts_nominal_place.csv", clear
 egen place_pop1970 = rowtotal(b18aa1970 b18ab1970 b18ac1970 b18ad1970)
 g place_wpop1970 = b18aa1970
 g place_bpop1970 = b18ab1970
+g place_apop1970 = b18ad1970
 
 egen place_pop2010 = rowtotal(b18aa2010 b18ab2010 b18ac2010 b18ad2010)
 g place_wpop2010 = b18aa2010
 g place_bpop2010 = b18ab2010
+g place_apop2010 = b18ad2010
+
+g place_whaspop1970 = place_wpop1970 + place_apop1970
+g place_whaspop2010 = place_wpop2010 + place_apop2010
 
 // Dropping duplicated unincorporated towns
 duplicates tag placea statefp, gen(dup)
@@ -99,20 +184,27 @@ drop _merge
 
 save "$CLEANDATA/place_race_pop.dta", replace
 
+merge 1:1 placefips statefips using "$CLEANDATA/place_education", nogen
 keep if in_cgoodman_data == 1
 
 ren czone cz
-merge m:1 cz using "$CLEANDATA/cz_pooled", keep(3) nogen keepusing(above_x_med dcourt cz cz_name GM_hat_raw_pp GM_raw_pp)
-keep if dcourt == 1
+merge m:1 cz using "$CLEANDATA/cz_pooled", keep(3) nogen keepusing(above_x_med cz cz_name GM_raw_pp shift_share_base)
+
+bys cz : egen cz_new_edpop1970 = total(place_edpop1970) if yr_incorp >=1940 & yr_incorp<=1970
+bys cz : egen cz_new_somehs1970 = total(place_somehs1970) if yr_incorp >=1940 & yr_incorp<=1970
+bys cz : egen cz_new_colgrad1970 = total(place_colgrad1970) if yr_incorp >=1940 & yr_incorp<=1970
 
 bys cz : egen cz_new_pop1970 = total(place_pop1970) if yr_incorp >=1940 & yr_incorp<=1970
 bys cz : egen cz_new_bpop1970 = total(place_bpop1970) if yr_incorp >=1940 & yr_incorp<=1970
 bys cz : egen cz_new_wpop1970 = total(place_wpop1970) if yr_incorp >=1940 & yr_incorp<=1970
 
+bys cz (cz_new_edpop1970): replace cz_new_edpop1970 = cz_new_edpop1970[1]
+bys cz (cz_new_somehs1970): replace cz_new_somehs1970 = cz_new_somehs1970[1]
+bys cz (cz_new_colgrad1970): replace cz_new_colgrad1970 = cz_new_colgrad1970[1]
+
 bys cz (cz_new_pop1970): replace cz_new_pop1970 = cz_new_pop1970[1]
 bys cz (cz_new_bpop1970): replace cz_new_bpop1970 = cz_new_bpop1970[1]
 bys cz (cz_new_wpop1970): replace cz_new_wpop1970 = cz_new_wpop1970[1]
-
 
 bys cz : egen cz_new_pop2010 = total(place_pop2010) if yr_incorp >=1940 & yr_incorp<=1970
 bys cz : egen cz_new_bpop2010 = total(place_bpop2010) if yr_incorp >=1940 & yr_incorp<=1970
@@ -122,6 +214,8 @@ bys cz (cz_new_pop2010): replace cz_new_pop2010 = cz_new_pop2010[1]
 bys cz (cz_new_bpop2010): replace cz_new_bpop2010 = cz_new_bpop2010[1]
 bys cz (cz_new_wpop2010): replace cz_new_wpop2010 = cz_new_wpop2010[1]
 
+g cz_new_prop_somehs1970 = 100*(cz_new_somehs1970 / cz_new_edpop1970)
+g cz_new_prop_colgrad1970 = 100*(cz_new_colgrad1970 / cz_new_edpop1970)
 
 g cz_new_prop_white1970 = 100*(cz_new_wpop1970 / cz_new_pop1970)
 g cz_new_prop_white2010 = 100*(cz_new_wpop2010 / cz_new_pop2010)
@@ -141,19 +235,46 @@ preserve
 	ren mean_hh_inc_cz cz_inc2010
 	keep cz cz_inc2010 cz_new_inc2010
 	duplicates drop
-	tempfile economic
-	save `economic'
+	tempfile economic2010
+	save `economic2010'
 restore 
 
-merge m:1 cz using `economic', keep(1 3) nogen
-keep cz cz_name cz_* GM_* above_x_med
+merge m:1 cz using `economic2010', keep(1 3) nogen
+
+
+preserve
+	keep statefips placefips cz yr_incorp
+	tempfile incorps
+	save `incorps'
+	
+	use "$INTDATA/census/1970_hh_incomes_hv", clear
+	ren PLACEFP placefips
+	ren STATEFP statefips
+	merge 1:1 cz statefips placefips using `incorps', keep(1 3) nogen
+	replace agg_fam_inc_place1970 = . if (yr_incorp < 1940 & yr_incorp > 1970)
+	replace famcount = . if (yr_incorp < 1940 & yr_incorp > 1970)
+	collapse (sum) agg_fam_inc_place1970 famcount, by(cz agg_fam_inc_cz1970)
+	g cz_new_inc1970 = agg_fam_inc_place1970 / famcount
+	ren agg_fam_inc_cz1970 cz_inc1970
+	keep cz cz_inc1970 cz_new_inc1970
+	duplicates drop
+	tempfile economic1970
+	save `economic1970'
+restore 
+
+merge m:1 cz using `economic1970', keep(1 3) nogen
+
+
+keep cz cz_name cz_* GM_* above_x_med shift_share_base
 duplicates drop
 
+merge 1:1 cz using "$INTDATA/census/cz_education1970", keep(3) nogen
 merge 1:1 cz using "$INTDATA/census/cz_race_pop1970", keep(3) nogen
 merge 1:1 cz using "$INTDATA/census/cz_race_pop", keep(3) nogen
 
-keep if cz_new_prop_white1970 != . 
+//keep if cz_new_prop_white1970 != . 
 replace cz_name = "Louisville, KY/IN" if cz==13101
 
-
+replace cz_new_inc1970 = . if mi(cz_new_wpop1970)
+replace cz_inc1970 = . if mi(cz_new_wpop1970)
 save "$CLEANDATA/pcarrow_fig_data", replace

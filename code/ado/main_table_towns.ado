@@ -1,4 +1,4 @@
-cap prog drop main_table_towns
+cap prog drop main_table_towns_ssaggregate
 prog def main_table_towns
 	syntax, endog(varname) controls(varlist) exog(varname) weight(varname) path(string) deplab(string) [endog2(varlist) exog2(varlist) cgoodman(varlist) gen_muni(varlist) schdist_ind(varlist) gen_town(varlist) spdist(varlist) totfrac(varlist)]
 	
@@ -21,36 +21,31 @@ prog def main_table_towns
 		
 		// RF
 		eststo rf_`outcome' : reg `deplab'_`outcome'_cz_pc `exog' `exog2' `ctrls' [aw = `weight'], r
+		local N_`outcome' = e(N)
+
 		
-		// 2SLS 
-		eststo iv_`outcome' : ivreg2 `deplab'_`outcome'_cz_pc (`endog' `endog2' = `exog' `exog2') `ctrls' [aw = `weight'], r
-			estadd scalar Fs = `F'
-			estadd scalar dep_var = `dv'
-			estadd scalar b_var = `bv'
 		
-		if "`deplab'"=="ln"{
-			qui su b_`outcome'_cz1970,  d
-			estadd scalar real = r(mean)
-			predict y_hat, xb
-			replace y_hat = exp(y_hat)
-			qui su y_hat, d
-			estadd scalar pred = r(mean)
-			g temp = `endog'
-			replace `endog' = 0 
-			predict y_cf if e(sample)
-			replace y_cf = exp(y_cf)
-			qui su y_cf, d
-			estadd scalar cf = r(mean)
-			local stats `"Fs dep_var b_var real pred cf N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Mean Real 1970 Count"  "Mean Predicted 1970 count" "Mean CF 1970 Count" "Observations") fmt(2 2 2 2 2 2 0)"'
-			replace `endog' = temp
-			drop y_hat y_cf temp
-			
-		}
-		else{
-			local stats `"Fs dep_var b_var N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0)"'
-		}
+		
 
 	}
+	// 2SLS 
+	preserve 
+		ssaggregate `deplab'_`outcome'_cz_pc  `endog' [aw=`weight'], n(`origin_id') l(cz) sfile("`share_folder'/shares_`version'.dta") controls("`ctrls'") s(share)
+		
+		merge 1:1 `origin_id' using "`share_folder'/shock_instrument_`version'.dta", keep(1 3) nogen
+		replace shift = 0 if mi(shift)
+		lab var shift "`xlab'"
+		
+		foreach outcome in   gen_town  {
+			eststo iv_`outcome': ivreg2 `deplab'_`outcome'_cz_pc (`endog' `endog2' = shift) [aw = s_n]
+			estadd scalar Fs = `F_`outcome''
+			estadd scalar dep_var = `dv_`outcome''
+			estadd scalar b_var = `bv_`outcome''
+			estadd scalar nobs = `N_`outcome''
+		}
+	restore
+	
+	local stats `"Fs dep_var b_var N, labels("First Stage F-Stat" "Dep. Var. Mean" "1940 Dep. Var. Mean" "Observations") fmt(2 2 2 0)"'
 
 	// Panel A: First Stage
 	esttab fs_gen_town      ///

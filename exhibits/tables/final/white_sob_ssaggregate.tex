@@ -1,0 +1,30 @@
+ \begin{tabularx}{\textwidth}{l*{6}{>{\centering\arraybackslash}X}} \toprule \setlength{\tabcolsep}{15pt}
+&\multicolumn{1}{c}{C. Goodman}&\multicolumn{4}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-6}\cmidrule(lr){7-7}
+&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Townships}&\multicolumn{1}{c}{Special districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-6}\cmidrule(lr){7-7}
+&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}&\multicolumn{1}{c}{(6)}\\
+\cmidrule(lr){1-7}
+\multicolumn{6}{l}{Panel A: First Stage}\\
+\cmidrule(lr){1-7}
+(sum) shift\_share&   -2.192   &   -2.192   &    3.466   &   -2.192   &   -2.192   &   -2.192   \\
+                &  (6.792)   &  (6.792)   &  (6.227)   &  (6.792)   &  (6.792)   &  (6.792)   \\
+\cmidrule(lr){1-7}
+\multicolumn{6}{l}{Panel B: OLS}\\
+\cmidrule(lr){1-7}
+WM\_tot\_sob      &   -0.017***&   -0.018***&    0.217***&   -0.016***&   -0.011   &    0.230   \\
+                &  (0.004)   &  (0.005)   &  (0.080)   &  (0.006)   &  (0.010)   &  (0.194)   \\
+\cmidrule(lr){1-7}
+\multicolumn{6}{l}{Panel C: Reduced Form}\\
+\cmidrule(lr){1-7}
+(sum) shift\_share&    0.259   &    0.390*  &  -22.485***&    0.068   &   -0.530   &   11.413   \\
+                &  (0.219)   &  (0.231)   &  (7.094)   &  (0.463)   &  (0.432)   &  (9.524)   \\
+\cmidrule(lr){1-7}
+\multicolumn{6}{l}{Panel D: 2SLS}\\
+\cmidrule(lr){1-7}
+WM\_tot\_sob      &   -0.118   &   -0.178   &   -6.488   &   -0.031   &    0.242   &   -5.207   \\
+                &  (0.633)   &  (0.958)   & (22.933)   &  (0.224)   &  (1.304)   & (27.117)   \\
+\midrule
+First Stage F-Stat&     0.10   &     0.10   &     0.31   &     0.10   &     0.10   &     0.10   \\
+Dep. Var. Mean  &    -0.26   &    -0.33   &   -12.95   &    -0.57   &     0.64   &    -3.37   \\
+1940 Dep. Var. Mean&     1.49   &     1.61   &    14.09   &     2.29   &     0.89   &    32.86   \\
+Observations    &      130   &      130   &      118   &      130   &      130   &      130   \\
+ \bottomrule \end{tabularx}

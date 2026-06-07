@@ -1,40 +1,150 @@
+
+local b_controls reg2 reg3 reg4 sumshare_base
+local extra_controls mean_income_1940 cz_popdens1940 mfg_lfshare1940
 use "$CLEANDATA/cz_pooled", clear
-
-g GM_raw_pp_2 = GM_raw_pp^2
-g GM_hat_raw_2 = GM_hat_raw^2
-
-qui su prop_enclosed, d
-g above_med_enclosed = prop_enclosed >= `r(p50)'
-
-g GM_X_above_med_enclosed = GM_raw_pp * above_med_enclosed
-g GM_hat_X_above_med_enclosed = GM_hat_raw * above_med_enclosed
+lab var GM_raw_pp "GM"
+g popgrowth4070 = (pop1970 - pop1940)/pop1940
 
 
-foreach controls in reg2 reg3 reg4 v2_sumshares_urban coastal transpo_cost_1920 mfg_lfshare1940{
-		g `controls'_X_ame = `controls' * above_med_enclosed
+
+
+
+// Two ref requests
+foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
+	drop n_`outcome'_cz_pc ld_`outcome'_cz_pc
+	ren n_`outcome'_cz_ld n_`outcome'_cz_pc
+	ren ld_`outcome'_cz_ld ld_`outcome'_cz_pc
+	
+}
+main_table_long_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' `extra_controls' ) weight(popc1940) path("$TABS/final/refspec_1.tex") 	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
+
+foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
+	drop n_`outcome'_cz_pc ld_`outcome'_cz_pc
+	ren pct_`outcome'_cz_pc n_`outcome'_cz_pc
+	ren  pct_ld_`outcome'_cz_pc ld_`outcome'_cz_pc
+	
+}
+main_table_long_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' `extra_controls' ) weight(popc1940) path("$TABS/final/refspec_2.tex") 	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
+
+
+// Population dilution
+foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
+	drop n_`outcome'_cz_pc ld_`outcome'_cz_pc
+	ren decomp_`outcome'_cz_pc n_`outcome'_cz_pc
+	ren decomp_ld_`outcome'_cz_pc ld_`outcome'_cz_pc
+	
+}
+main_table_long_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' `extra_controls' ) weight(popc1940) path("$TABS/final/pop_dilution.tex") 	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
+
+
+// Raw Differences
+foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
+	drop n_`outcome'_cz_pc ld_`outcome'_cz_pc
+	ren n_`outcome'_cz1970 n_`outcome'_cz_pc
+	ren  n_`outcome'_cz2010 ld_`outcome'_cz_pc
+	
 }
 
 
-poisson_table, endog(GM_raw_pp) exog(GM_hat_raw) type("manual") controls(reg2 reg3 reg4 v2_sumshares_urban) weight(popc1940) path("$TABS/poisson/poisson_table.tex") schdist_ind(coastal transpo_cost_1920 mfg_lfshare1940) startyr("1940") endyr("1970")
-
-poisson_table, endog(GM_raw_pp) exog(GM_hat_raw) type("manual") controls(reg2 reg3 reg4 v2_sumshares_urban wt_instmig_avg_pp) weight(popc1940) path("$TABS/poisson/poisson_table_eurmig.tex") schdist_ind(coastal transpo_cost_1920 mfg_lfshare1940) startyr(1940) endyr(1970)
+main_table_long_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' `extra_controls' ) weight(popc1940) path("$TABS/final/rawdiff.tex") 	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
 
 
-// Not converging
-poisson_table, endog(GM_raw_pp) exog(GM_hat_raw) type("manual") controls(reg2 reg3 reg4 v2_sumshares_urban) weight(popc1940) path("$TABS/poisson/poisson_table_ld.tex") schdist_ind(coastal transpo_cost_1920 mfg_lfshare1940)  startyr(1940) endyr(2010)
+// 1970 p.c. base outcome
+foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
+	drop n_`outcome'_cz_pc ld_`outcome'_cz_pc
+	ren b_`outcome'_cz1970_pc n_`outcome'_cz_pc
+	ren  b_`outcome'_cz2010_pc ld_`outcome'_cz_pc
+	
+}
+
+main_table_long_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' `extra_controls' ) weight(popc1940) path("$TABS/final/b70_pc.tex") 	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips") cgoodman("b_cgoodman_cz1940_pc") gen_muni("b_gen_muni_cz1940_pc") schdist_ind("b_schdist_ind_cz1940_pc") spdist("b_spdist_cz1940_pc") totfrac("b_totfrac_cz1940_pc")
+use "$CLEANDATA/cz_pooled", clear
+
+// 1970 base outcome
+foreach outcome in cgoodman schdist_ind gen_town spdist gen_muni totfrac {
+	drop n_`outcome'_cz_pc ld_`outcome'_cz_pc
+	ren b_`outcome'_cz1970 n_`outcome'_cz_pc
+	ren  b_`outcome'_cz2010 ld_`outcome'_cz_pc
+	
+}
 
 
-poisson_table, endog(GM) exog(GM_hat) type("manual") controls(reg2 reg3 reg4 v2_sumshares_urban) weight(popc1940) path("$TABS/poisson/poisson_table_pctile.tex") schdist_ind(coastal transpo_cost_1920 mfg_lfshare1940)  startyr(1940) endyr(1970)
+main_table_long_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940 ) weight(popc1940) path("$TABS/final/b70.tex") 	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips") cgoodman("b_cgoodman_cz1940") gen_muni("b_gen_muni_cz1940") schdist_ind("b_schdist_ind_cz1940") spdist("b_spdist_cz1940") totfrac("b_totfrac_cz1940")
+
+main_table_long_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b_controls' `extra_controls' popgrowth4070) weight(popc1940) path("$TABS/final/b70_growth.tex") 	version("base")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips") cgoodman("b_cgoodman_cz1940_pc") gen_muni("b_gen_muni_cz1940_pc") schdist_ind("b_schdist_ind_cz1940_pc") spdist("b_spdist_cz1940_pc") totfrac("b_totfrac_cz1940_pc")
+
+use "$CLEANDATA/cz_pooled", clear
+lab var GM_raw_pp "GM"
+g popgrowth4070 = (pop1970 - pop1940)/pop1940
+
+// Poisson Versions
+replace b_schdist_ind_cz1940 = . if region == 3
+replace b_schdist_ind_cz1970 = . if region == 3
+replace b_schdist_ind_cz2010 = . if region == 3
 
 
-// Not converging
-poisson_table, endog(WM_raw_pp) exog(GM_8_hat_raw) type("manual") controls(reg2 reg3 reg4 v2_sumshares_urban) weight(popc1940) path("$TABS/poisson/poisson_table_white.tex") schdist_ind(coastal transpo_cost_1920 mfg_lfshare1940)  startyr(1940) endyr(1970)
 
 
-poisson_table, endog(GM_raw_pp) exog(GM_hat_raw) type("manual") controls(reg2 reg3 reg4 v2_sumshares_urban) weight(popc1940) path("$TABS/poisson/poisson_table_1950.tex") schdist_ind(coastal transpo_cost_1920 mfg_lfshare1940)  startyr(1950) endyr(1970)
+replace pop1970 = pop1970/10000
+// Poisson, baseline control, no exposure 
+g noexposure = 1
+poisson_table_long, endog(GM_raw_pp) exog(shift_share_base) exposure_70(noexposure) exposure_10(noexposure) controls(reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940) weight(popc1940) path("$TABS/poisson/poisson_table_base.tex") cgoodman(b_cgoodman_cz1940) gen_muni(b_gen_muni_cz1940)  schdist_ind(b_schdist_ind_cz1940)  spdist(b_spdist_cz1940)
 
 
-poisson_table, endog(GM_raw_pp GM_raw_pp_2) exog(GM_hat_raw GM_hat_raw_2) type("manual") controls(reg2 reg3 reg4 v2_sumshares_urban) weight(popc1940) path("$TABS/poisson/poisson_table_quad.tex") schdist_ind(coastal transpo_cost_1920 mfg_lfshare1940)  startyr(1950) endyr(1970)
+
+// Poisson, baseline and pop growth control, no exposure
+poisson_table_long, endog(GM_raw_pp) exog(shift_share_base) exposure(noexposure) controls(reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940 popgrowth4070) weight(popc1940) path("$TABS/poisson/poisson_table_base_popgrowth.tex") cgoodman(b_cgoodman_cz1940) gen_muni(b_gen_muni_cz1940)  schdist_ind(b_schdist_ind_cz1940)  spdist(b_spdist_cz1940)
+
+// Poisson, baseline P.C. control, 1970 pop exposure
+
+foreach spec in cgoodman gen_muni schdist_ind spdist{
+	g basepos_`spec' = b_`spec'_cz1940_pc > 0 if !mi(b_`spec'_cz1940_pc)
+	gen ln_`spec'_base = cond(basepos_`spec', ln(b_`spec'_cz1940_pc), -5)
+}
+
+poisson_table_long, endog(GM_raw_pp) exog(shift_share_base) exposure_70(pop1970) exposure_10(pop2010) controls(reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940) weight(popc1940) path("$TABS/poisson/poisson_table_exposure.tex")  cgoodman(ln_cgoodman_base basepos_cgoodman) gen_muni(ln_gen_muni_base basepos_gen_muni)  schdist_ind(ln_schdist_ind_base basepos_schdist_ind)  spdist(ln_spdist_base basepos_spdist)
+
+g struc_exposure70 = exp(log(pop1970) - log(pop1940))
+g struc_exposure10 = exp(log(pop2010) - log(pop1940))
+poisson_table_long, endog(GM_raw_pp) exog(shift_share_base) exposure_70(struc_exposure70) exposure_10(struc_exposure10) controls(reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940) weight(popc1940) path("$TABS/poisson/poisson_table_structural_exposure.tex")  cgoodman_exposure(b_cgoodman_cz1940) gen_muni_exposure(b_gen_muni_cz1940)  schdist_ind_exposure(b_schdist_ind_cz1940)  spdist_exposure(b_spdist_cz1940)
+
+g test = log(struc_exposure70) + log(b_cgoodman_cz1940)
+
+ivpoisson cfunction b_cgoodman_cz1970 (GM_raw_pp = shift_share_base) reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940 [aw=popc1940], vce(r) offset(test)
 
 
-poisson_table, endog(GM_raw_pp GM_X_above_med_enclosed) exog(GM_hat_raw GM_hat_X_above_med_enclosed) type("manual") controls(reg2 reg3 reg4 v2_sumshares_urban reg2_X_ame reg3_X_ame reg4_X_ame v2_sumshares_urban_X_ame) weight(popc1940) path("$TABS/poisson/poisson_table_ame.tex") schdist_ind(coastal transpo_cost_1920 mfg_lfshare1940 coastal_X_ame transpo_cost_1920_X_ame mfg_lfshare1940_X_ame)  startyr(1940) endyr(1970)
+
+use "$CLEANDATA/cz_pooled", clear
+keep cz b_cgoodman_cz1940 b_gen_muni_cz1940 b_schdist_ind_cz1940 b_spdist_cz1940 b_cgoodman_cz1970 b_gen_muni_cz1970 b_schdist_ind_cz1970 b_spdist_cz1970 GM_raw_pp reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940 pop1940 pop1970 popc1940 shift_share_base
+rename b_*_1940 b_*1
+rename b_*_1970 b_*2
+
+
+g test2 = log(struc_exposure10) + log(b_cgoodman_cz1940)
+ivpoisson cfunction b_cgoodman_cz2010 (GM_raw_pp = shift_share_base) reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940 [aw=popc1940], vce(r) offset(test2)
+
+poisson_table_long, endog(GM_raw_pp) exog(shift_share_base) exposure(pop1970) controls(reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940) weight(popc1940) path("$TABS/poisson/poisson_table_exposure.tex")  cgoodman(ln_cgoodman_base basepos_cgoodman) gen_muni(ln_gen_muni_base basepos_gen_muni)  schdist_ind(ln_schdist_ind_base basepos_schdist_ind)  spdist(ln_spdist_base basepos_spdist)
+
+
+
+ivreg2  n_schdist_ind_cz_pc (GM_raw_pp = shift_share_base) reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940  [aw = popc1940] , r partial(reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940 )
+
+
+
+ivpoisson gmm b_cgoodman_cz1970 (GM_raw_pp = shift_share_base) reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940 b_cgoodman_cz1940  [aw = popc1940], vce(r) 
+ivpoisson gmm b_gen_muni_cz1970 (GM_raw_pp = shift_share_base) reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940 b_gen_muni_cz1940  [aw = popc1940], vce(r) 
+ivpoisson gmm b_schdist_ind_cz1970 (GM_raw_pp = shift_share_base) reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940 b_schdist_ind_cz1940  [aw = popc1940] if region != 3, vce(r) 
+ivpoisson gmm b_spdist_cz1970 (GM_raw_pp = shift_share_base) reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940 b_spdist_cz1940  [aw = popc1940], vce(r) 
+
+ivpoisson gmm b_cgoodman_cz1970 (GM_raw_pp = shift_share_base) reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940 ln_cgoodman_base basepos_cgoodman [aw = popc1940], vce(r) exposure(pop1970)
+ivpoisson gmm b_gen_muni_cz1970 (GM_raw_pp = shift_share_base) reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940 ln_gen_muni_base basepos_gen_muni [aw = popc1940], vce(r) exposure(pop1970)
+ivpoisson gmm b_schdist_ind_cz2010 (GM_raw_pp = shift_share_base) reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940 ln_schdist_ind_base basepos_schdist_ind [aw = popc1940] if region != 3 , vce(r) exposure(pop1970) 
+ivpoisson cfunction b_spdist_cz1970 (GM_raw_pp = shift_share_base) reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940 ln_spdist_base basepos_spdist [aw = popc1940], vce(r) exposure(pop1970)
+
+ivpoisson gmm b_schdist_ind_cz1970 (GM_raw_pp = shift_share_base) reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940 ln_schdist_ind_base basepos_schdist_ind [aw = popc1940] if region != 3, vce(r) exposure(pop1970) 
+
+g r1  = b_schdist_ind_cz1940 / (pop1940/10000)
+g r2 = b_schdist_ind_cz1970 / (pop1940/10000)
+g dr = r2 - r1 
+ivreg2  dr (GM_raw_pp = shift_share_base) reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940  [aw = popc1940] , r 
+ivreg2  r2 (GM_raw_pp = shift_share_base) reg2 reg3 reg4 sumshare_base mean_income_1940 mfg_lfshare1940 cz_popdens1940 r1 [aw = popc1940] , r 

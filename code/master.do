@@ -1,4 +1,6 @@
+
 clear all
+set seed 20260409     	
 
 // Flag to run
 local run = 1
@@ -15,7 +17,7 @@ if "`c(username)'"=="Everett Stamm"{
 	gl use_gzuse = 0
 }
 if "`c(username)'"=="edog9"{
-	gl DROPBOX `"D:\municipality_proliferation"'
+	gl DROPBOX `"F:\municipality_proliferation"'
 	gl REPO "/Users/edog9/Documents/Github/municipality_proliferation/"
 	gl FFMPEG "/Users/edog9/ffmpeg/bin/ffmpeg.exe"
 	gl Rterm_path `"C:/Program Files/R/R-4.3.1/bin/x64/Rterm.exe"'
@@ -70,90 +72,88 @@ export delimited "$REPO/paths.csv", replace
 
 
 if `run_dcourt'==1{
-	
-	
+
+
 	/* These are no longer needed
 	// Files I made to create data necessary for stacked derenoncourt
 	do "$CODE/dcourt_setup/A1_census_1950_1960_racepop.do"
 	do "$CODE/dcourt_setup/A2_clean_cz_mobility_1900_2015.do"
-
-
 	do "$CODE/dcourt_setup/4_final_dataset_split.do"
 	*/
 	do "$CODE/dcourt_setup/A4_clean_city_population_census_1940_full.do"
 	do "$CODE/dcourt_setup/A5_clean_cz_snq_european_immigration_instrument.do"
 	// Original derenoncourt final dataset, modified to drop data we don't need and reformat variables to what we need (e.g. percentage point instead of percentile instruments)
 	do "$CODE/cleaning/4_final_dataset.do"
-	
+
 }
 
 
 
 
 if `run'==1{
-	
+
 	// CLEANING
-		
+
 	// Cleaning CoG data
 	do "$CODE/cleaning/cog_cleaning.do"
-	
+
 	// Urban populations
 	do "$CODE/cleaning/census_urban_populations.do"
-	
+
 	// Race populations
 	do "$CODE/cleaning/census_race_cleaning.do"
-	
+
 	// GIS work
 	rsource using "$CODE/cleaning/cgoodman_place_county_geog.R"
 	rsource using "$CODE/cleaning/covariates.R"
 
 	// Fraction land incorporated geographies
 	do "$CODE/cleaning/geogs.do"
-	
+
 	// Municipal Finance cleaning
 	do "$CODE/cleaning/IndFin_cleaning.do"
-	
+
 	// Harmonizing datasets
 	do "$CODE/cleaning/dataprep.do"
 
 	// Figure A data
 	do "$CODE/cleaning/panel_a_data.do"
-	
+
 	// PCArrow Fig Data
 	do "$CODE/cleaning/pcarrow_fig_data.do"
-	
+
 	// Municipal Shapefile
 	rsource using "$CODE/cleaning/municipal_shapefile.R"
-	
+
 	// Analysis
-	
+
 	// Summary table
 	do "$CODE/analysis/summary_table.do"
-	
+
 	// Long term mechanisms: land use and municipal finance
 	do "$CODE/analysis/long_term_mechanisms.do"
-	
+
 	// PCArrow Figure
 	do "$CODE/analysis/pcarrow_fig.do"
-	
+
 	// Balance and pretrend tables
 	do "$CODE/analysis/balancetables.do"
-	
+
 	// Main tables and all variants
 	do "$CODE/analysis/main_table.do"
-	
+
 	// Leave one out tests
 	do "$CODE/analysis/loo_test.do"
-	
+
 	// Placebo tests
 	do "$CODE/analysis/placebo_test"
-	
+
 	// Alternative Instrument tests
 	do "$CODE/analysis/alt_inst_tests"
-	
+
 	// Motivating figures
 	do "$CODE/analysis/fig_1_panels_b_c"
-	
+
 	// In text calculations
 	do "$CODE/analysis/in_text_calculations"
 }

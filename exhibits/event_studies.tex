@@ -1,0 +1,169 @@
+\documentclass{article}
+\usepackage{blindtext}
+\usepackage{booktabs}
+\usepackage[margin=0.25in]{geometry}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage{tikz}
+\usepackage{threeparttable}
+\usepackage{algorithmic}
+\usepackage{tabularx}
+\usepackage{amsmath}
+
+\title{New Exhibits for AEJ Revisions}
+
+\begin{document}
+\maketitle
+\tableofcontents
+{\footnotesize 
+\listoffigures
+\listoftables}
+\clearpage
+
+\section{TWFE Plots}
+
+These figures are the $\beta_\tau$'s from the TWFE regression
+\begin{align}
+	y_{it} = \sum_{\tau = 1910}^{2010} \beta_\tau \text{Above Med GM}_{i} \times 1\{t = \tau\} + \gamma_i + \delta_t + \epsilon_{it}
+\end{align}
+Where $\delta_t$ and $\gamma_i$ are decade and CZ fixed effects. Sometimes controls are included.
+
+\clearpage
+\begin{figure}
+	\centering
+	 \includegraphics[width=0.7\linewidth]{figures/RR2/twfe_main.png}
+	\caption{TWFE, No controls}
+
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	 \includegraphics[width=0.7\linewidth]{figures/RR2/twfe_sumshare_base.png}
+	\caption{TWFE, year X sum of shares controls}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	 \includegraphics[width=0.7\linewidth]{figures/RR2/twfe_popgrowth.png}
+	\caption{TWFE, year X population growth controls}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	 \includegraphics[width=0.7\linewidth]{figures/RR2/twfe_regions.png}
+	\caption{TWFE, year X census region FEs}
+\end{figure}
+
+\clearpage
+\section{Repeated Cross Section Plots}
+
+These figures are the $\beta_t$'s from running the 2SLS regression of $t-10$ to $t$ changes $y_{it}$ on 1940-70 GM. 
+\begin{align}
+	y_{it} = \alpha_i + \beta_t GM_i + \mathbf{X}_i' \zeta_t + \epsilon_{it}
+\end{align}
+Where $X_i$ are the covariates in our main specification.
+
+
+\clearpage
+\begin{figure}
+	\centering
+	 \includegraphics[width=0.7\linewidth]{figures/RR2/es_by_year.png}
+	\caption{Repeated Cross Section, $\Delta$ munis P.C.}
+
+\end{figure}
+\clearpage
+
+\begin{figure}
+	\centering
+	 \includegraphics[width=0.7\linewidth]{figures/RR2/es_by_year_pct.png}
+	\caption{Repeated Cross Section, $\frac{n_{70} - n_{40}}{Pop_{40}}$}
+\end{figure}
+
+\begin{figure}
+	\centering
+	 \includegraphics[width=0.7\linewidth]{figures/RR2/es_by_year_decomp.png}
+	\caption{Repeated Cross Section, Population Dilution Term}
+\end{figure}
+
+\begin{figure}
+	\centering
+	 \includegraphics[width=0.7\linewidth]{figures/RR2/es_by_year_popgrowth.png}
+	\caption{Repeated Cross Section, Population Growth}
+\end{figure}
+\clearpage
+\section{Decadal 2SLS plots, Panel}
+This table comes from creating a separate X and IV for each decade 1940-50, 1950-60, and 1960-1970, then performing the 2SLS regression as a stacked panel. 
+\begin{align}
+	y_{it} =  \beta GM_{it} + \mathbf{X}_i' \zeta_t + \delta_t + \epsilon_{it}
+\end{align}
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Panel IV}
+\begin{threeparttable}
+\footnotesize
+\input{tables/RR2/panel_IV.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\section{Decadal 2SLS plots, Split}
+These figures come from creating a separate X and IV for each decade 1940-50, 1950-60, and 1960-1970, then performing the 2SLS regression separately for each year.  
+\begin{align}
+	y_{it} =  \beta_t GM_{it} + \mathbf{X}_i' \zeta_t + \delta_t + \epsilon_{it}
+\end{align}
+
+
+\clearpage
+\begin{figure}
+	\centering
+	 \includegraphics[width=0.7\linewidth]{figures/RR2/cgoodman_split_IV.png}
+	\caption{Decadal 2SLS, C.Goodman Munis}
+
+\end{figure}
+
+
+\clearpage
+\begin{figure}
+	\centering
+	 \includegraphics[width=0.7\linewidth]{figures/RR2/gen_muni_split_IV.png}
+	\caption{Decadal 2SLS, CoG Munis}
+
+\end{figure}
+
+
+\clearpage
+\begin{figure}
+	\centering
+	 \includegraphics[width=0.7\linewidth]{figures/RR2/schdist_ind_split_IV.png}
+	\caption{Decadal 2SLS, School Districts}
+
+\end{figure}
+
+
+\clearpage
+\begin{figure}
+	\centering
+	 \includegraphics[width=0.7\linewidth]{figures/RR2/spdist_split_IV.png}
+	\caption{Decadal 2SLS, Special Districts}
+
+\end{figure}
+
+\clearpage
+\begin{figure}
+	\centering
+	 \includegraphics[width=0.7\linewidth]{figures/RR2/totfrac_split_IV.png}
+	\caption{Decadal 2SLS, Main City Share}
+
+\end{figure}
+\clearpage
+
+
+
+\end{document}

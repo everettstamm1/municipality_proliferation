@@ -1,0 +1,280 @@
+\documentclass{article}
+\usepackage{blindtext}
+\usepackage{booktabs}
+\usepackage[margin=0.25in]{geometry}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage{tikz}
+\usepackage{threeparttable}
+\usepackage{algorithmic}
+\usepackage{tabularx}
+\usepackage{amsmath}
+
+\title{New Exhibits for AEJ Revisions}
+
+\begin{document}
+\maketitle
+\tableofcontents
+{\footnotesize 
+\listoffigures
+\listoftables}
+\clearpage
+
+\section{Overview}
+
+Below are some new tables and figures addressing what was asked for by the reviewers/editor. I've also copied our main table into Table \ref{tab:main_effect} for reference.
+
+\section{Event Studies}
+First, the main specification event study in Figure \ref{fig:main_es} shows 1940-70 Black migration had the largest effects on fragmentation in 1930-40 and 1940-50, and pretty flat before and after. Unless this causes problems for our instrument exogeneity, I think this should be ok? We're off by a decade, but we're not using 1940-70 because that's exactly the period of the Great Migration, but because there's readily accessible data for those years. 
+
+\section{Dependent variable variations}
+
+Next are the different definitions of dependent variables, first with log change in jurisdictions (controlling for 1940 CZ population) in Table \ref{tab:log_effect} and using 1940 population in both measures in Table \ref{tab:pct_effect}. Log effect looks bad across the board, however the 1940 population ones only look bad for municipalities results. 
+
+I was thinking how to interpret these in the context of our main results, and realized there was a somewhat intuitive decomposition (or at least ChatGPT did). Recall our main dependent specification is the change in jurisdictions per capita between 1940 to 1970:
+
+\begin{align*}
+	\Delta\text{LocGovPC}_{k\ell} = \frac{\text{LocGovs}_{k\ell,1970}}{\text{Pop}_{\ell,1970}} - \frac{\text{LocGovs}_{k\ell,1940}}{\text{Pop}_{\ell,1940}} = \frac{\text{LocGovs}_{k\ell,1970}}{\text{Pop}_{\ell,1970}} - \frac{\text{LocGovs}_{k\ell,1940}}{\text{Pop}_{\ell,1940}} +1 - 1 = \\
+\frac{\text{LocGovs}_{k\ell,1970}}{\text{Pop}_{\ell,1970}} - \frac{\text{LocGovs}_{k\ell,1940}}{\text{Pop}_{\ell,1940}} + \frac{\text{LocGovs}_{k\ell,1970}}{\text{Pop}_{\ell,1940}} - \frac{\text{LocGovs}_{k\ell,1970}}{\text{Pop}_{\ell,1940}} = \\
+ \frac{\text{LocGovs}_{k\ell,1970} - \text{LocGovs}_{k\ell,1940}}{\text{Pop}_{\ell,1940}} + \text{LocGovs}_{k\ell,1970} \left(\frac{1}{\text{Pop}_{\ell,1970}} - \frac{1}{\text{Pop}_{\ell,1970}} \right) = \\
+\underbrace{\frac{\text{LocGovs}_{k\ell,1970} - \text{LocGovs}_{k\ell,1940}}{\text{Pop}_{\ell,1940}}}_{\text{(i) Jurisdictional Changes Only}} - \underbrace{\frac{\text{LocGovs}_{k\ell,1970}}{\text{Pop}_{1970}} \left(\frac{\text{Pop}_{\ell,1970} - \text{Pop}_{\ell,1940}}{\text{Pop}_{\ell,1940}} \right)}_{\text{(ii) Population Dilution of 1970 Jurisdictions P.C.}} 
+\end{align*}
+
+So, table \ref{tab:pct_effect} uses (i) as the outcome, while table \ref{tab:dilute_effect} uses (ii). The linear combination of these results should be the effect in our main table \ref{tab:main_effect}. The effect on municipalities is positive but small/insignificant for municipalities in (i), but positive in (ii). School districts point in the same direction in both cases. Special districts are positive in (i) and negative in (ii), and are on net positive. Main city share is negative in (i) and positive in (ii), and are on net negative. 
+
+It's also worth noting that the regression of $\frac{\text{Pop}_{\ell,1970} - \text{Pop}_{\ell,1940}}{\text{Pop}_{\ell,1940}}$ on GM is positive in OLS, but negative in 2SLS. I also have event study style figures for (i), (ii), and population change in Figures \ref{fig:pct_es}, \ref{fig:dilute_es}, and \ref{fig:pop_es}. Let's spend some time thinking about how to interpret this. 
+
+\section{Balance Controls Decomposition}
+
+Tables \ref{tab:decomp_cgoodman}, \ref{tab:decomp_munis}, \ref{tab:decomp_schdist}, \ref{tab:decomp_spdist}, and \ref{tab:decomp_totfrac} decompose the change in effect of adding the different imbalanced covariates. As we know the results on municipalities and main city share are relatively stable. The effect on school districts drops a bit when any one control is added, but has the largest decline when 1940 labor force share in manufacturing \textbf{and} 1940 population density are controlled for (column 6 table \ref{tab:decomp_schdist}). Special districts seem to be affected by any combination of controls, but most significantly with 1940 mean income and 1940 labor force share in manufacturing (column 5 table \ref{tab:decomp_spdist}.
+
+\section{Migrant Differences Alternative}
+Recall our previous version did a heterogeneity split on whether the average (pre-migration) 1930 occupational score of a northern CZ's 1930-40 Black Migrants was above or below median, relative to the migrants to all northern CZs. This is reproduced in table \ref{tab:mig_orig}. Referee two suggested we instead split on the difference between 1930 black migrant occupation scores and the average occupation score in their destination CZs. I do this in \ref{tab:mig_new}, the results are quite similar and consistent with our main findings. 
+\clearpage
+\section*{Exhibits}
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/black_ssaggregate_long.tex}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Log Difference and 1940 pop control}
+\begin{threeparttable}
+\footnotesize
+\input{tables/RR/black_logdiff_outcome_popctrl.tex}
+\end{threeparttable}
+\label{tab:log_effect}
+\end{table}
+\clearpage
+
+
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Log Difference and 1940 and 1970 pop control}
+\begin{threeparttable}
+\footnotesize
+\input{tables/RR/black_logdiff_outcome_popctrl_both.tex}
+\end{threeparttable}
+\label{tab:log_effect}
+\end{table}
+\clearpage
+
+
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Log Difference and 1940-70 pop growth control}
+\begin{threeparttable}
+\footnotesize
+\input{tables/RR/black_logdiff_outcome_popgrowth.tex}
+\end{threeparttable}
+\label{tab:log_effect}
+\end{table}
+\clearpage
+
+
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Jurisdictional Changes Only}
+\begin{threeparttable}
+\footnotesize
+\input{tables/RR/black_pct_outcome.tex}
+\end{threeparttable}
+\label{tab:pct_effect}
+\end{table}
+\clearpage
+
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Population Dilution}
+\begin{threeparttable}
+\footnotesize
+\input{tables/RR/black_decomp_outcome.tex}
+\end{threeparttable}
+\label{tab:dilute_effect}
+\end{table}
+\clearpage
+
+
+
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Levels and Totfrac = Popgrowth}
+\begin{threeparttable}
+\footnotesize
+\input{tables/RR/black_levels_outcome.tex}
+\end{threeparttable}
+\label{tab:dilute_effect}
+\end{table}
+\clearpage
+
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{C.Goodman Munis Decomp}
+\begin{threeparttable}
+\footnotesize
+\input{tables/RR/cgoodman_balance_iter.tex}
+\end{threeparttable}
+\label{tab:decomp_cgoodman}
+\end{table}
+\clearpage
+
+\begin{table}
+\footnotesize
+\centering
+\caption{CoG Munis Decomp}
+\begin{threeparttable}
+\footnotesize
+\input{tables/RR/gen_muni_balance_iter.tex}
+\end{threeparttable}
+\label{tab:decomp_munis}
+\end{table}
+\clearpage
+
+\begin{table}
+\footnotesize
+\centering
+\caption{School Districts Decomp}
+\begin{threeparttable}
+\footnotesize
+\input{tables/RR/schdist_ind_balance_iter.tex}
+\end{threeparttable}
+\label{tab:decomp_schdist}
+\end{table}
+\clearpage
+
+\begin{table}
+\footnotesize
+\centering
+\caption{Special Districts Decomp}
+\begin{threeparttable}
+\footnotesize
+\input{tables/RR/spdist_balance_iter.tex}
+\end{threeparttable}
+\label{tab:decomp_spdist}
+\end{table}
+\clearpage
+
+\begin{table}
+\footnotesize
+\centering
+\caption{Main City Share Decomp}
+\begin{threeparttable}
+\footnotesize
+\input{tables/RR/totfrac_balance_iter.tex}
+\end{threeparttable}
+\label{tab:decomp_totfrac}
+\end{table}
+\clearpage
+
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Existing Version}
+\begin{threeparttable}
+\footnotesize
+\input{tables/occscore_links_interaction.tex}
+\end{threeparttable}
+\label{tab:mig_orig}
+\end{table}
+\clearpage
+
+
+\begin{table}
+\footnotesize
+\centering
+\caption{Occscore Difference Split}
+\begin{threeparttable}
+\footnotesize
+\input{tables/RR/occscorec_diffs_interaction.tex}
+\end{threeparttable}
+\label{tab:mig_new}
+\end{table}
+\clearpage
+
+
+\clearpage
+\begin{figure}
+	\centering
+	 \includegraphics[width=0.7\linewidth]{figures/RR/event_study_pp.png}
+	\caption{Main Specification}
+	\label{fig:main_es}
+	\caption*{\scriptsize \emph{Notes:} 2SLS regression of Decadal Change in Municipalities P.C.  ($\frac{\text{munis}_t}{\text{pop}_{t}} - \frac{\text{munis}_{t-10}}{\text{pop}_{t-10}}$) on 1940-70 P.P. Change in Black Population Share}
+\end{figure}
+\clearpage
+\begin{figure}
+	\centering
+	 \includegraphics[width=0.7\linewidth]{figures/RR/event_study_pct.png}
+	\caption{Jurisdictional Growth Specification}
+	\caption*{\scriptsize \emph{Notes:} 2SLS regression of Decadal Percent Change ($\frac{\text{munis}_t - \text{munis}_{t-10}}{\text{pop}_{t-10}}$) in Municipalities P.C. on 1940-70 P.P. Change in Black Population Share}
+	\label{fig:pct_es}
+\end{figure}
+
+\clearpage
+\begin{figure}
+	\centering
+	 \includegraphics[width=0.7\linewidth]{figures/RR/event_study_decomp.png}
+	\caption{Population Dilution Specification}
+	\caption*{\scriptsize \emph{Notes:} 2SLS regression of Decadal Population Dilution ($-\text{munis}_t(\frac{\text{pop}_{t} - \text{pop}_{t-10}}{\text{pop}_{t-10}})$) on Municipalities P.C. on 1940-70 P.P. Change in Black Population Share}
+	\label{fig:dilute_es}
+\end{figure}
+
+
+\clearpage
+\begin{figure}
+	\centering
+	 \includegraphics[width=0.7\linewidth]{figures/RR/event_study_popgrowth.png}
+	\caption{Population Dilution Specification}
+	\caption*{\scriptsize \emph{Notes:} 2SLS regression of Decadal Population Growth ($\frac{\text{pop}_{t} - \text{pop}_{t-10}}{\text{pop}_{t-10}}$) on Municipalities P.C. on 1940-70 P.P. Change in Black Population Share}
+	\label{fig:pop_es}
+\end{figure}
+\end{document}

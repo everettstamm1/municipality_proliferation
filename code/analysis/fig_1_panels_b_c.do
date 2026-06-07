@@ -1,22 +1,25 @@
 
 use "$CLEANDATA/cz_pooled.dta", clear 
 keep cz_name popc* bpopc*
-drop bpopc4070
 //need : bpopc1950, 60; popc1960, outcomes 1960
-keep if cz_name=="Cleveland, OH" | cz_name=="Columbus, OH" 
+keep if cz_name=="Cleveland" | cz_name=="Columbus" 
+replace cz_name = cz_name + ", OH"
 reshape long popc bpopc, i(cz_name) j(decade)
+keep if decade >= 1940 & decade <= 1970
+
 label var decade "Year"
 gen share=bpopc/popc
 
 twoway (scatter share decade if cz_name=="Cleveland, OH", connect(direct) msymbol(square) mcolor(gold) lcolor(gold)) ///
 (scatter share decade if cz_name=="Columbus, OH", connect(direct) mcolor(midgreen) lcolor(midgreen)), ///
-legend(order(2 "Columbus, OH" 1 "Cleveland, OH") position(6)) scheme(s1color) ytitle("Urban Black Population Share") 
+legend(off order(2 "Columbus, OH" 1 "Cleveland, OH") position(6)) scheme(s1color) ytitle("Urban Black Population Share") 
 
 graph export "$FIGS/motivation/design_panelb_new.pdf", as(pdf) replace 
 
 use "$CLEANDATA/cz_pooled.dta", clear
 
-keep if cz_name=="Cleveland, OH" | cz_name=="Columbus, OH" 
+keep if cz_name=="Cleveland" | cz_name=="Columbus" 
+replace cz_name = cz_name + ", OH"
 
 keep cz_name b_gen_muni_cz*_pc b_schdist_ind_cz*_pc b_cgoodman_cz*_pc b_gen_muni_cz???? b_schdist_ind_cz???? b_cgoodman_cz????
 

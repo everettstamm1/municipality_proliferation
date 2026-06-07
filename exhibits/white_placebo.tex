@@ -1,0 +1,153 @@
+\documentclass{article}
+\usepackage{blindtext}
+\usepackage{booktabs}
+\usepackage[margin=0.25in]{geometry}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage{tikz}
+\usepackage{threeparttable}
+\usepackage{algorithmic}
+\usepackage{tabularx}
+
+\title{Simple Tables for Municipality Proliferation}
+
+\begin{document}
+\maketitle
+\tableofcontents
+{\footnotesize 
+\listoffigures
+\listoftables}
+\clearpage
+
+\section{NEW NEW}
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Total Black Balance}
+\footnotesize
+\input{tables/balancetables/balancetable_black.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Total White  Balance}
+\footnotesize
+\input{tables/balancetables/balancetable_white.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Total Black County Balance}
+\footnotesize
+\input{tables/balancetables/balancetable_county_black.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Total White County Balance}
+\footnotesize
+\input{tables/balancetables/balancetable_county_white.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Results, Black}
+\footnotesize
+\input{tables/final/black_ssaggregate.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Results, White}
+\footnotesize
+\input{tables/final/white_ssaggregate.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{County Results, Black}
+\footnotesize
+\input{tables/final/county_black_ssaggregate.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{County Results, White}
+\footnotesize
+\input{tables/final/county_white_ssaggregate.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+\section{Updated Tables}
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Original Balance Table}
+\footnotesize
+\input{tables/balancetables/balancetable.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Total Black S.O.B. Balance}
+\footnotesize
+\input{tables/balancetables/balancetable_black_sob.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Total White S.O.B. Balance}
+\footnotesize
+\input{tables/balancetables/balancetable_white_sob.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Results}
+\footnotesize
+\input{tables/final/main_effect_long.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Black results, with balanced controls}
+\footnotesize
+\input{tables/final/black_sob_balance.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{White results, with balanced controls}
+\footnotesize
+\input{tables/final/white_sob_balance.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Black results, with White balanced controls}
+\footnotesize
+\input{tables/final/black_sob_white_balance.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{White results, with Black balanced controls}
+\footnotesize
+\input{tables/final/white_sob_black_balance.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Black results, no balance controls}
+\footnotesize
+\input{tables/final/black_sob.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{White results, no balance controls}
+\footnotesize
+\input{tables/final/white_sob.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Results, with income}
+\footnotesize
+\input{tables/final/main_effect_long_income.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+\end{document}

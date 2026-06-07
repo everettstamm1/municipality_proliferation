@@ -1,0 +1,265 @@
+\documentclass{article}
+\usepackage{blindtext}
+\usepackage{booktabs}
+\usepackage[margin=0.25in]{geometry}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage{tikz}
+\usepackage{threeparttable}
+\usepackage{algorithmic}
+\usepackage{tabularx}
+\usepackage{amsmath}
+\title{Updates August 7th}
+
+\begin{document}
+\maketitle
+\tableofcontents
+{\footnotesize 
+\listoffigures
+\listoftables}
+\clearpage
+
+
+
+\section{Percentile/Quadratic Results}
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Completely original percentile}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/main_effect_pctile}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+\begin{table}
+\footnotesize
+\centering
+\caption{Percentile in our specification with imbalanced controls}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/main_effect_pctile_outctrl}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+\begin{table}
+\footnotesize
+\centering
+\caption{Percentile in our specification without imbalanced controls}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/main_effect_pctile_noctrl}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+\begin{table}
+\footnotesize
+\centering
+\caption{Quadratic Instrument}
+\begin{threeparttable}
+\footnotesize
+\input{tables/quad_table}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+\section{Court Order Heterogeneity}
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Interacted on Fraction of districts with C.O. (continuous)}
+\begin{threeparttable}
+\footnotesize
+\input{tables/frac_co_interaction}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Interacted if principle city had court order (discrete)}
+\begin{threeparttable}
+\footnotesize
+\input{tables/main_co_interaction}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+\section{Black Migrant Characteristics}
+
+
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, interacted on above median 35-39 migrant 1940 incomes}
+\begin{threeparttable}
+\footnotesize
+\input{tables/bmiginc_interaction}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, interacted on above median 1930 black migrant occupational scores}
+\begin{threeparttable}
+\footnotesize
+\input{tables/occscore_links_interaction}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+
+
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Controlling for Recent Black Migrant Income Differences}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/black_ssaggregate_long_bincdiff}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Controlling for Black Migrants 1930 Occscore}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/black_ssaggregate_long_b30occscore}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+\section{White Migration}
+\clearpage
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{White Balance Table}
+\footnotesize
+\input{tables/balancetables/balancetable_white.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{White Effects, with white imbalanced controls}
+\footnotesize
+\input{tables/final/white_ssaggregate_long.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+\section{Pretrends}
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Municipalities Pre-trends}
+\input{tables/balancetables/pretrends_n.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Population Growth Pre-trends}
+\input{tables/balancetables/pretrends_growth.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Age Pre-trends}
+\input{tables/balancetables/pretrends_agec.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Black Pre-trends}
+\input{tables/balancetables/pretrends_blackc.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Literacy Pre-trends}
+\input{tables/balancetables/pretrends_literatec.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{In-Labor Force Pre-trends}
+\input{tables/balancetables/pretrends_labforcec.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{OCCSCORE Pre-trends}
+\input{tables/balancetables/pretrends_occscorec.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\section{Level Specification}
+The specification here is 
+\[
+	\text{Count Loc. Govts.}_{70} = \alpha + \beta \text{GM}_{40-70} + \gamma \text{Count Loc. Govts.}_{40} + \delta \text{PopGrowth}_{40-70} + X'\eta + \epsilon
+\]
+With the same set of imbalanced controls as in the main result
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{Main results, Levels}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/black_ssaggregate_long_levels}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+\section{Additional Variables}
+\begin{landscape}
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  
+\caption{Municipalities Incorporated between 1940 and 1970: Additional variables}\label{tab:touching_pct_rev_debt}
+\begin{threeparttable}
+\scriptsize 
+    \input{tables/land_use_index/touching_pct_rev_debt}
+
+    \end{threeparttable}
+    \end{table}
+\end{landscape}
+
+\end{document}

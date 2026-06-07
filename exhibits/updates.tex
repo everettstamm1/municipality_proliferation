@@ -1,0 +1,327 @@
+\documentclass{article}
+\usepackage{blindtext}
+\usepackage{booktabs}
+\usepackage[margin=0.25in]{geometry}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage{tikz}
+\usepackage{threeparttable}
+\usepackage{algorithmic}
+\usepackage{tabularx}
+
+\title{Simple Tables for Municipality Proliferation}
+
+\begin{document}
+\maketitle
+\tableofcontents
+{\footnotesize 
+\listoffigures
+\listoftables}
+\clearpage
+
+
+
+\section{Updated Tables}
+
+
+\input{tables/balancetables/balancetable.tex}
+\clearpage
+
+\begin{table}
+\footnotesize
+\centering
+\caption{The Effect of the Great Migration on Jurisdictions Per Capita using the Shift-Share Design}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/black_ssaggregate_long}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+\clearpage
+
+\begin{landscape}
+\input{tables/land_use_index/muni_outcomes_ols.tex}
+\end{landscape}
+\clearpage
+
+\begin{table}[htbp]
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi} 
+\centering
+\caption{Downstream: School Segregation and Achievement}\label{tab:seg}
+\begin{threeparttable}
+\footnotesize 
+\input{tables/implications/student_segregation_table_school.tex}
+    \end{threeparttable}
+    \end{table}
+\clearpage
+
+\begin{landscape}
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Summary statistics}
+\input{tables/summary.tex}
+ \end{threeparttable}
+\end{table}
+\end{landscape}
+\clearpage
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{New Municipalities Pre-trends}
+\input{tables/balancetables/pretrends.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Effects, 1952-1972}
+\footnotesize
+\input{tables/final/black_ssaggregate_5070.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Effects, Percentile}
+\footnotesize
+\input{tables/final/main_effect_pctile_new_ctrl.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+%\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Effects, Quadratic Control}
+%\footnotesize
+%\input{tables/final/main_effect_quad_new_ctrl.tex}
+%\end{threeparttable}  \end{table}
+%\clearpage
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Effects, European Migration Control}
+\footnotesize
+\input{tables/final/black_ssaggregate_eurmig.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{White Effects, Main Spec}
+\footnotesize
+\input{tables/final/white_ssaggregate.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main Effects, No Imbalanced Covariates}
+\footnotesize
+\input{tables/final/black_ssaggregate_nobal.tex}
+\end{threeparttable}  \end{table}
+\clearpage
+
+
+
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main effects, Township Outcome} \label{tab:main_effect_towns}
+\input{tables/final/main_effect_towns}
+ \end{threeparttable}
+ \end{table}
+
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  
+\caption{Municipalities Incorporated between 1940 and 1970: Additional variables}\label{tab:touching_pct_rev_debt}
+\begin{threeparttable}
+\scriptsize 
+    \input{tables/land_use_index/touching_pct_rev_debt}
+
+    \end{threeparttable}
+    \end{table}
+
+
+
+\clearpage
+\begin{figure*}[htbp]
+    \centering
+    \caption{Leave-one-out IV Tests, Balanced Controls}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/loo_iv_cgoodman_new_ctrls.pdf}
+        \label{fig:sub1}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests//loo_iv_gen_muni_new_ctrls.pdf}
+        \label{fig:sub2}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests//loo_iv_schdist_ind_new_ctrls.pdf}
+        \label{fig:sub3}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests//loo_iv_gen_town_new_ctrls.pdf}
+        \label{fig:sub4}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests//loo_iv_spdist_new_ctrls.pdf}
+        \label{fig:sub5}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/loo_iv_totfrac_new_ctrls.pdf}
+        \label{fig:sub6}
+    \end{subfigure}
+    \label{fig:loo_iv}
+    \caption*{\scriptsize \emph{Notes:} Regression results according to equations in the Empirical Strategy section, weighted by 1940 CZ urban population. All specifications include census region fixed effects and CZ-level controls for the sum of shares, coastal, and 1920 transportation cost. Each parameter estimate comes from a regression that drops one CZ at a time. Robust standard errors generate 95\% confidence intervals.} 
+\end{figure*}
+
+\clearpage
+
+\begin{figure*}[htbp]
+    \centering
+    \caption{Overidentification IV Tests, Balanced Controls}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/D16_alt_inst_pooled_cgoodman_new_ctrls.pdf}
+        \label{fig:sub1}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/D16_alt_inst_pooled_gen_muni_new_ctrls.pdf}
+        \label{fig:sub2}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/D16_alt_inst_pooled_schdist_ind_new_ctrls.pdf}
+        \label{fig:sub3}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/D16_alt_inst_pooled_gen_town_new_ctrls.pdf}
+        \label{fig:sub4}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/D16_alt_inst_pooled_spdist_new_ctrls.pdf}
+        \label{fig:sub5}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/exogeneity_tests/D16_alt_inst_pooled_totfrac_new_ctrls.pdf}
+        \label{fig:sub6}
+    \end{subfigure}
+    \label{fig:alt_inst}
+    \caption*{\scriptsize \emph{Notes:} Point estimates come from our baseline instrument and three alternative instruments, where all specifications include census region fixed effects and CZ-level controls for the sum of shares, coastal, and 1920 transportation cost, and are weighted by 1940 CZ urban population. Robust standard errors generate 95\% confidence intervals.} 
+\end{figure*}
+\clearpage
+
+\section*{New Material}
+
+\clearpage
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main effects, County-to-county links} 
+\input{tables/final/main_effect_county}
+ \end{threeparttable}
+ \end{table}
+\clearpage
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{White effects, county-to-county links} 
+\input{tables/final/white_effect_county}
+ \end{threeparttable}
+ \end{table}
+
+\clearpage
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Principal city had desegregation order} 
+\input{tables/final/main_effect_co_new_ctrl}
+ \end{threeparttable}
+ \end{table}
+
+\clearpage
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Proportion of students under desegregation order} 
+\input{tables/final/main_effect_frac_co_new_ctrl}
+ \end{threeparttable}
+ \end{table}
+
+
+\clearpage
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{All and Black Migration Interactions} 
+\input{tables/final/main_effect_all_int_new_ctrl}
+ \end{threeparttable}
+ \end{table}
+
+
+\clearpage
+\begin{figure}
+    \centering
+    \caption{Incorporations in 1940-1970 by some HS education}\label{fig:pcarrow_figure}
+    \includegraphics[width = .65\textwidth]{figures/pcarrow_figure_GM_somehs.pdf}
+\end{figure}
+\clearpage
+
+
+\begin{figure}
+    \centering
+    \caption{Incorporations in 1940-1970 by Four Years College}\label{fig:pcarrow_figure}
+    \includegraphics[width = .65\textwidth]{figures/pcarrow_figure_GM_colgrad.pdf}
+\end{figure}
+\clearpage
+
+\begin{figure}
+    \centering
+    \caption{Incorporations in 1940-1970 by 2010 Income}\label{fig:pcarrow_figure}
+    \includegraphics[width = .65\textwidth]{figures/pcarrow_figure_inc2010.pdf}
+\end{figure}
+\clearpage
+
+
+\subsection*{Other Pre-Trends}
+
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Population Pre-trends}
+\input{tables/balancetables/pretrends_pop.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Age Pre-trends}
+\input{tables/balancetables/pretrends_age.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Black Pre-trends}
+\input{tables/balancetables/pretrends_black.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Literacy Pre-trends}
+\input{tables/balancetables/pretrends_literate.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{In-Labor Force Pre-trends}
+\input{tables/balancetables/pretrends_labforce.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{OCCSCORE Pre-trends}
+\input{tables/balancetables/pretrends_occscore.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+
+
+\end{document}

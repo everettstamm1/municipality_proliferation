@@ -1,5 +1,4 @@
-local do_placebo = 1
-local do_resample = 0
+
 /*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 
 4. Assemble final dataset.
@@ -17,76 +16,86 @@ STEPS:
 *last updated: 12/29/2019
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------*/	
 
-	// 0. Create list of 130 CZs for later reference
 	use "$RAWDATA/dcourt/clean_city_population_census_1940.dta", clear // 711 cities in non-South
+	keep city citycode popc1940 bpopc1940 cz cz_name south
 	
+	merge 1:1 city using "$RAWDATA/dcourt/clean_city_population_ccdb_1944_1977.dta", keepusing(pop1940 bpop1970 bpop1960 pop1960 pop1970) 
+	rename bpop1970  bpopc1970
+	rename bpop1960 bpopc1960
+	rename pop1960 popc1960
+	rename pop1970 popc1970
+	/*
+	* Analysis of non-matches
+	not matched                           789
+				from master                       273  (_merge==1) // 273 cities from 1940 census city file do not match
+				from using                        516  (_merge==2) // 516 cities from CCDB file do not match because they are Southern or they are non-Southern but do not appear in 1940 Census
+	
+	Here are the cities that do not appear in 1940 census, are non-southern, and have non-missing data for black pop in 1970: Boise city, ID; East Providence, RI: Huntington Park CA; West
+	Haven CT; and Warwick, RI 
+	
+	Here are the cities that do not appear in 1940 census, are non-southern, and are missing data for black pop in 1970:
+	Ardmore, PA
+	Arlington, MA
+	Arlington, VA
+	Belmont, MA
+	Belvedere, CA
+	Bogota, NJ
+	Brookline, MA
+	Clarksburg, WV
+	Drexel Hill, PA
+	Haverford College, PA
+	Newport, KY
+	Secaucus, NJ
+	Watertown, MA
+	West Hartford, CT
+	Woodbridge, NJ
 
-	merge 1:1 city using "$RAWDATA/dcourt/clean_city_population_ccdb_1944_1977.dta", keepusing(bpop1970 bpop1960 nwhtpop1950 nwhtpop1960 pop1940 pop1950 pop1960 pop1970)
-
-	foreach var of varlist bpop1960 nwhtpop1950 nwhtpop1960{
-		ren `var' `var'_ccdb
-	}
-	ren _merge ccdb_merge
+		matched                               438  (_merge==3)
+	
+	*/
+	
 	/* Keep cities large enough (25k+) to appear in CCDB in 1940 and 1970. Results are 
-		robust to changing this criterion.*/
-		rename bpop1970 bpopc1970 // rename so it is clear these numbers correspond to city populations
-		rename pop1970 popc1970 // rename so it is clear these numbers correspond to city populations
-		rename pop1950 popc1950 // rename so it is clear these numbers correspond to city populations
-
-		/* Butte, MT and Amsterdam, NY received southern black migrants between 1935 and 1940, but are just below pop cutoff for CCDB. 
-		Keep them in sample by retrieving 1970 black pop info from Census for these cities */
-		replace bpopc1970=38 if city=="Butte, MT" // see Table 27 of published 1970 Census: https://www.census.gov/content/dam/Census/library/working-papers/2005/demo/POP-twps0076.pdf
-		replace popc1970=23368 if city=="Butte, MT" // see Table 27 of published 1970 Census: https://www.census.gov/content/dam/Census/library/working-papers/2005/demo/POP-twps0076.pdf
-		//replace wpopc1970= 23013 if city=="Butte, MT"
-		
-		replace bpopc1970=140 if city=="Amsterdam, NY" // see Table 27 of published 1970 Census: https://www2.census.gov/prod2/decennial/documents/1970a_ny1-02.pdf
-		replace popc1970=25524 if city=="Amsterdam, NY" // see Table 27 of published 1970 Census: https://www2.census.gov/prod2/decennial/documents/1970a_ny1-02.pdf
-		//replace wpopc1970= 25346 if city=="Amsterdam, NY"
-		
-		keep if  bpopc1970!=. & pop1940!=.
-		
-		/* The following non-southern cities are missing Black population data in 1970 though they have total population data for that year
-		city
-		Bolingbrook, IL
-		Burbank, IL
-		Burton, MI
-		Farmington Hills, MI
-		Grosse Pointe Woods, MI
-		Irvine, CA
-		Rancho Palos Verdes, CA
-		Romulus, MI
-		*/	
-		
-		drop if ccdb_merge==2 // Dropping cities in CCDB that do not appear in the 1940 Census list of non-southern cities, see analysis of non-matches above. 
-		drop ccdb_merge
-		
-	merge 1:1 city using "$INTDATA/dcourt/census_1950_1960_racepop_cz", keepusing(pop1950 bpop1950 nwhtpop1950)
-	foreach var of varlist pop1950 bpop1950 nwhtpop1950 {
-		ren `var' `var'_census
-	}
-	ren _merge census_merge
+	robust to changing this criterion.*/
+	//rename bpop1970 bpopc1970 // rename so it is clear these numbers correspond to city populations
+	//rename pop1970 popc1970 // rename so it is clear these numbers correspond to city populations
 	
+	/* Butte, MT and Amsterdam, NY received southern black migrants between 1935 and 1940, but are just below pop cutoff for CCDB. 
+	Keep them in sample by retrieving 1970 black pop info from Census for these cities */
+	replace bpopc1970=38 if city=="Butte, MT" // see Table 27 of published 1970 Census: https://www.census.gov/content/dam/Census/library/working-papers/2005/demo/POP-twps0076.pdf
+	replace popc1970=23368 if city=="Butte, MT" // see Table 27 of published 1970 Census: https://www.census.gov/content/dam/Census/library/working-papers/2005/demo/POP-twps0076.pdf
+	replace bpopc1970=140 if city=="Amsterdam, NY" // see Table 27 of published 1970 Census: https://www2.census.gov/prod2/decennial/documents/1970a_ny1-02.pdf
+	replace popc1970=25524 if city=="Amsterdam, NY" // see Table 27 of published 1970 Census: https://www2.census.gov/prod2/decennial/documents/1970a_ny1-02.pdf
+	//keep if bpopc1970!=. & pop1940!=.
+	keep if bpopc1970!=. & pop1940 != .
+	drop pop1940 // the CCDB pop we filter on
+	/* The following non-southern cities are missing Black population data in 1970 though they have total population data for that year
+	city
+	Bolingbrook, IL
+	Burbank, IL
+	Burton, MI
+	Farmington Hills, MI
+	Grosse Pointe Woods, MI
+	Irvine, CA
+	Rancho Palos Verdes, CA
+	Romulus, MI
+	*/	
+	merge 1:1 city using "$INTDATA/dcourt/census_1950_racepop_cz", keepusing(pop bpop) nogen
+	rename pop popc1950
+	rename bpop bpopc1950
 	
-	// Imputing Black urban population 1950 as close to CCDB data we can
-	// First by multiplying CCDB nonwhite population by ratio of Black to nonwhite population from census
-	g adjust = bpop1950_census/nwhtpop1950_census
-	g bpop1950_ccdb = nwhtpop1950_ccdb * adjust
-	// For cities with missing values of adjust, instead adjust by nationwide mean ratio
-	qui su adjust,d
-	replace bpop1950_ccdb = nwhtpop1950_ccdb * `r(mean)' if bpop1950_ccdb==.
-	
-	// If still missing, just use census urban Black population
-	g bpopc1950 = cond(bpop1950_ccdb<.,bpop1950_ccdb,bpop1950_census)
-	drop adjust
-
-	drop *_ccdb *_census*
-	
-	//keep if popc1940 >=25000 | popc1970>=25000
-	drop *_merge
-
-	drop if bpopc1940 ==. | bpopc1970 ==. | ///
-					popc1940 ==.  | popc1970 ==.
+	drop if bpopc1940 ==. | bpopc1950 ==. | bpopc1960 ==. | bpopc1970 ==. | ///
+					popc1940 ==. | popc1950 ==. | popc1960 ==. | popc1970 ==.
 	keep if popc1940 >=25000 | popc1970>=25000
+	drop *_merge
+	keep if popc1940 >=25000 | popc1970>=25000
+	
+	keep city citycode cz cz_name popc*
+	
+	forv y = 1940(10)1970{
+		bys cz : egen cz_popc`y' = total(popc`y')
+
+	}
+	save "$INTDATA/dcourt/xwalk_296_city_cz.dta", replace
 	keep cz cz_name
 	duplicates drop
 	save "$INTDATA/dcourt/original_130_czs", replace
@@ -96,8 +105,7 @@ STEPS:
 *1. Select sample of cities using complete count 1940 census and CCDB 1944-1977.
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 	/* Load city population data constructed from complete count 1940 census */
-		local varstubs = ""
-		local varstubs2 = "2 1940 r"
+
 		
 		use "$RAWDATA/dcourt/clean_city_population_census_1940.dta", clear // 711 cities in non-South
 		merge 1:1 citycode using "$INTDATA/dcourt/clean_city_population_census_1940_full.dta", keepusing(wpopc1940)  // add in white urban pop
@@ -177,259 +185,32 @@ STEPS:
 		drop if ccdb_merge==2 // Dropping cities in CCDB that do not appear in the 1940 Census list of non-southern cities, see analysis of non-matches above. 
 		drop ccdb_merge
 		
+		keep if popc1940 >=25000 | popc1970>=25000
+		
+		// Save reference datasets
+		preserve
+			keep city citycode cz cz_name popc*
 			
-		// Imputing Black urban population 1950 using census data as close to CCDB data we can
+			forv y = 1940(10)1970{
+				bys cz : egen cz_popc`y' = total(popc`y')
 
-		merge 1:1 city using "$INTDATA/dcourt/census_1950_1960_racepop_cz", keepusing(pop1950 bpop1950 nwhtpop1950) nogen
-		foreach var of varlist pop1950 bpop1950 nwhtpop1950 {
-			ren `var' `var'_census
-		}
-		
-		
-		// First by multiplying CCDB nonwhite population by ratio of Black to nonwhite population from census
-		g adjust = bpop1950_census/nwhtpop1950_census
-		g bpop1950_ccdb = nwhtpop1950_ccdb * adjust
-		// For cities with missing values of adjust, instead adjust by nationwide mean ratio
-		qui su adjust,d
-		replace bpop1950_ccdb = nwhtpop1950_ccdb * `r(mean)' if bpop1950_ccdb==.
-		
-		// If still missing, just use census urban Black population
-		g bpopc1950 = cond(bpop1950_ccdb<.,bpop1950_ccdb,bpop1950_census)
-		drop adjust
-
-		drop *_ccdb *_census*
-		
-		//keep if popc1940 >=25000 | popc1970>=25000
+			}
+			save "$INTDATA/dcourt/xwalk_296_city_cz.dta", replace
+			keep cz cz_name
+			duplicates drop
+			save "$INTDATA/dcourt/original_130_czs", replace
+		restore
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 	*2. Merge in data for instrument.
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 		
-		* Version 0 of the instrument: 1935-1940 black southern migrant location choice X observed total 1940-1970 net-migration for southern counties
-		foreach v in "0"{
-		merge 1:1 city using "$INTDATA/dcourt/instrument/city_crosswalked/`v'_black_actmig_1940_1970_wide_xw.dta"
-		ren sumshares v`v'_sumshares
-		/* Drop cities for which there's no hope of getting predictions for black pop in 
-		1970 data for these cities. This set of cities will change depending on the 
-		migration matrix used.*/
-		drop if _merge==2 
-		drop _merge
-		
-		/* Assume zero change in black pop for cities that black migrants did not move 
-		to between 1935 and 1940. Results are robust to changing this criterion. 
-		Uncomment "keep if _merge==3" and run again. */
-		foreach var of varlist black_actoutmigact*{
-		replace `var'=0 if `var'==.
-		rename `var' v`v'_`var'
-		}
-		rename totblackmigcity3539 v`v'_totblackmigcity3539
-		}
-
-		* Version 1 of the instrument: 
-		*	1935-1940 black southern migrant location choice X total 1940-1970 predicted net-migration for southern counties
-		*	Original Boustan (2010) variables for prediction. 
-		*	See Boustan (2016) replication files for more details: https://scholar.princeton.edu/lboustan/data-books#ch4.
-		
-		* Version 2 of the instrument: 
-		*	1935-1940 black southern migrant location choice X total 1940-1970 Post-LASSO predicted net-migration for southern counties
-		*	See Derenoncourt (2019) Appendix B.2 for more details: https://www.dropbox.com/s/58cv5fv1hsofau8/derenoncourt_2019_appendix.pdf?dl=0
-		
-		* Version 1940 of the instrument: 
-		*	1940 black southern-born state of birth X total 1940-1970 Post-LASSO predicted net-migration for southern states
-
-		* Version r of the instrument: 
-		*	1935-1940 black southern migrant location choice X total 1940-1970 Post-LASSO predicted net-migration for southern counties
-		* 	excluding the 42 major urban southern counties (NCHS-defined “central” counties of MSAs of 1 million or more population)
-		* 	See more here: https://www.cdc.gov/nchs/data/data_acces_files/NCHSUrbruralFileDocumentationInternet2.pdf
-
-		foreach v in `varstubs2'{
-		merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/`v'_black_prmig_1940_1970_wide_xw.dta"
-ren sumshares v`v'_sumshares
-		/* Drop cities for which there's no hope of getting predictions for black pop in 
-		1970 data for these cities. This set of cities will change depending on the 
-		migration matrix used.*/
-		g samp_`v' = _merge==3
-		drop if _merge==2 
-		drop _merge
-		
-		/* Assume zero change in black pop for cities that black migrants did not move 
-		to between 1935 and 1940. Results are robust to changing this criterion. 
-		Uncomment "keep if _merge==3" and run again. */
-
-		foreach var of varlist black_proutmigpr*{
-			replace `var'=0 if `var'==.
-			rename `var' v`v'_`var'
-		}
-		rename totblackmigcity3539 v`v'_totblackmigcity3539
-		}
-	
-		* Version 7r of the instrument: 
-		*	1935-1940 black southern migrant location choice X total observed 1940-1970 net-migration for southern counties,
-		*	residualized on southern state fixed effects.
-		foreach v in "7r" {
-		merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/`v'_black_residmig_1940_1970_wide_xw.dta", keepusing(totblackmigcity3539 black_residoutmigresid* sumshares)
-		*keep if _merge==3
-		ren sumshares v`v'_sumshares
-		/* Drop cities for which there's no hope of getting predictions for black pop in 
-		1970 data for these cities. This set of cities will change depending on the 
-		migration matrix used.*/
-		drop if _merge==2 
-		drop _merge
-		
-		/* Assume zero change in black pop for cities that black migrants did not move 
-		to between 1935 and 1940. Results are robust to changing this criterion. 
-		Uncomment "keep if _merge==3" and run again. */
-		
-		foreach var of varlist black_residoutmigresid*{
-		replace `var'=0 if `var'==.
-		rename `var' v`v'_`var'
-		}
-		rename totblackmigcity3539 v`v'_totblackmigcity3539
-		}
-		
-		* Version 8 of the instrument: 
-		*	1935-1940 white southern migrant location choice X total observed 1940-1970 white net-migration for southern counties,
-		foreach v in "8" {
-		merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/`v'_white_actmig_1940_1970_wide_xw.dta", keepusing(totwhitemigcity3539 white_actoutmigact* sumshares)
-		ren sumshares v`v'_sumshares
-		/* Drop cities for which there's no hope of getting predictions for black pop in 
-		1970 data for these cities. This set of cities will change depending on the 
-		migration matrix used.*/
-		drop if _merge==2 
-		drop _merge
-
-		/* Assume zero change in black pop for cities that black migrants did not move 
-		to between 1935 and 1940. Results are robust to changing this criterion. 
-		Uncomment "keep if _merge==3" and run again. */
-		
-		foreach var of varlist white_actoutmigact*{
-		replace `var'=0 if `var'==.
-		rename `var' v`v'_`var'
-		}
-		rename totwhitemigcity3539 v`v'_totwhitemigcity3539
-		}
-		
-		* Version 80 of the instrument: 
-		*	1935-1940 black southern migrant location choice X total observed 1940-1970 black net-migration for southern counties,
-		foreach v in "80" {
-		merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/`v'_black_actmig_1940_1970_wide_xw.dta", keepusing(totblackmigcity3539 black_actoutmigact* sumshares)
-		ren sumshares v`v'_sumshares
-		/* Drop cities for which there's no hope of getting predictions for black pop in 
-		1970 data for these cities. This set of cities will change depending on the 
-		migration matrix used.*/
-		drop if _merge==2 
-		drop _merge
-
-		/* Assume zero change in black pop for cities that black migrants did not move 
-		to between 1935 and 1940. Results are robust to changing this criterion. 
-		Uncomment "keep if _merge==3" and run again. */
-		
-		foreach var of varlist black_actoutmigact*{
-		replace `var'=0 if `var'==.
-		rename `var' v`v'_`var'
-		}
-		rename totblackmigcity3539 v`v'_totblackmigcity3539
-		}
-		if `do_placebo'==1{
-
-		* Placebo versions of the instrument: 
-		*	1935-1940 white southern migrant location choice X normally distributed random shocks,
-		*	with mean 0 and variance 5, iterated 1000 times.
-
-		
-		forval i=1(1)1000{
-		qui merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/rndmig/r`i'_black_prmig_1940_1970_wide_xw.dta" 
-		*keep if _merge==3
-		ren sumshares vr`i'_sumshares
-
-		/* Drop cities for which there's no hope of getting predictions for black pop in 
-		1970 data for these cities. This set of cities will change depending on the 
-		migration matrix used.*/
-		qui drop if _merge==2 
-		qui drop _merge
-		
-		/* Assume zero change in black pop for cities that black migrants did not move 
-		to between 1935 and 1940. Results are robust to changing this criterion. 
-		Uncomment "keep if _merge==3" and run again. */
-		foreach var of varlist black_proutmigpr*{
-		qui replace `var'=0 if `var'==.
-		qui rename `var' vr`i'_`var'
-		}
-		qui rename totblackmigcity3539 vr`i'_totblackmigcity3539
-		}
-		}
-		if `do_resample'==1{
-			forval i=1(1)1000{
-			qui merge 1:1 city using  "$INTDATA/dcourt/instrument/city_crosswalked/resample/re`i'_black_prmig_1940_1970_wide_xw.dta" 
-			*keep if _merge==3
-			ren sumshares vre`v'_sumshares
-
-			/* Drop cities for which there's no hope of getting predictions for black pop in 
-			1970 data for these cities. This set of cities will change depending on the 
-			migration matrix used.*/
-			qui drop if _merge==2 
-			qui drop _merge
-			
-			/* Assume zero change in black pop for cities that black migrants did not move 
-			to between 1935 and 1940. Results are robust to changing this criterion. 
-			Uncomment "keep if _merge==3" and run again. */
-			foreach var of varlist black_proutmigpr*{
-			qui replace `var'=0 if `var'==.
-			qui rename `var' vre`i'_`var'
-			}
-			qui rename totblackmigcity3539 vre`i'_totblackmigcity3539
-			}
-		}
-		/*
-		* Northern CZ measure of 1940 southern county upward mobility: 
-		*	1935-1940 black southern migrant location choice X total observed 1940-1970 net-migration for southern counties,
-		*	residualized on southern state fixed effects.	
-		foreach v in "m" {
-		
-		if "`v'"=="m"{
-		local svar smob
-		}
-			
-		local group "black"
-		
-		merge 1:1 city using "$INTDATA/dcourt/instrument/city_crosswalked/`v'_black_`svar'_1940_1940_wide_xw.dta"
-		* keep if _merge==3
-		
-		/* Drop cities for which there's no hope of getting predictions for black southern mob in 1970
-		for these cities. This set of cities will change depending on the 
-		migration matrix used.*/
-		drop if _merge==2
-		drop _merge
-
-		/* Assume zero change in black pop for cities that black migrants did not move 
-		to between 1935 and 1940. Results are robust to changing this criterion. 
-		Uncomment "keep if _merge==3" and run again. */
-		foreach var of varlist `group'_proutmigpr*{
-		egen mean`svar'_`var'=mean(`var')
-		replace `var'=mean`svar'_`var' if `var'==.
-		replace `var'=popc1940*`var'
-		rename `var' v`v'_`var'
-		}
-		}	
-		
-		*/
-		g wpopc4070 = wpopc1970 - wpopc1940
-		g nbpopc4070 = (popc1970 - bpopc1970) - (popc1940 - bpopc1940)
-		keep *_proutmigpr* *_actoutmigact* *_residoutmigresid* nbpopc4070 popc1940 bpopc1940 popc1970 popc1960 bpopc1950 bpopc1960 popc1950 bpopc1970 *migcity3539 statefip citycode city city_original cz cz_name wpopc1940 wpopc1970 samp_* *_sumshares
-		drop if popc1970==.
-		
-		// Recentered at city level
-		//egen vre_mean = rowmean(vre*_black_proutmigpr)
-		//egen vr_mean = rowmean(vr*_black_proutmigpr)
-
-		g v2_black_proutmigpr_re = v2_black_proutmigpr - vre_mean
-		g v2_black_proutmigpr_r = v2_black_proutmigpr - vr_mean
 
 		save "$INTDATA/dcourt/GM_city_final_dataset.dta", replace
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 	*3. Construct measure of black urban pop change and instrument for black urban in-migration at CZ level.
 	*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 	
-		local do_placebo = 1
+		//local do_placebo = 1
 local do_resample = 0
 			use "$INTDATA/dcourt/GM_city_final_dataset.dta", clear
 			local levelvar cz
@@ -444,6 +225,9 @@ local do_resample = 0
 			g bcpp1940_1970=100*((bpopc1970/popc1970)-(bpopc1940/popc1940))
 			
 			g wcpp1940_1970=100*((wpopc1970/popc1970)-(wpopc1940/popc1940))
+			g wc1940_1970=100*((wpopc1970 -wpopc1940)/popc1940)
+			
+			g tc1940_1970 = 100*((popc1970 - popc1940)/popc1940)
 
 			* Instrument by version
 			* Version 0
@@ -463,6 +247,29 @@ local do_resample = 0
 
 			}
 			
+			* Versions 1, 2, 1940
+			foreach v in "2t" "2tint"{
+			g v`v'_tc_pred1940_1970=100*v`v'_all_proutmigpr/popc1940
+			
+			g v`v'_allmig3539_share1940=100*v`v'_totallmigcity3539/popc1940
+			
+
+			}
+			
+			
+			foreach v in "2ipw" "2ent" "2wipw" "2went"{
+				if "`v'" == "2ipw" local type = "b_ipw"
+				if "`v'" == "2wipw" local type = "w_ipw"
+				if "`v'" == "2ent" local type = "b_ent"
+				if "`v'" == "2went" local type = "w_ent"
+				
+				g v`v'_bc_pred1940_1970=100*v`v'_`type'_proutmigpr/popc1940
+				
+				g v`v'_mig3539_share1940=100*v`v'_tot`type'migcity3539/popc1940
+				
+
+			}
+			
 			
 			* Versions 7r
 			foreach v in "7r"{
@@ -474,10 +281,11 @@ local do_resample = 0
 			}
 			
 			* Versions 8
-			foreach v in "8"{
+			foreach v in "8" "2w" "1940w"{
+				local type = cond("`v'"=="8","act","pr")
 
-			g v`v'_wc_pred1940_1970=100*v`v'_white_actoutmigact/popc1940
-			g v`v'_wcpp_pred1940_1970=100*((v`v'_white_actoutmigact+wpopc1940)/(popc1940+ v`v'_white_actoutmigact) - wpopc1940/popc1940)
+			g v`v'_wc_pred1940_1970=100*v`v'_white_`type'outmig`type'/popc1940
+			g v`v'_wcpp_pred1940_1970=100*((v`v'_white_`type'outmig`type'+wpopc1940)/(popc1940+ v`v'_white_`type'outmig`type') - wpopc1940/popc1940)
 
 			g v`v'_whitemig3539_share1940=100*v`v'_totwhitemigcity3539/popc1940
 			}
@@ -565,21 +373,20 @@ local do_resample = 0
 		*4. Merge in all datasets.
 		*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 			
-			// White migration instrument
-			merge 1:1 cz using "$INTDATA/dcourt/clean_cz_snq_european_immigration_instrument.dta", keep(1 3) nogen
 			// mfg_lfshare1940
 			merge 1:1 cz using "$INTDATA/dcourt/clean_cz_industry_employment_1940_1970.dta", keep(1 3) nogen
 
+			// frac_all_upm1940
+			merge 1:1 cz using "$RAWDATA/dcourt/clean_cz_mobility_1900_2015.dta", keep(1 3) nogen keepusing(frac_all_upm1940)
+
 			
 			
-			/* Get state and region info from cz-to-state_id-to-region crosswalk. */
-			merge 1:1 cz using "$RAWDATA/dcourt/cz_state_region_crosswalk.dta", keepusing(state_id region cz_name) keep (3) nogenerate
-			replace cz_name="Louisville, KY" if cz==13101 // Fill in Louisville, KY name, which was missing.
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 		*5. Create rank measure of shock. 
 		*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 			* OLS
 			xtile GM = bc1940_1970, nq(100) 
+			xtile WM = wc1940_1970, nq(100) 
 
 			* Instrument by version
 			* Version 0
@@ -599,8 +406,10 @@ local do_resample = 0
 			}	
 			
 			* Versions 8
-			foreach v in "8" {	
-			xtile GM_`v'_hat = v`v'_wc_pred1940_1970, nq(100) 
+			foreach v in "8" "2w"{	
+						local type = cond("`v'"=="8","act","pr")
+
+						xtile GM_`v'_hat = v`v'_wc_pred1940_1970, nq(100) 
 			}
 			
 			if `do_placebo'==1{
@@ -771,19 +580,38 @@ local do_resample = 0
 		*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 		*6. Create regional dummies. 
 		*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
-			tabulate region, gen(reg)	
 		*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 		*7. Create additional 1940 controls. 
 		*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 			
-			merge 1:1 cz using "$RAWDATA/dcourt/clean_cz_population_1940_1970", keep(1 3) keepusing(pop1940 pop1950 pop1960 pop1970) nogen
+			merge 1:1 cz using "$RAWDATA/dcourt/clean_cz_population_1940_1970", keep(1 3) keepusing(pop1940 pop1950 pop1960 pop1970 wpop1940 wpop1970) nogen
+			
+			*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
+			*7.5 Add real southern white
+			*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
+			merge 1:1 cz using "$INTDATA/census/southernpops_1940", keep(1 3) nogen keepusing(southern_black* southern_white* southern_black_urban* southern_white_urban*)
+			ren southern_* southern_*1940
+			merge 1:1 cz using "$INTDATA/census/southernpops_1970", keep(1 3) nogen keepusing(southern_black* southern_white* southern_black_urban* southern_white_urban*)
+			ren southern_* southern_*1970
+
+			g test1 = 100*(southern_white_urban1970/popc1970)
+			g test2 = 100*(southern_white_urban1940/popc1940)
+			g GM_sob_pp = 100*((southern_black_urban1970/popc1970) - (southern_black_urban1940/popc1940))
+			g GM_tot_sob_pp = 100*((southern_black1970/pop1970) - (southern_black1940/pop1940))
+			g WM_sob_pp = 100*((southern_white_urban1970/popc1970) - (southern_white_urban1940/popc1940))
+			g WM_tot_sob_pp = 100*((southern_white1970/pop1970) - (southern_white1940/pop1940))
+			
+			g GM_sob = 100*((southern_black_urban1970 - southern_black_urban1940)/popc1940)
+			g GM_tot_sob = 100*((southern_black1970 -southern_black1940)/pop1940)
+			g WM_sob = 100*((southern_white_urban1970 - southern_white_urban1940)/popc1940)
+			g WM_tot_sob = 100*((southern_white1970 - southern_white1940)/pop1940)
 			
 				*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 			*8. Label key variables and save final dataset. 
 			*------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 		
 			
-			//la var frac_all_upm1940 "Edu. Upward Mobility 1940"
+			la var frac_all_upm1940 "Edu. Upward Mobility 1940"
 			la var v2_blackmig3539_share1940 "Black Southern Mig 1935-1940"
 			la var reg2 "Midwest"
 			la var reg3 "South"
@@ -797,7 +625,13 @@ local do_resample = 0
 			ren bc1940_1970 GM_raw
 			ren bcpp1940_1970 GM_raw_pp
 			ren wcpp1940_1970 WM_raw_pp
+			ren tc1940_1970 AM_raw
+			ren v2t_tc_pred1940_1970 AM_hat_raw
+			ren v2tint_tc_pred1940_1970 AM_int_hat_raw
 			
+			ren v2wpp_white_proutmigpr WM_hat_pp
+			ren v2pp_black_proutmigpr GM_hat_pp
+
 			ren v2_bc_pred1940_1970 GM_hat_raw
 			ren v2_bcpp_pred1940_1970 GM_hat_raw_pp
 			
@@ -805,7 +639,16 @@ local do_resample = 0
 			ren v8_wcpp_pred1940_1970 GM_8_hat_raw_pp
 			
 			
-			foreach v in 1940 r 7r{
+			ren v2w_wc_pred1940_1970 GM_2w_hat_raw
+			ren v2w_wcpp_pred1940_1970 GM_2w_hat_raw_pp
+			
+			ren v1940w_wc_pred1940_1970 WM_sob_hat_raw
+			ren v1940w_wcpp_pred1940_1970 WM_sob_hat_raw_pp
+			ren v1940_bc_pred1940_1970 GM_sob_hat_raw
+			ren v1940_bcpp_pred1940_1970 GM_sob_hat_raw_pp
+			
+			
+			foreach v in r 7r{
 				ren v`v'_bcpp_pred1940_1970 GM_`v'_hat_raw_pp
 			}
 			if `do_placebo'==1{
@@ -820,13 +663,7 @@ local do_resample = 0
 			forv i=1(1)1000{	
 			ren vre`i'_bcpp_pred1940_1970 GM_hat_raw_re`i'
 			}	
-			
-			ren v2_bc_pred1940_1970_re_c GM_hat_raw_re_c
-			ren v2_bcpp_pred1940_1970_re_c GM_hat_raw_pp_re_c
-			ren v2_bc_pred1940_1970_re_cz GM_hat_raw_re_cz
-			ren v2_bcpp_pred1940_1970_re_cz GM_hat_raw_pp_re_cz
-			ren v2_bc_pred1940_1970_re_cz_t GM_hat_raw_re_cz_t
-			ren v2_bcpp_pred1940_1970_re_cz_t GM_hat_raw_pp_re_cz_t
+
 
 			
 			

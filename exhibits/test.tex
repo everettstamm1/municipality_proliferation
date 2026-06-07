@@ -11,6 +11,7 @@
 \usepackage{threeparttable}
 \usepackage{algorithmic}
 \usepackage{tabularx}
+\usepackage{amsmath}
 
 \title{Simple Tables for Municipality Proliferation}
 
@@ -22,14 +23,56 @@
 \listoftables}
 \clearpage
 
+\section{Overview}
 
-
-\section{MAIN}
-\begin{landscape}
-\input{tables/land_use_index/muni_outcomes_ols.tex}
+\begin{table}
+\footnotesize
+\centering
+\caption{Pretrends}
+\begin{threeparttable}
+\footnotesize
+\input{tables/balancetables/pretrends_extended.tex}
+\end{threeparttable}
+\label{tab:mig_new}
+\end{table}
 \clearpage
-\input{tables/land_use_index/muni_outcomes_ols_policies.tex}
-\end{landscape}
+
+
+\begin{table}
+\footnotesize
+\centering
+\caption{Pretrends update}
+\begin{threeparttable}
+\footnotesize
+\input{tables/balancetables/pretrends_extended_update.tex}
+\end{threeparttable}
+\label{tab:mig_new}
+\end{table}
+\clearpage
+
+
+\begin{table}
+\footnotesize
+\centering
+\caption{Pretrends update}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/black_ssaggregate_long.tex}
+\end{threeparttable}
+\label{tab:mig_new}
+\end{table}
+\clearpage
+\begin{table}
+\footnotesize
+\centering
+\caption{30 40 link sample}
+\begin{threeparttable}
+\footnotesize
+\input{tables/final/main_table_occscore_link_sample.tex}
+\end{threeparttable}
+\label{tab:mig_new}
+\end{table}
+\clearpage
 
 
 \end{document}

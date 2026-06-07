@@ -1,0 +1,37 @@
+ \begin{tabularx}{\textwidth}{l*{5}{>{\centering\arraybackslash}X}} \toprule \setlength{\tabcolsep}{15pt}
+&\multicolumn{1}{c}{C. Goodman}&\multicolumn{3}{c}{Census of Governments}&\multicolumn{1}{c}{Census}\\\cmidrule(lr){2-2}\cmidrule(lr){3-5}\cmidrule(lr){6-6}
+&\multicolumn{2}{c}{Municipalities}&\multicolumn{1}{c}{School districts}&\multicolumn{1}{c}{Special Districts}&\multicolumn{1}{c}{Main City Share}\\\cmidrule(lr){2-3}\cmidrule(lr){4-4}\cmidrule(lr){5-5}\cmidrule(lr){6-6}
+&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}&\multicolumn{1}{c}{(5)}\\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel A: First Stage}\\
+\cmidrule(lr){1-6}
+$\hat{GM}$      &    1.854***&    1.854***&    1.936***&    1.841***&    1.854***\\
+                &  (0.320)   &  (0.320)   &  (0.341)   &  (0.332)   &  (0.320)   \\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel B: OLS 1940-1970}\\
+\cmidrule(lr){1-6}
+GM              &    0.003   &    0.005   &    0.006   &    0.003   &   -0.000***\\
+                &  (0.002)   &  (0.003)   &  (0.017)   &  (0.021)   &  (0.000)   \\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel C: 2SLS 1940-1970}\\
+\cmidrule(lr){1-6}
+GM              &    0.003   &    0.007** &   -0.023** &    0.002   &   -0.000***\\
+                &  (0.002)   &  (0.003)   &  (0.009)   &  (0.007)   &  (0.000)   \\
+\midrule
+1940-70 Avg.    &     0.13   &     0.08   &    -1.80   &     1.15   &     0.00   \\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel D: OLS 1940-2010}\\
+\cmidrule(lr){1-6}
+GM              &    0.002   &    0.000   &    0.004   &   -0.018   &   -0.000***\\
+                &  (0.003)   &  (0.005)   &  (0.017)   &  (0.018)   &  (0.000)   \\
+\cmidrule(lr){1-6}
+\multicolumn{5}{l}{Panel E: 2SLS 1940-2010}\\
+\cmidrule(lr){1-6}
+GM              &    0.003   &    0.004   &   -0.028***&   -0.017*  &   -0.001***\\
+                &  (0.003)   &  (0.004)   &  (0.010)   &  (0.010)   &  (0.000)   \\
+\cmidrule(lr){1-6}
+1940-2010 Avg.  &     0.18   &     0.12   &    -1.92   &     1.71   &     0.00   \\
+1940 Avg.       &     1.48   &     1.61   &    14.05   &     0.88   &    32.78   \\
+First Stage F-Stat&    33.50   &    33.50   &    32.21   &    30.69   &    33.50   \\
+Observations    &      130   &      130   &      118   &      114   &      130   \\
+ \bottomrule \end{tabularx}
