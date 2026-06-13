@@ -1,5 +1,24 @@
 
 
+
+use city perwt stateicp countyicp incwage using "$RAWDATA/census/usa_00118.dta/usa_00118.dta" if incwage > 0 & incwage <=5000, clear
+
+ren city citycode
+
+replace citycode = 3540 if citycode == 3521 // Lebanon, PA rename
+
+merge m:1 citycode using "$INTDATA/dcourt/GM_city_final_dataset.dta",  keep(3) keepusing(citycode cz_name cz) 
+ren citycode city
+
+
+collapse (mean)  mean_income_1940=incwage , by(cz)
+
+save "$INTDATA/census/incomes_1940", replace
+
+
+// 2010 place level Incomes
+
+
 import delimited "$RAWDATA/census/census_place_fips_xwalk.txt", clear varnames(1)
 replace censusfipsname = strtrim(censusfipsname)
 g state = real(substr(censusfipsname,1,2))
@@ -21,28 +40,6 @@ foreach f in mo_il in_ne nv_sc sd_wy{
 }
 
 save "$XWALKS/blockgroup_place_xwalk.dta", replace
-
-use city perwt stateicp countyicp incwage using "$RAWDATA/census/usa_00118.dta/usa_00118.dta" if incwage > 0 & incwage <=5000, clear
-
-ren city citycode
-
-replace citycode = 3540 if citycode == 3521 // Lebanon, PA rename
-
-merge m:1 citycode using "$INTDATA/dcourt/GM_city_final_dataset.dta",  keep(3) keepusing(citycode cz_name cz) 
-ren citycode city
-
-
-collapse (mean)  mean_income_1940=incwage , by(cz)
-
-save "$INTDATA/census/incomes_1940", replace
-
-
-// 2010 Incomes
-
-
-tempfile place_hhinc_hv
-save `place_hhinc_hv'
-
 
 import delimited "$RAWDATA/census/nhgis0035_csv/nhgis0035_csv/nhgis0035_ds176_20105_blck_grp.csv", clear
 g cty_fips = 1000*statea + countya
@@ -87,7 +84,7 @@ save "$INTDATA/census/2010_hh_incomes", replace
 
 import delimited "$RAWDATA/census/nhgis0036_csv/nhgis0036_csv/nhgis0036_ds99_1970_county.csv", clear
 
-merge 1:1 gisjoin using  "$RAWDATA/dcourt/county1940_crosswalks", keepusing(cz) keep(3) nogen
+merge 1:1 gisjoin using  "$RAWDATA/dcourt//replication_AER/data/crosswalks//county1940_crosswalks", keepusing(cz) keep(3) nogen
 egen famcount = rowtotal(c3t*)
 collapse (sum) famcount c1k001, by(cz)
 g agg_fam_inc_cz1970 = c1k001/famcount

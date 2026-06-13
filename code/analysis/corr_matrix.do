@@ -18,7 +18,7 @@ local gm = string( `gm_b', "%9.3f") + "`gm_stars'"
 local n = string( `n_b', "%9.3f") + "`n_stars'"
 
 capture file close fh
-file open fh using "$TABS/corr_matrix.tex", write replace
+file open fh using "$TABS/TA4.tex", write replace
 
 
 file write fh "\begin{tabular}{l*{3}{c}} \toprule" _n

@@ -1,13 +1,4 @@
 
-local use_sumshare = 1
-local use_pct_inst = 1
-
-
-// Controls
-
-
-
-
 local b_controls reg2 reg3 reg4 sumshare_base 
 
 
@@ -27,15 +18,15 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac {
 	tempfile vr`i'
 	capture confirm variable GM_hat_raw_r`i'
 	if !_rc{
-	 parmby "reg n_`outcome'_cz_pc GM_hat_raw_r`i' `b_controls' `extra_controls' [aw=popc1940], r", lab saving(`"vr`i'`outcome'"', replace) idn(`i') ids(vr) ylabel rename(idn vrsn) level(90 95 99)
+	 parmby "reg n_`outcome'_cz_pc GM_hat_raw_r`i' `b_controls' `extra_controls' [aw=popc1940], r", lab saving(`"$INTDATA/temp/vr`i'`outcome'"', replace) idn(`i') ids(vr) ylabel rename(idn vrsn) level(90 95 99)
 	}
 	}
 	
 	drop _all
 	
 	forval i=1/1000 {
-	capture append using "vr`i'`outcome'"
-	erase "vr`i'`outcome'.dta"
+	capture append using "$INTDATA/temp/vr`i'`outcome'"
+	erase "$INTDATA/temp/vr`i'`outcome'.dta"
 	}
 	
 	la var vrsn "Version"
@@ -63,6 +54,6 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac {
 			
 	
 	
-	graph export "$FIGS/exogeneity_tests/D17_placebo_`outcome'_new_ctrls.pdf", replace as(pdf)
+	graph export "$FIGS/FA4_`outcome'.pdf", replace as(pdf)
 }
 

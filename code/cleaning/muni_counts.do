@@ -36,7 +36,7 @@
 		ren Pop czpop
 		
 		reshape wide czpop, i(cz) j(year)
-		save "$INTDATA/cog_populations/czpop", replace
+		save "$INTDATA/cog/czpop", replace
 	restore
 	
 	replace year = year+2
@@ -112,146 +112,6 @@
 		restore
 	}
 
-	// Preclean general purpose govts data
-	use "$INTDATA/cog/4_1_general_purpose_govts.dta", clear
-	drop if fips_code_state == "02" | fips_code_state=="15"
-	g fips = 1000*fips_state+fips_county_2002
-	rename czone cz
-	rename fips_code_msa msapmsa2000
-	keep if ID_type == 2 | ID_type == 3 // keeping only municipal and town/township observations
-
-	g incorp_date1 = original_incorporation_date
-	g incorp_date2 = year_home_rule_adopted
-
-	// Documentation notes some inconsistencies in incorporation dates and home rule charters, so we'll take the earliest reported
-	bys id (incorp_date1) : replace incorp_date1 = incorp_date1[1] 
-	bys id (incorp_date2) : replace incorp_date2 = incorp_date2[1] 
-
-	g incorp_date3 = cond(incorp_date1<.,incorp_date1,incorp_date2)
-	drop if incorp_date3==.
-
-	lab var incorp_date1 "Incorporations"
-	lab var incorp_date2 "Home Rule Adoptions"
-	lab var incorp_date3 "Incorporations or Home Rule Adoptions"
-
-	keep incorp_date* id cz
-	duplicates drop
-
-	forv i=1/3{
-		preserve
-			keep cz incorp_date`i'
-			local lab: variable label incorp_date`i'
-
-			g n = incorp_date`i'>=1940 & incorp_date`i'<=1970
-
-
-			g n1940 = incorp_date`i'<1940
-			g n1950 = incorp_date`i'<1950 
-			g n1960 = incorp_date`i'<1960
-			g n1970 = incorp_date`i'<1970
-			g n1980 = incorp_date`i'<1980
-
-			g n40_50 = incorp_date`i'>=1940 & incorp_date`i'<1950
-			g n50_60 = incorp_date`i'>=1950 & incorp_date`i'<1960
-			g n60_70 = incorp_date`i'>=1960 & incorp_date`i'<1970
-			g n70_80 = incorp_date`i'>=1970 & incorp_date`i'<1980
-			g n80_90 = incorp_date`i'>=1980 & incorp_date`i'<1990
-
-			collapse (sum) n*, by(cz)
-
-			rename n n_muni_cz
-
-			rename n1940 b_muni_cz1940
-			rename n1950 b_muni_cz1950
-			rename n1960 b_muni_cz1960
-			rename n1970 b_muni_cz1970
-			rename n1980 b_muni_cz1980
-
-			rename n40_50 n_muni_cz40_50
-			rename n50_60 n_muni_cz50_60
-			rename n60_70 n_muni_cz60_70
-			rename n70_80 n_muni_cz70_80
-			rename n80_90 n_muni_cz80_90
-
-			label var b_muni_cz1940 "Base `lab' 1940"
-			label var b_muni_cz1950 "Base `lab' 1950"
-			label var b_muni_cz1960 "Base `lab' 1960"
-			label var b_muni_cz1970 "Base `lab' 1970"
-			label var b_muni_cz1980 "Base `lab' 1980"
-
-			label var n_muni_cz40_50 "`lab'"
-			label var n_muni_cz50_60 "`lab'"
-			label var n_muni_cz60_70 "`lab'"
-			label var n_muni_cz70_80 "`lab'"
-			label var n_muni_cz80_90 "`lab'"
-			label var n_muni_cz "`lab'"
-			
-			ren *muni* *ngov`i'*
-			save "$INTDATA/counts/ngov`i'_cz", replace
-
-		restore
-	}
-
-	// Wikiscrape prep
-	use "$INTDATA/wikiscrape/wikiscrape_clean", clear
-
-	preserve
-		// Drop vars from county merge - keeping only commuting zones and info from settlement_infobox2
-		keep cz wid qid incorp_year 
-		
-		duplicates drop 
-
-
-
-		g n = incorp_year>=1940 & incorp_year<=1970
-
-
-		g n1940 = incorp_year<1940
-		g n1950 = incorp_year<1950 
-		g n1960 = incorp_year<1960
-		g n1970 = incorp_year<1970
-		g n1980 = incorp_year<1980
-
-		g n40_50 = incorp_year>=1940 & incorp_year<1950
-		g n50_60 = incorp_year>=1950 & incorp_year<1960
-		g n60_70 = incorp_year>=1960 & incorp_year<1970
-		g n70_80 = incorp_year>=1970 & incorp_year<1980
-		g n80_90 = incorp_year>=1980 & incorp_year<1990
-
-
-		collapse (sum) n*, by(cz)
-
-		rename n n_muni_cz
-
-		rename n1940 b_muni_cz1940
-		rename n1950 b_muni_cz1950
-		rename n1960 b_muni_cz1960
-		rename n1970 b_muni_cz1970
-		rename n1980 b_muni_cz1980
-
-		rename n40_50 n_muni_cz40_50
-		rename n50_60 n_muni_cz50_60
-		rename n60_70 n_muni_cz60_70
-		rename n70_80 n_muni_cz70_80
-		rename n80_90 n_muni_cz80_90
-
-		label var n_muni_cz "n_muni_cz"
-		label var b_muni_cz1940 "b_muni_cz1940"
-		label var b_muni_cz1950 "b_muni_cz1950"
-		label var b_muni_cz1960 "b_muni_cz1960"
-		label var b_muni_cz1970 "b_muni_cz1970"
-		label var b_muni_cz1980 "b_muni_cz1980"
-
-		label var n_muni_cz40_50 "n_muni_cz1940"
-		label var n_muni_cz50_60 "n_muni_cz1950"
-		label var n_muni_cz60_70 "n_muni_cz1960"
-		label var n_muni_cz70_80 "n_muni_cz1970"
-		label var n_muni_cz80_90 "n_muni_cz1980"
-		ren *muni* *wikiscrape*
-
-		save "$INTDATA/counts/n_muni_cz.dta", replace
-	restore
-	
 
 	// Preclean cgoodman data
 	use "$RAWDATA/cbgoodman/muni_incorporation_date.dta", clear
@@ -259,7 +119,6 @@
 	drop if statefips == 02 | statefips==15
 	g cty_fips = 1000*statefips+countyfips
 	merge m:1 cty_fips using "$XWALKS/cw_cty_czone.dta", keep(1 3) nogen
-	merge m:1 cty_fips using "$XWALKS/county_pmsa_xwalk.dta", nogen keep(1 3)
 	ren czone cz 
 	ren cty_fips fips
 	g yr_incorp_exact = yr_incorp

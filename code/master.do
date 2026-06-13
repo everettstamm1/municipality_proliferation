@@ -17,8 +17,10 @@ if "`c(username)'"=="Everett Stamm"{
 	gl use_gzuse = 0
 }
 if "`c(username)'"=="edog9"{
-	gl DROPBOX `"F:\municipality_proliferation"'
-	gl REPO "/Users/edog9/Documents/Github/municipality_proliferation/"
+	//gl DROPBOX `"F:\municipality_proliferation"'
+	gl DROPBOX `"F:/munis_replication/"'
+
+	gl REPO "C:/Users/edog9/Documents/Github/municipality_proliferation/"
 	gl FFMPEG "/Users/edog9/ffmpeg/bin/ffmpeg.exe"
 	gl Rterm_path `"C:/Program Files/R/R-4.3.1/bin/x64/Rterm.exe"'
 	gl Rterm_options `"--vanilla"'
@@ -74,17 +76,6 @@ export delimited "$REPO/paths.csv", replace
 if `run_dcourt'==1{
 
 
-	/* These are no longer needed
-	// Files I made to create data necessary for stacked derenoncourt
-	do "$CODE/dcourt_setup/A1_census_1950_1960_racepop.do"
-	do "$CODE/dcourt_setup/A2_clean_cz_mobility_1900_2015.do"
-	do "$CODE/dcourt_setup/4_final_dataset_split.do"
-	*/
-	do "$CODE/dcourt_setup/A4_clean_city_population_census_1940_full.do"
-	do "$CODE/dcourt_setup/A5_clean_cz_snq_european_immigration_instrument.do"
-	// Original derenoncourt final dataset, modified to drop data we don't need and reformat variables to what we need (e.g. percentage point instead of percentile instruments)
-	do "$CODE/cleaning/4_final_dataset.do"
-
 }
 
 
@@ -92,23 +83,78 @@ if `run_dcourt'==1{
 
 if `run'==1{
 
-	// CLEANING
 
+	// Run dcourt replication as far as we need it
+	do "$RAWDATA/dcourt/replication_AER/code/0_MASTER_edited.do"
+
+	// CLEANING
+	
+	// Get Census place-CZ crosswalk
+	do "$CODE/cleaning/place_county_xwalk.do"
+	
+	// Get Cgoodman place information
+	rsource using "$CODE/cleaning/cgoodman_place_county_geog.R"
+	
+	// Clean migration data to get white version of south_migrate
+	do "$CODE/cleaning/migrate_cleaning.do"
+	
+	// White lasso
+	do "$CODE/cleaning/2_lasso_white.do"
+	
+	// Creation of shift-share instruments and ssaggregate primatives
+	do "$CODE/cleaning/create_sumshare.do"
+	
 	// Cleaning CoG data
 	do "$CODE/cleaning/cog_cleaning.do"
-
-	// Urban populations
-	do "$CODE/cleaning/census_urban_populations.do"
-
-	// Race populations
-	do "$CODE/cleaning/census_race_cleaning.do"
-
-	// GIS work
-	rsource using "$CODE/cleaning/cgoodman_place_county_geog.R"
-	rsource using "$CODE/cleaning/covariates.R"
-
-	// Fraction land incorporated geographies
+	
+	// Creating jurisdiction counts
+	do "$CODE/cleaning/muni_counts.do"
+	
+	// Finding principal cities
+	do "$CODE/cleaning/maxcitypop.do"
+	
+	// Census incomes 1940, 1970, 2010
+	do "$CODE/cleaning/incomes.do"
+	
+	// Urban Geographies
 	do "$CODE/cleaning/geogs.do"
+	
+	// Streams
+	do "$CODE/cleaning/streams.do"
+	
+	// Other spatial covariates
+	rsource using "$CODE/cleaning/covariates.R"
+	
+	// Census education
+	do "$CODE/cleaning/education.do"
+
+	// Incumbent land changes 
+	do "$CODE/cleaning/cz_incumbent_land_changes.do"
+	
+	// CZ Court Orders
+	do "$CODE/cleaning/cz_court_orders.do"
+	
+	// Characteristics of 1930-40 linked Black migrants
+	do "$CODE/cleaning/black_linked_characteristics.do"
+	
+	// 1900-1950 full count populations, occupation scores, and mfg shares, as well as 1980-2000 mfg shares and 2010 urban populations
+	do "$CODE/cleaning/cz_pop_occscore_mfg.do"
+	
+	// Municipality shapefile
+	rsource using "$CODE/cleaning/municipal_shapefile.R"
+	
+	// Central city distances 
+	rsource using "$CODE/cleaning/full_touching.R"
+
+	// Muni-District Overlap 
+	rsource using "$CODE/cleaning/muni_district_overlap.R"
+
+	// Leaid geogs
+	///rsource using "$CODE/cleaning/leaid_place_xwalk.R"
+	//rsource using "$CODE/cleaning/leaid_areas.R"
+	
+	// School info cleaning
+	do "$CODE/cleaning/ncessch_cleaning.do"
 
 	// Municipal Finance cleaning
 	do "$CODE/cleaning/IndFin_cleaning.do"
@@ -121,39 +167,79 @@ if `run'==1{
 
 	// PCArrow Fig Data
 	do "$CODE/cleaning/pcarrow_fig_data.do"
-
-	// Municipal Shapefile
-	rsource using "$CODE/cleaning/municipal_shapefile.R"
-
+	
+	// Place level dataset
+	do "$CODE/cleaning/mechanisms.do"
+	
+	// Segregation Indices
+	do "$CODE/cleaning/cz_pop_segregation.do"
+	
+	
 	// Analysis
 
 	// Summary table
 	do "$CODE/analysis/summary_table.do"
+	
+	// Cleveland vs. Columbus
+	do "$CODE/analysis/fig_1_panels_b_c.do"
 
-	// Long term mechanisms: land use and municipal finance
-	do "$CODE/analysis/long_term_mechanisms.do"
-
+	// Balance Tables
+	do "$CODE/analysis/balancetables.do"
+	
+	// Main 2SLS tables 
+	do "$CODE/analysis/main_table.do"
+	
+	// Event Studies
+	do "$CODE/analysis/event_studies.do"
+	
 	// PCArrow Figure
 	do "$CODE/analysis/pcarrow_fig.do"
+	
+	// Linked OCCSCORE Heterogeneity
+	do "$CODE/analysis/occscore_links_diffs_fs.do"
+	do "$CODE/analysis/occscore_links_diffs_ss.do"
 
-	// Balance and pretrend tables
-	do "$CODE/analysis/balancetables.do"
+	// Court Ordered Heterogeneity
+	do "$CODE/analysis/main_court_ordered.do"
+	
+	// Mechanisms
+	do "$CODE/analysis/long_term_mechanisms.do"
 
-	// Main tables and all variants
-	do "$CODE/analysis/main_table.do"
+	// Long term segregation
+	do "$CODE/analysis/segregation_table.do"
+	
+	// Pretrends table
+	do "$CODE/analysis/pretrends.do"
+	
+	// Correlation Table
+	do "$CODE/analysis/corr_matrix.do"
+	
+	// Imbalanced controls decomposition
+	do "$CODE/analysis/imbalance_decomp.do"
 
-	// Leave one out tests
+	// Baseline controls individual effects
+	do "$CODE/analysis/balancecontrols_individualeffects.do"
+
+	// Other Mechanisms
+	do "$CODE/analysis/touching_pct_rev_debt_table.do"
+
+	// White Flight Check
+	do "$CODE/analysis/white_flight_check.do"
+
+	// Distance to principal city graphs
+	do "$CODE/analysis/dist_edge_edge.do"
+	
+	// Incorporations over time graph
+	do "$CODE/analysis/municipal_incorporations_graph.do"
+
+	// Leave-one-out tests
 	do "$CODE/analysis/loo_test.do"
 
+	// OverID tests
+	do "$CODE/analysis/alt_inst_tests.do"
+	
 	// Placebo tests
-	do "$CODE/analysis/placebo_test"
-
-	// Alternative Instrument tests
-	do "$CODE/analysis/alt_inst_tests"
-
-	// Motivating figures
-	do "$CODE/analysis/fig_1_panels_b_c"
-
-	// In text calculations
-	do "$CODE/analysis/in_text_calculations"
+	do "$CODE/analysis/placebo_test.do"
+	
+	
 }

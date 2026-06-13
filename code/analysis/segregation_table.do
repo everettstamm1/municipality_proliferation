@@ -48,7 +48,7 @@ eststo white_exposure: ivreg2 white_exposure (GM_raw_pp = shift) [aw=s_n]
 estadd scalar dv = `white_exposure_mean'
 
 
-esttab stu_vr stu_diss stu_iqr stu_var black_exposure white_exposure using "$TABS/implications/student_segregation_table_school.tex", 	replace se booktabs noconstant noobs compress frag label  ///
+esttab stu_vr stu_diss stu_iqr stu_var black_exposure white_exposure using "$TABS/T6.tex", 	replace se booktabs noconstant noobs compress frag label  ///
 				 starlevels( * 0.10 ** 0.05 *** 0.01) ///
 				mtitles("\shortstack{Variance \\ Ratio}" "\shortstack{Dissimilarity \\ Index}" "\shortstack{Interquartile \\ Range}" "\shortstack{Variance}" "\shortstack{Black \\ Exposure}" "\shortstack{White \\ Exposure}") ///
 				keep(GM_raw_pp) b(%05.3f) se(%05.3f) ///

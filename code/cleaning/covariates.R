@@ -1,4 +1,3 @@
-
 ## Load dependencies, install if not already.
 packages <-
   c('tidyverse',
@@ -14,49 +13,70 @@ for (pkg in packages) {
     install.packages(pkg)
     if (require(pkg, character.only = TRUE)) {
       print(paste0(pkg, " installed and loaded"))
-    } else{
+    } else {
       stop(paste0("could not install ", pkg))
     }
   }
 }
 
+# ----------------------------
 # Get paths
-paths <- read.csv("../paths.csv")
-RAWDATA <- paths[paths$global == "RAWDATA",2]
-INTDATA <- paths[paths$global == "INTDATA",2]
-XWALKS <- paths[paths$global == "XWALKS",2]
+# ----------------------------
 
+paths <- read.csv("../../paths.csv")
+
+RAWDATA <- paths[paths$global == "RAWDATA", 2]
+INTDATA <- paths[paths$global == "INTDATA", 2]
+XWALKS  <- paths[paths$global == "XWALKS", 2]
+
+# ----------------------------
+# Set tigris download/cache folder
+# ----------------------------
+
+TIGRIS_DIR <- file.path(RAWDATA, "census", "tiger", "full")
+
+dir.create(TIGRIS_DIR, recursive = TRUE, showWarnings = FALSE)
+
+# Normalize path for Windows/R compatibility
+TIGRIS_DIR <- normalizePath(TIGRIS_DIR, winslash = "/", mustWork = TRUE)
+
+options(tigris_use_cache = TRUE)
+options(timeout = 600)
+
+# Current R session cache location
+Sys.setenv(TIGRIS_CACHE_DIR = TIGRIS_DIR)
+
+# Optional: uncomment this if you want tigris to remember this folder
+# across future R sessions by writing to .Renviron.
+# tigris::tigris_cache_dir(TIGRIS_DIR)
+
+message("Tigris files will be saved/cached in: ", TIGRIS_DIR)
+
+TIGRIS_YEAR <- 2022
 #### Geographies ----
 county_cz_xwalk <- read_dta(paste0(XWALKS,"/cw_cty_czone.dta"))
+munis <- st_read(paste0(INTDATA,"/other/municipal_shapefile_v2.shp")) 
 
-counties <- counties()  %>% 
+
+counties  <- tigris::counties(
+  year = TIGRIS_YEAR,
+  cb = F,
+  class = "sf"
+)  %>% 
   select(ALAND, AWATER, STATEFP, COUNTYFP, geometry) %>% 
   rename(county_land = ALAND, county_water = AWATER) %>% 
   mutate(county_total = county_land+county_water,
          cty_fips = as.numeric(paste0(STATEFP,COUNTYFP))) %>% 
-  merge(county_cz_xwalk, by="cty_fips") 
+  left_join(county_cz_xwalk, by="cty_fips")
 
 crs <- st_crs(counties)
 
 
-#### Ports ----
-
-
-ports <- read_sf(paste0(RAWDATA,"/covariates/ports/ports_x010g.shp")) %>% 
-  st_set_crs(crs) %>% 
-  mutate(has_port = 1) 
-
-county_ports <- counties %>% 
-  st_intersects(ports) %>% 
-  data.frame() %>% 
-  rename(cty_row = row.id) %>% 
-  select(cty_row) %>% 
-  mutate(has_port = 1)
 
 
 
 #### Railroads ----
-railroads <- read_sf(paste0(RAWDATA,"/covariates/historical_railroads/Historical_Railroads___Vanderbilt.shp")) %>%
+railroads <- read_sf(paste0(RAWDATA,"/covariates/Historical_Railroads___Vanderbilt/Historical_Railroads___Vanderbilt.shp")) %>%
   st_transform(crs) %>% 
   filter(InOpBy <=1940)
 
@@ -74,18 +94,50 @@ county_km <- function(fips){
   return(int)
   
 }
+counties_sample <- counties %>% 
+  filter(STATEFP %in% unique(munis$STATEFP[munis$south == 0]))
 
 km_railroads_1940 <- aggregate(counties$cty_fips,list(counties$cty_fips),county_km) %>% 
   rename(cty_fips = Group.1,
          km_railroad = x)
 
+railroads <- read_sf(paste0(RAWDATA, "/covariates/Historical_Railroads___Vanderbilt/Historical_Railroads___Vanderbilt.shp")) %>%
+  filter(InOpBy <= 1940) %>%
+  st_transform(crs)
+
+counties_sample <- counties %>%
+  filter(STATEFP %in% unique(munis$STATEFP[munis$south == 0])) %>%
+  select(cty_fips)
+
+# Sparse spatial index: candidate railroads for each county
+rail_ix <- st_intersects(counties_sample, railroads)
+
+county_km <- function(i) {
+  if (i %% 100 == 0) {
+    message("Starting county ", i, " of ", nrow(counties_sample))
+    gc()
+  }
+  
+  rr <- railroads[rail_ix[[i]], ]
+  
+  if (nrow(rr) == 0) return(0)
+  
+  as.numeric(
+    sum(st_length(st_intersection(rr, counties_sample[i, ])))
+  )
+}
+
+km_railroads_1940 <- counties_sample %>%
+  st_drop_geometry() %>%
+  mutate(km_railroad = sapply(seq_len(nrow(counties_sample)), county_km))
+
 
 #### Network costs ----
-cost_id_county <-  read_excel(paste0(RAWDATA,"/covariates/RR_NetworkDatabase_DH_Oct2015/Data/Transportation_Costs_AllDecades/Cost_ID_county.xlsx")) %>% 
+cost_id_county <-  read_excel(paste0(RAWDATA,"/covariates/RR_NetworkDatabase_DH_Oct2015/RR_NetworkDatabase_DH_Oct2015/Data/Transportation_Costs_AllDecades/Cost_ID_county.xlsx")) %>% 
   select(`gis id`, ICPSRFIP) %>% 
   rename(cty_fips = ICPSRFIP, gisid= `gis id`)
 
-cost_matrix <- read_dta(paste0(RAWDATA,"/covariates/RR_NetworkDatabase_DH_Oct2015/Data/Transportation_Costs_AllDecades/NSFtranspCost.dta")) %>%
+cost_matrix <- read_dta(paste0(RAWDATA,"/covariates/RR_NetworkDatabase_DH_Oct2015/RR_NetworkDatabase_DH_Oct2015/Data/Transportation_Costs_AllDecades/NSFtranspCost.dta")) %>%
   merge(cost_id_county, by.x = 'gisid_origin', by.y = 'gisid', all = T) %>%
   rename(cty_fips_origin = cty_fips) %>% 
   merge(county_cz_xwalk, by.x = 'cty_fips_origin', by.y = 'cty_fips', all.x = T) %>% 
@@ -106,7 +158,6 @@ coastline_counties <- read_excel(paste0(RAWDATA,"/covariates/coastline-counties-
 
 ### Climate ----
 headers <- c("JAN","FEB","MAR","APR","MAY","JUN","JUL","AUG","SEP","OCT","NOV","DEC","cty_fips","year")
-
 precip <- read.table(paste0(RAWDATA,"/covariates/climate/ncei.noaa.gov_data_nclimdiv-monthly_access_climdiv-pcpncy-v1.0.0-20230606.txt")) %>% 
   mutate(cty_fips = if_else(nchar(V1)==11,str_sub(V1,1,5),str_sub(V1,1,4)), 
          year = if_else(nchar(V1)==11,str_sub(V1,8,11),str_sub(V1,7,10))) %>% 
@@ -157,39 +208,9 @@ min_temp$min_temp <- apply(min_temp[1:12],1,function(x) min(x))
 min_temp <-  min_temp %>% 
   select(cty_fips, min_temp)
 
-#### Saiz housing elasticity ----
-# pklist <- c("dtplyr", "curl", "foreign")
-# library(dtplyr)
-# library(curl)
-# library(foreign)
-# source("https://raw.githubusercontent.com/fgeerolf/R/master/load-packages.R")
-# 
-# url.Saiz2010 <- "http://web.archive.org/web/20100619052721/http://real.wharton.upenn.edu/~saiz/"
-# filename.zip <- "SUPPLYDATA.zip"
-# filename.dta <- "HOUSING_SUPPLY.dta"
-# 
-# curl_download(paste(url.Saiz2010, filename.zip, sep = ""), destfile = filename.zip, quiet = FALSE)
-# unzip(filename.zip)
-# housing.supply <- read.dta(filename.dta)
-# unlink(filename.dta)
-# unlink(filename.zip)
-# rm(filename.dta, filename.zip, url.Saiz2010)
-
-#### Natural Resources ----
-oil_nat_gas <- read.csv(paste0(RAWDATA,"/covariates/Oil__and__Natural__Gas__Wells.csv")) %>% 
-  mutate(year = as.numeric(substr(COMPDATE,1,4)),
-         n = 1,
-         cty_fips = as.numeric(COUNTYFIPS)) %>% 
-  filter(year<=1940) %>% 
-  group_by(cty_fips) %>% 
-  summarise(n_wells = sum(n))
-
 #### Combining data ----
 output <- counties %>% 
-  # Ports
   mutate(cty_row = row_number()) %>% 
-  merge(county_ports, by = "cty_row", all.x = T) %>% 
-  mutate(has_port = if_else(is.na(has_port),0,has_port)) %>% 
   # Coastal counties
   merge(coastline_counties, by = "cty_fips", all.x=T) %>% 
   mutate(coastal = if_else(is.na(coastal),0,coastal)) %>% 
@@ -198,17 +219,13 @@ output <- counties %>%
   merge(avg_temp, by = 'cty_fips', all.x = T) %>% 
   merge(max_temp, by = 'cty_fips', all.x = T) %>% 
   merge(min_temp, by = 'cty_fips', all.x = T) %>% 
-  # Oil
-  merge(oil_nat_gas, by = 'cty_fips', all.x = T) %>% 
   # Railroad lines
   merge(km_railroads_1940, by = 'cty_fips', all.x = T) %>% 
   group_by(czone) %>% 
-  summarize(n_wells = sum(n_wells, na.rm = T),
-            max_temp = max(max_temp, na.rm = T),
+  summarize(max_temp = max(max_temp, na.rm = T),
             min_temp = min(min_temp, na.rm = T),
             avg_temp = mean(avg_temp, na.rm = T),
             avg_precip = sum(avg_precip, na.rm = T),
-            has_port = max(has_port, na.rm = T),
             coastal = max(coastal, na.rm = T),
             m_rr = sum(km_railroad, na.rm = T),
             m_rr_sqm_total = sum(km_railroad, na.rm = T)/(sum(county_total,na.rm = T)),
@@ -218,6 +235,6 @@ output <- counties %>%
   rename(cz = czone)
 
 
-write_dta(output,path=paste0(INTDATA,"/covariates/covariates.dta"))
+write_dta(output,path=paste0(INTDATA,"/other/covariates.dta"))
 
 

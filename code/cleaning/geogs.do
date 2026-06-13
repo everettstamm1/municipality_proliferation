@@ -4,7 +4,7 @@ use "$INTDATA/cgoodman/cgoodman_place_county_geog.dta", clear
 collapse (mean) yr_incorp (sum) place_land place_total, by(STATEFP PLACEFP)
 
 g gisjoin = "G" + STATEFP + "0" + PLACEFP
-merge 1:1 gisjoin using "$RAWDATA/dcourt/US_place_point_2010_crosswalks.dta", keep(3) nogen
+merge 1:1 gisjoin using "$RAWDATA/dcourt//replication_AER/data/crosswalks/US_place_point_2010_crosswalks.dta", keep(3) nogen
 
 merge 1:1 city using "$INTDATA/dcourt/xwalk_296_city_cz.dta", keep(2 3) nogen
 
@@ -28,6 +28,8 @@ replace place_total = 1855079700 if city == "Butte, MT"
 collapse (sum) place_land place_total, by(cz)
 ren place_land orig_land
 ren place_total orig_total
+ren orig* new_orig*
+
 save "$INTDATA/cgoodman/orig_geogs.dta", replace
 
 // Incorp Split
@@ -52,51 +54,27 @@ restore
 merge m:1 cz using `cz_land', assert(3) nogen
 
 // Stacked
-foreach level in county cz{
-	if "`level'"=="county" local levelvar "fips"
-	if "`level'"=="cz" local levelvar "cz"
-	preserve
-		foreach geog in land total{
-			forv d=1940(10)1970{
-				bys `levelvar' : egen `geog'`d' = total(place_`geog') if yr_incorp<=`d'
-				replace `geog'`d' = 0 if `geog'`d' == .
-				g frac_`geog'`d' = `geog'`d' / `level'_`geog'
-				replace frac_`geog'`d' = min(frac_`geog'`d',1)
-			}
-		}
 
 
-		keep `levelvar' frac_land19* frac_total19* `level'_land `level'_total land* total*
-
-		collapse (max) land* total* frac_land19* frac_total19* `level'_land `level'_total, by(`levelvar')
-
-		reshape long frac_land frac_total land total, i(`levelvar') j(decade) 
-		ren `level'_land `level'_land2010
-		ren `level'_total `level'_total2010
-		ren land land_incorp
-		ren total total_incorp
-		
-		save "$INTDATA/cgoodman/`level'_geogs.dta", replace
-	restore
+foreach geog in land total{
+	forv d=1940(10)1970{
+		bys cz : egen `geog'`d' = total(place_`geog') if yr_incorp<=`d'
+		replace `geog'`d' = 0 if `geog'`d' == .
+		g frac_`geog'`d' = `geog'`d' / cz_`geog'
+		replace frac_`geog'`d' = min(frac_`geog'`d',1)
+	}
 }
 
-// Incorp + Rugged land split
-local files : dir "$INTDATA/land_cover/states/" files *
-foreach f in `files'{
-	use "$INTDATA/land_cover/states/`f'", clear
-	local state = substr(`"`f'"',-6,2)
-	tempfile s`state'
-	save `s`state''
-}
-clear
 
-foreach f in `files'{
-	local state = substr(`"`f'"',-6,2)
-	append using `s`state''
-}
+keep cz frac_land19* frac_total19* cz_land cz_total land* total*
 
-g frac_unusable = (area_unusable + area_incorporated -area_both)/area_total
+collapse (max) land* total* frac_land19* frac_total19* cz_land cz_total, by(cz)
 
-ren county_fips fips
-keep fips decade frac_unusable
-save "$INTDATA/land_cover/frac_unusable", replace
+reshape long frac_land frac_total land total, i(cz) j(decade) 
+ren cz_land cz_land2010
+ren cz_total cz_total2010
+ren land land_incorp
+ren total total_incorp
+
+save "$INTDATA/cgoodman/cz_geogs.dta", replace
+

@@ -68,10 +68,7 @@ restore
 merge 1:1 ncessch using `offerings', keep(1 3) nogen
 
 destring leaid, replace
-//merge m:1 year leaid using "$XWALKS/leaid_county_xwalk", keep(1 3) nogen
-//ren county_code cty_fips
-//merge m:1 cty_fips using "$XWALKS/cw_cty_czone", keep(3) nogen
-//merge m:1 leaid using "$XWALKS/leaid_place_xwalk", keep(1 3) nogen
+
 merge 1:1 ncessch using "$XWALKS/ncessch_place_xwalk", keep(1 3) nogen keepusing(PLACEFP STATEFP)
 
 preserve 

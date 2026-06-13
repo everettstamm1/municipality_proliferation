@@ -1,83 +1,39 @@
+library(tidyverse)
+library(sf)
 
-## Load dependencies, install if not already.
-packages <-
-  c('tidyverse',
-    'sf',
-    'haven',
-    'tigris',
-    'stringr',
-    'readxl',
-    'terra')
+munis <- st_read(paste0(INTDATA, "/other/municipal_shapefile_v2.shp")) %>% 
+  filter(sm_130_ == 1) %>%
+  mutate(STATEFP = as.integer(STATEFP)) %>%
+  select(muni_geoid = GEOID, STATEFP, geometry) %>%
+  st_make_valid() 
 
-for (pkg in packages) {
-  if (require(pkg, character.only = TRUE) == FALSE) {
-    print(paste0("Trying to install ", pkg))
-    install.packages(pkg)
-    if (require(pkg, character.only = TRUE)) {
-      print(paste0(pkg, " installed and loaded"))
-    } else{
-      stop(paste0("could not install ", pkg))
-    }
-  }
-}
+districts_full <- st_read(paste0(RAWDATA, "/nces/EDGE_SCHOOLDISTRICT_TL23_SY2233/EDGE_SCHOOLDISTRICT_TL23_SY2233/EDGE_SCHOOLDISTRICT_TL_23_SY2223.shp")) 
 
-# Get paths
-paths <- read.csv("../../paths.csv")
-CLEANDATA <- paths[paths$global == "CLEANDATA",2]
-RAWDATA <- paths[paths$global == "RAWDATA",2]
-INTDATA <- paths[paths$global == "INTDATA",2]
-XWALKS <- paths[paths$global == "XWALKS",2]
+districts <- districts_full %>%
+  mutate(STATEFP = as.integer(STATEFP)) %>%
+  filter(STATEFP %in% unique(munis$STATEFP)) %>%
+  select(dist_geoid = GEOID, STATEFP, geometry) %>%
+  st_make_valid()
 
-munis <- st_read(paste0(CLEANDATA,"/other/municipal_shapefile/municipal_shapefile_v2.shp")) 
-districts <- st_read(paste0(RAWDATA,"/nces/EDGE_SCHOOLDISTRICT_TL23_SY2233/EDGE_SCHOOLDISTRICT_TL23_SY2233/EDGE_SCHOOLDISTRICT_TL_23_SY2223.shp")) 
+# Make sure CRS matches
+districts <- st_transform(districts, st_crs(districts))
 
+# Which munis cover which districts?
+covered_list <- st_covered_by(districts, munis, sparse = TRUE)
 
-munis <- munis %>% 
-  filter(sm_130_ == 1) %>% 
-  mutate(land_area = st_area(geometry))
+covered_pairs <- tibble(
+  dist_geoid = districts$dist_geoid,
+  muni_index = covered_list
+) %>%
+  tidyr::unnest_longer(muni_index, values_to = "muni_index") %>%
+  filter(!is.na(muni_index)) %>%
+  mutate(
+    muni_geoid = munis$muni_geoid[muni_index]
+  )
 
-districts <- districts %>% 
-  mutate(STATEFP = as.numeric(STATEFP)) %>% 
-  filter(STATEFP %in% unique(munis$STATEFP)) %>% 
-  st_make_valid() %>% 
-  mutate(land_area = st_area(geometry))
+out <- munis %>%
+  st_drop_geometry() %>% 
+  mutate(exclusive_school_district = muni_geoid %in% covered_pairs$muni_geoid) %>% 
+  rename(GEOID = muni_geoid)
 
-
-
-for(s in unique(munis$STATEFP)){
-  print(paste0("Starting state: ",s))
-  state_munis <- munis %>% filter(STATEFP == s)
-  state_districts <- districts %>% filter(STATEFP == s)
-  
-  nr <- nrow(state_munis)
-  nc <- nrow(state_districts)
-  
-  munigrid = data.frame(matrix(NA, nrow = nr, ncol = nc))
-  distgrid = data.frame(matrix(NA, nrow = nr, ncol = nc))
-  
-  colnames(munigrid) <- state_districts$GEOID
-  rownames(munigrid) <- state_munis$GEOID
-  
-  colnames(distgrid) <- state_districts$GEOID
-  rownames(distgrid) <- state_munis$GEOID
-  
-  for(i in 1:nr){
-    muni <- state_munis[i,]
-    print(paste0("Starting i: ",i))
-    for(j in 1:nc){
-        dist <- state_districts[j,]
-        int <- st_intersection(muni,dist,dimension = "polygon")
-        if(nrow(int) > 0){
-          int_area <- st_area(st_make_valid(int))
-          munigrid[i,j] <- int_area/ state_munis$land_area[i]
-          distgrid[i,j] <- int_area/ state_districts$land_area[j]
-        }
-        else{
-          munigrid[i,j] <- 0
-          distgrid[i,j] <- 0
-        }
-      }
-  }
-  write.csv(munigrid,paste0(INTDATA,'/nces/muni_district_overlaps/munigrid_',s,".csv"))
-  write.csv(distgrid,paste0(INTDATA,'/nces/muni_district_overlaps/distgrid_',s,".csv"))
-}
+write_dta(out,paste0(INTDATA,"/other/covered_ex_dist.dta"))

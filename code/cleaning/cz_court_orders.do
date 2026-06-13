@@ -39,4 +39,4 @@ lab var main_court_order "=1 if largest school district in CZ in any year was co
 lab var enrollment "2000 Total Enrollment"
 
 drop enrollment*
-save "$CLEANDATA/nces/cz_court_orders", replace
+save "$INTDATA/nces/cz_court_orders", replace

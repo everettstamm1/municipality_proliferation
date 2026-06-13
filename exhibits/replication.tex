@@ -1,0 +1,554 @@
+\documentclass{article}
+\usepackage{blindtext}
+\usepackage{booktabs}
+\usepackage[margin=0.25in]{geometry}
+\usepackage{subcaption}
+\usepackage{graphicx}
+\usepackage{caption}
+\usepackage{hyperref}
+\usepackage{pdflscape}
+\usepackage{tikz}
+\usepackage{threeparttable}
+\usepackage{algorithmic}
+\usepackage{tabularx}
+\usepackage{amsmath}
+
+\title{Replicated Exhibits}
+
+\begin{document}
+\maketitle
+\tableofcontents
+{\footnotesize 
+\listoffigures
+\listoftables}
+\clearpage
+
+\section{Main Exhibits}
+
+%%%%%% Fig 1
+%\begin{figure}[H]
+%    \caption{Illustration of empirical investigation using Cleveland and Columbus, OH}\label{fig:map_example}
+%    \begin{subfigure}[b]{0.55\textwidth}
+%	\centering
+%        \includegraphics[width=.7\textwidth, trim={3cm 0 0 0}]{Exhibits/figures_pre_05_20_2025/columbus.pdf}
+%        \caption{All Municipalities in Columbus, OH}
+%    \end{subfigure}
+%    \begin{subfigure}[b]{0.55\textwidth}
+%	\centering
+%        \includegraphics[width=.7\textwidth, trim={3cm 0 0 0}]{Exhibits/figures_pre_05_20_2025/cleveland.pdf}
+%        \caption{All Municipalities in Cleveland, OH}
+%    \end{subfigure}
+%    \begin{subfigure}[h]{0.7\textwidth}
+%	\centering
+% \hspace{-4.2cm}
+%        \includegraphics[width=.85\textwidth]{Exhibits/figures_pre_05_20_2025/links.pdf}
+%        \caption{Pre-existing Migration Links (Shares)}
+%    \end{subfigure}
+%    \captionsetup[subfigure]{oneside,margin={10cm,-6cm}}
+%    \begin{subfigure}[b]{0.64\textwidth}
+%    \vspace{-12.2cm}
+%    \hspace{8.9cm}
+%	\includegraphics[width=.7\textwidth]{Exhibits/exhibits_0430/design_panelb_new.pdf}
+% \vspace{-.65cm}
+%  \caption{Change in Urban Black Share}
+%         \hspace{8.9cm}
+%         \vspace{-.8cm}
+%	\includegraphics[width=.7\textwidth]{Exhibits/exhibits_0430/design_panelc_new.pdf}
+%  \hspace{8.9cm}
+%        \caption{Jurisdictional Fragmentation}
+%         \hspace{9.6cm}
+%        \includegraphics[width=.6\textwidth]{Exhibits/figures_pre_05_20_2025/legend.pdf}
+%    \end{subfigure}
+%  \vspace{.5cm}
+%    \caption*{\scriptsize \emph{Notes:} Shades in Panels A and B indicate share of White residents in each of the municipalities; red markers indicate municipalities incorporated between 1940-1970. The large White space above Cleveland is Lake Erie. The data on the share of White residents we use here is from the 2020 Census, by which time several of the newly incorporated municipalities in Cleveland had diversified relative to the time of their founding. Panel C shows a map of established links from Southern counties to Cleveland, OH, and Columbus, OH. Panel D shows the evolution of the urban Black share over the course of 1940-1970. Panel E shows the evolution of the number of municipalities and school districts over 1940-1970.}
+%\end{figure}
+
+
+%%%%% TABLE 1
+\begin{landscape}
+\begin{table}[htbp]\centering 
+\begin{threeparttable} \caption{Summary statistics}
+\label{tab:summary}
+\input{tables/T1.tex}
+\end{threeparttable}
+\end{table}
+\end{landscape}
+\clearpage
+
+%%%%% TABLE 2
+\small
+\begin{table}
+\footnotesize
+\centering
+\caption{The Effect of the Great Migration on Jurisdictions Per Capita using the Shift-Share Design}
+\begin{threeparttable}
+\footnotesize
+\input{tables/T2.tex}
+\end{threeparttable}
+\label{tab:main_effect}
+\end{table}
+
+
+
+\clearpage
+\begin{figure}
+    \centering
+        \caption{Effect of $GM$ on $\Delta \text{Munis}_{t,1940}$}
+    % ---- first row ----
+\begin{subfigure}[b]{0.65\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/F2a.png}
+    \caption{Baseline Controls}
+\end{subfigure}
+\hfill
+\begin{subfigure}[b]{0.65\textwidth}
+    \centering
+    \includegraphics[width=\linewidth]{figures/F2b.png}
+    \caption{Imbalanced Controls}
+    \label{fig:sub2}
+    \end{subfigure}
+  
+\end{figure}
+
+\clearpage
+
+
+
+
+%%%%%% TABLE 5
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+
+\begin{threeparttable}
+\caption{Dissolution of Incumbent Municipalities}
+\label{tab:fragmech}
+    \input{tables/T3.tex}
+    \end{threeparttable}
+ \end{table}
+\clearpage
+
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  
+\caption{Main results, Split on Occupation Scores of 1930-40 Black Migrants}\label{tab:occscore_split}
+\begin{threeparttable}
+\scriptsize 
+    \input{tables/T4.tex}
+ 
+    \end{threeparttable}
+    \end{table}
+\clearpage
+
+
+
+%%%%%% FIGURE 2
+\begin{figure}
+    \captionsetup{justification=centering}
+    \centering
+    \caption{Most Incorporations in 1940-1970 are Mostly White, without large income differences}\label{fig:pcarrow_figure}
+    \begin{subfigure}[b]{0.49\textwidth}
+        	\centering
+\includegraphics[width=.8\textwidth]{figures/F3a.pdf}
+        \caption{Proportion of Population White, 1970}
+    \end{subfigure}
+    \begin{subfigure}[b]{0.49\textwidth}
+            	\centering
+\includegraphics[width=.8\textwidth]{figures/F3b.pdf}
+    \caption{Average Household Income, 1970}
+    \end{subfigure}
+ 
+\end{figure}
+
+\begin{landscape}
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  
+\caption{Municipalities Incorporated between 1940 and 1970: Is racial exclusion a key motivator?}\label{tab:landuse}
+\begin{threeparttable}
+\scriptsize 
+    \input{tables/T5.tex}
+
+    \end{threeparttable}
+    \end{table}
+\end{landscape}
+
+    
+%%%%% TABLE 4
+\begin{table}[htbp]
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi} 
+\centering
+\caption{Downstream: School Segregation and Achievement}\label{tab:seg}
+\begin{threeparttable}
+\footnotesize 
+\input{tables/T6.tex}
+   
+    \end{threeparttable}
+    \end{table}
+
+\section{Appendix}
+
+
+\begin{table}[htbp]\centering 
+ \begin{threeparttable} \caption{Balance Tests: 1940 Observables}\label{tab:balance}
+   \input{tables/TA1.tex}  \end{threeparttable} \end{table}
+%
+%\begin{table}[htbp]\centering 
+%\begin{threeparttable} \caption{Pre-trends}
+%\label{tab:pretrends}
+%   \input{tables/TA2.tex}  \end{threeparttable}
+%\end{table}
+%\clearpage
+
+\footnotesize
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main effects, Township Outcome} \label{tab:main_effect_towns}
+   \input{tables/TA3.tex}  \end{threeparttable}
+ \end{table}
+\clearpage
+
+\begin{table}[htbp]
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  
+\caption{Correlation Table}\label{tab:corr_matrix}
+\begin{threeparttable}
+      \input{tables/TA4.tex} 
+    \end{threeparttable}
+    \end{table}
+\clearpage
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+
+\begin{threeparttable}
+\caption{Decomposition of Main Effect: Changes in Jurisdictions}
+\label{tab:decomp_count}
+      \input{tables/TA5.tex} \end{threeparttable}
+ \end{table}
+\clearpage
+
+\begin{table}[htbp]
+\centering
+\scriptsize
+
+\begin{threeparttable}
+\caption{Decomposition of Main Effect: Changes in Population}
+\label{tab:decomp_pop}
+        \input{tables/TA6.tex}\end{threeparttable}
+ \end{table}
+\clearpage
+
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main effects, 1950-1970, avoiding the 1942 CoG measurement issues}
+\label{tab:main_effect_1950_1970}
+    \input{tables/TA7.tex} \end{threeparttable}  \end{table}
+\clearpage
+
+\begin{landscape}
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effect on C. Goodman Municipalities, varying inclusion of imbalanced controls} \label{tab:cgoodman_balance_iter}
+    \input{tables/TA8.tex} \end{threeparttable}
+ \end{table}
+\clearpage
+
+\footnotesize
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effect on CoG Municipalities, varying inclusion of imbalanced controls} \label{tab:gen_muni_balance_iter}
+    \input{tables/TA9.tex} \end{threeparttable}
+ \end{table}
+\clearpage
+
+
+\footnotesize
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effect on School Districts, varying inclusion of imbalanced controls} \label{tab:schdist_ind_balance_iter}
+    \input{tables/TA10.tex} \end{threeparttable}
+ \end{table}
+\clearpage
+
+
+\footnotesize
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effect on Special Districts, varying inclusion of imbalanced controls} \label{tab:spdist_balance_iter}
+    \input{tables/TA11.tex} \end{threeparttable}
+ \end{table}
+\clearpage
+
+
+\footnotesize
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Effect on Main City Share, varying inclusion of imbalanced controls} \label{tab:totfrac_balance_iter}
+    \input{tables/TA12.tex} \end{threeparttable}
+ \end{table}
+\clearpage
+
+\end{landscape}
+
+\footnotesize
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main effects, 1940-1970, without controls for imbalanced baseline covariates}  \label{tab:main_effect_noctrl}
+    \input{tables/TA13.tex} \end{threeparttable}
+ \end{table}
+\clearpage
+
+
+\footnotesize
+\begin{table}[htbp]
+\centering
+\scriptsize
+\begin{threeparttable}
+\caption{Main Effects, including all baseline covariates}
+\label{tab:allctrls}
+       \input{tables/TA14.tex} \end{threeparttable}
+ \end{table}
+\clearpage
+
+
+\begin{table}[htbp]
+\centering
+\tiny
+\begin{threeparttable}
+\caption{Main Effects, varying inclusion of all baseline controls}
+\label{tab:varyctrl}
+     \input{tables/TA15.tex}\end{threeparttable}
+ \end{table}
+\clearpage
+
+
+
+\begin{table}[htbp]\centering 
+ \begin{threeparttable} \caption{Balance Tests: 1940 Observables using the percentile instrument and endogenous regressor}\label{tab:balance_pctile}
+    \input{tables/TA16.tex} \end{threeparttable} \end{table}
+
+
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main effects, 1940-1970, using percentile transformation of instrument and endogenous regressor}\label{tab:main_effect_pctile}
+    \input{tables/TA17.tex}
+ \end{threeparttable} 
+\end{table}
+\clearpage
+
+
+
+\footnotesize
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{Main effects, including European migration control} \label{tab:main_effect_eurmig}
+    \input{tables/TA18.tex} \end{threeparttable}
+ \end{table}
+\clearpage
+
+
+\begin{table}[htbp]\centering 
+ \begin{threeparttable} \caption{White Instrument Balance Tests: 1940 Observables}\label{tab:balance_white}
+    \input{tables/TA19.tex} \end{threeparttable} \end{table}
+
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{White migration effect, 1940-1970}
+\footnotesize
+\label{tab:White_effect}
+    \input{tables/TA20.tex}
+ \end{threeparttable}  \end{table}
+
+
+\clearpage
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{First Stage and OLS of Panel A of Table \ref{tab:occscore_split}}
+\scriptsize
+\label{tab:links_fs_ols}
+    \input{tables/TA21.tex}
+ \end{threeparttable}  \end{table}
+
+
+\clearpage
+\begin{table}[htbp]\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  \begin{threeparttable} \caption{First Stage and OLS of Panel B of Table \ref{tab:occscore_split}}
+\scriptsize
+\label{tab:diffs_fs_ols}
+    \input{tables/TA22.tex}
+\end{threeparttable}
+\end{table}
+\clearpage
+
+\clearpage
+
+
+    
+
+\clearpage
+
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  
+\caption{Municipalities Incorporated between 1940 and 1970: Additional variables}\label{tab:touching_pct_rev_debt}
+\begin{threeparttable}
+\scriptsize 
+       \input{tables/TA23.tex}
+    \end{threeparttable}
+    \end{table}
+\clearpage
+
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  
+\caption{Main results, Split on whether CZ's largest school district had a Court Ordered Desegregation Plan}\label{tab:co_split}
+\begin{threeparttable}
+\scriptsize 
+    \input{tables/TA24.tex}
+    
+    \end{threeparttable}
+    \end{table}
+\clearpage
+
+\begin{table}[htbp]
+\footnotesize
+\centering \def\sym#1{\ifmmode^{#1}\else\(^{#1}\)\fi}  
+\caption{Municipalities Incorporated between 1940 and 1970: Evidence of White Flight}\label{tab:wf_check}
+\begin{threeparttable}
+\scriptsize 
+    \input{tables/TA25.tex}
+
+    \end{threeparttable}
+    \end{table}
+\clearpage
+
+
+
+%%%%%% TABLE 3
+
+\clearpage
+\begin{landscape}
+
+\begin{figure}
+    \centering
+    \caption{Municipal incorporations by decade}\label{fig:muni_incorps_graph}
+    \includegraphics[width = .65\textwidth]{figures/FA1}
+   
+\end{figure}
+
+\clearpage
+\begin{figure*}[htbp]
+    \centering
+    \caption{Leave-one-out IV Tests, Balanced Controls}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/FA2_cgoodman.pdf}
+        \label{fig:sub1}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/FA2_gen_muni.pdf}
+        \label{fig:sub2}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/FA2_schdist_ind.pdf}
+        \label{fig:sub3}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/FA2_gen_town.pdf}
+        \label{fig:sub4}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/FA2_spdist.pdf}
+        \label{fig:sub5}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/FA2_totfrac.pdf}
+        \label{fig:sub6}
+    \end{subfigure}
+    \label{fig:loo_iv}
+   
+\end{figure*}
+
+\clearpage
+
+
+\begin{figure*}[htbp]
+    \centering
+    \caption{Overidentification IV Tests, Balanced Controls}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/FA3_cgoodman.pdf}
+        \label{fig:sub1}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/FA3_gen_muni.pdf}
+        \label{fig:sub2}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/FA3_schdist_ind.pdf}
+        \label{fig:sub3}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/FA3_gen_town.pdf}
+        \label{fig:sub4}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/FA3_spdist.pdf}
+        \label{fig:sub5}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/FA3_totfrac.pdf}
+        \label{fig:sub6}
+    \end{subfigure}
+    \label{fig:alt_inst}
+    
+\end{figure*}
+
+\clearpage
+
+\begin{figure*}[htbp]
+    \centering
+    \caption{Placebo Tests, Balanced Controls}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/FA4_cgoodman.pdf}
+        \label{fig:sub1}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/FA4_gen_muni.pdf}
+        \label{fig:sub2}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/FA4_schdist_ind.pdf}
+        \label{fig:sub3}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/FA4_gen_town.pdf}
+        \label{fig:sub4}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/FA4_spdist.pdf}
+        \label{fig:sub5}
+    \end{subfigure}
+    \begin{subfigure}{0.4\textwidth}
+        \includegraphics[width=\linewidth]{figures/FA4_totfrac.pdf}
+        \label{fig:sub6}
+    \end{subfigure}
+    \label{fig:placebo}
+   
+\end{figure*}
+
+\pagebreak
+\begin{figure*}[htbp]
+    \centering
+    \vspace{2cm}
+    \caption{Distribution of Distance to Central City, 1940-70 Incorporations}
+    \begin{subfigure}{0.6\textwidth}
+    \includegraphics[width=\linewidth]{figures/FA5a}
+        \label{fig:sub1}
+    \end{subfigure}
+    \begin{subfigure}{0.6\textwidth}
+        \includegraphics[width=\linewidth]{figures/FA5b.pdf}
+        \label{fig:sub2}
+    \end{subfigure}
+    \label{fig:dist_4070}
+    
+\end{figure*}
+
+\end{landscape}
+
+\end{document}

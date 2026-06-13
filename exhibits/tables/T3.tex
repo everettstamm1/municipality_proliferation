@@ -1,0 +1,36 @@
+ \begin{tabularx}{\textwidth}{l*{4}{>{\centering\arraybackslash}X}} \toprule 
+&\multicolumn{2}{c}{Disincorporations/Consolidations}&\multicolumn{2}{c}{Incumbent Municipality Land}\\\cmidrule(lr){2-3}\cmidrule(lr){4-5}
+&\multicolumn{1}{c}{Raw}&\multicolumn{1}{c}{Zero Censored}&\multicolumn{1}{c}{$\Delta \log$ Land}&\multicolumn{1}{c}{$\Delta$ Prop. Incorporated}\\\cmidrule(lr){2-2}\cmidrule(lr){3-3}\cmidrule(lr){4-4}\cmidrule(lr){5-5}
+&\multicolumn{1}{c}{(1)}&\multicolumn{1}{c}{(2)}&\multicolumn{1}{c}{(3)}&\multicolumn{1}{c}{(4)}\\
+\cmidrule(lr){1-5}
+\multicolumn{4}{l}{Panel A: First Stage}\\
+\cmidrule(lr){1-5}
+$\hat{GM}$      &    1.757***&    1.757***&    1.759***&    1.751***\\
+                &  (0.316)   &  (0.316)   &  (0.315)   &  (0.315)   \\
+\cmidrule(lr){1-5}
+\multicolumn{4}{l}{Panel B: OLS 1940-1970}\\
+\cmidrule(lr){1-5}
+GM              &   -0.002   &   -0.002*  &   -0.026***&   -0.450*  \\
+                &  (0.001)   &  (0.001)   &  (0.009)   &  (0.238)   \\
+\cmidrule(lr){1-5}
+\multicolumn{4}{l}{Panel C: 2SLS 1940-1970}\\
+\cmidrule(lr){1-5}
+GM              &   -0.005***&   -0.005***&   -0.066***&   -0.585***\\
+                &  (0.001)   &  (0.001)   &  (0.006)   &  (0.166)   \\
+\midrule
+1940-70 Avg.    &     0.06   &     0.06   &     0.59   &     4.38   \\
+\cmidrule(lr){1-5}
+\multicolumn{4}{l}{Panel D: OLS 1940-2010}\\
+\cmidrule(lr){1-5}
+GM              &   -0.001   &   -0.001   &   -0.041***&   -0.785***\\
+                &  (0.001)   &  (0.001)   &  (0.009)   &  (0.251)   \\
+\cmidrule(lr){1-5}
+\multicolumn{4}{l}{Panel E: 2SLS 1940-2010}\\
+\cmidrule(lr){1-5}
+GM              &   -0.003***&   -0.002** &   -0.073***&   -0.728***\\
+                &  (0.001)   &  (0.001)   &  (0.006)   &  (0.206)   \\
+\cmidrule(lr){1-5}
+1940-2010 Avg.  &     0.08   &     0.08   &     0.95   &     8.48   \\
+First Stage F-Stat&    30.93   &    30.93   &    31.10   &    30.85   \\
+Observations    &      130   &      130   &      129   &      129   \\
+ \bottomrule \end{tabularx}

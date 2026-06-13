@@ -1,6 +1,6 @@
 use city stateicp countyicp educd age using "$RAWDATA/census/usa_00118.dta/usa_00118.dta" if educd != 999, clear
 
-merge m:1 stateicp countyicp using "$RAWDATA/dcourt/county1940_crosswalks", keep(3) nogen keepusing(cz)
+merge m:1 stateicp countyicp using "$RAWDATA/dcourt/replication_AER/data/crosswalks/county1940_crosswalks", keep(3) nogen keepusing(cz)
 
 g hsgrad = educd >= 60 if !mi(educd)
 g unigrad = educd >= 100 if !mi(educd)

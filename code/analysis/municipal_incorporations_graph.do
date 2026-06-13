@@ -1,7 +1,7 @@
 	use "$INTDATA/counts/cgoodman_cz", clear
 	drop n_cgoodman_cz*
 	merge 1:1 cz using "$CLEANDATA/cz_pooled", keep(1 3) keepusing(cz)
-	forv y =1700(10)2000{
+	forv y =1900(10)2000{
 		local y2 = `y'+10
 		g n_cgoodman_cz`y' = b_cgoodman_cz`y2' - b_cgoodman_cz`y'
 		g samp_cgoodman_cz`y' = n_cgoodman_cz`y'*(_merge == 3)
@@ -18,23 +18,6 @@ gen shade_top = .     // top of shaded area (max y)
 replace shade_bottom = 0 if inrange(decade, 1940, 1970)
 replace shade_top    = 2633 if inrange(decade, 1940, 1970)  // adjust if your y max is not 100
 
-twoway ///
-	(rarea shade_top shade_bottom decade if inrange(decade,1940,1970), ///
-        color(gs14)) ///
-    (line n_cgoodman_cz decade, lcolor(teal) lwidth(medthick) lpattern(solid) ///
-                      msymbol(circle) mcolor(teal)) ///
-    (line samp_cgoodman_cz decade, lcolor(orange) lwidth(medthick) lpattern(dash) ///
-                      msymbol(square) mcolor(orange)) ///
-    , ///
-    xtitle("Decade") ///
-    ytitle("Count") ///
-    legend(order(2 "Nationwide Total" 3 "Sample Non-Southern CZs" ) ///
-           cols(1)) ///
-    graphregion(color(white)) ///
-    scheme(s1color) 
-	
-graph export "$FIGS/municipal_incorporations_1700_2000.png", replace as(png)
-
 
 g decade2 = decade + 5
 
@@ -49,8 +32,8 @@ twoway (rarea shade_top shade_bottom decade if inrange(decade,1940,1970), ///
            cols(1)) ///
     graphregion(color(white)) ///
     scheme(s1color) 
-graph export "$FIGS/municipal_incorporations_1700_2000.png", replace as(png)
-
+graph export "$FIGS/FA1.png", replace as(png)
+/*
 // Numbers for footnote 8
 use "$INTDATA/counts/cgoodman_cz", clear
  

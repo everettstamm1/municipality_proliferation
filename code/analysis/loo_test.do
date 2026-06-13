@@ -35,7 +35,6 @@ foreach outcome in  schdist_ind gen_town spdist totfrac spdist cgoodman gen_muni
 	
 	foreach cz in `czs'{
 		
-		qui parmby "reg n_`outcome'_cz_pc shift_share_base `b_controls' `extra_controls' [aw=popc1940] if cz!=`cz', r", lab saving(`"rf`cz'`outcome'"', replace) idn(`cz') ids(vr) ylabel rename(idn vrsn) level(90 95 99)
 		
 		local xlab : variable label shift_share_base
 
@@ -47,45 +46,15 @@ foreach outcome in  schdist_ind gen_town spdist totfrac spdist cgoodman gen_muni
 			replace shift = 0 if mi(shift)
 			lab var shift "`xlab'"
 			
-			qui parmby "ivreg2 n_`outcome'_cz_pc (GM_raw_pp = shift) [aw=s_n]", lab saving(`"iv`cz'`outcome'"', replace) idn(`cz') ids(vr) ylabel rename(idn vrsn) level(90 95 99)
+			qui parmby "ivreg2 n_`outcome'_cz_pc (GM_raw_pp = shift) [aw=s_n]", lab saving(`"$INTDATA/temp/iv`cz'`outcome'"', replace) idn(`cz') ids(vr) ylabel rename(idn vrsn) level(90 95 99)
 		restore
 		
 	}
-	clear
 	
-	foreach cz in `czs'{
-		append using "rf`cz'`outcome'"
-		erase "rf`cz'`outcome'.dta"
-	}
-	keep if parmseq==1
-	g x = _n
-	local n = _N
-	g significant90=((min90<0 & max90<0) | (min90>0 & max90>0))
-	g significant95=((min95<0 & max95<0) | (min95>0 & max95>0))
-	g significant99=((min99<0 & max99<0) | (min99>0 & max99>0))
-	count if significant90==1
-	local n90 = r(N)
-	count if significant95==1
-	local n95 = r(N)
-	count if significant99==1
-	local n99 = r(N)
-
-	
-	
-	di "RF outcome `outcome' insig CZs: "
-	twoway scatter estimate x , mcolor(jmpgreen) ///
-	|| rcap min95 max95 x, lcolor(jmpgreen%50)  ///
-	 yline(0, lcolor(black)) ///
-	xsc(range(1(10)131)) xla(none) xtitle("") graphregion(color(white)) plotregion(ilcolor(white)) ylabel(,nogrid ) legend(rows(2)) ///
-	yline(`b_rf', lcolor(red) lstyle(dash)) title("`outlab'") ///
-		caption("`n90' out of `n' significant at the 90% level" "`n95' out of `n' significant at the 95% level" "`n99' out of `n' significant at the 99% level" "Red line indicates full sample point estimate")
-		
-	graph export "$FIGS/exogeneity_tests/loo_rf_`outcome'_new_ctrls.pdf", replace as(pdf)	
-
 	clear
 	foreach cz in `czs'{
-		append using "iv`cz'`outcome'"
-		erase "iv`cz'`outcome'.dta"
+		append using "$INTDATA/temp/iv`cz'`outcome'"
+		erase "$INTDATA/temp/iv`cz'`outcome'.dta"
 	}
 	g x = _n
 	keep if parmseq==1
@@ -109,6 +78,6 @@ foreach outcome in  schdist_ind gen_town spdist totfrac spdist cgoodman gen_muni
 	yline(`b_iv', lcolor(red) lstyle(dash)) title("`outlab'") ///
 		caption("`n90' out of `n' significant at the 90% level" "`n95' out of `n' significant at the 95% level" "`n99' out of `n' significant at the 99% level" "Red line indicates full sample point estimate")
 
-		graph export "$FIGS/exogeneity_tests/loo_iv_`outcome'_new_ctrls.pdf", replace as(pdf)
+		graph export "$FIGS/FA2_`outcome'.pdf", replace as(pdf)
 
 }

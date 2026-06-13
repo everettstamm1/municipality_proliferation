@@ -14,7 +14,7 @@ twoway (scatter share decade if cz_name=="Cleveland, OH", connect(direct) msymbo
 (scatter share decade if cz_name=="Columbus, OH", connect(direct) mcolor(midgreen) lcolor(midgreen)), ///
 legend(off order(2 "Columbus, OH" 1 "Cleveland, OH") position(6)) scheme(s1color) ytitle("Urban Black Population Share") 
 
-graph export "$FIGS/motivation/design_panelb_new.pdf", as(pdf) replace 
+graph export "$FIGS/F1d.pdf", as(pdf) replace 
 
 use "$CLEANDATA/cz_pooled.dta", clear
 
@@ -43,4 +43,4 @@ twoway (scatter b_cgoodman_cz decade if cz_name=="Cleveland, OH", connect(direct
 legend(off) scheme(s1color) ytitle("Count of Jurisdictions") /// 
 text(157 1951 "{it:School Districts}" "{it:(Dashed Lines)}", size(.28cm)) text(71 1944 "{it:Municipalities}" "{it:Incorporated}" "{it:(Solid Lines)}", size(.28cm))
 
-graph export "$FIGS/motivation/design_panelc_new.pdf", as(pdf) replace 
+graph export "$FIGS/F1e.pdf", as(pdf) replace 

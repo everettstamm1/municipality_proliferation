@@ -42,7 +42,7 @@ prog def create_sumshare
 		restore
 		g fips = dest_fips
 		
-		merge m:1 fips using "$RAWDATA/dcourt/county1940_crosswalks.dta", keepusing(cz) keep(3) nogen
+		merge m:1 fips using "$RAWDATA/dcourt/replication_AER/data/crosswalks/county1940_crosswalks.dta", keepusing(cz) keep(3) nogen
 		merge m:1 cz using `czpop', keep(2 3)
 	}
 	

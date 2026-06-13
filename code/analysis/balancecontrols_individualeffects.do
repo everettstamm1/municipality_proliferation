@@ -6,8 +6,7 @@ local controls reg2 reg3 reg4 sumshare_base
 // Run the interacted regression
 use "$CLEANDATA/cz_pooled", clear
 rename transpo_cost_1920 t_cost
-g n_streams_mi = mi(n_streams)
-replace n_streams = -1 if mi(n_streams)
+
 
 
 
@@ -24,7 +23,7 @@ foreach outcome in cgoodman  spdist gen_muni totfrac schdist_ind{
 	
 	foreach covar of varlist `covars'{
 		preserve
-			if "`covar'" == "n_streams" ssaggregate n_`outcome'_cz_pc GM_raw_pp [aw=popc1940], n(origin_fips) l(cz) sfile("$INTDATA/ssaggregate_prep//shares_base.dta") controls("`controls' `covar' n_streams_mi") s(share)
+			if "`covar'" == "n_streams" ssaggregate n_`outcome'_cz_pc GM_raw_pp [aw=popc1940], n(origin_fips) l(cz) sfile("$INTDATA/ssaggregate_prep//shares_base.dta") controls("`controls' `covar' mi_n_streams") s(share)
 			if "`covar'" != "n_streams"  ssaggregate n_`outcome'_cz_pc GM_raw_pp [aw=popc1940], n(origin_fips) l(cz) sfile("$INTDATA/ssaggregate_prep//shares_base.dta") controls("`controls' `covar'") s(share)
 			
 			merge 1:1 origin_fips using "$INTDATA/ssaggregate_prep//shock_instrument_base.dta", keep(1 3) nogen
@@ -48,7 +47,7 @@ foreach outcome in cgoodman  spdist gen_muni totfrac schdist_ind{
 	
 	preserve
 	
-		ssaggregate n_`outcome'_cz_pc GM_raw_pp [aw=popc1940], n(origin_fips) l(cz) sfile("$INTDATA/ssaggregate_prep//shares_base.dta") controls("`controls' `covars' n_streams_mi") s(share)
+		ssaggregate n_`outcome'_cz_pc GM_raw_pp [aw=popc1940], n(origin_fips) l(cz) sfile("$INTDATA/ssaggregate_prep//shares_base.dta") controls("`controls' `covars' mi_n_streams") s(share)
 		merge 1:1 origin_fips using "$INTDATA/ssaggregate_prep//shock_instrument_base.dta", keep(1 3) nogen
 		replace shift = 0 if mi(shift)
 		
@@ -77,7 +76,7 @@ foreach outcome in cgoodman spdist gen_muni totfrac schdist_ind{
 
 
 capture file close fh
-file open fh using "$TABS/balancecontrols_individualeffects.tex", write replace
+file open fh using "$TABS/TA15.tex", write replace
 file write fh "\begin{tabularx}{\textwidth}{l*{5}{>{\centering\arraybackslash}X}} \toprule \setlength{\tabcolsep}{15pt}" _n
 
  
@@ -109,7 +108,7 @@ file write fh "\bottomrule \end{tabularx}" _n
 
 file close fh
 
-
+/*
 
 local covars avg_precip avg_temp n_streams coastal mfg_lfshare1940 m_rr_sqm_total t_cost frac_total  hsgrad_25 unigrad_25 mean_income_1940 cz_popdens1940 growth1930
 
@@ -119,9 +118,8 @@ local controls reg2 reg3 reg4
 // Run the interacted regression
 use "$CLEANDATA/cz_pooled", clear
 rename transpo_cost_1920 t_cost
-g n_streams_mi = mi(n_streams)
-replace n_streams = -1 if mi(n_streams)
-replace n_streams = n_streams/10000
+
+replace n_streams = n_streams/10000 // rescale
 
 
 // Normalize
@@ -133,7 +131,7 @@ foreach covar of varlist `covars'{
 
 eststo clear
 foreach outcome in cgoodman  spdist gen_muni totfrac schdist_ind{
-	eststo : reg n_`outcome'_cz_pc  `covars' n_streams_mi `controls' [aw = popc1940], r
+	eststo : reg n_`outcome'_cz_pc  `covars' mi_n_streams `controls' [aw = popc1940], r
 }
 	
 esttab     ///
@@ -162,8 +160,7 @@ local controls reg2 reg3 reg4
 // Run the interacted regression
 use "$CLEANDATA/cz_pooled", clear
 rename transpo_cost_1920 t_cost
-g n_streams_mi = mi(n_streams)
-replace n_streams = -1 if mi(n_streams)
+
 replace n_streams = n_streams/10000
 
 // Normalize
@@ -178,7 +175,7 @@ foreach outcome in cgoodman  spdist gen_muni totfrac schdist_ind{
 	
 	foreach covar of varlist `covars'{
 		
-		if "`covar'" == "n_streams" reg n_`outcome'_cz_pc `covar' n_streams_mi `controls' [aw=popc1940], r
+		if "`covar'" == "n_streams" reg n_`outcome'_cz_pc `covar' mi_n_streams `controls' [aw=popc1940], r
 		if "`covar'" != "n_streams"  reg n_`outcome'_cz_pc `covar' `controls' [aw=popc1940], r
 		local b_`outcome'_`covar' =  r(table)[1,1]
 		local se_`outcome'_`covar' = r(table)[2,1] 
@@ -233,6 +230,6 @@ file write fh "Observations    &      130   &      130   &      118   &      130
 file write fh "\bottomrule \end{tabularx}" _n
 
 file close fh
-
+*/
 	
 

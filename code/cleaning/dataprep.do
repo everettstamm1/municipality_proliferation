@@ -2,113 +2,15 @@
 	
 	// Start from final cleaning of derenoncourt dataset
 	
-
-	
-	use "$RAWDATA/dcourt/clean_city_population_census_1940.dta", clear // 711 cities in non-South
-	merge 1:1 citycode using "$INTDATA/dcourt/clean_city_population_census_1940_full.dta", keepusing(wpopc1940)  // add in white urban pop
-	
-	keep if _merge==3 | citycode == 910 /*butte, MT, correction later */ | citycode == 170 /* Amsterdam, NY,  correction later */
-	drop _merge
-	
-	
-	merge 1:1 city using "$RAWDATA/dcourt/clean_city_population_ccdb_1944_1977.dta", keepusing(bpop1970 bpop1960 nwhtpop1950 nwhtpop1960 pop1960 whtpop1970 pop1950 pop1940 pop1970 land_area1940 land_area1970)
-	ren whtpop1970 wpopc1970
-	foreach var of varlist bpop1960 nwhtpop1950 nwhtpop1960  pop1960{
-	ren `var' `var'_ccdb
-}
-		ren _merge ccdb_merge
-
-	/*
-	* Analysis of non-matches
-	not matched                           789
-				from master                       273  (_merge==1) // 273 cities from 1940 census city file do not match
-				from using                        516  (_merge==2) // 516 cities from CCDB file do not match because they are Southern or they are non-Southern but do not appear in 1940 Census
-	
-	Here are the cities that do not appear in 1940 census, are non-southern, and have non-missing data for black pop in 1970: Boise city, ID; East Providence, RI: Huntington Park CA; West
-	Haven CT; and Warwick, RI 
-	
-	Here are the cities that do not appear in 1940 census, are non-southern, and are missing data for black pop in 1970:
-	Ardmore, PA
-	Arlington, MA
-	Arlington, VA
-	Belmont, MA
-	Belvedere, CA
-	Bogota, NJ
-	Brookline, MA
-	Clarksburg, WV
-	Drexel Hill, PA
-	Haverford College, PA
-	Newport, KY
-	Secaucus, NJ
-	Watertown, MA
-	West Hartford, CT
-	Woodbridge, NJ
-
-		matched                               438  (_merge==3)
-	
-	*/
-	
-	
-	
-	/* Keep cities large enough (25k+) to appear in CCDB in 1940 and 1970. Results are 
-	robust to changing this criterion.*/
-	rename bpop1970 bpopc1970 // rename so it is clear these numbers correspond to city populations
-	rename pop1970 popc1970 // rename so it is clear these numbers correspond to city populations
-	rename pop1950 popc1950 // rename so it is clear these numbers correspond to city populations
-	rename pop1960 popc1960 // rename so it is clear these numbers correspond to city populations
-	rename bpop1960 bpopc1960 // rename so it is clear these numbers correspond to city populations
-	/* Butte, MT and Amsterdam, NY received southern black migrants between 1935 and 1940, but are just below pop cutoff for CCDB. 
-	Keep them in sample by retrieving 1970 black pop info from Census for these cities */
-	replace bpopc1970=38 if city=="Butte, MT" // see Table 27 of published 1970 Census: https://www.census.gov/content/dam/Census/library/working-papers/2005/demo/POP-twps0076.pdf
-	replace popc1970=23368 if city=="Butte, MT" // see Table 27 of published 1970 Census: https://www.census.gov/content/dam/Census/library/working-papers/2005/demo/POP-twps0076.pdf
-	replace wpopc1970= 23013 if city=="Butte, MT"
-	
-	replace bpopc1970=140 if city=="Amsterdam, NY" // see Table 27 of published 1970 Census: https://www2.census.gov/prod2/decennial/documents/1970a_ny1-02.pdf
-	replace popc1970=25524 if city=="Amsterdam, NY" // see Table 27 of published 1970 Census: https://www2.census.gov/prod2/decennial/documents/1970a_ny1-02.pdf
-	replace wpopc1970= 25346 if city=="Amsterdam, NY"
-	keep if  bpopc1970!=. & pop1940!=.
-	/* The following non-southern cities are missing Black population data in 1970 though they have total population data for that year
-	city
-	Bolingbrook, IL
-	Burbank, IL
-	Burton, MI
-	Farmington Hills, MI
-	Grosse Pointe Woods, MI
-	Irvine, CA
-	Rancho Palos Verdes, CA
-	Romulus, MI
-	*/	
-	
-	drop if ccdb_merge==2 // Dropping cities in CCDB that do not appear in the 1940 Census list of non-southern cities, see analysis of non-matches above. 
-	drop ccdb_merge
-	
-	keep if popc1940 >=25000 | popc1970>=25000
-	
-	// Save reference datasets
-	preserve
-		keep city citycode cz cz_name popc*
-		
-		forv y = 1940(10)1970{
-			bys cz : egen cz_popc`y' = total(popc`y')
-
-		}
-		save "$INTDATA/dcourt/xwalk_296_city_cz.dta", replace
-		keep cz cz_name
-		duplicates drop
-		save "$INTDATA/dcourt/original_130_czs", replace
-	restore
-
-	
-	
 	use "$INTDATA/dcourt/GM_city_final_dataset.dta", clear
 
 	collapse (sum)  popc* bpopc* wpopc1940 wpopc1970, by(cz)
 	
 	// Merge in other cleaned derenoncourt objects
 	// White migration instrument
-	merge 1:1 cz using "$INTDATA/dcourt/clean_cz_snq_european_immigration_instrument.dta", keep(1 3) nogen
+	merge 1:1 cz using "$RAWDATA/dcourt//replication_AER/data/mechanisms/population/clean_cz_snq_european_immigration_instrument.dta", keep(1 3) nogen
 	/* Get state and region info from cz-to-state_id-to-region crosswalk. */
-	merge 1:1 cz using "$RAWDATA/dcourt/cz_state_region_crosswalk.dta", keepusing(state_id region cz_name) keep (3) nogenerate
+	merge 1:1 cz using "$RAWDATA/dcourt//replication_AER/data/crosswalks/cz_state_region_crosswalk.dta", keepusing(state_id region cz_name) keep (3) nogenerate
 	replace cz_name="Louisville, KY" if cz==13101 // Fill in Louisville, KY name, which was missing.
 	tabulate region, gen(reg)	
 
@@ -132,7 +34,7 @@
 	merge 1:1 cz using "$INTDATA/counts/cgoodman_cz", keep(1 3) nogen keepusing(n_cgoodman_cz b_cgoodman_cz*)
 	merge 1:1 cz using "$INTDATA/counts/cgoodman_exact_cz", keep(1 3) nogen keepusing(n_cgoodman_exact_cz b_cgoodman_exact_cz*)
 
-	merge 1:1 cz using "$INTDATA/census/maxcitypop_ccdb", keep(1 3) nogen keepusing(maxcitypop1940 maxcitypop1950 maxcitypop1960 maxcitypop1970)
+	merge 1:1 cz using "$INTDATA/census/maxcitypop", keep(1 3) nogen keepusing(maxcitypop1940 maxcitypop1950 maxcitypop1960 maxcitypop1970)
 	merge 1:1 cz using "$INTDATA/census/maxcitypop_2010", keep(1 3) nogen keepusing(maxcitypop2010)
 
 	rename maxcitypop* b_totfrac_cz*
@@ -153,25 +55,14 @@
 	su frac_total , d
 	g above_med_frac_total = frac_total >= r(p50)
 		
-	merge 1:1 cz using "$INTDATA/covariates/covariates.dta", keep(1 3) nogen
-	merge 1:1 cz using "$INTDATA/census/maxcitypop", keep(1 3) nogen
-	ren cz czone
-	//merge 1:1 czone using "$INTDATA/census/home_values", keep(1 3) nogen
-	//merge 1:1 czone using "$INTDATA/census/incomes", keep(1 3) nogen
-	ren czone cz
-	//merge 1:1 cz using "$INTDATA/census/incomes_and_education_1940", keep(1 3) nogen
-	//merge 1:1 cz using "$INTDATA/census/incomes_and_education_1940_new", keep(1 3) nogen
+	merge 1:1 cz using "$INTDATA/other/covariates.dta", keep(1 3) nogen
 	merge 1:1 cz using "$INTDATA/census/incomes_1940", keep(1 3) nogen
 	merge 1:1 cz using "$INTDATA/census/education_1940", keep(1 3) nogen
-
-	//merge 1:1 czone using "$INTDATA/census/black_incomes_and_education_1940", keep(1 3) nogen
-	//drop mean_urban_income_1940 mean_pos_urban_income_1940
-	//merge 1:1 czone using "$INTDATA/census/urban_incomes_and_education_1940_scc", keep(1 3) nogen 
-	merge 1:1 cz using "$INTDATA/cz_incumbent_land_changes.dta", keep(3) nogen
+	merge 1:1 cz using "$INTDATA/borders/cz_incumbent_land_changes.dta", keep(3) nogen
 
 	
 	// Missing dummies
-	foreach var of varlist frac_land transpo_cost_1920 coastal has_port avg_precip avg_temp n_wells totfrac_in_main_city m_rr m_rr_sqm_land m_rr_sqm_total{
+	foreach var of varlist frac_land transpo_cost_1920 coastal avg_precip avg_temp m_rr m_rr_sqm_land m_rr_sqm_total{
 		g `var'_m = `var'==.
 		replace `var' = 0 if `var'==.
 	}
@@ -201,6 +92,28 @@
 	merge 1:1 cz using "$INTDATA/census/cz_mfg_1980_2000.dta", keep(1 3) nogen
 
 	//drop pop19* 
+	
+	preserve
+		import delimited using "$RAWDATA/census/nhgis0046_csv/nhgis0046_csv/nhgis0046_ts_nominal_county.csv", clear
+		ren a00aa* pop*
+		tostring statefp countyfp, gen(statefip countyfip)
+		replace statefip = "0" + statefip if statefp < 10
+		replace countyfip = "00" + countyfip if countyfp < 10
+		replace countyfip = "0" + countyfip if countyfp >= 10 & countyfp < 100
+
+		//keep pop* nhgisst nhgiscty
+		keep pop* gisjoin
+		reshape long pop, i(gisjoin) j(year)
+		drop if mi(pop)
+		
+		merge m:1 gisjoin using "$RAWDATA/dcourt/replication_AER/data/crosswalks/county1940_crosswalks", keepusing(cz)
+		
+		collapse (sum) pop, by(year cz)
+		reshape wide pop, i(cz) j(year)
+		tempfile nhgispops
+		save `nhgispops'
+	restore
+	//merge 1:1 cz using `nhgispops', keep(1 3) nogen
 
 	preserve
 		import delimited using "$RAWDATA/census/nhgis0046_csv/nhgis0046_csv/nhgis0046_ts_nominal_county.csv", clear
@@ -272,18 +185,17 @@
 		
 		collapse (sum) pop, by(year cz)
 		reshape wide pop, i(cz) j(year)
-		drop pop1940 
 		tempfile nhgispops
 		save `nhgispops'
 	restore
 	merge 1:1 cz using `nhgispops', keep(1 3) nogen
-		
+	
 	
 	
 	//merge 1:1 cz using "$INTDATA/census/cz_mfg.dta", keep(3) nogen
 	drop mfg_lfshare1940
 	
-	merge 1:1 cz using "$INTDATA/dcourt/clean_cz_industry_employment_1940_1970.dta", keep(1 3) nogen keepusing(mfg_lfshare1940 mfg_lfshare1950 mfg_lfshare1960 mfg_lfshare1970)
+	merge 1:1 cz using "$RAWDATA/dcourt/replication_AER/data/mechanisms/jobs/clean_cz_industry_employment_1940_1970.dta", keep(1 3) nogen keepusing(mfg_lfshare1940 mfg_lfshare1950 mfg_lfshare1960 mfg_lfshare1970)
 	
 	
 	// Outcome transformations
@@ -372,59 +284,7 @@
 	g pre_cgoodman_cz_pc = b1940_cgoodman_cz_pc - b1910_cgoodman_cz_pc
 	g pre_cgoodman_exact_cz_pc = b1940_cgoodman_exact_cz_pc - b1910_cgoodman_exact_cz_pc
 
-	// Adding measure of enclosedness
-	preserve	
-		import delimited using "$CLEANDATA/other/length_enclosed.csv", clear
-		duplicates drop
-		keep cz total_length
-		tempfile length
-		save `length'
-	restore
-	
-	merge 1:1 cz using `length', assert(3) nogen
-
-	preserve 
-		import delimited using "$DATA/qgis/enclosedness/enclosed_1940.csv", clear
-		keep cz_2 cz_2_2 len
-		g cz = cond(mi(cz_2), cz_2_2, cz_2) 
-		collapse (sum) len, by(cz)
-		ren len enclosed1940
-		tempfile enclosed1940
-		save `enclosed1940'
-	restore
-	
-	merge 1:1 cz using `enclosed1940', keep(1 3) nogen
-	replace enclosed1940 = 0 if mi(enclosed1940)
-	preserve 
-		import delimited using "$DATA/qgis/enclosedness/enclosed_1970.csv", clear
-		keep cz_2 cz_2_2 len
-		g cz = cond(mi(cz_2), cz_2_2, cz_2) 
-		collapse (sum) len, by(cz)
-		ren len enclosed1970
-		tempfile enclosed1970
-		save `enclosed1970'
-	restore
-	
-	merge 1:1 cz using `enclosed1970', keep(1 3) nogen
-	replace enclosed1970 = 0 if mi(enclosed1970)
-	
-	
-	
-	
-	g prop_enclosed1940 = enclosed1940/total_length
-	g prop_enclosed1970 = enclosed1970/total_length
-	g change_enclosed4070 = (enclosed1970 - enclosed1940)/(total_length - enclosed1940)
-	
 	// New York causing problems but clearly fully enclosed by 1940
-	replace prop_enclosed1940 = 1 if cz==19400
-	replace prop_enclosed1970 = 1 if cz==19400
-	replace change_enclosed4070 = 1 if cz == 19400
-	
-	
-	su prop_enclosed1940, d
-	g above_med_enclosed = prop_enclosed1940 >= r(p50)
-	
-	
 	
 	merge 1:1 cz using "$INTDATA/cgoodman/orig_geogs", keep(3) nogen
 	
@@ -441,28 +301,7 @@
 		label variable growth`y1' "`lab' Population Growth Rate"
 	}
 	
-	g orig_popdens1940 = popc1940/(orig_total/1000000)
-	g orig_popdenst1940 = popc1940/(orig_total/1000000)
 
-
-	// Count of touching munis
-	preserve
-		import excel using "$CLEANDATA/other/touching_munis.xlsx", clear first
-		keep cz GEOID_2 yr_ncrp
-		duplicates drop
-		g touching40 = yr_ncrp<=1940
-		g touching70 = yr_ncrp<=1970
-		collapse (sum) touching40 touching70, by(cz)
-		g touching_diff = touching70 - touching40
-		tempfile touching 
-		save `touching'
-	restore
-	
-	merge 1:1 cz using `touching', assert(1 3)
-	replace touching40 = 0 if _merge == 1
-	replace touching70 = 0 if _merge == 1
-	replace touching_diff = 0 if _merge == 1
-	drop _merge
 	
 	// Incorporated populations
 	preserve 
@@ -486,13 +325,13 @@
 	g change_frac_unc = frac_unc1970 - frac_unc1940
 	
 	// Add in new instruments and sumshares
-	foreach version in base base_quad base_white base_stres black_sob base_rur{
+	foreach version in base  base_white base_stres black_sob base_rur{
 		merge 1:1 cz using "$INTDATA/ssaggregate_prep/dest_instrument_`version'", keep(3) nogen
 		ren shift_share shift_share_`version'
 		ren sumshare sumshare_`version'
 		replace shift_share_`version' = 100* shift_share_`version'
 	}
-	/*
+	
 	// Add in placebo instruments
 	forv i=1/1000{
 		if mod(`i',100) == 0 di "At placebo `i'"
@@ -505,37 +344,11 @@
 		qui merge 1:1 cz using "$INTDATA/ssaggregate_prep/placebo/dcourt_placebo_`i'", keep(3) nogen
 
 	}
-	*/
+	
 		
-	// Panel Instrument
-	preserve
-		use "$INTDATA/ssaggregate_prep/dest_instrument_panel_base", clear
-		ren shift_share shift_share_panel_
-		ren sumshare sumshare_panel_
-		reshape wide shift_share_panel_ sumshare_panel_, i(cz) j(year)
-		tempfile sumshare_panel
-		save `sumshare_panel'
-	restore
-	
-	merge 1:1 cz using `sumshare_panel', keep(1 3) nogen
-	
-	// Repeated decadal instrument
-	preserve
-		foreach y in 1940 1950 1960{
-			use "$INTDATA/ssaggregate_prep/dest_instrument_panel_`y'_base", clear
-			ren shift_share shift_share_split_`y'
-			ren sumshare sumshare_split_`y'
-			tempfile sumshare_split_`y'
-			save `sumshare_split_`y''
-		}
-	restore
-	merge 1:1 cz using `sumshare_split_1940', keep(1 3) nogen
-	merge 1:1 cz using `sumshare_split_1950', keep(1 3) nogen
-	merge 1:1 cz using `sumshare_split_1960', keep(1 3) nogen
-	
 	// Court Orders
 	ren cz czone
-	merge 1:1 czone using "$CLEANDATA/nces/cz_court_orders", keep(1 3) nogen
+	merge 1:1 czone using "$INTDATA/nces/cz_court_orders", keep(1 3) nogen
 	ren czone cz
 	replace frac_court_ordered = 100*frac_court_ordered
 	
@@ -564,27 +377,15 @@
 	g pos_occscorec_diff = bmig_occscorec_diff > 0 if !mi(occscore_black_3040_linked)	
 	
 	
-	// Black mig income differences
-	merge 1:1 cz using "$INTDATA/census/bmig_incomes", keep(1 3) nogen
-
-	// Difference from CZ average
-	g bmig_income_diff_cz = (mean_income_1940_bmig - mean_income_1940) / mean_income_1940
-	su bmig_income_diff_cz, d
-	g above_bmig_diff_cz = bmig_income_diff_cz >= r(p50) if !mi(mean_income_1940_bmig)
-	
-	// Difference from all black migrants
-	g bmig_income_diff = (mean_income_1940_bmig - mean_income_1940_bmig_all) / mean_income_1940_bmig_all
-	su bmig_income_diff, d
-	g above_bmig_diff = bmig_income_diff >= r(p50)  if !mi(mean_income_1940_bmig)
-
 	
 	// Streams 
 	merge 1:1 cz using "$INTDATA/other/streams", keep(1 3) nogen
 	lab var n_streams "Number of Streams"
+	replace n_streams = -1 if mi(n_streams)
+	g mi_n_streams = n_streams == -1 
+	
 	
 	// Upward mobility
-	merge 1:1 cz using "$RAWDATA/dcourt/clean_cz_mobility_1900_2015.dta", keep(1 3) nogen keepusing(frac_all_upm1940)
-
 	su GM_raw_pp, d
 	g above_x_med = GM_raw_pp >= r(p50)
 
@@ -596,14 +397,11 @@
 	g GM_raw_pp_quad = GM_raw_pp^2
 	xtile GM_hat = shift_share_base, nq(100) 
 	
-	lab var GM_raw_pp "Percentage Point Change in Urban Black Population"
-	lab var GM_raw "Percentage Change in Urban Black Population"
-	lab var shift_share_base "Predicted Percentage Change in Urban Black Population"
-	lab var GM "Percentile Change in Urban Black Population"
-	lab var GM_hat "Predicted Percentile Change in Urban Black Population"
-	
-	
-	
+		
+	lab var shift_share_base "$\widehat{GM}$"
+	lab var GM "Percentile GM"
+	lab var GM_hat "Percentile $\widehat{GM}$"
+	lab var GM_raw_pp "GM"
 	
 	forv y=1900/2010{
 		cap lab var bpop`y' "Total Black Population, `y'"
@@ -619,13 +417,10 @@
 	cap lab var fips "County FIPS Code"
 	
 
-	lab var totfrac_in_main_city "Fraction of population in largest city"
-	lab var n_wells "Number of Oil/Nat Gas Wells, 1940"
 	lab var max_temp "Maximum Temperature, 1940"
 	lab var min_temp "Minimum Temperature, 1940"
 	lab var avg_temp "Average Temperature, 1940"
 	lab var avg_precip "Average Precipitation, 1940"
-	lab var has_port "Has Port, 1940"
 	lab var coastal "Coastal"
 	lab var transpo_cost_1920 "Average Transport Cost out of CZ, 1920"
 	lab var m_rr "Meters of Railroad, 1940"
@@ -677,4 +472,6 @@
 	ren prop_incumbent_land_change4010 ld_pinc_annex_cz_pc
 	ren prop_incumbent_land_4070 n_pinc_cz_pc
 	ren prop_incumbent_land_4010 ld_pinc_cz_pc
+	
+	
 	save "$CLEANDATA/cz_pooled", replace

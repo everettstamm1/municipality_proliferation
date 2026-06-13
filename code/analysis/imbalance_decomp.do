@@ -7,7 +7,8 @@ use "$CLEANDATA/cz_pooled", clear
 
 lab var GM_raw_pp "GM"
 ivreg2 n_cgoodman_cz_pc (GM_raw_pp = shift_share_base) reg2 reg3 reg4 sumshare_base [aw=popc1940], r
-foreach outcome in cgoodman  spdist gen_muni totfrac schdist_ind{
+local t = 8
+foreach outcome in cgoodman gen_muni schdist_ind spdist totfrac {
 	forv spec = 1/8{
 		if `spec' == 1 local controls "`b_controls'" 
 		if `spec' == 2 local controls "`b_controls' mfg_lfshare1940"
@@ -41,7 +42,7 @@ foreach outcome in cgoodman  spdist gen_muni totfrac schdist_ind{
 
 	// Panel A: First Stage
 	esttab iv70_1 iv70_2 iv70_3 iv70_4 iv70_5 iv70_6 iv70_7 iv70_8    ///
-		using "$TABS/balancetables/`outcome'_balance_iter.tex", ///
+		using "$TABS/TA`t'.tex", ///
 		replace se booktabs noconstant noobs compress frag label nomtitles nonum ///
 		b(%04.3f) se(%04.3f) ///
 		starlevels( * 0.10 ** 0.05 *** 0.01) ///
@@ -55,7 +56,7 @@ foreach outcome in cgoodman  spdist gen_muni totfrac schdist_ind{
 		
 	// Panel E: 2SLS
 	esttab iv10_1 iv10_2 iv10_3 iv10_4 iv10_5 iv10_6 iv10_7 iv10_8    ///
-		using "$TABS/balancetables/`outcome'_balance_iter.tex", ///
+		using "$TABS/TA`t'.tex", ///
 		se booktabs noconstant compress frag append noobs nonum nomtitle label ///
 		posthead("\cmidrule(lr){1-9}" "\multicolumn{8}{l}{Panel B: 2SLS 1940-2010}\\" "\cmidrule(lr){1-9}" ) ///
 		b(%04.3f) se(%04.3f) ///
@@ -65,4 +66,6 @@ foreach outcome in cgoodman  spdist gen_muni totfrac schdist_ind{
 		stats(popdens income mfg, labels("Pop. Dens. Control" "Avg. Income Control" "Share Mfg. Control")) substitute("\midrule" "\cmidrule(lr){1-9}")
 
 	eststo clear
+	
+	local t = `t' + 1
 }
