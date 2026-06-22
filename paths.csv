@@ -1,10 +1,10 @@
 global,path
-RAWDATA,F:/munis_replication//data/raw
-INTDATA,F:/munis_replication//data/interim
-CLEANDATA,F:/munis_replication//data/clean
-XWALKS,F:/munis_replication//data/xwalks
-FIGS,C:/Users/edog9/Documents/Github/municipality_proliferation//exhibits/figures
-TABS,C:/Users/edog9/Documents/Github/municipality_proliferation//exhibits/tables
-DROPBOX,F:/munis_replication/
-REPO,C:/Users/edog9/Documents/Github/municipality_proliferation/
-Rterm_path,C:/Program Files/R/R-4.3.1/bin/x64/Rterm.exe
+RAWDATA,D:/munis_replication//data/raw
+INTDATA,D:/munis_replication//data/interim
+CLEANDATA,D:/munis_replication//data/clean
+XWALKS,D:/munis_replication//data/xwalks
+FIGS,C:/Users/Everett Stamm/Documents/Github/municipality_proliferation//exhibits/figures
+TABS,C:/Users/Everett Stamm/Documents/Github/municipality_proliferation//exhibits/tables
+DROPBOX,D:/munis_replication/
+REPO,C:/Users/Everett Stamm/Documents/Github/municipality_proliferation/
+Rterm_path,C:\Program Files\R\R-4.4.2\bin\x64\Rterm.exe

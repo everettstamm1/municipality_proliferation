@@ -53,7 +53,7 @@ Sys.setenv(TIGRIS_CACHE_DIR = TIGRIS_DIR)
 message("Tigris files will be saved/cached in: ", TIGRIS_DIR)
 
 # Use 2022 TIGER/Line files
-TIGRIS_YEAR <- 2022
+TIGRIS_YEAR <- 2010
 
 county_cz_xwalk <- read_dta(paste0(XWALKS, "/cw_cty_czone.dta"))
 
@@ -98,13 +98,13 @@ cbgoodman <- cbgoodman %>%
 # Download/read national county file from tigris cache
 # ----------------------------
 
-counties <- tigris::counties(
-  year = TIGRIS_YEAR,
+counties_raw <- tigris::counties(
+  year = TIGRIS_YEAR, # NEED 2010 COUNTIES 
   cb = TRUE,
   class = "sf"
 )
 
-counties <- counties %>% 
+counties <- counties_raw %>% 
   st_drop_geometry() %>% 
   select(ALAND, AWATER, STATEFP, COUNTYFP) %>% 
   rename(
@@ -112,24 +112,26 @@ counties <- counties %>%
     county_water = AWATER
   ) %>% 
   mutate(
-    STATEFP = str_pad(as.character(STATEFP), 2, side = "left", pad = "0"),
-    COUNTYFP = str_pad(as.character(COUNTYFP), 3, side = "left", pad = "0"),
+    #STATEFP = str_pad(as.character(STATEFP), 2, side = "left", pad = "0"),
+    #COUNTYFP = str_pad(as.character(COUNTYFP), 3, side = "left", pad = "0"),
     county_total = county_land + county_water,
     cty_fips = as.numeric(paste0(STATEFP, COUNTYFP))
   ) %>% 
-  merge(county_cz_xwalk, by = "cty_fips")
+  left_join(county_cz_xwalk, by = "cty_fips") %>% 
+  mutate(czone = if_else(STATEFP == "09",20901,czone)) %>% # Spot fix for change in CT counties. Actual crosswalk doesn't matter since state has only one CZone
+  filter(!is.na(czone))
 
 # ----------------------------
 # Download/read national places file from tigris cache
 # ----------------------------
 
-places <- tigris::places(
+places_raw <- tigris::places(
   year = TIGRIS_YEAR,
   cb = TRUE,
   class = "sf"
 )
 
-places <- places %>% 
+places <- places_raw %>% 
   st_drop_geometry() %>% 
   select(ALAND, AWATER, STATEFP, PLACEFP) %>% 
   rename(

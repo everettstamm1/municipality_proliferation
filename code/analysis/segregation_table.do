@@ -15,13 +15,13 @@ merge 1:1 cz using "$INTDATA/nces/cz_achievement_segregation", keep(1 3) nogen
 merge 1:1 cz using `seg', keep(1 3) nogen
 g schoolflag = mi(n_schdist_ind_cz_pc)
 
-
-ssaggregate GM_raw_pp sch_vr_blwt_cz sch_diss_blwt_cz achievement_iqr achievement_var_cz black_exposure white_exposure [aw=popc1940], n(origin_fips) l(cz) sfile("$INTDATA/ssaggregate_prep//shares_base.dta") controls("reg2 reg3 reg4 sumshare_base mfg_lfshare1940 mean_income_1940 cz_popdens1940") s(share)
-		
+	
 foreach var of varlist sch_vr_blwt_cz sch_diss_blwt_cz achievement_iqr achievement_var_cz black_exposure white_exposure{ 
 	su `var'
 	local `var'_mean = r(mean)
 }
+ssaggregate GM_raw_pp sch_vr_blwt_cz sch_diss_blwt_cz achievement_iqr achievement_var_cz black_exposure white_exposure [aw=popc1940], n(origin_fips) l(cz) sfile("$INTDATA/ssaggregate_prep//shares_base.dta") controls("reg2 reg3 reg4 sumshare_base mfg_lfshare1940 mean_income_1940 cz_popdens1940") s(share)
+	
 merge 1:1 origin_fips using "$INTDATA/ssaggregate_prep//shock_instrument_base.dta", keep(1 3) nogen
 replace shift = 0 if mi(shift)
 lab var shift "`xlab'"

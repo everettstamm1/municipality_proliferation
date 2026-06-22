@@ -1,6 +1,5 @@
 
 
-fs *.txt                // Or *.csv, *.dta, etc.
 local myfiles : dir "$RAWDATA/GNIS/DomesticNames_AllStates_Text/Text/"  files "*.txt"
 
 local count = 1
@@ -28,4 +27,5 @@ forv t=1/`end'{
 }
 rename czone cz
 collapse (sum) n_streams, by(cz)
+
 save "$INTDATA/other/streams", replace

@@ -76,37 +76,13 @@ crs <- st_crs(counties)
 
 
 #### Railroads ----
-railroads <- read_sf(paste0(RAWDATA,"/covariates/Historical_Railroads___Vanderbilt/Historical_Railroads___Vanderbilt.shp")) %>%
-  st_transform(crs) %>% 
-  filter(InOpBy <=1940)
 
-# Writing this function because my computer crashes if I try the
-# intersection all at once, plus I want to keep tabs on the 
-# progress with the print statement.
-
-county_km <- function(fips){
-  print(paste0("Starting FIPS: ",fips))
-  county <- counties %>% 
-    filter(cty_fips == fips) 
-  int <- st_intersection(railroads, county) %>% 
-    st_length() %>% 
-    sum()
-  return(int)
-  
-}
-counties_sample <- counties %>% 
-  filter(STATEFP %in% unique(munis$STATEFP[munis$south == 0]))
-
-km_railroads_1940 <- aggregate(counties$cty_fips,list(counties$cty_fips),county_km) %>% 
-  rename(cty_fips = Group.1,
-         km_railroad = x)
 
 railroads <- read_sf(paste0(RAWDATA, "/covariates/Historical_Railroads___Vanderbilt/Historical_Railroads___Vanderbilt.shp")) %>%
   filter(InOpBy <= 1940) %>%
   st_transform(crs)
 
 counties_sample <- counties %>%
-  filter(STATEFP %in% unique(munis$STATEFP[munis$south == 0])) %>%
   select(cty_fips)
 
 # Sparse spatial index: candidate railroads for each county
@@ -130,7 +106,6 @@ county_km <- function(i) {
 km_railroads_1940 <- counties_sample %>%
   st_drop_geometry() %>%
   mutate(km_railroad = sapply(seq_len(nrow(counties_sample)), county_km))
-
 
 #### Network costs ----
 cost_id_county <-  read_excel(paste0(RAWDATA,"/covariates/RR_NetworkDatabase_DH_Oct2015/RR_NetworkDatabase_DH_Oct2015/Data/Transportation_Costs_AllDecades/Cost_ID_county.xlsx")) %>% 

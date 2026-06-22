@@ -23,7 +23,8 @@ STEPS:
 	/* Data on black netmigration for southern counties come from Boustan (2016):
 	south_county.dta. These data were downloaded from the following link: 
 	https://economics.princeton.edu/dl/Boustan/Chapter4.zip. */
-	use "$RAWDATA/dcourt/south_county.dta", clear
+	cd "$migdata/raw"
+	use south_county.dta, clear
 	drop if netbmig==.
 	
 	/* Instructions for cleaning the data from Boustan (2016) replication files
@@ -69,7 +70,8 @@ STEPS:
 	
 	/* Save the dataset that will be used for post LASSO */
 	
-	save "$INTDATA/dcourt/clean_south_county.dta", replace
+	cd "$migdata"
+	save clean_south_county.dta, replace
 	
 	/* Additional cleaning to prepare the data for R and running LASSO. */
 	*local final_varlist netbmig perten perag permin perman aaa_pc warfac_pc warcon_pc avesz3 tmpav30 pcpav30 mxsw30s mxsd30s dustbowa summit swamp valley elevmax riv1120 riv2150 riv51up riv0510 elevrang awc clay kffact om perm thick minem35a Astate_5 Astate_12 Astate_13 Astate_21 Astate_22 Astate_28 Astate_37 Astate_40 Astate_45 Astate_47 Astate_48 Astate_51 Astate_54 satl pertensa permansa tob peragtob ot perminot
@@ -90,21 +92,24 @@ STEPS:
 	
 	/* Create a separate dataset for each decade. */
 	preserve
+	cd "$lasso"
 	keep if year==1950
 	drop year
-	save "$INTDATA/dcourt/south_county_migration_dataset_for_prediction_1950.dta", replace
+	save south_county_migration_dataset_for_prediction_1950.dta, replace
 	restore
 	
 	preserve
+	cd "$lasso"
 	keep if year==1960
 	drop year
-	save "$INTDATA/dcourt/south_county_migration_dataset_for_prediction_1960.dta", replace
+	save south_county_migration_dataset_for_prediction_1960.dta, replace
 	restore
 	
 	preserve
+	cd "$lasso"
 	keep if year==1970
 	drop year
-	save "$INTDATA/dcourt/south_county_migration_dataset_for_prediction_1970.dta", replace
+	save south_county_migration_dataset_for_prediction_1970.dta, replace
 	restore
 	
 	clear
@@ -115,35 +120,29 @@ STEPS:
 
 	/* Initiate R and run LASSO using cv glmnet. */
 	
-/*
-	global Rterm_path `"/usr/local/bin/r"'
-	
+
+	/*
 	rsource, terminator(END_OF_R) roptions(--vanilla)
 	
-		// 'haven' is an R package for importing Stata '.dta' file
-		library(haven)
-		library(ggplot2)
-		library(dplyr)
-		library(tidyr)
-		library(data.table)
-		library(stargazer)
-		library(randomForest)
-		library(glmnet)
-		library(rpart)
-		library(parallel)
-		library(stringr)
+		require(haven)
+		require(ggplot2)
+		require(dplyr)
+		require(tidyr)
+		require(data.table)
+		require(stargazer)
+		require(randomForest)
+		require(glmnet)
+		require(rpart)
+		require(parallel)
+		require(stringr)
 		
-		// 0. Clear all
 		rm(list = ls()) 
 	
-		// 1. Change to your directory
-		setwd("/Users/elloraderenoncourt/Great_Migration_Mobility/code/lasso")
-		
-		// 2. Set code to run or not
-		runLasso = FALSE
+		setwd("F:/munis_replication/data/raw/dcourt/replication_AER/code/lasso")
+
+		runLasso = TRUE
 		
 		if (runLasso) {
-		// 3. Load the data, run lasso, get list of selected variables. Repeat for each year (1950, 1960, 1970)
 		train = read_dta('south_county_migration_dataset_for_prediction_1950.dta')
 	
 		x = model.matrix(~., data=train %>% select(-netbmig))
@@ -175,7 +174,7 @@ STEPS:
 	write.csv(lasso_list_of_vars_1970[2:dim(lasso_list_of_vars_1970)[1],1:dim(lasso_list_of_vars_1970)[2]], file='lasso_list_of_vars_1970.csv')
 	}
 	END_OF_R
-*/
+	*/
 
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 *3. Predict using original Boustan (2016) variables.
@@ -183,7 +182,8 @@ STEPS:
 
 	/* Load full clean data. */
 	
-	use "$INTDATA/dcourt/clean_south_county.dta", clear
+	cd "$migdata"
+	use clean_south_county.dta, clear
 	
 	/* Predict county-level net migration rate, decade by decade with southern 
 	variables chosen by LASSO. Predict net migration rate ("netbmig_pred") based on 
@@ -212,7 +212,7 @@ STEPS:
 	
 	/* One observation per county, year. */
 	
-	drop if year==year[_n-1]
+	//drop if year==year[_n-1]
 	sort countyfips year
 	drop if countyfips==.
 	rename totbmig actoutmig
@@ -222,7 +222,8 @@ STEPS:
 	
 	/* Merge with 1940 crosswalks data file. */
 	
-	merge m:1 stateicp countyicp using "$RAWDATA/dcourt/county1940_crosswalks.dta", keepusing(fips state_name county_name)
+	cd "$xwalks"
+	merge m:1 stateicp countyicp using county1940_crosswalks.dta, keepusing(fips state_name county_name)
 	drop if _merge==2 
 	g origin_fips=fips
 	rename state_name origin_state_name
@@ -247,10 +248,11 @@ STEPS:
 	
 	drop dup
 	
-	save "$INTDATA/dcourt/1_boustan_predict_mig.dta", replace
+	cd "$instrument"
+	save 1_boustan_predict_mig.dta, replace
 	
 	collapse (sum) netbmig_pred actoutmig proutmig, by(origin_fips year)
-	save "$INTDATA/dcourt/1_boustan_predict_mig_collapsed.dta", replace
+	save $instrument/1_boustan_predict_mig_collapsed.dta, replace
 	
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 *4. Run Post-LASSO to generate predicted migration figures for each county by decade.
@@ -258,7 +260,8 @@ STEPS:
 
 	/* Load full clean data. */
 	
-	use "$INTDATA/dcourt/clean_south_county.dta", clear
+	cd "$migdata"
+	use clean_south_county.dta, clear
 	
 	/* Predict county-level net migration rate, decade by decade with southern 
 	variables chosen by LASSO. Predict net migration rate ("netbmig_pred") based on 
@@ -345,7 +348,8 @@ STEPS:
 	
 	*/
 
-	merge m:1 stateicp countyicp using "$RAWDATA/dcourt/county1940_crosswalks.dta", keepusing(fips state_name county_name)
+	cd "$xwalks"
+	merge m:1 stateicp countyicp using county1940_crosswalks.dta, keepusing(fips state_name county_name)
 	drop if _merge==2 
 	g origin_fips=fips
 	rename state_name origin_state_name
@@ -372,22 +376,24 @@ STEPS:
 	preserve
 	keep origin_fips year proutmig actoutmig netbmig_pred
 	
-	save "$INTDATA/dcourt/2_lasso_boustan_predict_mig.dta", replace
+	cd "$instrument"
+	save 2_lasso_boustan_predict_mig.dta, replace
 	restore
 	
 	preserve
 	collapse (sum) netbmig_pred actoutmig proutmig, by(origin_fips year)
-	save "$INTDATA/dcourt/2_lasso_boustan_predict_mig_collapsed.dta", replace
+	save $instrument/2_lasso_boustan_predict_mig_collapsed.dta, replace
 	restore
 	
 	collapse (sum) netbmig_pred actoutmig proutmig, by(origin_state_name year)
 	drop if origin_state_name==""
+	cd $xwalks
 	statastates, abbrev(origin_state_name)
 	drop _merge 
 	rename state_fips origin_state_fips
 	tostring origin_state_fips, replace
-	g origin_statefp = origin_state_fips
-	save "$INTDATA/dcourt/3_lasso_boustan_predict_mig_state.dta", replace
+	
+	save $instrument/3_lasso_boustan_predict_mig_state.dta, replace
 
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 *5. Within state variation in migration.
@@ -395,7 +401,8 @@ STEPS:
 
 	/* Load full clean data. */
 	
-	use "$INTDATA/dcourt/clean_south_county.dta", clear
+	cd "$migdata"
+	use clean_south_county.dta, clear
 
 	/* Predict county-level net migration rate within state, decade by decade. */
 	reg netbmig  if year==1950, absorb(stateicp)
@@ -422,7 +429,7 @@ STEPS:
 	
 	/* One observation per county, year. */
 	
-	//drop if year==year[_n-1]
+	//drop if year==year[_n-1] // CLEARLY AN ERROR
 	sort countyfips year
 	drop if countyfips==.
 	rename totbmig actoutmig
@@ -432,7 +439,8 @@ STEPS:
 	
 	/* Merge with 1940 crosswalks data file. */
 	
-	merge m:1 stateicp countyicp using "$RAWDATA/dcourt/county1940_crosswalks.dta", keepusing(fips state_name county_name)
+	cd "$xwalks"
+	merge m:1 stateicp countyicp using county1940_crosswalks.dta, keepusing(fips state_name county_name)
 	drop if _merge==2 
 	g origin_fips=fips
 	rename state_name origin_state_name
@@ -458,17 +466,19 @@ STEPS:
 	
 	drop dup
 	
-	save "$INTDATA/dcourt/3_residstate_act_mig.dta", replace
+	cd "$instrument"
+	save 3_residstate_act_mig.dta, replace
 	
 	collapse (sum) netbmig_resid actoutmig residoutmig, by(origin_fips year)
-	save "$INTDATA/dcourt//3_residstate_act_mig_collapsed.dta", replace	
+	save $instrument/3_residstate_act_mig_collapsed.dta, replace	
 
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 *6. Dropping urban counties.
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 
 	/* Load full clean data. */
-	use "$INTDATA/dcourt/clean_south_county.dta", clear
+	cd "$migdata"
+	use clean_south_county.dta, clear
 	
 	/* Predict county-level net migration rate, decade by decade with southern 
 	variables chosen by LASSO. Predict net migration rate ("netbmig_pred") based on 
@@ -497,7 +507,7 @@ STEPS:
 	
 	/* One observation per county, year. */
 	
-	drop if year==year[_n-1]
+	//drop if year==year[_n-1]
 	sort countyfips year
 	drop if countyfips==.
 	rename totbmig actoutmig
@@ -507,7 +517,8 @@ STEPS:
 	
 	/* Merge with 1940 crosswalks data file. */
 	
-	merge m:1 stateicp countyicp using "$RAWDATA/dcourt/county1940_crosswalks.dta", keepusing(fips state_name county_name ur_code_1990)
+	cd "$xwalks"
+	merge m:1 stateicp countyicp using county1940_crosswalks.dta, keepusing(fips state_name county_name ur_code_1990)
 	drop if _merge==2 
 	
 	/* Alternative method dropping top 1% percent urban counties */
@@ -540,10 +551,11 @@ STEPS:
 	
 	drop dup
 	
-	save "$INTDATA/dcourt/rur_boustan_predict_mig.dta", replace
+	cd "$instrument"
+	save rur_boustan_predict_mig.dta, replace
 	
 	collapse (sum) netbmig_pred actoutmig proutmig, by(origin_fips year)
-	save "$INTDATA/dcourt/rur_boustan_predict_mig_collapsed.dta", replace		
+	save $instrument/rur_boustan_predict_mig_collapsed.dta, replace		
 	
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%	
 *7. White southern migration.
@@ -551,17 +563,18 @@ STEPS:
 
 	/* Load full clean data. */
 	
-	use "$RAWDATA/dcourt/clean_south_county_white_nonwhite_mig_1940_1970.dta", clear
+	cd "$migdata"
+	use clean_south_county_white_nonwhite_mig_1940_1970.dta, clear
 	
 	/* One observation per county, year. */
 	
-	drop if year==year[_n-1]
+	//drop if year==year[_n-1]
 	sort fips year
 	drop if fips==.
 	rename whitemig actoutmig
 	
 	/* Merge with 1940 crosswalks data file. */
-	keep fips state_name county_name *mig* year 
+	keep fips state_name county_name *mig* year
 	g origin_fips=fips
 	rename state_name origin_state_name
 	rename county_name origin_county_name 
@@ -569,7 +582,7 @@ STEPS:
 	/* Hand correct counties that didn't match using crosswalk file and internet search. */
 	
 	tostring origin_fips, replace
-	keep origin_fips year actoutmig 
+	keep origin_fips year actoutmig
 	
 	drop if actoutmig==.
 	
@@ -578,39 +591,9 @@ STEPS:
 	
 	drop dup
 	
-	save "$INTDATA/dcourt/5_white_mig.dta", replace
+	cd "$instrument"
+	save 5_white_mig.dta, replace
 	
-	collapse (sum) actoutmig , by(origin_fips year)
-	save "$INTDATA/dcourt/5_white_mig_collapsed.dta", replace	
+	collapse (sum) actoutmig, by(origin_fips year)
+	save $instrument/5_white_mig_collapsed.dta, replace	
 	
-	use "$RAWDATA/dcourt/clean_south_county_white_nonwhite_mig_1940_1970.dta", clear
-	
-	/* One observation per county, year. */
-	
-	drop if year==year[_n-1]
-	sort fips year
-	drop if fips==.
-	rename nonwhitemig actoutmig
-	
-	/* Merge with 1940 crosswalks data file. */
-	keep fips state_name county_name *mig* year 
-	g origin_fips=fips
-	rename state_name origin_state_name
-	rename county_name origin_county_name 
-	
-	/* Hand correct counties that didn't match using crosswalk file and internet search. */
-	
-	tostring origin_fips, replace
-	keep origin_fips year actoutmig 
-	
-	drop if actoutmig==.
-	
-	bysort origin_fips year: gen dup= cond(_N==1,0,_n)
-	tab dup
-	
-	drop dup
-	
-	save "$INTDATA/dcourt/5_nonwhite_mig.dta", replace
-	
-	collapse (sum) actoutmig , by(origin_fips year)
-	save "$INTDATA/dcourt/5_nonwhite_mig_collapsed.dta", replace	

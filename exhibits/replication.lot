@@ -4,27 +4,28 @@
 \contentsline {table}{\numberline {4}{\ignorespaces Main results, Split on Occupation Scores of 1930-40 Black Migrants}}{7}{table.caption.11}%
 \contentsline {table}{\numberline {5}{\ignorespaces Municipalities Incorporated between 1940 and 1970: Is racial exclusion a key motivator?}}{9}{table.caption.14}%
 \contentsline {table}{\numberline {6}{\ignorespaces Downstream: School Segregation and Achievement}}{10}{table.caption.16}%
-\contentsline {table}{\numberline {7}{\ignorespaces Balance Tests: 1940 Observables}}{10}{table.caption.19}%
-\contentsline {table}{\numberline {8}{\ignorespaces Main effects, Township Outcome}}{11}{table.caption.21}%
-\contentsline {table}{\numberline {9}{\ignorespaces Correlation Table}}{12}{table.caption.22}%
-\contentsline {table}{\numberline {10}{\ignorespaces Decomposition of Main Effect: Changes in Jurisdictions}}{13}{table.caption.25}%
-\contentsline {table}{\numberline {11}{\ignorespaces Decomposition of Main Effect: Changes in Population}}{14}{table.caption.27}%
-\contentsline {table}{\numberline {12}{\ignorespaces Main effects, 1950-1970, avoiding the 1942 CoG measurement issues}}{15}{table.caption.29}%
-\contentsline {table}{\numberline {13}{\ignorespaces Effect on C. Goodman Municipalities, varying inclusion of imbalanced controls}}{16}{table.caption.31}%
-\contentsline {table}{\numberline {14}{\ignorespaces Effect on CoG Municipalities, varying inclusion of imbalanced controls}}{17}{table.caption.33}%
-\contentsline {table}{\numberline {15}{\ignorespaces Effect on School Districts, varying inclusion of imbalanced controls}}{18}{table.caption.35}%
-\contentsline {table}{\numberline {16}{\ignorespaces Effect on Special Districts, varying inclusion of imbalanced controls}}{19}{table.caption.37}%
-\contentsline {table}{\numberline {17}{\ignorespaces Effect on Main City Share, varying inclusion of imbalanced controls}}{20}{table.caption.39}%
-\contentsline {table}{\numberline {18}{\ignorespaces Main effects, 1940-1970, without controls for imbalanced baseline covariates}}{21}{table.caption.41}%
-\contentsline {table}{\numberline {19}{\ignorespaces Main Effects, including all baseline covariates}}{22}{table.caption.43}%
-\contentsline {table}{\numberline {20}{\ignorespaces Main Effects, varying inclusion of all baseline controls}}{23}{table.caption.45}%
-\contentsline {table}{\numberline {21}{\ignorespaces Balance Tests: 1940 Observables using the percentile instrument and endogenous regressor}}{24}{table.caption.47}%
-\contentsline {table}{\numberline {22}{\ignorespaces Main effects, 1940-1970, using percentile transformation of instrument and endogenous regressor}}{25}{table.caption.49}%
-\contentsline {table}{\numberline {23}{\ignorespaces Main effects, including European migration control}}{26}{table.caption.51}%
-\contentsline {table}{\numberline {24}{\ignorespaces White Instrument Balance Tests: 1940 Observables}}{27}{table.caption.53}%
-\contentsline {table}{\numberline {25}{\ignorespaces White migration effect, 1940-1970}}{28}{table.caption.55}%
-\contentsline {table}{\numberline {26}{\ignorespaces First Stage and OLS of Panel A of Table \ref {tab:occscore_split}}}{29}{table.caption.57}%
-\contentsline {table}{\numberline {27}{\ignorespaces First Stage and OLS of Panel B of Table \ref {tab:occscore_split}}}{30}{table.caption.59}%
-\contentsline {table}{\numberline {28}{\ignorespaces Municipalities Incorporated between 1940 and 1970: Additional variables}}{31}{table.caption.60}%
-\contentsline {table}{\numberline {29}{\ignorespaces Main results, Split on whether CZ's largest school district had a Court Ordered Desegregation Plan}}{32}{table.caption.62}%
-\contentsline {table}{\numberline {30}{\ignorespaces Municipalities Incorporated between 1940 and 1970: Evidence of White Flight}}{33}{table.caption.64}%
+\contentsline {table}{\numberline {7}{\ignorespaces Balance Tests: 1940 Observables}}{11}{table.caption.19}%
+\contentsline {table}{\numberline {8}{\ignorespaces Pre-trends}}{12}{table.caption.21}%
+\contentsline {table}{\numberline {9}{\ignorespaces Main effects, Township Outcome}}{13}{table.caption.23}%
+\contentsline {table}{\numberline {10}{\ignorespaces Correlation Table}}{14}{table.caption.24}%
+\contentsline {table}{\numberline {11}{\ignorespaces Decomposition of Main Effect: Changes in Jurisdictions}}{15}{table.caption.27}%
+\contentsline {table}{\numberline {12}{\ignorespaces Decomposition of Main Effect: Changes in Population}}{16}{table.caption.29}%
+\contentsline {table}{\numberline {13}{\ignorespaces Main effects, 1950-1970, avoiding the 1942 CoG measurement issues}}{17}{table.caption.31}%
+\contentsline {table}{\numberline {14}{\ignorespaces Effect on C. Goodman Municipalities, varying inclusion of imbalanced controls}}{18}{table.caption.33}%
+\contentsline {table}{\numberline {15}{\ignorespaces Effect on CoG Municipalities, varying inclusion of imbalanced controls}}{19}{table.caption.35}%
+\contentsline {table}{\numberline {16}{\ignorespaces Effect on School Districts, varying inclusion of imbalanced controls}}{20}{table.caption.37}%
+\contentsline {table}{\numberline {17}{\ignorespaces Effect on Special Districts, varying inclusion of imbalanced controls}}{21}{table.caption.39}%
+\contentsline {table}{\numberline {18}{\ignorespaces Effect on Main City Share, varying inclusion of imbalanced controls}}{22}{table.caption.41}%
+\contentsline {table}{\numberline {19}{\ignorespaces Main effects, 1940-1970, without controls for imbalanced baseline covariates}}{23}{table.caption.43}%
+\contentsline {table}{\numberline {20}{\ignorespaces Main Effects, including all baseline covariates}}{24}{table.caption.45}%
+\contentsline {table}{\numberline {21}{\ignorespaces Main Effects, varying inclusion of all baseline controls}}{25}{table.caption.47}%
+\contentsline {table}{\numberline {22}{\ignorespaces Balance Tests: 1940 Observables using the percentile instrument and endogenous regressor}}{26}{table.caption.49}%
+\contentsline {table}{\numberline {23}{\ignorespaces Main effects, 1940-1970, using percentile transformation of instrument and endogenous regressor}}{27}{table.caption.51}%
+\contentsline {table}{\numberline {24}{\ignorespaces Main effects, including European migration control}}{28}{table.caption.53}%
+\contentsline {table}{\numberline {25}{\ignorespaces White Instrument Balance Tests: 1940 Observables}}{29}{table.caption.55}%
+\contentsline {table}{\numberline {26}{\ignorespaces White migration effect, 1940-1970}}{30}{table.caption.57}%
+\contentsline {table}{\numberline {27}{\ignorespaces First Stage and OLS of Panel A of Table \ref {tab:occscore_split}}}{31}{table.caption.59}%
+\contentsline {table}{\numberline {28}{\ignorespaces First Stage and OLS of Panel B of Table \ref {tab:occscore_split}}}{32}{table.caption.61}%
+\contentsline {table}{\numberline {29}{\ignorespaces Municipalities Incorporated between 1940 and 1970: Additional variables}}{33}{table.caption.62}%
+\contentsline {table}{\numberline {30}{\ignorespaces Main results, Split on whether CZ's largest school district had a Court Ordered Desegregation Plan}}{34}{table.caption.64}%
+\contentsline {table}{\numberline {31}{\ignorespaces Municipalities Incorporated between 1940 and 1970: Evidence of White Flight}}{35}{table.caption.66}%

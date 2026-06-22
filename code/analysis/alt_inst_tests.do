@@ -23,13 +23,13 @@ foreach outcome in cgoodman schdist_ind spdist gen_town gen_muni totfrac{
 		
 		forval spec=1(1)4{
 			tempfile spec`spec'
-			parmby "ivreg2 n_`outcome'_cz_pc ${spec`spec'} [aw = popc1940], r partial(reg2 reg3 reg4)", lab saving(`"spec`spec'"', replace) idn(`l') ids(spec) ylabel 
+			parmby "ivreg2 n_`outcome'_cz_pc ${spec`spec'} [aw = popc1940], r partial(reg2 reg3 reg4)", lab saving(`"$INTDATA/temp/spec`spec'"', replace) idn(`l') ids(spec) ylabel 
 		}
 			
 		drop _all
 		forval spec=1(1)4{
-			capture append using "spec`spec'"
-			rm "spec`spec'.dta"
+			capture append using "$INTDATA/temp/spec`spec'"
+			rm "$INTDATA/temp/spec`spec'.dta"
 		}
 		
 		tempfile overid_coefplot
