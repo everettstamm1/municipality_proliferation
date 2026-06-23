@@ -260,7 +260,7 @@ preserve
 	tempfile wwhite_achievement
 	save `wwhite_achievement'
 restore
-
+adsf
 drop if stu_RCO_blwt_cz == .
 keep cz stu_* achievement_diss_blwt_cz achievement_VR_blwt_cz totenroll_p90_cz totenroll_p75_cz achievement_iqr achievement_var_cz achievement_diss_bl_cz  
 duplicates drop

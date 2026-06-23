@@ -1,1085 +1,474 @@
-% Options for packages loaded elsewhere
-\PassOptionsToPackage{unicode}{hyperref}
-\PassOptionsToPackage{hyphens}{url}
-%
-\documentclass[
-]{article}
+\documentclass[11pt]{article}
+\usepackage[margin=1in]{geometry}
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
 \usepackage{lmodern}
-\usepackage{amssymb,amsmath}
-\usepackage{ifxetex,ifluatex}
-\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
-  \usepackage[T1]{fontenc}
-  \usepackage[utf8]{inputenc}
-  \usepackage{textcomp} % provide euro and other symbols
-\else % if luatex or xetex
-  \usepackage{unicode-math}
-  \defaultfontfeatures{Scale=MatchLowercase}
-  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
-\fi
-% Use upquote if available, for straight quotes in verbatim environments
-\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
-\IfFileExists{microtype.sty}{% use microtype if available
-  \usepackage[]{microtype}
-  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
-}{}
-\makeatletter
-\@ifundefined{KOMAClassName}{% if non-KOMA class
-  \IfFileExists{parskip.sty}{%
-    \usepackage{parskip}
-  }{% else
-    \setlength{\parindent}{0pt}
-    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
-}{% if KOMA class
-  \KOMAoptions{parskip=half}}
-\makeatother
-\usepackage{xcolor}
-\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
-\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
-\hypersetup{
-  hidelinks,
-  pdfcreator={LaTeX via pandoc}}
-\urlstyle{same} % disable monospaced font for URLs
-\usepackage{longtable,booktabs}
-% Correct order of tables after \paragraph or \subparagraph
-\usepackage{etoolbox}
-\makeatletter
-\patchcmd\longtable{\par}{\if@noskipsec\mbox{}\fi\par}{}{}
-\makeatother
-% Allow footnotes in longtable head/foot
-\IfFileExists{footnotehyper.sty}{\usepackage{footnotehyper}}{\usepackage{footnote}}
-\makesavenoteenv{longtable}
-\setlength{\emergencystretch}{3em} % prevent overfull lines
-\providecommand{\tightlist}{%
-  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
-\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\usepackage{amssymb}
+\usepackage{array}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{pdflscape}
+\usepackage{enumitem}
+\usepackage{xurl}
+\usepackage[hidelinks]{hyperref}
 
-\author{}
-\date{}
+\setlist[itemize]{noitemsep, topsep=2pt}
+\setlist[enumerate]{itemsep=2pt, topsep=2pt}
+\setlength{\emergencystretch}{3em}
+\newcommand{\todo}[1]{\textbf{TODO:} #1}
+\newcolumntype{L}[1]{>{\raggedright\arraybackslash}p{#1}}
+
+\title{README for Replication Package}
+\author{Municipality Proliferation}
+\date{\today}
 
 \begin{document}
+\maketitle
 
-\hypertarget{template-readme-and-guidance}{%
-\section{Template README and
-Guidance}\label{template-readme-and-guidance}}
+\section*{Overview}
 
-\begin{quote}
-INSTRUCTIONS: This README suggests structure and content that have been
-approved by various journals, see
-\href{https://social-science-data-editors.github.io/template_README/Endorsers.html}{Endorsers}.
-It is available as
-\href{https://github.com/social-science-data-editors/template_README/blob/master/template-README.html}{Markdown/txt},
-\href{https://social-science-data-editors.github.io/template_README/templates/README.docx}{Word},
-\href{https://social-science-data-editors.github.io/template_README/templates/README.tex}{LaTeX},
-and
-\href{https://social-science-data-editors.github.io/template_README/templates/README.pdf}{PDF}.
-In practice, there are many variations and complications, and authors
-should feel free to adapt to their needs. All instructions can (should)
-be removed from the final README (in Markdown, remove lines starting
-with \texttt{\textgreater{}\ INSTRUCTIONS}). Please ensure that a PDF is
-submitted in addition to the chosen native format. Please ensure that
-the README is called ``README'' plus the appropriate suffix, not some
-non-standard name. This helps replicators immediately locate the
-necessary document.
-\end{quote}
+This replication package contains the Stata and R code used to construct the analysis data and reproduce the tables and figures for the municipality proliferation project. The main entry point is \path{code/master.do}. That file sets all paths, writes \path{paths.csv} for R scripts, runs the Derenoncourt replication setup used by this project, constructs cleaned/interim datasets, and then runs the analysis scripts that write tables to \path{exhibits/tables} and figures to \path{exhibits/figures}.
 
-\hypertarget{overview}{%
-\subsection{Overview}\label{overview}}
-
-\begin{quote}
-INSTRUCTIONS: The typical README in social science journals serves the
-purpose of guiding a reader through the available material and a route
-to replicating the results in the research paper. Start by providing a
-brief overview of the available material and a brief guide as to how to
-proceed from beginning to end.
-\end{quote}
-
-Example: The code in this replication package constructs the analysis
-file from the three data sources (Ruggles et al, 2018; Inglehart et al,
-2019; BEA, 2016) using Stata and Julia. Two main files run all of the
-code to generate the data for the 15 figures and 3 tables in the paper.
-The replicator should expect the code to run for about 14 hours.
-
-\hypertarget{data-availability-and-provenance-statements}{%
-\subsection{Data Availability and Provenance
-Statements}\label{data-availability-and-provenance-statements}}
-
-\begin{quote}
-INSTRUCTIONS: Every README should contain a description of the origin
-(provenance), location and accessibility (data availability) of the data
-used in the article. These descriptions are generally referred to as
-``Data Availability Statements'' (DAS). However, in some cases, there is
-no external data used.
-\end{quote}
+The current code is organized around an external data directory rather than a \path{data/} directory inside the Git repository. In \path{code/master.do}, \path{$DROPBOX} is currently set to \path{D:/munis_replication/} for user \path{Everett Stamm} and \path{F:/munis_replication/} for user \path{edog9}. The code then expects:
 
 \begin{itemize}
-\tightlist
-\item[$\square$]
-  This paper does not involve analysis of external data (i.e., no data
-  are used or the only data are generated by the authors via simulation
-  in their code).
+  \item \path{$DROPBOX/data/raw} for raw inputs.
+  \item \path{$DROPBOX/data/interim} for generated intermediate files.
+  \item \path{$DROPBOX/data/clean} for final cleaned analysis files.
+  \item \path{$DROPBOX/data/xwalks} for crosswalk inputs and generated crosswalks.
 \end{itemize}
 
-\begin{quote}
-If box above is checked and if no simulated/synthetic data files are
-provided by the authors, please skip directly to the section on
-\protect\hyperlink{computational-requirements}{Computational
-Requirements}. Otherwise, continue.
-\end{quote}
+The exact default data root at the time of this draft is \path{D:/munis_replication/data}. A replicator should edit the path block at the top of \path{code/master.do} before running the code.
 
-\begin{quote}
-INSTRUCTIONS: - When the authors are \textbf{secondary data users} (they
-did not generate the data), the provenance and DAS coincide, and should
-describe the condition under which (a) the current authors (b) any
-future users might access the data. - When the data were generated (by
-the authors) in the course of conducting (lab or field)
-\textbf{experiments}, or were collected as part of \textbf{surveys},
-then the description of the provenance should describe the data
-generating process, i.e., survey or experimental procedures: -
-Experiments: complete sets of experimental instructions, questionnaires,
-stimuli for all conditions, potentially screenshots, scripts for
-experimenters or research assistants, as well as for subject eligibility
-criteria (e.g.~selection criteria, exclusions), recruitment waves,
-demographics of subject pool used. - For lab experiments specifically, a
-description of any pilot sessions/studies, and computer programs,
-configuration files, or scripts used to run the experiment. - For
-surveys, the whole questionnaire (code or images/PDF) including survey
-logic if not linear, interviewer instructions, enumeration lists, sample
-selection criteria.
+\todo{Before deposit, confirm whether the final package will keep data outside the repository as in the current code, or whether the data will be deposited under a package-level \path{data/} directory. If the latter, update \path{code/master.do} so path changes are limited to one portable configuration block.}
 
-The information should describe ALL data used, regardless of whether
-they are provided as part of the replication archive or not, and
-regardless of size or scope. The DAS should provide enough information
-that a replicator can obtain the data from the original source, even if
-the file is provided.
+\section*{Data Availability and Provenance Statements}
 
-For instance, if using GDP deflators, the source of the deflators
-(e.g.~at the national statistical office) should also be listed here. If
-any of this information has been provided in a pre-registration, then a
-link to that registration may (partially) suffice.
-
-DAS can be complex and varied. Examples are provided
-\href{https://social-science-data-editors.github.io/guidance/Requested_information_dcas.html}{here},
-and below.
-
-Importantly, if providing the data as part of the replication package,
-authors should be clear about whether they have the \textbf{rights} to
-distribute the data. Data may be subject to distribution restrictions
-due to sensitivity, IRB, proprietary clauses in the data use agreement,
-etc.
-
-NOTE: DAS do not replace Data Citations (see
-\href{https://social-science-data-editors.github.io/guidance/Data_citation_guidance.html}{Guidance}).
-Rather, they augment them. Depending on journal requirements and to some
-extent stylistic considerations, data citations should appear in the
-main article, in an appendix, or in the README. However, data citations
-only provide information \textbf{where} to find the data, not
-\textbf{how to access} those data. Thus, DAS augment data citations by
-going into additional detail that allow a researcher to assess cost,
-complexity, and availability over time of the data used by the original
-author.
-\end{quote}
-
-\hypertarget{statement-about-rights}{%
-\subsubsection{Statement about Rights}\label{statement-about-rights}}
+\subsection*{Statement About Rights}
 
 \begin{itemize}
-\tightlist
-\item[$\square$]
-  I certify that the author(s) of the manuscript have legitimate access
-  to and permission to use the data used in this manuscript.
-\item[$\square$]
-  I certify that the author(s) of the manuscript have documented
-  permission to redistribute/publish the data contained within this
-  replication package. Appropriate permission are documented in the
-  \href{https://social-science-data-editors.github.io/template_README/LICENSE.txt}{LICENSE.txt}
-  file.
+  \item[$\square$] I certify that the author(s) of the manuscript have legitimate access to and permission to use the data used in this manuscript.
+  \item[$\square$] I certify that the author(s) of the manuscript have documented permission to redistribute/publish the data contained within this replication package.
 \end{itemize}
 
-\hypertarget{optional-but-recommended-license-for-data}{%
-\subsubsection{(Optional, but recommended) License for
-Data}\label{optional-but-recommended-license-for-data}}
+\todo{Check these boxes only after confirming the redistribution terms for all raw and derived inputs, especially IPUMS extracts, Derenoncourt replication inputs, CoreLogic-derived files, and any court-order or school-achievement files.}
 
-\begin{quote}
-INSTRUCTIONS: Most data repositories provide for a default license, but
-do not impose a specific license. Authors should actively select a
-license. This should be provided in a LICENSE.txt file, separately from
-the README, possibly combined with the license for any code. Some data
-may be subject to inherited license requirements, i.e., the data
-provider may allow for redistribution only if the data is licensed under
-specific rules - authors should check with their data providers. For
-instance, a data use license might require that users - the current
-author, but also any subsequent users - cite the data provider.
-Licensing can be complex. Some non-legal guidance may be found
-\href{https://social-science-data-editors.github.io/guidance/Licensing_guidance.html}{here}.
-For multiple licenses within a data package, the \texttt{LICENSE.txt}
-file might contain the concatenation of all the licenses that apply (for
-instance, a custom license for one file, plus a CC-BY license for
-another file).
+\subsection*{License for Data}
 
-NOTE: In many cases, it is not up to the creator of the replication
-package to simply define a license, a license may be \emph{sticky} and
-be defined by the original data creator.
-\end{quote}
+\todo{Specify the data license for the replication package. The repository contains a \path{LICENSE} file, but this README draft does not determine whether it covers code only or both code and redistributed data. Some source data may have inherited licenses or redistribution restrictions.}
 
-\emph{Example:} The data are licensed under a Creative Commons/CC-BY-NC
-license. See LICENSE.txt for details.
-
-\hypertarget{summary-of-availability}{%
-\subsubsection{Summary of Availability}\label{summary-of-availability}}
+\subsection*{Summary of Availability}
 
 \begin{itemize}
-\tightlist
-\item[$\square$]
-  All data \textbf{are} publicly available.
-\item[$\square$]
-  Some data \textbf{cannot be made} publicly available.
-\item[$\square$]
-  \textbf{No data can be made} publicly available.
+  \item[$\square$] All data are publicly available.
+  \item[$\square$] Some data cannot be made publicly available.
+  \item[$\square$] No data can be made publicly available.
 \end{itemize}
 
-\begin{quote}
-INSTRUCTIONS: If \emph{No or some data can be made} \textbf{publicly}
-available, the journal may require that data be preserved for a
-specified time.
-\end{quote}
+Based on the code inspection, the package appears to rely on a mixture of public-use data, public data with registration or citation requirements, pre-generated intermediate data, and possibly restricted/proprietary data. The current repository does not contain the \path{data/} directory used by \path{code/master.do}.
 
-\begin{itemize}
-\tightlist
-\item[$\square$]
-  Confidential data used in this paper and not provided as part of the
-  public replication package will be preserved for \_\_\_ years after
-  publication, in accordance with journal policies.
-\end{itemize}
+\todo{Select the correct availability statement after confirming whether the final data deposit will include all raw and derived data, or whether some data must be omitted or provided separately.}
 
-\hypertarget{details-on-each-data-source}{%
-\subsubsection{Details on each Data
-Source}\label{details-on-each-data-source}}
+\subsection*{Details on Each Data Source}
 
-\begin{quote}
-INSTRUCTIONS: For each data source, list the file that contains data
-from that source here; if providing combined/derived datafiles, list
-them separately after the DAS. For each data source or file, as
-appropriate,
+The table below lists the external and pre-generated data inputs identified from programs called by \path{code/master.do}. The Derenoncourt replication package is intentionally treated as one upstream input, as requested. Census, NHGIS, Census of Governments, and Individual Finance files are split into separate rows so source checks can be completed one file family at a time.
 
-\begin{itemize}
-\tightlist
-\item
-  Describe the format (open formats preferred, but some
-  software-specific formats OK if open-source readers available):
-  \texttt{.dta}, \texttt{.xlsx}, \texttt{.csv}, \texttt{netCDF}, etc.
-\item
-  Provide a data dictionairy, either as part of the archive (list the
-  file name), or at a URL (list the URL). Some formats are
-  self-describing \emph{if} they have the requisite information (e.g.,
-  \texttt{.dta} should have both variable and value labels).
-\item
-  List availability within the package
-\item
-  Use proper bibliographic references in addition to a verbose
-  description (and provide a bibliography at the end of the README,
-  expanding those references)
-\end{itemize}
-
-A summary in tabular form can be useful:
-\end{quote}
-
-\begin{longtable}[]{@{}lllll@{}}
+\begin{landscape}
+\begingroup
+\scriptsize
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.18}
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
+\begin{longtable}{L{0.17\linewidth}L{0.34\linewidth}L{0.20\linewidth}L{0.22\linewidth}}
 \toprule
-\begin{minipage}[b]{0.17\columnwidth}\raggedright
-Data.Name\strut
-\end{minipage} & \begin{minipage}[b]{0.17\columnwidth}\raggedright
-Data.Files\strut
-\end{minipage} & \begin{minipage}[b]{0.17\columnwidth}\raggedright
-Location\strut
-\end{minipage} & \begin{minipage}[b]{0.17\columnwidth}\raggedright
-Provided\strut
-\end{minipage} & \begin{minipage}[b]{0.17\columnwidth}\raggedright
-Citation\strut
-\end{minipage}\tabularnewline
+Data source & Files or folders used by code & Expected location & Use and availability notes \\
 \midrule
 \endhead
-\begin{minipage}[t]{0.17\columnwidth}\raggedright
-``Current Population Survey 2018''\strut
-\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
-cepr\_march\_2018.dta\strut
-\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
-data/\strut
-\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
-TRUE\strut
-\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
-CEPR (2018)\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.17\columnwidth}\raggedright
-``Provincial Administration Reports''\strut
-\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
-coast\_simplepoint2.csv; rivers\_simplepoint2.csv; RAIL\_dummies.dta;
-railways\_Dissolve\_Simplify\_point2.csv\strut
-\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
-Data/maps/\strut
-\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
-TRUE\strut
-\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
-Administration (2017)\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.17\columnwidth}\raggedright
-``2017 SAT scores''\strut
-\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
-Not available\strut
-\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
-data/to\_clean/\strut
-\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
-FALSE\strut
-\end{minipage} & \begin{minipage}[t]{0.17\columnwidth}\raggedright
-College Board (2020)\strut
-\end{minipage}\tabularnewline
+Derenoncourt replication package & \path{dcourt/replication_AER/}; includes Derenoncourt migration, crosswalk, city population, industry employment, and mechanism files used throughout the pipeline. & \path{data/raw/dcourt/replication_AER/}; outputs also written to \path{data/interim/dcourt/}. & Treat as a single input. \todo{Add exact citation, DOI/URL, license, and redistribution status.} \\
+\addlinespace
+C. Goodman municipal incorporation data & \path{cbgoodman/muni_incorporation_date.dta} & \path{data/raw/cbgoodman/} & Used to construct municipal incorporation outcomes and shapefile attributes. \todo{Confirm source, citation, and permission to redistribute.} \\
+\addlinespace
+IPUMS USA extract & \path{census/usa_00072.dta/usa_00072.dta} & \path{data/raw/census/} & Used by \path{black_linked_characteristics.do} for linked Black migrant characteristics. \todo{Confirm extract definition, citation, and redistribution rules.} \\
+\addlinespace
+IPUMS USA extract & \path{census/usa_00108.dta/usa_00108.dta} & \path{data/raw/census/} & Used by \path{cz_pop_occscore_mfg.do} for full-count CZ population, race, OCCSCORE, and manufacturing share variables. \todo{Confirm year/content of this extract.} \\
+\addlinespace
+IPUMS USA extract & \path{census/usa_00109.dta/usa_00109.dta} & \path{data/raw/census/} & Used by \path{cz_pop_occscore_mfg.do}. \todo{Confirm year/content of this extract.} \\
+\addlinespace
+IPUMS USA extract & \path{census/usa_00110.dta/usa_00110.dta} & \path{data/raw/census/} & Used by \path{cz_pop_occscore_mfg.do}. \todo{Confirm year/content of this extract.} \\
+\addlinespace
+IPUMS USA extract & \path{census/usa_00111.dta/usa_00111.dta} & \path{data/raw/census/} & Used by \path{cz_pop_occscore_mfg.do}. \todo{Confirm year/content of this extract.} \\
+\addlinespace
+IPUMS USA extract & \path{census/usa_00116.dta/usa_00116.dta} & \path{data/raw/census/} & Used by \path{cz_pop_occscore_mfg.do}. \todo{Confirm year/content of this extract.} \\
+\addlinespace
+IPUMS USA extract & \path{census/usa_00118.dta/usa_00118.dta} & \path{data/raw/census/} & Used by \path{incomes.do}, \path{education.do}, and \path{cz_pop_occscore_mfg.do} for 1940 income, education, and full-count CZ variables. \todo{Confirm extract definition and IPUMS citation.} \\
+\addlinespace
+Census Gazetteer / national county file & \path{census/national_county.txt} & \path{data/raw/census/} & Used by \path{place_county_xwalk.do} to build the place-county crosswalk. \todo{Add exact Census citation and access date.} \\
+\addlinespace
+Census Gazetteer / national places file & \path{census/national_places.txt} & \path{data/raw/census/} & Used by \path{place_county_xwalk.do} to build the place-county crosswalk. \todo{Add exact Census citation and access date.} \\
+\addlinespace
+Census metro reference file & \path{census/99mfips.txt} & \path{data/raw/census/} & Used by \path{cog_cleaning.do} for PMSA/MSA names and county-PMSA crosswalks. Source comment points to the 1999 Census historical delineation file. \\
+\addlinespace
+Census place FIPS crosswalk & \path{census/census_place_fips_xwalk.txt} & \path{data/raw/census/} & Used by \path{incomes.do} and \path{mechanisms.do} to translate 1970 Census place codes to FIPS place codes. \todo{Confirm source and citation.} \\
+\addlinespace
+Geocorr block-group to place crosswalk & \path{census/geocorr/geocorr2014_mo_il.csv} & \path{data/raw/census/geocorr/} & Used by \path{incomes.do} for 2010 place-level household income. \todo{Confirm Geocorr version, parameters, and citation.} \\
+\addlinespace
+Geocorr block-group to place crosswalk & \path{census/geocorr/geocorr2014_in_ne.csv} & \path{data/raw/census/geocorr/} & Used by \path{incomes.do}. \todo{Confirm Geocorr version, parameters, and citation.} \\
+\addlinespace
+Geocorr block-group to place crosswalk & \path{census/geocorr/geocorr2014_nv_sc.csv} & \path{data/raw/census/geocorr/} & Used by \path{incomes.do}. \todo{Confirm Geocorr version, parameters, and citation.} \\
+\addlinespace
+Geocorr block-group to place crosswalk & \path{census/geocorr/geocorr2014_sd_wy.csv} & \path{data/raw/census/geocorr/} & Used by \path{incomes.do}. \todo{Confirm Geocorr version, parameters, and citation.} \\
+\addlinespace
+NHGIS extract & \path{census/nhgis0017_csv/nhgis0017_csv/nhgis0017_ts_nominal_county.csv} & \path{data/raw/census/} & Used by \path{cz_place_race_pop_1970_2010.do} for county race/population time series. \todo{Add NHGIS extract citation and access date.} \\
+\addlinespace
+NHGIS extract & \path{census/nhgis0019_csv/nhgis0019_ds94_1970_county.csv} & \path{data/raw/census/} & Used by \path{cz_place_race_pop_1970_2010.do} for 1970 county race/population. \todo{Add NHGIS extract citation.} \\
+\addlinespace
+NHGIS extract & \path{census/nhgis0020_fixed/nhgis0020_fixed/nhgis0020_ds172_2010_county.do} and associated data files & \path{data/raw/census/} & Used by \path{cz_pop_occscore_mfg.do} for 2010 urban population. \todo{Confirm all files required by the NHGIS Stata import script.} \\
+\addlinespace
+NHGIS extract & \path{census/nhgis0025_csv/nhgis0025_csv/nhgis0025_ds258_2020_place.csv} & \path{data/raw/census/} & Used by \path{municipal_shapefile.R} for 2020 place population attributes. \todo{Add NHGIS extract citation.} \\
+\addlinespace
+NHGIS extract & \path{census/nhgis0027_csv/nhgis0027_csv/nhgis0027_ts_nominal_place.csv} & \path{data/raw/census/} & Used by \path{cz_place_race_pop_1970_2010.do} for 1970 and 2010 place race/population variables. \todo{Add NHGIS extract citation.} \\
+\addlinespace
+NHGIS extract & \path{census/nhgis0035_csv/nhgis0035_csv/nhgis0035_ds176_20105_blck_grp.csv} & \path{data/raw/census/} & Used by \path{incomes.do} for 2010 household income at CZ and place level. \todo{Add NHGIS extract citation.} \\
+\addlinespace
+NHGIS extract & \path{census/nhgis0036_csv/nhgis0036_csv/nhgis0036_ds99_1970_county.csv} & \path{data/raw/census/} & Used by \path{incomes.do} for 1970 CZ family income. \todo{Add NHGIS extract citation.} \\
+\addlinespace
+NHGIS extract & \path{census/nhgis0036_csv/nhgis0036_csv/nhgis0036_ds99_1970_place.csv} & \path{data/raw/census/} & Used by \path{incomes.do} for 1970 place family income and house value variables. \todo{Add NHGIS extract citation.} \\
+\addlinespace
+NHGIS extract & \path{census/nhgis0038_csv/nhgis0038_ds172_2010_place.csv} & \path{data/raw/census/} & Used by \path{maxcitypop.do} for maximum principal-city population in 2010. \todo{Add NHGIS extract citation.} \\
+\addlinespace
+NHGIS extract & \path{census/nhgis0041_csv/nhgis0041_csv/nhgis0041_ts_nominal_county.csv} & \path{data/raw/census/} & Used by \path{cz_place_race_pop_1970_2010.do} for 1970 education variables. \todo{Add NHGIS extract citation.} \\
+\addlinespace
+NHGIS extract & \path{census/nhgis0046_csv/nhgis0046_csv/nhgis0046_ts_nominal_county.csv} & \path{data/raw/census/} & Used by \path{dataprep.do} for additional county/CZ controls. \todo{Confirm exact variables and extract citation.} \\
+\addlinespace
+NHGIS extract & \path{census/nhgis0048_csv/nhgis0048_csv/nhgis0048_ds107_1980_county.csv} & \path{data/raw/census/} & Used by \path{cz_pop_occscore_mfg.do} for 1980 manufacturing/labor-force shares. \todo{Add NHGIS extract citation.} \\
+\addlinespace
+NHGIS extract & \path{census/nhgis0048_csv/nhgis0048_csv/nhgis0048_ds123_1990_county.csv} & \path{data/raw/census/} & Used by \path{cz_pop_occscore_mfg.do} for 1990 manufacturing/labor-force shares. \todo{Add NHGIS extract citation.} \\
+\addlinespace
+NHGIS extract & \path{census/nhgis0048_csv/nhgis0048_csv/nhgis0048_ds151_2000_county.csv} & \path{data/raw/census/} & Used by \path{cz_pop_occscore_mfg.do} for 2000 manufacturing/labor-force shares. \todo{Add NHGIS extract citation.} \\
+\addlinespace
+NHGIS extract & \path{census/nhgis0052_csv/nhgis0052_csv/nhgis0052_ds99_1970_place.csv} & \path{data/raw/census/} & Used by \path{mechanisms.do} for 1970 white-flight / mover measures. \todo{Add NHGIS extract citation.} \\
+\addlinespace
+Census TIGER/Line place shapefiles & \path{census/tiger/states/tl_2022_*_place.shp} and sidecar files & \path{data/raw/census/tiger/states/} & Used by \path{municipal_shapefile.R}. \todo{Confirm all state shapefile sidecars and cite TIGER/Line 2022.} \\
+\addlinespace
+Census cartographic/TIGER cache & tigris-downloaded county/place shapes cached under \path{census/tiger/CB}, \path{census/tiger/full}, and \path{census/tiger/states_2011/}. & \path{data/raw/census/tiger/} or downloaded by R package \path{tigris}. & Used by R spatial cleaning scripts. Requires network access if the tigris cache is not pre-populated. \todo{Confirm cache contents included in final deposit.} \\
+\addlinespace
+Census of Governments crosswalk & \path{cog/4_Govt_Org_Directory_Surveys/GOVS_ID_to_FIPS_Place_Codes_2002.xls} & \path{data/raw/cog/} & Used by \path{cog_cleaning.do} to build the COG ID to FIPS place crosswalk. \todo{Confirm citation and redistribution status.} \\
+\addlinespace
+Census of Governments crosswalk & \path{cog/1-3_Govt_Org_Nat_CoArea_ElecOff/GOVS_to_FIPS_Codes_State_&_County_2007.xls} & \path{data/raw/cog/} & Used by \path{cog_cleaning.do} to crosswalk 2002/2007 county FIPS. \todo{Confirm citation.} \\
+\addlinespace
+Census of Governments crosswalk & \path{cog/1-3_Govt_Org_Nat_CoArea_ElecOff/2012_GOVS_COUNTY_to_FIPS_COUNTY.xls} & \path{data/raw/cog/} & Used by \path{cog_cleaning.do} to crosswalk 2012 county FIPS. \todo{Confirm citation.} \\
+\addlinespace
+Census of Governments county counts & \path{cog/1-3_Govt_Org_Nat_CoArea_ElecOff/2_Govt_Org_County_Area_Counts.xls} & \path{data/raw/cog/} & Used by \path{cog_cleaning.do} for municipal, county, school district, and special district counts. \todo{Confirm citation.} \\
+\addlinespace
+Census of Governments individual-government directory & ODBC DSN \path{4_Govt_Org_Directory_Surveys}, pointing to the downloaded database/files under \path{cog/4_Govt_Org_Directory_Surveys/}. & \path{data/raw/cog/} plus local ODBC DSN & Used by \path{cog_cleaning.do} for tables 2--4 of individual governments. \todo{Confirm exact database filename and whether it is included or must be downloaded.} \\
+\addlinespace
+Census Government Units file & \path{cog/Govt_Units_2021_Final.xlsx} & \path{data/raw/cog/} & Used by \path{cog_cleaning.do} for the 2021 master unit file. \todo{Confirm citation.} \\
+\addlinespace
+Census historical city finance database & ODBC DSN \path{City_Gov_Fin}, table \path{City_Govt_Finances}. & \path{data/raw/cog/} or other local database path & Used by \path{cog_cleaning.do} for historical city-government finance variables. \todo{Confirm database filename, source, citation, and redistribution status.} \\
+\addlinespace
+Census Individual Finance file & \path{census/_IndFin_1967-2012/IndFin12a.txt} & \path{data/raw/census/_IndFin_1967-2012/} & Used by \path{IndFin_cleaning.do} to build \path{data/interim/census/IndFin12.dta}. \todo{The active master calls \path{code/cleaning/IndFin_cleaning.do}, but that exact file is missing.} \\
+\addlinespace
+Census Individual Finance file & \path{census/_IndFin_1967-2012/IndFin12b.txt} & \path{data/raw/census/_IndFin_1967-2012/} & Used by \path{IndFin_cleaning.do}. \todo{Confirm citation and redistribution status.} \\
+\addlinespace
+Census Individual Finance file & \path{census/_IndFin_1967-2012/IndFin12c.txt} & \path{data/raw/census/_IndFin_1967-2012/} & Used by \path{IndFin_cleaning.do}. \todo{Confirm citation and redistribution status.} \\
+\addlinespace
+NCES / CRDC / EDFacts / EDGE school data & \path{nces/school-districts_lea_directory.csv}; \path{nces/EDGE_SCHOOLDISTRICT_TL23_SY2233/.../EDGE_SCHOOLDISTRICT_TL_23_SY2223.shp}; pre-generated \path{school_ccd_directory.dta}, \path{school_offerings.dta}, \path{school_race_ccd.dta}, \path{cz_achievement_segregation.dta}. & \path{data/raw/nces/}; \path{data/interim/nces/}; \path{data/xwalks/ncessch_place_xwalk.dta}. & Used for school district geography, offerings, race/enrollment, court-order shares, and school segregation/achievement outcomes. \todo{The active code comments out the \path{educationdata} download commands, so the generated inputs and exact source steps need documentation.} \\
+\addlinespace
+School desegregation / court-order data & \path{other/district_court_order_data_feb2021.dta} & \path{data/raw/other/} & Used to construct commuting-zone court-order variables. \todo{Add creator, citation, access conditions, and redistribution status.} \\
+\addlinespace
+GNIS domestic names / streams & Files under \path{GNIS/DomesticNames_AllStates_Text/Text/}. & \path{data/raw/GNIS/} & Used to count stream features by commuting zone. \todo{Add exact GNIS download citation and date.} \\
+\addlinespace
+Transportation and railroad covariates & \path{covariates/RR_NetworkDatabase_DH_Oct2015/.../Cost_ID_county.xlsx}; \path{NSFtranspCost.dta}; \path{Historical_Railroads___Vanderbilt.shp}. & \path{data/raw/covariates/} & Used for transport cost and rail density controls. \todo{Add exact citations and redistribution terms.} \\
+\addlinespace
+Coastline and climate covariates & \path{coastline-counties-list.xlsx}; NOAA/NCEI \path{climdiv-*.txt}. & \path{data/raw/covariates/} & Used for coastal status and 1940 climate controls. \todo{Add exact citations and redistribution terms.} \\
+\addlinespace
+CoreLogic-derived place characteristics & \path{corelogic/censusplace_clogic_chars.csv} & \path{data/interim/corelogic/} & Used in municipal shapefile attributes and mechanisms. \todo{Confirm provenance, whether this can be redistributed, and whether only derived variables can be shared.} \\
+\addlinespace
+Generated and provided crosswalks & \path{cw_cty_czone.dta}; \path{consistent_1990.dta}; \path{consistent_1940_1970.dta}; \path{place_county_xwalk.dta}; \path{cz_place_xwalk.dta}; COG ID-FIPS crosswalks; \path{ncessch_place_xwalk.dta}. & \path{data/xwalks/} & Several are generated by the cleaning scripts, while others appear to be required inputs. \todo{Separate generated crosswalks from source crosswalks in the final deposit.} \\
 \bottomrule
 \end{longtable}
+\endgroup
+\end{landscape}
 
-where the \texttt{Data.Name} column is then expanded in the subsequent
-paragraphs, and \texttt{CEPR\ (2018)} is resolved in the References
-section of the README.
+\section*{Dataset List}
 
-\hypertarget{example-for-public-use-data-collected-by-the-authors}{%
-\subsubsection{Example for public use data collected by the
-authors}\label{example-for-public-use-data-collected-by-the-authors}}
+The code creates the following analysis and intermediate datasets. This list is based on \path{save}, \path{write_dta}, \path{write.csv}, and \path{st_write} commands in the programs called by \path{code/master.do}.
 
-\begin{quote}
-The {[}DATA TYPE{]} data used to support the findings of this study have
-been deposited in the {[}NAME{]} repository ({[}DOI or OTHER PERSISTENT
-IDENTIFIER{]}).
-{[}\href{https://www.hindawi.com/research.data/\#statement.templates}{1}{]}.
-The data were collected by the authors, and are available under a
-Creative Commons Non-commercial license.
-\end{quote}
-
-\hypertarget{example-for-public-use-data-sourced-from-elsewhere-and-provided}{%
-\subsubsection{Example for public use data sourced from elsewhere and
-provided}\label{example-for-public-use-data-sourced-from-elsewhere-and-provided}}
-
-\begin{quote}
-Data on National Income and Product Accounts (NIPA) were downloaded from
-the U.S. Bureau of Economic Analysis (BEA, 2016). We use Table 30. Data
-can be downloaded from https://apps.bea.gov/regional/downloadzip.cfm,
-under ``Personal Income (State and Local)'', select CAINC30: Economic
-Profile by County, then download. Data can also be directly downloaded
-using https://apps.bea.gov/regional/zip/CAINC30.zip. A copy of the data
-is provided as part of this archive. The data are in the public domain.
-\end{quote}
-
-Datafile: \texttt{CAINC30\_\_ALL\_AREAS\_1969\_2018.csv}
-
-\hypertarget{example-for-public-use-data-with-required-registration-and-provided-extract}{%
-\subsubsection{Example for public use data with required registration
-and provided
-extract}\label{example-for-public-use-data-with-required-registration-and-provided-extract}}
-
-\begin{quote}
-The paper uses IPUMS Terra data (Ruggles et al, 2018). IPUMS-Terra does
-not allow for redistribution, except for the purpose of replication
-archives. Permissions as per https://terra.ipums.org/citation have been
-obtained, and are documented within the ``data/IPUMS-terra'' folder.
-\textgreater{} Note: the reference to ``Ruggles et al, 2018'' would be
-resolved in the Reference section of this README, \textbf{and} in the
-main manuscript.
-\end{quote}
-
-Datafile: \texttt{data/raw/ipums\_terra\_2018.dta}
-
-\hypertarget{example-for-free-use-data-with-required-registration-extract-not-provided}{%
-\subsubsection{Example for free use data with required registration,
-extract not
-provided}\label{example-for-free-use-data-with-required-registration-extract-not-provided}}
-
-\begin{quote}
-The paper uses data from the World Values Survey Wave 6 (Inglehart et
-al, 2019). Data is subject to a redistribution restriction, but can be
-freely downloaded from
-http://www.worldvaluessurvey.org/WVSDocumentationWV6.jsp. Choose
-\texttt{WV6\_Data\_Stata\_v20180912}, fill out the registration form,
-including a brief description of the project, and agree to the
-conditions of use. Note: ``the data files themselves are not
-redistributed'' and other conditions. Save the file in the directory
-\texttt{data/raw}.
-\end{quote}
-
-\begin{quote}
-\begin{quote}
-Note: the reference to ``Inglehart et al, 2018'' would be resolved in
-the Reference section of this README, \textbf{and} in the main
-manuscript.
-\end{quote}
-\end{quote}
-
-Datafile: \texttt{data/raw/WV6\_Data\_Stata\_v20180912.dta} (not
-provided)
-
-\hypertarget{example-for-confidential-data}{%
-\subsubsection{Example for confidential
-data}\label{example-for-confidential-data}}
-
-\begin{quote}
-INSTRUCTIONS: Citing and describing confidential data, in particular
-when it does not have a regular distribution channel or online landing
-page, can be tricky. A citation can be crafted
-(\href{https://social-science-data-editors.github.io/guidance/FAQ.html\#data-citation-without-online-link}{see
-guidance}), and the DAS should describe how to access, whom to contact
-(including the role of the particular person, should that person
-retire), and other relevant information, such as required citizenship
-status or cost.
-\end{quote}
-
-\begin{quote}
-The data for this project (DESE, 2019) are confidential, but may be
-obtained with Data Use Agreements with the Massachusetts Department of
-Elementary and Secondary Education (DESE). Researchers interested in
-access to the data may contact {[}NAME{]} at {[}EMAIL{]}, also see
-www.doe.mass.edu/research/contact.html. It can take some months to
-negotiate data use agreements and gain access to the data. The author
-will assist with any reasonable replication attempts for two years
-following publication.
-\end{quote}
-
-\hypertarget{example-for-confidential-census-bureau-data}{%
-\subsubsection{Example for confidential Census Bureau
-data}\label{example-for-confidential-census-bureau-data}}
-
-\begin{quote}
-All the results in the paper use confidential microdata from the U.S.
-Census Bureau. To gain access to the Census microdata, follow the
-directions here on how to write a proposal for access to the data via a
-Federal Statistical Research Data Center:
-https://www.census.gov/ces/rdcresearch/howtoapply.html. You must request
-the following datasets in your proposal: 1. Longitudinal Business
-Database (LBD), 2002 and 2007 2. Foreign Trade Database -- Import (IMP),
-2002 and 2007 {[}\ldots{]}
-\end{quote}
-
-(adapted from \href{https://doi.org/10.1093/restud/rdw057}{Fort (2016)})
-
-\hypertarget{example-for-preliminary-code-during-the-editorial-process}{%
-\subsubsection{Example for preliminary code during the editorial
-process}\label{example-for-preliminary-code-during-the-editorial-process}}
-
-\begin{quote}
-Code for data cleaning and analysis is provided as part of the
-replication package. It is available at
-https://dropbox.com/link/to/code/XYZ123ABC for review. It will be
-uploaded to the {[}JOURNAL REPOSITORY{]} once the paper has been
-conditionally accepted.
-\end{quote}
-
-\hypertarget{dataset-list}{%
-\subsection{Dataset list}\label{dataset-list}}
-
-\begin{quote}
-INSTRUCTIONS: In some cases, authors will provide one dataset (file) per
-data source, and the code to combine them. In others, in particular when
-data access might be restrictive, the replication package may only
-include derived/analysis data. Every file should be described. This can
-be provided as a Excel/CSV table, or in the table below.
-\end{quote}
-
-\begin{quote}
-INSTRUCTIONS: While it is often most convenient to provide data in the
-native format of the software used to analyze and process the data, not
-all formats are ``open'' and can be read by other (free) software. Data
-should at a minimum be provided in formats that can be read by
-open-source software (R, Python, others), and ideally be provided in
-non-proprietary, archival-friendly formats.
-\end{quote}
-
-\begin{quote}
-INSTRUCTIONS: All data files should be fully documented:
-variables/columns should have labels (long-form meaningful names), and
-values should be explained. This might mean generating a codebook,
-pointing at a public codebook, or providing data in (non-proprietary)
-formats that allow for a rich description. This is in particular
-important for data that is not distributable.
-\end{quote}
-
-\begin{quote}
-INSTRUCTIONS: Some journals require, and it is considered good practice,
-to provide synthetic or simulated data that has some of the key
-characteristics of the restricted-access data which are not provided.
-The level of fidelity may vary - it may be useful for debugging only, or
-it should allow to assess the key characteristics of the
-statistical/econometric procedure or the main conclusions of the paper.
-\end{quote}
-
-\begin{longtable}[]{@{}llll@{}}
+\begin{landscape}
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
+\begin{longtable}{L{0.27\linewidth}L{0.42\linewidth}L{0.25\linewidth}}
 \toprule
-\begin{minipage}[b]{0.26\columnwidth}\raggedright
-Data file\strut
-\end{minipage} & \begin{minipage}[b]{0.19\columnwidth}\raggedright
-Source\strut
-\end{minipage} & \begin{minipage}[b]{0.23\columnwidth}\raggedright
-Notes\strut
-\end{minipage} & \begin{minipage}[b]{0.21\columnwidth}\raggedright
-Provided\strut
-\end{minipage}\tabularnewline
+Dataset & Description & Created by \\
 \midrule
 \endhead
-\begin{minipage}[t]{0.26\columnwidth}\raggedright
-\texttt{data/raw/lbd.dta}\strut
-\end{minipage} & \begin{minipage}[t]{0.19\columnwidth}\raggedright
-LBD\strut
-\end{minipage} & \begin{minipage}[t]{0.23\columnwidth}\raggedright
-Confidential\strut
-\end{minipage} & \begin{minipage}[t]{0.21\columnwidth}\raggedright
-No\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.26\columnwidth}\raggedright
-\texttt{data/raw/terra.dta}\strut
-\end{minipage} & \begin{minipage}[t]{0.19\columnwidth}\raggedright
-IPUMS Terra\strut
-\end{minipage} & \begin{minipage}[t]{0.23\columnwidth}\raggedright
-As per terms of use\strut
-\end{minipage} & \begin{minipage}[t]{0.21\columnwidth}\raggedright
-Yes\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.26\columnwidth}\raggedright
-\texttt{data/derived/regression\_input.dta}\strut
-\end{minipage} & \begin{minipage}[t]{0.19\columnwidth}\raggedright
-All listed\strut
-\end{minipage} & \begin{minipage}[t]{0.23\columnwidth}\raggedright
-Combines multiple data sources, serves as input for Table 2, 3 and
-Figure 5.\strut
-\end{minipage} & \begin{minipage}[t]{0.21\columnwidth}\raggedright
-Yes\strut
-\end{minipage}\tabularnewline
+\path{data/clean/cz_pooled.dta} & Main commuting-zone analysis dataset; merges Derenoncourt city/CZ data, municipal outcomes, school district outcomes, controls, instruments, court-order variables, streams, population, income, education, and shift-share objects. & \path{code/cleaning/dataprep.do} \\
+\addlinespace
+\path{data/clean/mechanisms.dta} & Place-level mechanisms dataset used for long-run mechanism, white-flight, distance, finance, land-use, and school exclusivity analyses. & \path{code/cleaning/mechanisms.do} \\
+\addlinespace
+\path{data/clean/panel_a_data.dta} & Data for the paper's first-panel migration/instrument figure. & \path{code/cleaning/panel_a_data.do} \\
+\addlinespace
+\path{data/clean/pcarrow_fig_data.dta} & Data for principal-city arrow figures. & \path{code/cleaning/pcarrow_fig_data.do} \\
+\addlinespace
+\path{data/interim/dcourt/*.dta} & Derenoncourt-derived city/CZ datasets, original 130 CZ sample, white migration LASSO prediction files, and city-CZ crosswalks. & \path{code/dcourt_setup/*.do}; \path{code/cleaning/2_lasso_white.do} \\
+\addlinespace
+\path{data/interim/ssaggregate_prep/*.dta} & Shift-share shares, shocks, destination instruments, interacted shares, and 1,000 placebo instrument files. & \path{code/cleaning/create_sumshares.do}; \path{code/ado/create_sumshare*.ado} \\
+\addlinespace
+\path{data/interim/counts/*_cz.dta} & CZ-level municipal, county, school district, and special-purpose government counts. & \path{code/cleaning/muni_counts.do}; \path{code/cleaning/cog_cleaning.do} \\
+\addlinespace
+\path{data/interim/census/*.dta} & Income, education, population, occupation score, manufacturing share, urban population, municipal finance, and linked migrant characteristics. & Multiple cleaning scripts \\
+\addlinespace
+\path{data/interim/cgoodman/*.dta} & C. Goodman place-county geography, original geographies, and CZ geography summaries. & \path{code/cleaning/cgoodman_place_county_geog.R}; \path{code/cleaning/geogs.do} \\
+\addlinespace
+\path{data/interim/cog/*.dta} & Census of Governments county counts, individual-government extracts, 2021 master unit file, and historical city finance data. & \path{code/cleaning/cog_cleaning.do} \\
+\addlinespace
+\path{data/interim/other/*.dta}, \path{*.csv}, \path{*.shp} & Municipal shapefile and attributes, spatial covariates, central-city distances, covered exclusive school district indicator, streams. & R and Stata cleaning scripts \\
+\addlinespace
+\path{data/interim/nces/*.dta} & School offerings, place offerings, CZ court order variables, and school achievement/segregation files. & \path{code/cleaning/ncessch_cleaning.do}; \todo{achievement/segregation source script not in active master} \\
+\addlinespace
+\path{data/xwalks/*.dta} & Crosswalks used in cleaning and analysis. & Some generated by current cleaning scripts; some required as inputs \\
 \bottomrule
 \end{longtable}
+\endgroup
+\end{landscape}
 
-\hypertarget{computational-requirements}{%
-\subsection{Computational
-requirements}\label{computational-requirements}}
+\section*{Computational Requirements}
 
-\begin{quote}
-INSTRUCTIONS: In general, the specific computer code used to generate
-the results in the article will be within the repository that also
-contains this README. However, other computational requirements - shared
-libraries or code packages, required software, specific computing
-hardware - may be important, and is always useful, for the goal of
-replication. Some example text follows.
-\end{quote}
+\subsection*{Software Requirements}
 
-\begin{quote}
-INSTRUCTIONS: We strongly suggest providing setup scripts that
-install/set up the environment. Sample scripts for
-\href{https://github.com/gslab-econ/template/blob/master/config/config_stata.do}{Stata},
-\href{https://github.com/labordynamicsinstitute/paper-template/blob/master/programs/global-libraries.R}{R},
-\href{https://github.com/labordynamicsinstitute/paper-template/blob/master/programs/packages.jl}{Julia}
-are easy to set up and implement. Specific software may have more
-sophisticated tools:
-\href{https://pip.pypa.io/en/stable/user_guide/\#ensuring-repeatability}{Python},
-\href{https://julia.quantecon.org/more_julia/tools_editors.html\#Package-Environments}{Julia}.
-\end{quote}
-
-\hypertarget{software-requirements}{%
-\subsubsection{Software Requirements}\label{software-requirements}}
-
-\begin{quote}
-INSTRUCTIONS: List all of the software requirements, up to and including
-any operating system requirements, for the entire set of code. It is
-suggested to distribute most dependencies together with the replication
-package if allowed, in particular if sourced from unversioned code
-repositories, Github repos, and personal webpages. In all cases, list
-the version \emph{you} used. All packages should be listed in
-human-readable form in this README, but should also be included in a
-setup or install script.
-\end{quote}
+The main code is Stata and R. \path{code/master.do} declares \path{version 17.0}, so Stata 17 or newer is recommended. The master file currently points to R 4.4.2 on one machine and R 4.3.1 on another via \path{$Rterm_path}. The code has hard-coded Windows paths; no Linux/macOS run was verified while preparing this README draft.
 
 \begin{itemize}
-\item[$\square$]
-  The replication package contains one or more programs to install all
-  dependencies and set up the necessary directory structure. {[}HIGHLY
-  RECOMMENDED{]}
-\item
-  Stata (code was last run with version 15)
-
-  \begin{itemize}
-  \tightlist
-  \item
-    \texttt{estout} (as of 2018-05-12)
-  \item
-    \texttt{rdrobust} (as of 2019-01-05)
-  \item
-    the program ``\texttt{0\_setup.do}'' will install all dependencies
-    locally, and should be run once.
-  \end{itemize}
-\item
-  Python 3.6.4
-
-  \begin{itemize}
-  \tightlist
-  \item
-    \texttt{pandas} 0.24.2
-  \item
-    \texttt{numpy} 1.16.4
-  \item
-    the file ``\texttt{requirements.txt}'' lists these dependencies,
-    please run ``\texttt{pip\ install\ -r\ requirements.txt}'' as the
-    first step. See
-    \url{https://pip.pypa.io/en/stable/user_guide/\#ensuring-repeatability}
-    for further instructions on creating and using the
-    ``\texttt{requirements.txt}'' file.
-  \end{itemize}
-\item
-  Intel Fortran Compiler version 20200104
-\item
-  Matlab (code was run with Matlab Release 2018a)
-\item
-  R 3.4.3
-
-  \begin{itemize}
-  \tightlist
-  \item
-    \texttt{tidyr} (0.8.3)
-  \item
-    \texttt{rdrobust} (0.99.4)
-  \item
-    the file ``\texttt{0\_setup.R}'' will install all dependencies
-    (latest version), and should be run once prior to running other
-    programs.
-  \end{itemize}
+  \item Stata 17 or newer.
+  \item R, currently configured for R 4.4.2 or R 4.3.1 depending on username.
+  \item Stata community packages can be installed by running \path{do code/setup_stata_packages.do} from the repository root. The setup script installs the Stata packages used by the active project code and by the edited Derenoncourt replication scripts, including \path{rsource}, \path{statastates}, \path{estout}, \path{ivreg2}, \path{ranktest}, \path{reghdfe}, \path{ftools}, \path{parmest}, \path{unique}, \path{labutil}, and related plotting/table utilities.
+  \item R packages used by scripts called from \path{master.do}: \path{tidyverse}, \path{sf}, \path{haven}, \path{tigris}, \path{stringr}, \path{readxl}, \path{terra}, and \path{glmnet}. Some scripts install missing R packages from CRAN, which requires internet access.
+  \item The NCES pre-generation comments use the Stata package \path{educationdata}. If those commented downloads are reactivated, document the package version and source queries.
 \end{itemize}
 
-Portions of the code use bash scripting, which may require Linux.
+\todo{Create an R package lockfile or setup script. The AEA guidance recommends not assuming that the replicator already has user-written packages installed.}
 
-Portions of the code use Powershell scripting, which may require Windows
-10 or higher.
+\subsection*{ODBC Setup for Census of Governments}
 
-\hypertarget{controlled-randomness}{%
-\subsubsection{Controlled Randomness}\label{controlled-randomness}}
+\path{code/cleaning/cog_cleaning.do} uses Stata's \path{odbc} commands for two Census of Governments inputs. The machine running the replication must have an ODBC driver that matches the Stata architecture. For 64-bit Stata on Windows, install the 64-bit Microsoft Access Database Engine / Access ODBC driver if it is not already available, then open the 64-bit ODBC Data Source Administrator at \path{C:/Windows/System32/odbcad32.exe}. For 32-bit Stata, use the 32-bit administrator at \path{C:/Windows/SysWOW64/odbcad32.exe}.
 
-\begin{quote}
-INSTRUCTIONS: Some estimation code uses random numbers, almost always
-provided by pseudorandom number generators (PRNGs). For reproducibility
-purposes, these should be provided with a deterministic seed, so that
-the sequence of numbers provided is the same for the original author and
-any replicators. While this is not always possible, it is a requirement
-by many journals' policies. The seed should be set once, and not use a
-time-stamp. If using parallel processing, special care needs to be
-taken. If using multiple programs in sequence, care must be taken on how
-to call these programs, ideally from a main program, so that the
-sequence is not altered. If no PRNG is used, check the other box.
-\end{quote}
+Create either User DSNs or System DSNs with these exact names:
 
 \begin{itemize}
-\tightlist
-\item[$\square$]
-  Random seed is set at line \_\_\_\_\_ of program \_\_\_\_\_\_
-\item[$\square$]
-  No Pseudo random generator is used in the analysis described here.
+  \item \path{4_Govt_Org_Directory_Surveys}: point this DSN to the downloaded Census of Governments individual-government directory database in \path{$RAWDATA/cog/4_Govt_Org_Directory_Surveys/}. The script queries this DSN, reads tables 2--4, and writes \path{data/interim/cog/4_*.dta}.
+  \item \path{City_Gov_Fin}: point this DSN to the historical city-government finance database containing table \path{City_Govt_Finances}. The script writes \path{data/interim/cog/city_gov_fin.dta}.
 \end{itemize}
 
-\hypertarget{memory-runtime-storage-requirements}{%
-\subsubsection{Memory, Runtime, Storage
-Requirements}\label{memory-runtime-storage-requirements}}
+After creating the DSNs, test them in Stata before running the full master file:
 
-\begin{quote}
-INSTRUCTIONS: Memory and compute-time requirements may also be relevant
-or even critical. Some example text follows. It may be useful to break
-this out by Table/Figure/section of processing. For instance, some
-estimation routines might run for weeks, but data prep and creating
-figures might only take a few minutes. You should also describe how much
-storage is required in addition to the space visible in the typical
-repository, for instance, because data will be unzipped, data
-downloaded, or temporary files written.
-\end{quote}
+\begin{verbatim}
+odbc list
+odbc query "4_Govt_Org_Directory_Surveys"
+odbc query "City_Gov_Fin"
+\end{verbatim}
 
-\hypertarget{summary}{%
-\paragraph{Summary}\label{summary}}
+If Stata cannot see either DSN, confirm that the DSN was created in the administrator matching the Stata bitness and that the database driver can open the downloaded file. Stata's Windows ODBC FAQ is linked in \path{code/cleaning/cog_cleaning.do}: \url{https://www.stata.com/support/faqs/data-management/configuring-odbc-win/}.
 
-Approximate time needed to reproduce the analyses on a standard (CURRENT
-YEAR) desktop machine:
+\todo{Confirm the exact database filenames for both DSNs and whether they will be redistributed in the replication package or must be downloaded by replicators.}
+
+\subsection*{Controlled Randomness}
+
+The active code does not set a Stata seed. The file \path{code/cleaning/2_lasso_white.do} calls R's \path{cv.glmnet} with \path{nfolds=5} and does not set an R seed in the embedded R block. The code also uses 1,000 Derenoncourt placebo files as inputs generated by the Derenoncourt replication workflow.
+
+\todo{Set and document an R seed before each \path{cv.glmnet} call, or document why the resulting selected variables are fixed by provided intermediate outputs. Confirm whether the Derenoncourt placebo files were generated with a documented seed.}
+
+\subsection*{Memory, Runtime, and Storage Requirements}
+
+\todo{Add the machine specifications, operating system, memory, runtime, and storage requirements from a clean full run of \path{code/master.do}.}
+
+Approximate runtime category:
 
 \begin{itemize}
-\tightlist
-\item[$\square$]
-  \textless10 minutes
-\item[$\square$]
-  10-60 minutes
-\item[$\square$]
-  1-2 hours
-\item[$\square$]
-  2-8 hours
-\item[$\square$]
-  8-24 hours
-\item[$\square$]
-  1-3 days
-\item[$\square$]
-  3-14 days
-\item[$\square$]
-  \textgreater{} 14 days
+  \item[$\square$] Less than 10 minutes
+  \item[$\square$] 10--60 minutes
+  \item[$\square$] 1--2 hours
+  \item[$\square$] 2--8 hours
+  \item[$\square$] 8--24 hours
+  \item[$\square$] 1--3 days
+  \item[$\square$] 3--14 days
+  \item[$\square$] More than 14 days
 \end{itemize}
 
-Approximate storage space needed:
+Approximate storage requirement:
 
 \begin{itemize}
-\item[$\square$]
-  \textless{} 25 MBytes
-\item[$\square$]
-  25 MB - 250 MB
-\item[$\square$]
-  250 MB - 2 GB
-\item[$\square$]
-  2 GB - 25 GB
-\item[$\square$]
-  25 GB - 250 GB
-\item[$\square$]
-  \textgreater{} 250 GB
-\item[$\square$]
-  Not feasible to run on a desktop machine, as described below.
+  \item[$\square$] Less than 25 MB
+  \item[$\square$] 25 MB--250 MB
+  \item[$\square$] 250 MB--2 GB
+  \item[$\square$] 2 GB--25 GB
+  \item[$\square$] 25 GB--250 GB
+  \item[$\square$] More than 250 GB
 \end{itemize}
 
-\hypertarget{details}{%
-\paragraph{Details}\label{details}}
+\section*{Description of Programs and Code}
 
-The code was last run on a \textbf{4-core Intel-based laptop with MacOS
-version 10.14.4 with 200GB of free space}.
+\path{code/master.do} is the master script. It performs the following steps:
 
-Portions of the code were last run on a \textbf{32-core Intel server
-with 1024 GB of RAM, 12 TB of fast local storage}. Computation took
-\textbf{734 hours}.
+\begin{enumerate}
+  \item Sets user-specific paths, Stata version, Stata globals, and the ado path.
+  \item Writes \path{paths.csv}, which several R scripts read to recover Stata global paths.
+  \item Copies edited Derenoncourt setup scripts into the Derenoncourt replication directory via \path{code/cleaning/dcourt_file_setup.do}.
+  \item Runs the edited Derenoncourt replication master file at \path{$RAWDATA/dcourt/replication_AER/code/0_MASTER_edited.do}.
+  \item Runs cleaning scripts under \path{code/cleaning}.
+  \item Runs analysis scripts under \path{code/analysis}.
+\end{enumerate}
 
-Portions of the code were last run on a \textbf{12-node AWS R3 cluster,
-consuming 20,000 core-hours, with 2TB of attached storage}.
+\subsection*{Cleaning Code}
 
-\begin{quote}
-INSTRUCTIONS: Identifiying hardware and OS can be obtained through a
-variety of ways: Some of these details can be found as follows:
+The cleaning stage constructs crosswalks, Derenoncourt-derived inputs, municipal counts, Census/IPUMS/NHGIS-derived controls, spatial covariates, school and court-order inputs, and the final clean analysis datasets. Key outputs are \path{data/clean/cz_pooled.dta}, \path{data/clean/mechanisms.dta}, \path{data/clean/panel_a_data.dta}, and \path{data/clean/pcarrow_fig_data.dta}.
+
+\subsection*{Analysis Code}
+
+The analysis stage reads the cleaned datasets and writes manuscript and appendix outputs to \path{exhibits/tables} and \path{exhibits/figures}. Stata helper programs in \path{code/ado} produce repeated table formats and shift-share/segregation calculations.
+
+\subsection*{Known Execution Issues to Resolve Before Deposit}
 
 \begin{itemize}
-\tightlist
-\item
-  (Windows) by right-clicking on ``This PC'' in File Explorer and
-  choosing ``Properties''
-\item
-  (Mac) Apple-menu \textgreater{} ``About this Mac''
-\item
-  (Linux) see code in
-  \href{https://github.com/AEADataEditor/replication-template/blob/master/tools/linux-system-info.sh}{linux-system-info.sh}`
+  \item \path{code/master.do} calls \path{code/cleaning/migrate_cleaning.do}, but that exact file is not present. A likely related file exists at \path{code/cleaning/old/migrate_cleaning.do}. \todo{Confirm whether to restore it, remove the call, or replace it with the Derenoncourt-generated migration input.}
+  \item \path{code/master.do} calls \path{code/cleaning/create_sumshare.do}, but the repository contains \path{code/cleaning/create_sumshares.do}. \todo{Confirm whether this is a typo in the master script.}
+  \item \path{code/master.do} calls \path{code/cleaning/IndFin_cleaning.do}, but that exact file is not present. A likely related file exists at \path{code/cleaning/old/IndFin_cleaning.do}. \todo{Confirm whether to restore it.}
+  \item \path{code/cleaning/ncessch_cleaning.do} assumes \path{data/interim/nces/school_ccd_directory.dta}, \path{school_offerings.dta}, and \path{school_race_ccd.dta} already exist; the download commands are commented out. \todo{Document and automate creation of these files or include them as inputs with source details.}
+  \item \path{code/analysis/segregation_table.do} uses \path{data/interim/nces/cz_achievement_segregation.dta}, but the active master does not generate it. A related script exists under \path{code/cleaning/old/ap_de_cleaning.do}. \todo{Confirm source and include active generation code if needed.}
+  \item \path{code/cleaning/muni_district_overlap.R} uses \path{INTDATA} and \path{RAWDATA} directly and does not read \path{paths.csv}, unlike the other R cleaning scripts. \todo{Confirm that these objects are defined under \path{rsource}; otherwise add the same path-loading block used by the other R scripts.}
 \end{itemize}
-\end{quote}
 
-\hypertarget{description-of-programscode}{%
-\subsection{Description of
-programs/code}\label{description-of-programscode}}
+\subsection*{License for Code}
 
-\begin{quote}
-INSTRUCTIONS: Give a high-level overview of the program files and their
-purpose. Remove redundant/ obsolete files from the Replication archive.
-\end{quote}
+\todo{Specify the code license. The repository includes \path{LICENSE}; confirm whether the license is intended for all code in the replication package and whether any bundled third-party code or ado files require separate notices.}
+
+\section*{Instructions to Replicators}
+
+\begin{enumerate}
+  \item Obtain the data sources listed in the data availability section and place them in the directory structure expected by \path{code/master.do}. By default, the current local path is \path{D:/munis_replication/data}.
+  \item Edit the path block near the top of \path{code/master.do} so that \path{$DROPBOX}, \path{$REPO}, \path{$Rterm_path}, and \path{$FFMPEG} point to local paths on the replicator's machine.
+  \item In Stata, from the repository root, run \path{do code/setup_stata_packages.do} to install required user-written Stata packages.
+  \item Install required R packages, or allow the R scripts that install missing packages to use internet access. \todo{Replace this with an R setup script or lockfile once created.}
+  \item Configure the two Census of Governments ODBC DSNs described above if running \path{code/cleaning/cog_cleaning.do}.
+  \item Ensure that \path{data/raw/dcourt/replication_AER/} contains the Derenoncourt replication package, because \path{master.do} copies edited scripts into that directory and then runs \path{0_MASTER_edited.do}.
+  \item Resolve the known execution issues listed above, especially the three missing master-called files.
+  \item In Stata, from the repository root, run \path{do code/master.do}.
+  \item Outputs will be written to \path{exhibits/tables} and \path{exhibits/figures}.
+\end{enumerate}
+
+\section*{List of Tables, Figures, and Programs}
+
+The provided code is intended to reproduce:
 
 \begin{itemize}
-\tightlist
-\item
-  Programs in \texttt{programs/01\_dataprep} will extract and reformat
-  all datasets referenced above. The file
-  \texttt{programs/01\_dataprep/main.do} will run them all.
-\item
-  Programs in \texttt{programs/02\_analysis} generate all tables and
-  figures in the main body of the article. The program
-  \texttt{programs/02\_analysis/main.do} will run them all. Each program
-  called from \texttt{main.do} identifies the table or figure it creates
-  (e.g., \texttt{05\_table5.do}). Output files are called appropriate
-  names (\texttt{table5.tex}, \texttt{figure12.png}) and should be easy
-  to correlate with the manuscript.
-\item
-  Programs in \texttt{programs/03\_appendix} will generate all tables
-  and figures in the online appendix. The program
-  \texttt{programs/03\_appendix/main-appendix.do} will run them all.
-\item
-  Ado files have been stored in \texttt{programs/ado} and the
-  \texttt{main.do} files set the ADO directories appropriately.
-\item
-  The program \texttt{programs/00\_setup.do} will populate the
-  \texttt{programs/ado} directory with updated ado packages, but for
-  purposes of exact reproduction, this is not needed. The file
-  \texttt{programs/00\_setup.log} identifies the versions as they were
-  last updated.
-\item
-  The program \texttt{programs/config.do} contains parameters used by
-  all programs, including a random seed. Note that the random seed is
-  set once for each of the two sequences (in \texttt{02\_analysis} and
-  \texttt{03\_appendix}). If running in any order other than the one
-  outlined below, your results may differ.
+  \item[$\square$] All numbers provided in text in the paper.
+  \item[$\square$] All tables and figures in the paper.
+  \item[$\square$] Selected tables and figures in the paper, as explained below.
 \end{itemize}
 
-\hypertarget{optional-but-recommended-license-for-code}{%
-\subsubsection{(Optional, but recommended) License for
-Code}\label{optional-but-recommended-license-for-code}}
+\todo{Check the appropriate box after comparing this output list with the final manuscript and appendix.}
 
-\begin{quote}
-INSTRUCTIONS: Most journal repositories provide for a default license,
-but do not impose a specific license. Authors should actively select a
-license. This should be provided in a LICENSE.txt file, separately from
-the README, possibly combined with the license for any data provided.
-Some code may be subject to inherited license requirements, i.e., the
-original code author may allow for redistribution only if the code is
-licensed under specific rules - authors should check with their sources.
-For instance, some code authors require that their article describing
-the econometrics of the package be cited. Licensing can be complex. Some
-non-legal guidance may be found
-\href{https://social-science-data-editors.github.io/guidance/Licensing_guidance.html}{here}.
-\end{quote}
-
-The code is licensed under a MIT/BSD/GPL {[}choose one!{]} license. See
-\href{https://social-science-data-editors.github.io/template_README/LICENSE.txt}{LICENSE.txt}
-for details.
-
-\hypertarget{instructions-to-replicators}{%
-\subsection{Instructions to
-Replicators}\label{instructions-to-replicators}}
-
-\begin{quote}
-INSTRUCTIONS: The first two sections ensure that the data and software
-necessary to conduct the replication have been collected. This section
-then describes a human-readable instruction to conduct the replication.
-This may be simple, or may involve many complicated steps. It should be
-a simple list, no excess prose. Strict linear sequence. If more than 4-5
-manual steps, please wrap a main program/Makefile around them, in
-logical sequences. Examples follow.
-\end{quote}
-
-\begin{itemize}
-\tightlist
-\item
-  Edit \texttt{programs/config.do} to adjust the default path
-\item
-  Run \texttt{programs/00\_setup.do} once on a new system to set up the
-  working environment.
-\item
-  Download the data files referenced above. Each should be stored in the
-  prepared subdirectories of \texttt{data/}, in the format that you
-  download them in. Do not unzip. Scripts are provided in each directory
-  to download the public-use files. Confidential data files requested as
-  part of your FSRDC project will appear in the \texttt{/data} folder.
-  No further action is needed on the replicator's part.
-\item
-  Run \texttt{programs/01\_main.do} to run all steps in sequence.
-\end{itemize}
-
-\hypertarget{details-1}{%
-\subsubsection{Details}\label{details-1}}
-
-\begin{itemize}
-\tightlist
-\item
-  \texttt{programs/00\_setup.do}: will create all output directories,
-  install needed ado packages.
-
-  \begin{itemize}
-  \tightlist
-  \item
-    If wishing to update the ado packages used by this archive, change
-    the parameter \texttt{update\_ado} to \texttt{yes}. However, this is
-    not needed to successfully reproduce the manuscript tables.
-  \end{itemize}
-\item
-  \texttt{programs/01\_dataprep}:
-
-  \begin{itemize}
-  \tightlist
-  \item
-    These programs were last run at various times in 2018.
-  \item
-    Order does not matter, all programs can be run in parallel, if
-    needed.
-  \item
-    A \texttt{programs/01\_dataprep/main.do} will run them all in
-    sequence, which should take about 2 hours.
-  \end{itemize}
-\item
-  \texttt{programs/02\_analysis/main.do}.
-
-  \begin{itemize}
-  \tightlist
-  \item
-    If running programs individually, note that ORDER IS IMPORTANT.
-  \item
-    The programs were last run top to bottom on July 4, 2019.
-  \end{itemize}
-\item
-  \texttt{programs/03\_appendix/main-appendix.do}. The programs were
-  last run top to bottom on July 4, 2019.
-\item
-  Figure 1: The figure can be reproduced using the data provided in the
-  folder ``2\_data/data\_map'', and ArcGIS Desktop (Version 10.7.1) by
-  following these (manual) instructions:
-
-  \begin{itemize}
-  \tightlist
-  \item
-    Create a new map document in ArcGIS ArcMap, browse to the folder
-    ``2\_data/data\_map'' in the ``Catalog'', with files
-    ``provinceborders.shp'', ``lakes.shp'', and ``cities.shp''.
-  \item
-    Drop the files listed above onto the new map, creating three
-    separate layers. Order them with ``lakes'' in the top layer and
-    ``cities'' in the bottom layer.
-  \item
-    Right-click on the cities file, in properties choose the variable
-    ``health''\ldots{} (more details)
-  \end{itemize}
-\end{itemize}
-
-\hypertarget{list-of-tables-and-programs}{%
-\subsection{List of tables and
-programs}\label{list-of-tables-and-programs}}
-
-\begin{quote}
-INSTRUCTIONS: Your programs should clearly identify the tables and
-figures as they appear in the manuscript, by number. Sometimes, this may
-be obvious, e.g.~a program called ``\texttt{table1.do}'' generates a
-file called \texttt{table1.png}. Sometimes, mnemonics are used, and a
-mapping is necessary. In all circumstances, provide a list of tables and
-figures, identifying the program (and possibly the line number) where a
-figure is created.
-
-NOTE: If the public repository is incomplete, because not all data can
-be provided, as described in the data section, then the list of tables
-should clearly indicate which tables, figures, and in-text numbers can
-be reproduced with the public material provided.
-\end{quote}
-
-The provided code reproduces:
-
-\begin{itemize}
-\tightlist
-\item[$\square$]
-  All numbers provided in text in the paper
-\item[$\square$]
-  All tables and figures in the paper
-\item[$\square$]
-  Selected tables and figures in the paper, as explained and justified
-  below.
-\end{itemize}
-
-\begin{longtable}[]{@{}lllll@{}}
+\begin{landscape}
+\begingroup
+\small
+\setlength{\tabcolsep}{4pt}
+\renewcommand{\arraystretch}{1.15}
+\setlength{\LTleft}{0pt}
+\setlength{\LTright}{0pt}
+\begin{longtable}{L{0.16\linewidth}L{0.31\linewidth}L{0.27\linewidth}L{0.20\linewidth}}
 \toprule
-\begin{minipage}[b]{0.13\columnwidth}\raggedright
-Figure/Table \#\strut
-\end{minipage} & \begin{minipage}[b]{0.18\columnwidth}\raggedright
-Program\strut
-\end{minipage} & \begin{minipage}[b]{0.09\columnwidth}\raggedright
-Line Number\strut
-\end{minipage} & \begin{minipage}[b]{0.23\columnwidth}\raggedright
-Output file\strut
-\end{minipage} & \begin{minipage}[b]{0.23\columnwidth}\raggedright
-Note\strut
-\end{minipage}\tabularnewline
+Figure/Table & Program & Output file(s) & Notes \\
 \midrule
 \endhead
-\begin{minipage}[t]{0.13\columnwidth}\raggedright
-Table 1\strut
-\end{minipage} & \begin{minipage}[t]{0.18\columnwidth}\raggedright
-02\_analysis/table1.do\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright
-\strut
-\end{minipage} & \begin{minipage}[t]{0.23\columnwidth}\raggedright
-summarystats.csv\strut
-\end{minipage} & \begin{minipage}[t]{0.23\columnwidth}\raggedright
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.13\columnwidth}\raggedright
-Table 2\strut
-\end{minipage} & \begin{minipage}[t]{0.18\columnwidth}\raggedright
-02\_analysis/table2and3.do\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright
-15\strut
-\end{minipage} & \begin{minipage}[t]{0.23\columnwidth}\raggedright
-table2.csv\strut
-\end{minipage} & \begin{minipage}[t]{0.23\columnwidth}\raggedright
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.13\columnwidth}\raggedright
-Table 3\strut
-\end{minipage} & \begin{minipage}[t]{0.18\columnwidth}\raggedright
-02\_analysis/table2and3.do\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright
-145\strut
-\end{minipage} & \begin{minipage}[t]{0.23\columnwidth}\raggedright
-table3.csv\strut
-\end{minipage} & \begin{minipage}[t]{0.23\columnwidth}\raggedright
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.13\columnwidth}\raggedright
-Figure 1\strut
-\end{minipage} & \begin{minipage}[t]{0.18\columnwidth}\raggedright
-n.a. (no data)\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright
-\strut
-\end{minipage} & \begin{minipage}[t]{0.23\columnwidth}\raggedright
-\strut
-\end{minipage} & \begin{minipage}[t]{0.23\columnwidth}\raggedright
-Source: Herodus (2011)\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.13\columnwidth}\raggedright
-Figure 2\strut
-\end{minipage} & \begin{minipage}[t]{0.18\columnwidth}\raggedright
-02\_analysis/fig2.do\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright
-\strut
-\end{minipage} & \begin{minipage}[t]{0.23\columnwidth}\raggedright
-figure2.png\strut
-\end{minipage} & \begin{minipage}[t]{0.23\columnwidth}\raggedright
-\strut
-\end{minipage}\tabularnewline
-\begin{minipage}[t]{0.13\columnwidth}\raggedright
-Figure 3\strut
-\end{minipage} & \begin{minipage}[t]{0.18\columnwidth}\raggedright
-02\_analysis/fig3.do\strut
-\end{minipage} & \begin{minipage}[t]{0.09\columnwidth}\raggedright
-\strut
-\end{minipage} & \begin{minipage}[t]{0.23\columnwidth}\raggedright
-figure-robustness.png\strut
-\end{minipage} & \begin{minipage}[t]{0.23\columnwidth}\raggedright
-Requires confidential data\strut
-\end{minipage}\tabularnewline
+Table 1 & \path{code/analysis/summary_table.do} & \path{exhibits/tables/T1.tex} & Summary statistics. \\
+\addlinespace
+Table 2 & \path{code/analysis/main_table.do}; \path{main_table_long_ssaggregate.ado} & \path{exhibits/tables/T2.tex} & Main 2SLS table. \\
+\addlinespace
+Table 3 & \path{code/analysis/main_table.do}; \path{fragmech_long_ssaggregate.ado} & \path{exhibits/tables/T3.tex} & Fragmentation/mechanism table. \\
+\addlinespace
+Table 4 & \path{code/analysis/occscore_links_diffs_ss.do} & \path{exhibits/tables/T4.tex} & Linked OCCSCORE heterogeneity. \todo{Confirm manuscript title.} \\
+\addlinespace
+Table 5 & \path{code/analysis/long_term_mechanisms.do} & \path{exhibits/tables/T5.tex} & Long-term mechanisms. \\
+\addlinespace
+Table 6 & \path{code/analysis/segregation_table.do} & \path{exhibits/tables/T6.tex} & Long-term segregation and achievement-related outcomes. \\
+\addlinespace
+Figure 1, panels D--E & \path{code/analysis/fig_1_panels_b_c.do} & \path{exhibits/figures/F1d.pdf}; \path{F1e.pdf} & \todo{Confirm panel labels; program name says panels B/C.} \\
+\addlinespace
+Figure 2, panels A--B & \path{code/analysis/event_studies.do} & \path{exhibits/figures/F2a.png}; \path{F2b.png} & Event studies. \\
+\addlinespace
+Figure 3, panels A--B & \path{code/analysis/pcarrow_fig.do} & \path{exhibits/figures/F3a.pdf}; \path{F3b.pdf} & Principal-city arrow figures. \\
+\addlinespace
+Appendix Table A1 & \path{code/analysis/balancetables.do} & \path{exhibits/tables/TA1.tex} & Balance table for baseline instrument. \\
+\addlinespace
+Appendix Table A2 & \path{code/analysis/pretrends.do} & \path{exhibits/tables/TA2.tex} & Pre-trends table. \\
+\addlinespace
+Appendix Table A3 & \path{code/analysis/main_table.do} & \path{exhibits/tables/TA3.tex} & Town outcome robustness. \\
+\addlinespace
+Appendix Table A4 & \path{code/analysis/corr_matrix.do} & \path{exhibits/tables/TA4.tex} & Correlation matrix. \\
+\addlinespace
+Appendix Tables A5--A7 & \path{code/analysis/main_table.do} & \path{TA5.tex}; \path{TA6.tex}; \path{TA7.tex} & Main-table robustness variants. \\
+\addlinespace
+Appendix Tables A8--A12 & \path{code/analysis/imbalance_decomp.do} & \path{TA8.tex}--\path{TA12.tex} & Imbalanced-controls decomposition for \path{cgoodman}, \path{gen_muni}, \path{schdist_ind}, \path{spdist}, and \path{totfrac}. \\
+\addlinespace
+Appendix Tables A13--A14 & \path{code/analysis/main_table.do} & \path{TA13.tex}; \path{TA14.tex} & Control-set robustness. \\
+\addlinespace
+Appendix Table A15 and auxiliary files & \path{code/analysis/balancecontrols_individualeffects.do} & \path{TA15.tex}; \path{balancecontrols_rf.tex}; \path{balancecontrols_rf_sep.tex} & Baseline controls individual effects and auxiliary reduced-form balance files. \todo{Confirm whether auxiliary files appear in manuscript/appendix.} \\
+\addlinespace
+Appendix Table A16 & \path{code/analysis/balancetables.do} & \path{exhibits/tables/TA16.tex} & Percentile instrument balance table. \\
+\addlinespace
+Appendix Table A17 & \path{code/analysis/main_table.do} & \path{exhibits/tables/TA17.tex} & Non-ssaggregate / alternative instrument version. \todo{Confirm description.} \\
+\addlinespace
+Appendix Table A18 & \path{code/analysis/main_table.do} & \path{exhibits/tables/TA18.tex} & Weighted instrument-migration robustness. \\
+\addlinespace
+Appendix Table A19 & \path{code/analysis/balancetables.do} & \path{exhibits/tables/TA19.tex} & White migration balance table. \\
+\addlinespace
+Appendix Table A20 & \path{code/analysis/main_table.do} & \path{exhibits/tables/TA20.tex} & White migration robustness table. \\
+\addlinespace
+Appendix Tables A21--A22 & \path{code/analysis/occscore_links_diffs_fs.do} & \path{TA21.tex}; \path{TA22.tex} & First-stage linked OCCSCORE heterogeneity by links/differences. \\
+\addlinespace
+Appendix Table A23 & \path{code/analysis/touching_pct_rev_debt_table.do} & \path{exhibits/tables/TA23.tex} & Boundary/revenue/debt mechanisms. \\
+\addlinespace
+Appendix Table A24 & \path{code/analysis/main_court_ordered.do} & \path{exhibits/tables/TA24.tex} & Court-ordered heterogeneity. \\
+\addlinespace
+Appendix Table A25 & \path{code/analysis/white_flight_check.do} & \path{exhibits/tables/TA25.tex} & White-flight check. \\
+\addlinespace
+Appendix Figure A1 & \path{code/analysis/municipal_incorporations_graph.do} & \path{exhibits/figures/FA1.png} & Municipal incorporations over time. \\
+\addlinespace
+Appendix Figure A2 series & \path{code/analysis/loo_test.do} & \path{FA2_<outcome>.pdf} & Leave-one-out tests for \path{cgoodman}, \path{gen_muni}, \path{gen_town}, \path{schdist_ind}, \path{spdist}, \path{totfrac}. \\
+\addlinespace
+Appendix Figure A3 series & \path{code/analysis/alt_inst_tests.do} & \path{FA3_<outcome>.pdf} & Alternative instrument tests for the same outcome family. \\
+\addlinespace
+Appendix Figure A4 series & \path{code/analysis/placebo_test.do} & \path{FA4_<outcome>.pdf} & Derenoncourt placebo tests for the same outcome family. \\
+\addlinespace
+Appendix Figures A5a--A5b & \path{code/analysis/dist_edge_edge.do} & \path{FA5a.pdf}; \path{FA5b.pdf} & Distance to principal city graphs. \\
 \bottomrule
 \end{longtable}
+\endgroup
+\end{landscape}
 
-\hypertarget{references}{%
-\subsection{References}\label{references}}
+\section*{References}
 
-\begin{quote}
-INSTRUCTIONS: As in any scientific manuscript, you should have proper
-references. For instance, in this sample README, we cited ``Ruggles et
-al, 2019'' and ``DESE, 2019'' in a Data Availability Statement. The
-reference should thus be listed here, in the style of your journal:
-\end{quote}
+\todo{Replace this draft reference list with final journal-formatted citations and ensure that all data citations also appear in the manuscript or appendix if required.}
 
-Steven Ruggles, Steven M. Manson, Tracy A. Kugler, David A. Haynes II,
-David C. Van Riper, and Maryia Bakhtsiyarava. 2018. ``IPUMS Terra:
-Integrated Data on Population and Environment: Version 2
-{[}dataset{]}.'' Minneapolis, MN: \emph{Minnesota Population Center,
-IPUMS}. https://doi.org/10.18128/D090.V2
+\begin{itemize}
+  \item Derenoncourt, Ellora. 2022. \todo{Add full article title, journal, replication package URL/DOI, and access date.}
+  \item Goodman, Christopher B. \todo{Add full citation for municipal incorporation data.}
+  \item Manson, Steven, Jonathan Schroeder, David Van Riper, Tracy Kugler, and Steven Ruggles. IPUMS National Historical Geographic Information System: Version used in this project. Minneapolis, MN: IPUMS. \todo{Add extract-specific citation/DOI and access date.}
+  \item Ruggles, Steven, Sarah Flood, Matthew Sobek, Daniel Backman, Annie Chen, Grace Cooper, Stephanie Richards, Renae Rodgers, and Megan Schouweiler. IPUMS USA: Version used in this project. Minneapolis, MN: IPUMS. \todo{Add exact version/DOI and extract access date.}
+  \item U.S. Census Bureau. Census of Governments, Government Organization and Individual Unit / Individual Finance files. \todo{Add exact file citations and dates.}
+  \item U.S. Census Bureau. TIGER/Line Shapefiles and Cartographic Boundary Files. \todo{Add exact years and access date.}
+  \item National Center for Education Statistics and Civil Rights Data Collection / EDFacts. \todo{Add exact dataset citations and access dates.}
+  \item U.S. Board on Geographic Names. Geographic Names Information System. \todo{Add exact download citation and access date.}
+  \item National Centers for Environmental Information. Climate Division monthly data. \todo{Add exact citation and access date.}
+  \item \todo{Add citations for transportation-cost data, historical railroad shapefile, coastline county list, CoreLogic-derived data, court-order data, Geocorr crosswalks, and all source crosswalks.}
+\end{itemize}
 
-Department of Elementary and Secondary Education (DESE), 2019. ``Student
-outcomes database {[}dataset{]}'' \emph{Massachusetts Department of
-Elementary and Secondary Education (DESE)}. Accessed January 15, 2019.
+\section*{Acknowledgements}
 
-U.S. Bureau of Economic Analysis (BEA). 2016. ``Table 30:''Economic
-Profile by County, 1969-2016.'' (accessed Sept 1, 2017).
-
-Inglehart, R., C. Haerpfer, A. Moreno, C. Welzel, K. Kizilova, J.
-Diez-Medrano, M. Lagos, P. Norris, E. Ponarin \& B. Puranen et
-al.~(eds.). 2014. World Values Survey: Round Six - Country-Pooled
-Datafile Version:
-http://www.worldvaluessurvey.org/WVSDocumentationWV6.jsp. Madrid: JD
-Systems Institute.
-
-\begin{center}\rule{0.5\linewidth}{0.5pt}\end{center}
-
-\hypertarget{acknowledgements}{%
-\subsection{Acknowledgements}\label{acknowledgements}}
-
-Some content on this page was copied from
-\href{https://www.hindawi.com/research.data/\#statement.templates}{Hindawi}.
-Other content was adapted from
-\href{https://doi.org/10.1093/restud/rdw057}{Fort (2016)}, Supplementary
-data, with the author's permission.
+This README structure follows the social science replication README template and the AEA Data Editor guidance for preparing files for verification. See \url{https://aeadataeditor.github.io/aea-de-guidance/preparing-for-data-deposit.html}.
 
 \end{document}

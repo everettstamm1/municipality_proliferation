@@ -74,9 +74,10 @@ export delimited "$REPO/paths.csv", replace
 
 
 if `run_dcourt'==1{
+	do "$CODE/cleaning/dcourt_file_setup.do"
+	
 	// Run dcourt replication as far as we need it
 	do "$RAWDATA/dcourt/replication_AER/code/0_MASTER_edited.do"
-
 
 }
 
@@ -152,6 +153,9 @@ if `run'==1{
 
 	// School info cleaning
 	do "$CODE/cleaning/ncessch_cleaning.do"
+
+	// SEDA achievement cleaning
+	do "$CODE/cleaning/achievement_cleaning.do"
 
 	// Municipal Finance cleaning
 	do "$CODE/cleaning/IndFin_cleaning.do"

@@ -53,7 +53,7 @@ Sys.setenv(TIGRIS_CACHE_DIR = TIGRIS_DIR)
 message("Tigris files will be saved/cached in: ", TIGRIS_DIR)
 
 # Use 2022 TIGER/Line files
-TIGRIS_YEAR <- 2010
+TIGRIS_YEAR <- 2022
 
 county_cz_xwalk <- read_dta(paste0(XWALKS, "/cw_cty_czone.dta"))
 
@@ -147,7 +147,7 @@ places <- places_raw %>%
   mutate(
     COUNTYFP = str_pad(as.character(COUNTYFP), 3, side = "left", pad = "0")
   ) %>% 
-  merge(counties, by = c("COUNTYFP", "STATEFP")) %>% 
+  full_join(counties, by = c("COUNTYFP", "STATEFP")) %>% 
   mutate(
     frac_land  = place_land / county_land,
     frac_total = place_total / county_total

@@ -7,13 +7,12 @@ keep cz sch_vr_blwt_cz sch_diss_blwt_cz
 duplicates drop
 tempfile seg
 save `seg'
+
 use "$CLEANDATA/cz_pooled.dta", clear
 lab var GM_raw_pp "GM"
 lab var n_schdist_ind_cz_pc "$\Delta$ School Districts P.C."
-merge 1:1 cz using "$INTDATA/cz_pop_segregation", keep(1 3) nogen
 merge 1:1 cz using "$INTDATA/nces/cz_achievement_segregation", keep(1 3) nogen
 merge 1:1 cz using `seg', keep(1 3) nogen
-g schoolflag = mi(n_schdist_ind_cz_pc)
 
 	
 foreach var of varlist sch_vr_blwt_cz sch_diss_blwt_cz achievement_iqr achievement_var_cz black_exposure white_exposure{ 
@@ -26,6 +25,7 @@ merge 1:1 origin_fips using "$INTDATA/ssaggregate_prep//shock_instrument_base.dt
 replace shift = 0 if mi(shift)
 lab var shift "`xlab'"
 lab var GM_raw_pp "GM"
+
 
 eststo clear
 

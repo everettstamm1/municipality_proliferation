@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.6.16)  22 JUN 2026 17:19
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.6.16)  22 JUN 2026 18:53
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -770,9 +770,6 @@ File: l3backend-pdftex.def 2025-10-09 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count362
 ) (replication.aux
 
-LaTeX Warning: Label `tab:pretrends' multiply defined.
-
-
 LaTeX Warning: Label `fig:sub2' multiply defined.
 
 
@@ -986,12 +983,12 @@ LaTeX Warning: No \author given.
 [3
 
 ] (tables/T2.tex) [4]
-<figures/F2a.png, id=131, 1060.96375pt x 771.88374pt>
+<figures/F2a.png, id=129, 1060.96375pt x 771.88374pt>
 File: figures/F2a.png Graphic file (type png)
 <use figures/F2a.png>
 Package pdftex.def Info: figures/F2a.png  used on input line 100.
 (pdftex.def)             Requested size: 375.80048pt x 273.4023pt.
-<figures/F2b.png, id=132, 1060.96375pt x 771.88374pt>
+<figures/F2b.png, id=130, 1060.96375pt x 771.88374pt>
 File: figures/F2b.png Graphic file (type png)
 <use figures/F2b.png>
 Package pdftex.def Info: figures/F2b.png  used on input line 106.
@@ -1008,7 +1005,7 @@ ex) [6
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/F3a.pdf): PDF inclusion: foun
 d PDF version <1.6>, but at most version <1.5> allowed
-<figures/F3a.pdf, id=151, 397.485pt x 867.24pt>
+<figures/F3a.pdf, id=149, 397.485pt x 867.24pt>
 File: figures/F3a.pdf Graphic file (type pdf)
 <use figures/F3a.pdf>
 Package pdftex.def Info: figures/F3a.pdf  used on input line 153.
@@ -1017,7 +1014,7 @@ Package pdftex.def Info: figures/F3a.pdf  used on input line 153.
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/F3b.pdf): PDF inclusion: foun
 d PDF version <1.6>, but at most version <1.5> allowed
-<figures/F3b.pdf, id=152, 397.485pt x 867.24pt>
+<figures/F3b.pdf, id=150, 397.485pt x 867.24pt>
 File: figures/F3b.pdf Graphic file (type pdf)
 <use figures/F3b.pdf>
 Package pdftex.def Info: figures/F3b.pdf  used on input line 158.
@@ -1084,7 +1081,7 @@ Package pdftex.def Info: figures/F3b.pdf  used on input line 158.
 (tables/TA25.tex) [35
 
 ]
-<figures/FA1.png, id=325, 1060.96375pt x 771.88374pt>
+<figures/FA1.png, id=323, 1060.96375pt x 771.88374pt>
 File: figures/FA1.png Graphic file (type png)
 <use figures/FA1.png>
 Package pdftex.def Info: figures/FA1.png  used on input line 431.
@@ -1093,7 +1090,7 @@ Package pdftex.def Info: figures/FA1.png  used on input line 431.
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA2_cgoodman.pdf): PDF inclus
 ion: found PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA2_cgoodman.pdf, id=331, 397.485pt x 289.08pt>
+<figures/FA2_cgoodman.pdf, id=328, 397.485pt x 289.08pt>
 File: figures/FA2_cgoodman.pdf Graphic file (type pdf)
 <use figures/FA2_cgoodman.pdf>
 Package pdftex.def Info: figures/FA2_cgoodman.pdf  used on input line 440.
@@ -1102,7 +1099,7 @@ Package pdftex.def Info: figures/FA2_cgoodman.pdf  used on input line 440.
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA2_gen_muni.pdf): PDF inclus
 ion: found PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA2_gen_muni.pdf, id=332, 397.485pt x 289.08pt>
+<figures/FA2_gen_muni.pdf, id=329, 397.485pt x 289.08pt>
 File: figures/FA2_gen_muni.pdf Graphic file (type pdf)
 <use figures/FA2_gen_muni.pdf>
 Package pdftex.def Info: figures/FA2_gen_muni.pdf  used on input line 444.
@@ -1111,7 +1108,7 @@ Package pdftex.def Info: figures/FA2_gen_muni.pdf  used on input line 444.
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA2_schdist_ind.pdf): PDF inc
 lusion: found PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA2_schdist_ind.pdf, id=333, 397.485pt x 289.08pt>
+<figures/FA2_schdist_ind.pdf, id=330, 397.485pt x 289.08pt>
 File: figures/FA2_schdist_ind.pdf Graphic file (type pdf)
 <use figures/FA2_schdist_ind.pdf>
 Package pdftex.def Info: figures/FA2_schdist_ind.pdf  used on input line 448.
@@ -1120,7 +1117,7 @@ Package pdftex.def Info: figures/FA2_schdist_ind.pdf  used on input line 448.
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA2_gen_town.pdf): PDF inclus
 ion: found PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA2_gen_town.pdf, id=334, 397.485pt x 289.08pt>
+<figures/FA2_gen_town.pdf, id=331, 397.485pt x 289.08pt>
 File: figures/FA2_gen_town.pdf Graphic file (type pdf)
 <use figures/FA2_gen_town.pdf>
 Package pdftex.def Info: figures/FA2_gen_town.pdf  used on input line 452.
@@ -1129,7 +1126,7 @@ Package pdftex.def Info: figures/FA2_gen_town.pdf  used on input line 452.
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA2_spdist.pdf): PDF inclusio
 n: found PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA2_spdist.pdf, id=335, 397.485pt x 289.08pt>
+<figures/FA2_spdist.pdf, id=332, 397.485pt x 289.08pt>
 File: figures/FA2_spdist.pdf Graphic file (type pdf)
 <use figures/FA2_spdist.pdf>
 Package pdftex.def Info: figures/FA2_spdist.pdf  used on input line 456.
@@ -1138,7 +1135,7 @@ Package pdftex.def Info: figures/FA2_spdist.pdf  used on input line 456.
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA2_totfrac.pdf): PDF inclusi
 on: found PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA2_totfrac.pdf, id=336, 397.485pt x 289.08pt>
+<figures/FA2_totfrac.pdf, id=333, 397.485pt x 289.08pt>
 File: figures/FA2_totfrac.pdf Graphic file (type pdf)
 <use figures/FA2_totfrac.pdf>
 Package pdftex.def Info: figures/FA2_totfrac.pdf  used on input line 460.
@@ -1154,7 +1151,7 @@ FA2_totfrac.pdf>]
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA3_cgoodman.pdf): PDF inclus
 ion: found PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA3_cgoodman.pdf, id=2737, 397.485pt x 289.08pt>
+<figures/FA3_cgoodman.pdf, id=2733, 397.485pt x 289.08pt>
 File: figures/FA3_cgoodman.pdf Graphic file (type pdf)
 <use figures/FA3_cgoodman.pdf>
 Package pdftex.def Info: figures/FA3_cgoodman.pdf  used on input line 474.
@@ -1163,7 +1160,7 @@ Package pdftex.def Info: figures/FA3_cgoodman.pdf  used on input line 474.
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA3_gen_muni.pdf): PDF inclus
 ion: found PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA3_gen_muni.pdf, id=2738, 397.485pt x 289.08pt>
+<figures/FA3_gen_muni.pdf, id=2734, 397.485pt x 289.08pt>
 File: figures/FA3_gen_muni.pdf Graphic file (type pdf)
 <use figures/FA3_gen_muni.pdf>
 Package pdftex.def Info: figures/FA3_gen_muni.pdf  used on input line 478.
@@ -1172,7 +1169,7 @@ Package pdftex.def Info: figures/FA3_gen_muni.pdf  used on input line 478.
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA3_schdist_ind.pdf): PDF inc
 lusion: found PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA3_schdist_ind.pdf, id=2739, 397.485pt x 289.08pt>
+<figures/FA3_schdist_ind.pdf, id=2735, 397.485pt x 289.08pt>
 File: figures/FA3_schdist_ind.pdf Graphic file (type pdf)
 <use figures/FA3_schdist_ind.pdf>
 Package pdftex.def Info: figures/FA3_schdist_ind.pdf  used on input line 482.
@@ -1181,7 +1178,7 @@ Package pdftex.def Info: figures/FA3_schdist_ind.pdf  used on input line 482.
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA3_gen_town.pdf): PDF inclus
 ion: found PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA3_gen_town.pdf, id=2740, 397.485pt x 289.08pt>
+<figures/FA3_gen_town.pdf, id=2736, 397.485pt x 289.08pt>
 File: figures/FA3_gen_town.pdf Graphic file (type pdf)
 <use figures/FA3_gen_town.pdf>
 Package pdftex.def Info: figures/FA3_gen_town.pdf  used on input line 486.
@@ -1190,7 +1187,7 @@ Package pdftex.def Info: figures/FA3_gen_town.pdf  used on input line 486.
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA3_spdist.pdf): PDF inclusio
 n: found PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA3_spdist.pdf, id=2741, 397.485pt x 289.08pt>
+<figures/FA3_spdist.pdf, id=2737, 397.485pt x 289.08pt>
 File: figures/FA3_spdist.pdf Graphic file (type pdf)
 <use figures/FA3_spdist.pdf>
 Package pdftex.def Info: figures/FA3_spdist.pdf  used on input line 490.
@@ -1199,7 +1196,7 @@ Package pdftex.def Info: figures/FA3_spdist.pdf  used on input line 490.
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA3_totfrac.pdf): PDF inclusi
 on: found PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA3_totfrac.pdf, id=2742, 397.485pt x 289.08pt>
+<figures/FA3_totfrac.pdf, id=2738, 397.485pt x 289.08pt>
 File: figures/FA3_totfrac.pdf Graphic file (type pdf)
 <use figures/FA3_totfrac.pdf>
 Package pdftex.def Info: figures/FA3_totfrac.pdf  used on input line 494.
@@ -1212,7 +1209,7 @@ FA3_totfrac.pdf>]
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA4_cgoodman.pdf): PDF inclus
 ion: found PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA4_cgoodman.pdf, id=2891, 397.485pt x 289.08pt>
+<figures/FA4_cgoodman.pdf, id=2887, 397.485pt x 289.08pt>
 File: figures/FA4_cgoodman.pdf Graphic file (type pdf)
 <use figures/FA4_cgoodman.pdf>
 Package pdftex.def Info: figures/FA4_cgoodman.pdf  used on input line 507.
@@ -1221,7 +1218,7 @@ Package pdftex.def Info: figures/FA4_cgoodman.pdf  used on input line 507.
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA4_gen_muni.pdf): PDF inclus
 ion: found PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA4_gen_muni.pdf, id=2892, 397.485pt x 289.08pt>
+<figures/FA4_gen_muni.pdf, id=2888, 397.485pt x 289.08pt>
 File: figures/FA4_gen_muni.pdf Graphic file (type pdf)
 <use figures/FA4_gen_muni.pdf>
 Package pdftex.def Info: figures/FA4_gen_muni.pdf  used on input line 511.
@@ -1230,7 +1227,7 @@ Package pdftex.def Info: figures/FA4_gen_muni.pdf  used on input line 511.
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA4_schdist_ind.pdf): PDF inc
 lusion: found PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA4_schdist_ind.pdf, id=2893, 397.485pt x 289.08pt>
+<figures/FA4_schdist_ind.pdf, id=2889, 397.485pt x 289.08pt>
 File: figures/FA4_schdist_ind.pdf Graphic file (type pdf)
 <use figures/FA4_schdist_ind.pdf>
 Package pdftex.def Info: figures/FA4_schdist_ind.pdf  used on input line 515.
@@ -1239,7 +1236,7 @@ Package pdftex.def Info: figures/FA4_schdist_ind.pdf  used on input line 515.
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA4_gen_town.pdf): PDF inclus
 ion: found PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA4_gen_town.pdf, id=2894, 397.485pt x 289.08pt>
+<figures/FA4_gen_town.pdf, id=2890, 397.485pt x 289.08pt>
 File: figures/FA4_gen_town.pdf Graphic file (type pdf)
 <use figures/FA4_gen_town.pdf>
 Package pdftex.def Info: figures/FA4_gen_town.pdf  used on input line 519.
@@ -1248,7 +1245,7 @@ Package pdftex.def Info: figures/FA4_gen_town.pdf  used on input line 519.
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA4_spdist.pdf): PDF inclusio
 n: found PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA4_spdist.pdf, id=2895, 397.485pt x 289.08pt>
+<figures/FA4_spdist.pdf, id=2891, 397.485pt x 289.08pt>
 File: figures/FA4_spdist.pdf Graphic file (type pdf)
 <use figures/FA4_spdist.pdf>
 Package pdftex.def Info: figures/FA4_spdist.pdf  used on input line 523.
@@ -1257,7 +1254,7 @@ Package pdftex.def Info: figures/FA4_spdist.pdf  used on input line 523.
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA4_totfrac.pdf): PDF inclusi
 on: found PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA4_totfrac.pdf, id=2896, 397.485pt x 289.08pt>
+<figures/FA4_totfrac.pdf, id=2892, 397.485pt x 289.08pt>
 File: figures/FA4_totfrac.pdf Graphic file (type pdf)
 <use figures/FA4_totfrac.pdf>
 Package pdftex.def Info: figures/FA4_totfrac.pdf  used on input line 527.
@@ -1270,7 +1267,7 @@ FA4_totfrac.pdf>]
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA5a.pdf): PDF inclusion: fou
 nd PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA5a.pdf, id=20991, 397.485pt x 289.08pt>
+<figures/FA5a.pdf, id=20987, 397.485pt x 289.08pt>
 File: figures/FA5a.pdf Graphic file (type pdf)
 <use figures/FA5a.pdf>
 Package pdftex.def Info: figures/FA5a.pdf  used on input line 540.
@@ -1279,7 +1276,7 @@ Package pdftex.def Info: figures/FA5a.pdf  used on input line 540.
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA5b.pdf): PDF inclusion: fou
 nd PDF version <1.6>, but at most version <1.5> allowed
-<figures/FA5b.pdf, id=20992, 397.485pt x 289.08pt>
+<figures/FA5b.pdf, id=20988, 397.485pt x 289.08pt>
 File: figures/FA5b.pdf Graphic file (type pdf)
 <use figures/FA5b.pdf>
 Package pdftex.def Info: figures/FA5b.pdf  used on input line 544.
@@ -1297,51 +1294,39 @@ Package rerunfilecheck Info: File `replication.out' has not changed.
 (rerunfilecheck)             Checksum: E74CC898AE02B9ADFD25573588B4D0A9;194.
  ) 
 Here is how much of TeX's memory you used:
- 22754 strings out of 467871
- 433868 string characters out of 5414468
- 845794 words of memory out of 5000000
+ 22751 strings out of 467871
+ 433818 string characters out of 5414468
+ 845785 words of memory out of 5000000
  51061 multiletter control sequences out of 15000+600000
  633445 words of font info for 60 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  84i,14n,104p,761b,600s stack positions out of 10000i,1000n,20000p,200000b,200000s
-
-pdfTeX warning (dest): name{table.caption.68} has been referenced but does not 
-exist, replaced by a fixed one
-
-
-pdfTeX warning (dest): name{figure.caption.74} has been referenced but does not
- exist, replaced by a fixed one
-
-
-pdfTeX warning (dest): name{figure.caption.73} has been referenced but does not
- exist, replaced by a fixed one
-
-<C:/Users/Everett Stamm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfon
-ts/cm/cmbx10.pfb><C:/Users/Everett Stamm/AppData/Local/Programs/MiKTeX/fonts/ty
-pe1/public/amsfonts/cm/cmbx12.pfb><C:/Users/Everett Stamm/AppData/Local/Program
-s/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/Everett Stamm/AppD
-ata/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmex7.pfb><C:/Use
-rs/Everett Stamm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmex
-tra/cmex8.pfb><C:/Users/Everett Stamm/AppData/Local/Programs/MiKTeX/fonts/type1
-/public/amsfonts/cm/cmmi10.pfb><C:/Users/Everett Stamm/AppData/Local/Programs/M
-iKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/Everett Stamm/AppData/
-Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/Everet
-t Stamm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pfb>
-<C:/Users/Everett Stamm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfon
-ts/cm/cmr10.pfb><C:/Users/Everett Stamm/AppData/Local/Programs/MiKTeX/fonts/typ
-e1/public/amsfonts/cm/cmr12.pfb><C:/Users/Everett Stamm/AppData/Local/Programs/
-MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/Everett Stamm/AppData
-/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr5.pfb><C:/Users/Everet
-t Stamm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb><
-C:/Users/Everett Stamm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfont
-s/cm/cmr7.pfb><C:/Users/Everett Stamm/AppData/Local/Programs/MiKTeX/fonts/type1
-/public/amsfonts/cm/cmr8.pfb><C:/Users/Everett Stamm/AppData/Local/Programs/MiK
-TeX/fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Users/Everett Stamm/AppData/Loc
-al/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/Everett S
-tamm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti7.pfb>
-Output written on replication.pdf (40 pages, 4186874 bytes).
+<C:/Users/Everett Stamm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsf
+onts/cm/cmbx10.pfb><C:/Users/Everett Stamm/AppData/Local/Programs/MiKTeX/fonts/
+type1/public/amsfonts/cm/cmbx12.pfb><C:/Users/Everett Stamm/AppData/Local/Progr
+ams/MiKTeX/fonts/type1/public/amsfonts/cm/cmex10.pfb><C:/Users/Everett Stamm/Ap
+pData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cmextra/cmex7.pfb><C:/U
+sers/Everett Stamm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm
+extra/cmex8.pfb><C:/Users/Everett Stamm/AppData/Local/Programs/MiKTeX/fonts/typ
+e1/public/amsfonts/cm/cmmi10.pfb><C:/Users/Everett Stamm/AppData/Local/Programs
+/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi6.pfb><C:/Users/Everett Stamm/AppDat
+a/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi7.pfb><C:/Users/Ever
+ett Stamm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmmi8.pf
+b><C:/Users/Everett Stamm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsf
+onts/cm/cmr10.pfb><C:/Users/Everett Stamm/AppData/Local/Programs/MiKTeX/fonts/t
+ype1/public/amsfonts/cm/cmr12.pfb><C:/Users/Everett Stamm/AppData/Local/Program
+s/MiKTeX/fonts/type1/public/amsfonts/cm/cmr17.pfb><C:/Users/Everett Stamm/AppDa
+ta/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr5.pfb><C:/Users/Ever
+ett Stamm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmr6.pfb
+><C:/Users/Everett Stamm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfo
+nts/cm/cmr7.pfb><C:/Users/Everett Stamm/AppData/Local/Programs/MiKTeX/fonts/typ
+e1/public/amsfonts/cm/cmr8.pfb><C:/Users/Everett Stamm/AppData/Local/Programs/M
+iKTeX/fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Users/Everett Stamm/AppData/L
+ocal/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/Everett
+ Stamm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti7.pfb>
+Output written on replication.pdf (40 pages, 4187546 bytes).
 PDF statistics:
- 21176 PDF objects out of 22161 (max. 8388607)
- 118 named destinations out of 1000 (max. 500000)
+ 21172 PDF objects out of 22161 (max. 8388607)
+ 115 named destinations out of 1000 (max. 500000)
  154 words of extra memory for PDF output out of 10000 (max. 10000000)
 

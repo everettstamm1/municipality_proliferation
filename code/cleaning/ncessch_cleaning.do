@@ -108,7 +108,6 @@ g st_ratio_mean = place_enroll / place_teachers
 
 makeDissimilarity , gen(sch_diss_blwt_cz) mingroup(blenroll) majgroup(wtenroll) id(ncessch) agg_id(cz)
 
-
 makeVR , gen(sch_vr_blwt_cz) mingroup(blenroll) majgroup(wtenroll) id(ncessch) agg_id(cz)
 
 save "$INTDATA/nces/offerings", replace

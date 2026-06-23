@@ -83,7 +83,7 @@ main_table_long_ssaggregate, endog(GM_raw_pp) exog(shift_share_base) controls(`b
 
 // Table A20: White Migration Effect
 
-main_table_long_ssaggregate, endog(WM_raw_pp) exog(shift_share_base_white) controls(reg2 reg3 reg4 sumshare_base_white growth1930 mean_income_1940 hsgrad_25 unigrad_25 mfg_lfshare1940 coastal) weight(popc1940) path("$TABS/TA20.tex") version("base_white")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
+main_table_long_ssaggregate, endog(WM_raw_pp) exog(shift_share_base_white) controls(reg2 reg3 reg4 sumshare_base_white growth1930 mean_income_1940 hsgrad_25 unigrad_25 mfg_lfshare1940 coastal frac_total) weight(popc1940) path("$TABS/TA20.tex") version("base_white")	share_folder("$INTDATA/ssaggregate_prep/") origin_id("origin_fips")
 
 
 	
