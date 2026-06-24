@@ -1,0 +1,22 @@
+package,version,probe,source,notes
+estout,,esttab,ssc,Regression table commands
+maptile,,maptile,ssc,Mapping utilities used by Derenoncourt setup
+spmap,,spmap,ssc,Map plotting
+shp2dta,,shp2dta,ssc,Shapefile conversion
+parmest,,parmby,ssc,Parameter export commands
+ranktest,,ranktest,ssc,ivreg2 dependency
+ivreg2,,ivreg2,ssc,Instrumental variables estimation
+statastates,,statastates,ssc,State identifier utilities
+mdesc,,mdesc,ssc,Missingness diagnostics
+coefplot,,coefplot,ssc,Coefficient plots
+rsource,,rsource,ssc,Run R scripts from Stata
+binscatter,,binscatter,ssc,Binned scatter plots
+keeporder,,keeporder,ssc,Derenoncourt dependency
+lincomest,,lincomest,ssc,Derenoncourt dependency
+distinct,,distinct,ssc,Distinct-count utility
+unique,,unique,ssc,Unique-count utility
+ftools,,ftools,ssc,reghdfe dependency
+reghdfe,,reghdfe,ssc,High-dimensional fixed effects
+labutil,,labmask,ssc,Value label utilities
+gzsave,,gzuse,ssc,Optional gzipped Stata IO
+egenmore,,_gends,ssc,Additional egen functions

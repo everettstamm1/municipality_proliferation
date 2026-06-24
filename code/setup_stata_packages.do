@@ -2,12 +2,12 @@
 Project: Municipality Proliferation
 Purpose: Install user-written Stata packages needed by code/master.do.
 
-Run from the repository root before running code/master.do:
+Run directly from the repository root:
 
     do code/setup_stata_packages.do
 
-This script requires internet access to SSC. It is intentionally separate from
-master.do so package installation is an explicit setup step for replication.
+code/master.do also calls this script when local setup_dependencies is 1.
+This script requires internet access to SSC.
 *******************************************************************************/
 
 version 17.0
@@ -15,58 +15,48 @@ set more off
 
 display as text "Checking user-written Stata package dependencies..."
 
-local packages ///
-    estout ///
-    maptile ///
-    spmap ///
-    shp2dta ///
-    parmest ///
-    ivreg2 ///
-    ranktest ///
-    statastates ///
-    mdesc ///
-    coefplot ///
-    rsource ///
-    binscatter ///
-    keeporder ///
-    lincomest ///
-    distinct ///
-    unique ///
-    reghdfe ///
-    ftools ///
-    labutil ///
-    gzsave ///
-    egenmore
-
-local probes ///
-    esttab ///
-    maptile ///
-    spmap ///
-    shp2dta ///
-    parmest ///
-    ivreg2 ///
-    ranktest ///
-    statastates ///
-    mdesc ///
-    coefplot ///
-    rsource ///
-    binscatter ///
-    keeporder ///
-    lincomest ///
-    distinct ///
-    unique ///
-    reghdfe ///
-    ftools ///
-    labmask ///
-    gzuse ///
-    _gends
+local lockfile "$CODE/dependencies/stata_packages.csv"
+capture confirm file "`lockfile'"
+if _rc {
+    local lockfile "code/dependencies/stata_packages.csv"
+}
+capture confirm file "`lockfile'"
+if _rc {
+    display as error "Could not find code/dependencies/stata_packages.csv."
+    display as error "Run this script from the repository root or define global CODE first."
+    exit 601
+}
 
 local failures ""
-local n_packages : word count `packages'
 
-forvalues i = 1/`n_packages' {
-    local pkg : word `i' of `packages'
-    local probe : word `i' of `probes'
+preserve
+import delimited using "`lockfile'", varnames(1) stringcols(_all) clear
+
+foreach required in package probe source {
+    capture confirm variable `required'
+    if _rc {
+        display as error "Stata dependency lock is missing column: `required'"
+        restore
+        exit 498
+    }
+}
+
+forvalues i = 1/`=_N' {
+    local pkg = package[`i']
+    local probe = probe[`i']
+    local source = lower(source[`i'])
+
+    if trim("`pkg'") == "" {
+        continue
+    }
+    if trim("`probe'") == "" {
+        local probe "`pkg'"
+    }
+    if trim("`source'") != "ssc" {
+        display as error "Unsupported Stata package source for `pkg': `source'"
+        local failures "`failures' `pkg'"
+        continue
+    }
 
     capture which `probe'
     if _rc {
@@ -81,6 +71,7 @@ forvalues i = 1/`n_packages' {
         display as text "`pkg' already available; skipping."
     }
 }
+restore
 
 if trim("`failures'") != "" {
     display as error "The following packages could not be installed:`failures'"
@@ -89,4 +80,3 @@ if trim("`failures'") != "" {
 }
 
 display as result "Stata package setup complete."
-display as text "Note: R package setup is separate; see README_template.tex."

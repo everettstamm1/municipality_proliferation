@@ -1,0 +1,146 @@
+\begin{thebibliography}{20}
+\providecommand{\natexlab}[1]{#1}
+\providecommand{\url}[1]{\texttt{#1}}
+\expandafter\ifx\csname urlstyle\endcsname\relax
+  \providecommand{\doi}[1]{doi: #1}\else
+  \providecommand{\doi}{doi: \begingroup \urlstyle{rm}\Url}\fi
+
+\bibitem[Atack(2016)]{atack2016historical}
+Jeremy Atack.
+\newblock Historical geographic information systems (gis) database of u.s.
+  railroads, May 2016.
+\newblock URL \url{https://doi.org/10.3886/E102326V1}.
+\newblock Dataset.
+
+\bibitem[CoreLogic(2023)]{corelogic}
+CoreLogic.
+\newblock Corelogic real estate data, 2023.
+\newblock URL \url{https://www.corelogic.com/360-property-data/}.
+\newblock Accessed October 1, 2024.
+
+\bibitem[Derenoncourt(2022{\natexlab{a}})]{derenoncourt2022}
+Ellora Derenoncourt.
+\newblock Can you move to opportunity? evidence from the great migration.
+\newblock \emph{American Economic Review}, 112\penalty0 (2):\penalty0 369--408,
+  2022{\natexlab{a}}.
+
+\bibitem[Derenoncourt(2022{\natexlab{b}})]{derenoncourt_data}
+Ellora Derenoncourt.
+\newblock Data and code for can you move to opportunity? evidence from the
+  great migration.
+\newblock \emph{Inter-University Consortium for Political and Social Research,
+  Ann Arbor, MI.}, https://doi.org/10.3886/E147963V1, 2022{\natexlab{b}}.
+
+\bibitem[Donaldson and Hornbeck(2016)]{donaldson2016railroads}
+Dave Donaldson and Richard Hornbeck.
+\newblock Railroads and american economic growth: A ``market access'' approach.
+\newblock \emph{The Quarterly Journal of Economics}, 131\penalty0 (2):\penalty0
+  799--858, May 2016.
+\newblock \doi{10.1093/qje/qjw002}.
+\newblock URL \url{https://doi.org/10.1093/qje/qjw002}.
+
+\bibitem[Goodman(2023)]{Goodman_Municipal_Incorporation_Data_2023}
+Christopher~B. Goodman.
+\newblock {Municipal Incorporation Data, 1789-2020}, 2023.
+\newblock URL \url{https://github.com/cbgoodman/muni-incorporation/}.
+
+\bibitem[{Missouri Census Data Center}(2014)]{MCDC_Geocorr_2014}
+{Missouri Census Data Center}.
+\newblock Geocorr 2014 geographic correspondence engine, 2014.
+\newblock URL \url{https://mcdc.missouri.edu/applications/geocorr2014.html}.
+\newblock University of Missouri.
+
+\bibitem[{NCES}(2017)]{NCES_CCD_2017_Urban_Institute}
+{NCES}.
+\newblock National center for education statistics common core of data, 2017,
+  2017.
+\newblock URL \url{https://educationdata.urban.org/}.
+\newblock Accessed via Urban Institute's Education Data Explorer.
+
+\bibitem[{NCES}(2023)]{NCES_School_District_Boundaries_2023}
+{NCES}.
+\newblock National center for education statistics 2023 school district
+  boundaries shapefile, 2023.
+\newblock URL
+  \url{https://nces.ed.gov/programs/edge/Geographic/DistrictBoundaries}.
+\newblock U.S. Department of Education.
+
+\bibitem[Reardon et~al.(2024)Reardon, Ho, Shear, Fahle, Kalogrides, and
+  Saliba]{Reardon_SEDA_2024}
+Sean~F. Reardon, Andrew~D. Ho, Benjamin~R. Shear, Erin~M. Fahle, Demetra
+  Kalogrides, and Jessica Saliba.
+\newblock Stanford education data archive (version 5.0), 2024.
+\newblock URL \url{https://purl.stanford.edu/cs829jn7849}.
+\newblock Retrieved from Stanford University.
+
+\bibitem[Sean F.~Reardon and Greenberg(2012)]{reardon_data}
+Demetra~Kalogrides Sean F.~Reardon, Elena~Grewal and Erica Greenberg.
+\newblock Brown fades: The end of court ordered school desegregation and the
+  resegregation of american public schools.
+\newblock \emph{Journal of Policy Analysis and Management}, 31:\penalty0
+  876--904, 2012.
+\newblock URL \url{https://doi.org/10.1002/pam.21649}.
+
+\bibitem[{U.S. Board on Geographic Names}(2026)]{USGS_GNIS_Domestic_Names}
+{U.S. Board on Geographic Names}.
+\newblock Geographic names information system (gnis) domestic names data, 2026.
+\newblock URL
+  \url{https://www.usgs.gov/us-board-on-geographic-names/download-gnis-data}.
+\newblock U.S. Geological Survey.
+
+\bibitem[{U.S. Census Bureau}(1999)]{US_Census_1999_Metro_Delineation}
+{U.S. Census Bureau}.
+\newblock 1999 historical delineation files: Fips state and county codes for
+  metropolitan areas, 1999.
+\newblock URL
+  \url{https://www2.census.gov/programs-surveys/metro-micro/geographies/reference-files/1999/historical-delineation-files/99mfips.txt}.
+\newblock U.S. Department of Commerce.
+
+\bibitem[{U.S. Census Bureau}(2012)]{indfin}
+{U.S. Census Bureau}.
+\newblock Annual survey of state and local government finances and census of
+  governments.
+\newblock U.S. Census Bureau Publication, 2012.
+\newblock Available online:
+  \url{https://www.census.gov/programs-surveys/gov-finances.html}.
+
+\bibitem[{U.S. Census Bureau}(2014)]{cog}
+{U.S. Census Bureau}.
+\newblock {Census of Governments, Government Organization Phase}.
+\newblock
+  \url{https://www.census.gov/programs-surveys/cog/data/historical-data.html},
+  2014.
+
+\bibitem[{U.S. Census Bureau}(2018)]{uscensus2018}
+{U.S. Census Bureau}.
+\newblock {U.S. Coastline Counties}, August 2018.
+\newblock Released in August 2018 by the US Census Bureau, Population Division.
+
+\bibitem[{U.S. Census Bureau}(2021)]{US_Census_TIGER_Line_2021}
+{U.S. Census Bureau}.
+\newblock 2021 tiger/line shapefiles (machine readable data files), 2021.
+\newblock URL \url{https://www.census.gov/cgi-bin/geo/shapefiles/index.php}.
+\newblock U.S. Department of Commerce.
+
+\bibitem[{U.S. Census Bureau}(2022)]{US_Census_TIGER_Line_2022}
+{U.S. Census Bureau}.
+\newblock 2022 tiger/line shapefiles (machine readable data files), 2022.
+\newblock URL
+  \url{https://www.census.gov/geographies/mapping-files/time-series/geo/tiger-line-file.html}.
+\newblock U.S. Department of Commerce.
+
+\bibitem[{U.S. Census Bureau}(2025)]{US_Census_Gazetteer_Files}
+{U.S. Census Bureau}.
+\newblock Gazetteer files, 2025.
+\newblock URL
+  \url{https://www.census.gov/geographies/reference-files/time-series/geo/gazetteer-files.html}.
+\newblock U.S. Department of Commerce.
+
+\bibitem[Vose et~al.(2014)Vose, Applequist, Squires, Durre, Menne, Williams,
+  Fenimore, Gleason, and Arndt]{vose2014}
+Russell~S. Vose, Scott Applequist, Mike Squires, Imke Durre, Matthew~J. Menne,
+  Jr. Williams, Claude~N., Chris Fenimore, Karin Gleason, and Derek Arndt.
+\newblock {NOAA Monthly U.S. Climate Divisional Database (NClimDiv)}.
+\newblock NOAA National Climatic Data Center, 2014.
+
+\end{thebibliography}

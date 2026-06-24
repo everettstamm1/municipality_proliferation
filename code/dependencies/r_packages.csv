@@ -1,0 +1,23 @@
+package,version,source,notes
+tidyverse,2.0.0,CRAN,Used by spatial cleaning scripts
+sf,1.1-0,CRAN,Spatial data IO and geometry operations
+haven,2.5.5,CRAN,Read and write Stata data
+tigris,2.2.1,CRAN,Census TIGER geometry downloads
+stringr,1.6.0,CRAN,String cleaning
+readxl,1.4.5,CRAN,Read Excel inputs
+readr,2.2.0,CRAN,Tidyverse file-reading package used by old scripts
+purrr,1.2.2,CRAN,Tidyverse mapping package used by cz_place_xwalk.R
+tibble,3.3.1,CRAN,Tidyverse table package used by cz_place_xwalk.R
+terra,1.9-11,CRAN,Spatial raster/vector support
+ggplot2,4.0.3,CRAN,Derenoncourt and lasso plotting dependency
+dplyr,1.2.1,CRAN,Derenoncourt and lasso data manipulation
+tidyr,1.3.2,CRAN,Derenoncourt and lasso reshaping
+data.table,1.18.2.1,CRAN,Derenoncourt lasso dependency
+stargazer,5.2.3,CRAN,Derenoncourt table dependency
+randomForest,4.7-1.2,CRAN,Derenoncourt lasso dependency
+glmnet,4.1-10,CRAN,LASSO estimation
+rpart,4.1.23,CRAN,Derenoncourt lasso dependency
+raster,3.6-32,CRAN,Raster processing in old/county_tri.R
+spatialEco,2.0-5,CRAN,Spatial utilities in old/county_tri.R
+elevatr,0.99.1,CRAN,Elevation downloads in old/county_tri.R
+parallel,4.4.2,base,Base R parallel package

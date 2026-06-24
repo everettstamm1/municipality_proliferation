@@ -41,27 +41,24 @@ STEPS:
 	/* Action required: Change to path to the replication folder on your home directory. */
 	global XXX 		"$RAWDATA/dcourt/replication_AER"	
 	
-	* Action required: Install packages 
-
-						ssc install estout, replace
-						ssc install maptile, replace
-						ssc install spmap, replace
-						ssc install shp2dta, replace
-						ssc install parmest, replace
-						ssc install ivreg2, replace
-						ssc install ranktest, replace
-						ssc install statastates, replace
-						ssc install mdesc, replace
-						ssc install coefplot, replace
-						ssc install rsource, replace
-						ssc install binscatter, replace
-						ssc install keeporder, replace
-						ssc install lincomest, replace
-						ssc install egenmore, replace
-						ssc install distinct, replace
-						ssc install unique, replace 
-			
-						maptile_install using "http://files.michaelstepner.com/geo_cz1990.zip", replace
+	* Package dependencies are installed by the parent replication package via
+	* code/setup_stata_packages.do before this edited Derenoncourt master runs.
+	local missing_dependency = 0
+	foreach command in esttab maptile spmap shp2dta parmby ivreg2 ranktest statastates mdesc coefplot rsource binscatter keeporder lincomest _gends distinct unique {
+		capture which `command'
+		if _rc {
+			local missing_dependency = 1
+		}
+	}
+	if `missing_dependency' {
+		if "$CODE" != "" {
+			do "$CODE/setup_stata_packages.do"
+		}
+		else {
+			display as error "Run code/setup_stata_packages.do before this file."
+			exit 499
+		}
+	}
 						
 	/* Action required: Install .style files (customized color palette). */
 						*i. copy the .style files (located in 'color_palette' folder) to the top of your SITE or PERSONAL directory 
@@ -146,5 +143,3 @@ STEPS:
 *------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------%
 
 	 //do "$code/7_keep_and_label_analysis_vars.do"
-
-
