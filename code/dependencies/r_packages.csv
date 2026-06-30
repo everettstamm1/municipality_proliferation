@@ -17,7 +17,4 @@ stargazer,5.2.3,CRAN,Derenoncourt table dependency
 randomForest,4.7-1.2,CRAN,Derenoncourt lasso dependency
 glmnet,4.1-10,CRAN,LASSO estimation
 rpart,4.1.23,CRAN,Derenoncourt lasso dependency
-raster,3.6-32,CRAN,Raster processing in old/county_tri.R
-spatialEco,2.0-5,CRAN,Spatial utilities in old/county_tri.R
-elevatr,0.99.1,CRAN,Elevation downloads in old/county_tri.R
 parallel,4.4.2,base,Base R parallel package

@@ -20,3 +20,4 @@ reghdfe,,reghdfe,ssc,High-dimensional fixed effects
 labutil,,labmask,ssc,Value label utilities
 gzsave,,gzuse,ssc,Optional gzipped Stata IO
 egenmore,,_gends,ssc,Additional egen functions
+ssaggregate,,ssaggregate,ssc,Borusyak (2022) dependency

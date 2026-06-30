@@ -14,6 +14,14 @@ enforce_locked_packages()
 library(tidyverse)
 library(sf)
 
+
+# Get paths
+paths <- read.csv("../../paths.csv")
+CLEANDATA <- paths[paths$global == "CLEANDATA",2]
+RAWDATA <- paths[paths$global == "RAWDATA",2]
+INTDATA <- paths[paths$global == "INTDATA",2]
+XWALKS <- paths[paths$global == "XWALKS",2]
+
 munis <- st_read(paste0(INTDATA, "/other/municipal_shapefile_v2.shp")) %>% 
   filter(sm_130_ == 1) %>%
   mutate(STATEFP = as.integer(STATEFP)) %>%

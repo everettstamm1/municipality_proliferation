@@ -69,3 +69,6 @@ export delimited "$REPO/paths.csv", replace
 
 do "$CODE/setup_stata_packages.do"
 rsource using "$CODE/setup_r_packages.R"
+
+copy "$RAWDATA/david_dorn/cw_cty_czone/cw_cty_czone.dta" "$XWALKS/cw_cty_czone.dta"
+

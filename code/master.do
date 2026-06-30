@@ -6,7 +6,7 @@ version 17.0
 local run = 1
 local run_dcourt = 1
 local setup = 1
-
+local load_odbc = 0
 
 // Which school districts version to use
 // 0: Raw
@@ -16,25 +16,15 @@ gl schdist_version = 2
 
 // ADD AN IF ELSE BLOCK WITH YOUR COMPUTER'S ABSOLUTE PATH TO THE MUNICIPALITY PROLIFERATION DROPBOX FOLDER
 if "`c(username)'"=="Everett Stamm"{
-	gl DROPBOX `"D:/munis_replication/"'
+	gl DROPBOX `"C:/Users/Everett Stamm/Dropbox/replication_template"'
 	gl REPO "C:/Users/Everett Stamm/Documents/Github/municipality_proliferation/"
 	gl FFMPEG "/Users/Everett Stamm/ffmpeg/bin/ffmpeg.exe"
 	gl Rterm_path `"C:\Program Files\R\R-4.4.2\bin\x64\Rterm.exe"'
 	gl Rterm_options `"--vanilla"'
 	gl use_gzuse = 0
 }
-if "`c(username)'"=="edog9"{
-	gl DROPBOX `"F:/munis_replication/"'
 
-	gl REPO "C:/Users/edog9/Documents/Github/municipality_proliferation/"
-	gl FFMPEG "/Users/edog9/ffmpeg/bin/ffmpeg.exe"
-	gl Rterm_path `"C:/Program Files/R/R-4.3.1/bin/x64/Rterm.exe"'
-	gl Rterm_options `"--vanilla"'
-	gl use_gzuse = 0
-}
-
-
-do "$CODE/setup.do"
+do "$REPO/code/setup.do"
 
 
 if `run_dcourt'==1{
@@ -53,7 +43,6 @@ if `run_dcourt'==1{
 
 if `run'==1{
 
-
 	
 	// CLEANING
 	cd "$REPO/code/cleaning"
@@ -65,14 +54,14 @@ if `run'==1{
 	cd "$REPO/code/cleaning"
 	rsource using "$CODE/cleaning/cgoodman_place_county_geog.R"
 	
-	// Clean migration data to get white version of south_migrate
-	do "$CODE/cleaning/migrate_cleaning.do"
+	// 1970 and 2010 cz and place racial populations
+	do "$CODE/cleaning/cz_place_race_pop_1970_2010.do"
 	
 	// White lasso
 	do "$CODE/cleaning/2_lasso_white.do"
 	
 	// Creation of shift-share instruments and ssaggregate primatives
-	do "$CODE/cleaning/create_sumshare.do"
+	do "$CODE/cleaning/create_sumshares.do"
 	
 	// Cleaning CoG data
 	do "$CODE/cleaning/cog_cleaning.do"
@@ -122,6 +111,10 @@ if `run'==1{
 	// Muni-District Overlap
 	cd "$CODE/cleaning"
 	rsource using "$CODE/cleaning/muni_district_overlap.R"
+	
+	// Muni-District Crosswalk
+	cd "$CODE/cleaning"
+	rsource using "$CODE/cleaning/leaid_place_xwalk.R"
 
 	// School info cleaning
 	do "$CODE/cleaning/ncessch_cleaning.do"

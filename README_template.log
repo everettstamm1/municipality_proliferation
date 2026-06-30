@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.6.16)  24 JUN 2026 13:48
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.6.16)  24 JUN 2026 15:28
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -528,62 +528,62 @@ Overfull \hbox (39.99004pt too wide) in alignment at lines 71--75
 LaTeX Font Info:    External font `lmex10' loaded for size
 (Font)              <5> on input line 76.
 
-Overfull \hbox (39.99004pt too wide) in alignment at lines 75--178
+Overfull \hbox (39.99004pt too wide) in alignment at lines 75--124
 [] [] [] [] []
  []
 
 [3
 
-] [4] [5] [6] [7] [8] [9
+] [4] [5] [6
 
 ]
-Underfull \hbox (badness 10000) in alignment at lines 193--197
+Underfull \hbox (badness 10000) in alignment at lines 139--143
 [] [] []
  []
 
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <10> on input line 198.
+(Font)              <10> on input line 144.
 LaTeX Font Info:    External font `lmex10' loaded for size
-(Font)              <7> on input line 198.
+(Font)              <7> on input line 144.
 
-Underfull \hbox (badness 10000) in alignment at lines 197--224
+Underfull \hbox (badness 10000) in alignment at lines 143--170
 [] [] []
  []
 
-[10
+[7
 
-] [11]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 2
-35.
+] [8]
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 1
+81.
 
 (C:\Users\Everett Stamm\AppData\Local\Programs\MiKTeX\tex/latex/lm\ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-ignored error: Infinite glue shrinkage found in box being split [12
+ignored error: Infinite glue shrinkage found in box being split [9
 
 {C:/Users/Everett Stamm/AppData/Local/Programs/MiKTeX/fonts/enc/dvips/lm/lm-ts1
 .enc}]
-[13]
-Underfull \hbox (badness 1762) in paragraph at lines 350--351
+[10]
+Underfull \hbox (badness 1762) in paragraph at lines 296--297
 \T1/lmr/m/n/10.95 The clean-ing stage con-structs cross-walks, Derenoncourt-der
 ived in-puts, mu-nic-i-pal counts,
  []
 
-[14] [15]
-Underfull \hbox (badness 10000) in alignment at lines 389--393
+[11] [12]
+Underfull \hbox (badness 10000) in alignment at lines 335--339
 [] [] [] []
  []
 
 
-Underfull \hbox (badness 10000) in alignment at lines 393--456
+Underfull \hbox (badness 10000) in alignment at lines 339--402
 [] [] [] []
  []
 
-[16
+[13
 
-] [17] [18] [19
+] [14] [15] [16
 
-] (README_template.bbl [20]) [21] (README_template.aux)
+] (README_template.bbl [17]) [18] (README_template.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2025-12-24>
@@ -592,10 +592,10 @@ Package rerunfilecheck Info: File `README_template.out' has not changed.
 (rerunfilecheck)             Checksum: D41D8CD98F00B204E9800998ECF8427E;0.
  ) 
 Here is how much of TeX's memory you used:
- 10989 strings out of 467871
- 172906 string characters out of 5414468
- 721725 words of memory out of 5000000
- 39618 multiletter control sequences out of 15000+600000
+ 10998 strings out of 467871
+ 173136 string characters out of 5414468
+ 653573 words of memory out of 5000000
+ 39627 multiletter control sequences out of 15000+600000
  695647 words of font info for 94 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
  89i,7n,95p,957b,655s stack positions out of 10000i,1000n,20000p,200000b,200000s
@@ -612,9 +612,9 @@ tamm/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt10.pfb><C:/Users/E
 verett Stamm/AppData/Local/Programs/MiKTeX/fonts/type1/public/lm/lmtt8.pfb><C:/
 Users/Everett Stamm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/s
 ymbols/msam10.pfb>
-Output written on README_template.pdf (21 pages, 362457 bytes).
+Output written on README_template.pdf (18 pages, 356703 bytes).
 PDF statistics:
- 335 PDF objects out of 1000 (max. 8388607)
+ 318 PDF objects out of 1000 (max. 8388607)
  79 named destinations out of 1000 (max. 500000)
  1 words of extra memory for PDF output out of 10000 (max. 10000000)
 

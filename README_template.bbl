@@ -1,4 +1,4 @@
-\begin{thebibliography}{20}
+\begin{thebibliography}{23}
 \providecommand{\natexlab}[1]{#1}
 \providecommand{\url}[1]{\texttt{#1}}
 \expandafter\ifx\csname urlstyle\endcsname\relax
@@ -11,6 +11,16 @@ Jeremy Atack.
   railroads, May 2016.
 \newblock URL \url{https://doi.org/10.3886/E102326V1}.
 \newblock Dataset.
+
+\bibitem[Autor and Dorn(2013)]{dorn_xwalks}
+David~H. Autor and David Dorn.
+\newblock The growth of low-skill service jobs and the polarization of the us
+  labor market.
+\newblock \emph{American Economic Review}, 103\penalty0 (5):\penalty0
+  1553–97, August 2013.
+\newblock \doi{10.1257/aer.103.5.1553}.
+\newblock URL \url{https://www.aeaweb.org/articles?id=10.1257/aer.103.5.1553}.
+\newblock Downloaded from \url{https://www.ddorn.net/data/cw_cty_czone.zip}.
 
 \bibitem[CoreLogic(2023)]{corelogic}
 CoreLogic.
@@ -73,6 +83,26 @@ Sean~F. Reardon, Andrew~D. Ho, Benjamin~R. Shear, Erin~M. Fahle, Demetra
 \newblock URL \url{https://purl.stanford.edu/cs829jn7849}.
 \newblock Retrieved from Stanford University.
 
+\bibitem[Ruggles et~al.(2025{\natexlab{a}})Ruggles, Flood, Sobek, Backman,
+  Cooper, Rivera~Drew, Richards, Rogers, Schroeder, and
+  Williams]{full_count_census}
+Steven Ruggles, Sarah Flood, Matthew Sobek, Daniel Backman, Grace Cooper,
+  Julia~A. Rivera~Drew, Stephanie Richards, Renae Rogers, Jonathan Schroeder,
+  and Kari C.~W. Williams.
+\newblock {IPUMS USA}: Version 16.0, 2025{\natexlab{a}}.
+\newblock URL \url{https://doi.org/10.18128/D010.V16.0}.
+\newblock 1900-1950 Full Count Censuses.
+
+\bibitem[Ruggles et~al.(2025{\natexlab{b}})Ruggles, Ozder, Fitch, Sobek, Drew,
+  Hacker, Helgertz, Lonobile, Nelson, Roberts, and
+  Warren]{ruggles2025ipumslinked}
+Steven Ruggles, Nesile Ozder, Catherine~A. Fitch, Matthew Sobek, Julia
+  A.~Rivera Drew, J.~David Hacker, Jonas Helgertz, Cheyenne Lonobile, Matt~A.
+  Nelson, Evan Roberts, and John~Robert Warren.
+\newblock {IPUMS} {Multigenerational} {Longitudinal} {Panel}: {Version} 2.0.
+\newblock 1930-40 Census, 2025{\natexlab{b}}.
+\newblock URL \url{https://doi.org/10.18128/D016.V2.0}.
+
 \bibitem[Sean F.~Reardon and Greenberg(2012)]{reardon_data}
 Demetra~Kalogrides Sean F.~Reardon, Elena~Grewal and Erica Greenberg.
 \newblock Brown fades: The end of court ordered school desegregation and the
@@ -88,14 +118,6 @@ Demetra~Kalogrides Sean F.~Reardon, Elena~Grewal and Erica Greenberg.
   \url{https://www.usgs.gov/us-board-on-geographic-names/download-gnis-data}.
 \newblock U.S. Geological Survey.
 
-\bibitem[{U.S. Census Bureau}(1999)]{US_Census_1999_Metro_Delineation}
-{U.S. Census Bureau}.
-\newblock 1999 historical delineation files: Fips state and county codes for
-  metropolitan areas, 1999.
-\newblock URL
-  \url{https://www2.census.gov/programs-surveys/metro-micro/geographies/reference-files/1999/historical-delineation-files/99mfips.txt}.
-\newblock U.S. Department of Commerce.
-
 \bibitem[{U.S. Census Bureau}(2012)]{indfin}
 {U.S. Census Bureau}.
 \newblock Annual survey of state and local government finances and census of
@@ -103,6 +125,14 @@ Demetra~Kalogrides Sean F.~Reardon, Elena~Grewal and Erica Greenberg.
 \newblock U.S. Census Bureau Publication, 2012.
 \newblock Available online:
   \url{https://www.census.gov/programs-surveys/gov-finances.html}.
+
+\bibitem[{U.S. Census Bureau}(2013)]{uscensus_us_places_2013}
+{U.S. Census Bureau}.
+\newblock {US Places Text File}.
+\newblock \url{https://www2.census.gov/geo/tiger/PREVGENZ/pl/us_places.txt},
+  2013.
+\newblock TIGER/Line previous-generation place file; last modified June 20,
+  2013. Accessed June 24, 2026.
 
 \bibitem[{U.S. Census Bureau}(2014)]{cog}
 {U.S. Census Bureau}.

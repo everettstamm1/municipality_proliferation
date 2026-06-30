@@ -50,17 +50,13 @@ The Fragmentation of Political Jurisdictions}. The main entry point is \path{cod
 
 \begin{itemize}
   \item[$\square$] All data are publicly available.
-  \item[$\square$] Some data cannot be made publicly available.
+  \item[$\rlap{$\checkmark$}\square$] Some data cannot be made publicly available.
   \item[$\square$] No data can be made publicly available.
 \end{itemize}
 
-The majority of data are publicly available, with two exceptions. First, the ICPSR restricted access data used in the [dcourt] replication files. The readme of [dcourt] provides instruction on how to access these. Second, while we provide the derived city-level Corelogic data, the microdata used to produce it are not publicly available.
+The majority of data are publicly available, with two exceptions. First, the ICPSR restricted access data used in the \citet{derenoncourt_data} replication files. An affiliation with an ICPSR member institution is required to access these resources. The readme of \citet{derenoncourt_data} provides instruction on how to access these. Second, while we provide the derived city-level Corelogic data, the microdata used to produce it are not publicly available.
 
-
-\subsection*{Details on Each Data Source}
-
-The table below lists the external and pre-generated data inputs identified from programs called by \path{code/master.do}. The Derenoncourt replication package is intentionally treated as one upstream input, as requested. Census, NHGIS, Census of Governments, and Individual Finance files are split into separate rows so source checks can be completed one file family at a time.
-
+\subsection*{Raw Dataset List}
 \begin{landscape}
 \begingroup
 \scriptsize
@@ -85,41 +81,11 @@ Census Gazetteer / national county file & \path{census/national_county.txt} & \p
 \addlinespace
 Census Gazetteer / national places file & \path{census/national_places.txt} & \path{data/raw/census/} & Used by \path{place_county_xwalk.do} to build the place-county crosswalk. & \citet{US_Census_Gazetteer_Files}\\
 \addlinespace
-Census metro reference file & \path{census/99mfips.txt} & \path{data/raw/census/} & Used by \path{cog_cleaning.do} for PMSA/MSA names and county-PMSA crosswalks. Source comment points to the 1999 Census historical delineation file.& \citet{US_Census_1999_Metro_Delineation} \\
-\addlinespace
-Census place FIPS crosswalk & \path{census/census_place_fips_xwalk.txt} & \path{data/raw/census/} & Used by \path{incomes.do} and \path{mechanisms.do} to translate 1970 Census place codes to FIPS place codes. \todo{Confirm source and citation.}& Notes \\
+Census place FIPS crosswalk & \path{census/census_place_fips_xwalk.txt} & \path{data/raw/census/} & Used by \path{incomes.do} and \path{mechanisms.do} to translate 1970 Census place codes to FIPS place codes. & \citet{uscensus_us_places_2013} \\
 \addlinespace
 Geocorr block-group to place crosswalk & \path{census/geocorr/geocorr2014_mo_il.csv}, \path{census/geocorr/geocorr2014_in_ne.csv}, \path{census/geocorr/geocorr2014_nv_sc.csv} & \path{data/raw/census/geocorr/},  \path{census/geocorr/geocorr2014_sd_wy.csv} & Used by \path{incomes.do} for 2010 place-level household income. \todo{Confirm Geocorr parameters and access date.} & \citet{MCDC_Geocorr_2014}\\
 \addlinespace
-NHGIS extract & \path{census/nhgis0017_csv/nhgis0017_csv/nhgis0017_ts_nominal_county.csv} & \path{data/raw/census/} & Used by \path{cz_place_race_pop_1970_2010.do} for county race/population time series. \todo{Add NHGIS extract citation and access date.} & Notes\\
-\addlinespace
-NHGIS extract & \path{census/nhgis0019_csv/nhgis0019_ds94_1970_county.csv} & \path{data/raw/census/} & Used by \path{cz_place_race_pop_1970_2010.do} for 1970 county race/population. \todo{Add NHGIS extract citation.}& Notes \\
-\addlinespace
-NHGIS extract & \path{census/nhgis0020_fixed/nhgis0020_fixed/nhgis0020_ds172_2010_county.do} and associated data files & \path{data/raw/census/} & Used by \path{cz_pop_occscore_mfg.do} for 2010 urban population. \todo{Confirm all files required by the NHGIS Stata import script.} & Notes\\
-\addlinespace
-NHGIS extract & \path{census/nhgis0025_csv/nhgis0025_csv/nhgis0025_ds258_2020_place.csv} & \path{data/raw/census/} & Used by \path{municipal_shapefile.R} for 2020 place population attributes. \todo{Add NHGIS extract citation.} & Notes\\
-\addlinespace
-NHGIS extract & \path{census/nhgis0027_csv/nhgis0027_csv/nhgis0027_ts_nominal_place.csv} & \path{data/raw/census/} & Used by \path{cz_place_race_pop_1970_2010.do} for 1970 and 2010 place race/population variables. \todo{Add NHGIS extract citation.} & Notes\\
-\addlinespace
-NHGIS extract & \path{census/nhgis0035_csv/nhgis0035_csv/nhgis0035_ds176_20105_blck_grp.csv} & \path{data/raw/census/} & Used by \path{incomes.do} for 2010 household income at CZ and place level. \todo{Add NHGIS extract citation.} & Notes\\
-\addlinespace
-NHGIS extract & \path{census/nhgis0036_csv/nhgis0036_csv/nhgis0036_ds99_1970_county.csv} & \path{data/raw/census/} & Used by \path{incomes.do} for 1970 CZ family income. \todo{Add NHGIS extract citation.}& Notes \\
-\addlinespace
-NHGIS extract & \path{census/nhgis0036_csv/nhgis0036_csv/nhgis0036_ds99_1970_place.csv} & \path{data/raw/census/} & Used by \path{incomes.do} for 1970 place family income and house value variables. \todo{Add NHGIS extract citation. }& Notes \\
-\addlinespace
-NHGIS extract & \path{census/nhgis0038_csv/nhgis0038_ds172_2010_place.csv} & \path{data/raw/census/} & Used by \path{maxcitypop.do} for maximum principal-city population in 2010. \todo{Add NHGIS extract citation.} & Notes\\
-\addlinespace
-NHGIS extract & \path{census/nhgis0041_csv/nhgis0041_csv/nhgis0041_ts_nominal_county.csv} & \path{data/raw/census/} & Used by \path{cz_place_race_pop_1970_2010.do} for 1970 education variables. \todo{Add NHGIS extract citation.} & Notes\\
-\addlinespace
-NHGIS extract & \path{census/nhgis0046_csv/nhgis0046_csv/nhgis0046_ts_nominal_county.csv} & \path{data/raw/census/} & Used by \path{dataprep.do} for additional county/CZ controls. \todo{Confirm exact variables and extract citation.}& Notes \\
-\addlinespace
-NHGIS extract & \path{census/nhgis0048_csv/nhgis0048_csv/nhgis0048_ds107_1980_county.csv} & \path{data/raw/census/} & Used by \path{cz_pop_occscore_mfg.do} for 1980 manufacturing/labor-force shares. \todo{Add NHGIS extract citation.}& Notes \\
-\addlinespace
-NHGIS extract & \path{census/nhgis0048_csv/nhgis0048_csv/nhgis0048_ds123_1990_county.csv} & \path{data/raw/census/} & Used by \path{cz_pop_occscore_mfg.do} for 1990 manufacturing/labor-force shares. \todo{Add NHGIS extract citation.}& Notes \\
-\addlinespace
-NHGIS extract & \path{census/nhgis0048_csv/nhgis0048_csv/nhgis0048_ds151_2000_county.csv} & \path{data/raw/census/} & Used by \path{cz_pop_occscore_mfg.do} for 2000 manufacturing/labor-force shares. \todo{Add NHGIS extract citation.} & Notes\\
-\addlinespace
-NHGIS extract & \path{census/nhgis0052_csv/nhgis0052_csv/nhgis0052_ds99_1970_place.csv} & \path{data/raw/census/} & Used by \path{mechanisms.do} for 1970 white-flight / mover measures. \todo{Add NHGIS extract citation.}& Notes \\
+NHGIS extracts & \path{census/nhgis0017_csv/}, \path{census/nhgis0019_csv/}, \path{census/nhgis0020_fixed/}, \path{census/nhgis0025_csv/}, \path{census/nhgis0027_csv/}, \path{census/nhgis0035_csv/}, \path{census/nhgis0036_csv/}, \path{census/nhgis0038_csv/}, \path{census/nhgis0041_csv/}, \path{census/nhgis0046_csv/}, \path{census/nhgis0048_csv/}, \path{census/nhgis0052_csv/} & \path{data/raw/census/} & Used by \path{cz_place_race_pop_1970_2010.do}, \path{cz_pop_occscore_mfg.do}, \path{municipal_shapefile.R}, \path{incomes.do}, \path{maxcitypop.do}, \path{dataprep.do}, and \path{mechanisms.do} for county/place race, population, education, income, manufacturing, and mover measures. \todo{Add NHGIS extract citations, access dates, and confirm all files required by the Stata import script.} & \citet{schroeder_etal_nhgis_2026} \\
 \addlinespace
 Census TIGER/Line place shapefiles & \path{census/tiger/states/tl_2022_*_place.shp} and sidecar files & \path{data/raw/census/tiger/states/} & Used by \path{municipal_shapefile.R} & \citet{US_Census_TIGER_Line_2022}\\
 \addlinespace
@@ -149,15 +115,14 @@ Coastline and climate covariates & \path{coastline-counties-list.xlsx}; NOAA/NCE
 \addlinespace
 CoreLogic-derived place characteristics & \path{corelogic/censusplace_clogic_chars.csv} & \path{data/interim/corelogic/} & Used in municipal shapefile attributes and mechanisms. & \citet{corelogic} \\
 \addlinespace
-1990 CZ-County Crosswalk & \path{cw_cty_czone.dta}; \path{consistent_1990.dta}; \path{consistent_1940_1970.dta}; \path{place_county_xwalk.dta}; \path{cz_place_xwalk.dta}; COG ID-FIPS crosswalks; \path{ncessch_place_xwalk.dta}. & \path{data/xwalks/} & Several are generated by the cleaning scripts, while others appear to be required inputs. \todo{Separate generated crosswalks from source crosswalks in the final deposit.} & Notes \\
+1990 CZ-County Crosswalk & \path{cw_cty_czone.dta} & \path{data/raw/david_dorn/} & Used to define county-cz crosswalk & \citet{dorn_xwalks} \\
 \bottomrule
 \end{longtable}
 \endgroup
 \end{landscape}
 
-\section*{Dataset List}
+\subsection*{Final Dataset List}
 
-The code creates the following analysis and intermediate datasets. This list is based on \path{save}, \path{write_dta}, \path{write.csv}, and \path{st_write} commands in the programs called by \path{code/master.do}.
 
 \begin{landscape}
 \begingroup
@@ -178,24 +143,6 @@ Dataset & Description & Created by \\
 \path{data/clean/panel_a_data.dta} & Data for the paper's first-panel migration/instrument figure. & \path{code/cleaning/panel_a_data.do} \\
 \addlinespace
 \path{data/clean/pcarrow_fig_data.dta} & Data for principal-city arrow figures. & \path{code/cleaning/pcarrow_fig_data.do} \\
-\addlinespace
-\path{data/interim/dcourt/*.dta} & Derenoncourt-derived city/CZ datasets, original 130 CZ sample, white migration LASSO prediction files, and city-CZ crosswalks. & \path{code/dcourt_setup/*.do}; \path{code/cleaning/2_lasso_white.do} \\
-\addlinespace
-\path{data/interim/ssaggregate_prep/*.dta} & Shift-share shares, shocks, destination instruments, interacted shares, and 1,000 placebo instrument files. & \path{code/cleaning/create_sumshares.do}; \path{code/ado/create_sumshare*.ado} \\
-\addlinespace
-\path{data/interim/counts/*_cz.dta} & CZ-level municipal, county, school district, and special-purpose government counts. & \path{code/cleaning/muni_counts.do}; \path{code/cleaning/cog_cleaning.do} \\
-\addlinespace
-\path{data/interim/census/*.dta} & Income, education, population, occupation score, manufacturing share, urban population, municipal finance, and linked migrant characteristics. & Multiple cleaning scripts \\
-\addlinespace
-\path{data/interim/cgoodman/*.dta} & C. Goodman place-county geography, original geographies, and CZ geography summaries. & \path{code/cleaning/cgoodman_place_county_geog.R}; \path{code/cleaning/geogs.do} \\
-\addlinespace
-\path{data/interim/cog/*.dta} & Census of Governments county counts, individual-government extracts, 2021 master unit file, and historical city finance data. & \path{code/cleaning/cog_cleaning.do} \\
-\addlinespace
-\path{data/interim/other/*.dta}, \path{*.csv}, \path{*.shp} & Municipal shapefile and attributes, spatial covariates, central-city distances, covered exclusive school district indicator, streams. & R and Stata cleaning scripts \\
-\addlinespace
-\path{data/interim/nces/*.dta} & School offerings, place offerings, CZ court order variables, and school achievement/segregation files. & \path{code/cleaning/ncessch_cleaning.do}; \todo{achievement/segregation source script not in active master} \\
-\addlinespace
-\path{data/xwalks/*.dta} & Crosswalks used in cleaning and analysis. & Some generated by current cleaning scripts; some required as inputs \\
 \bottomrule
 \end{longtable}
 \endgroup
@@ -256,7 +203,9 @@ Package & Version & Source \\
 
 \subsection*{ODBC Setup for Census of Governments}
 
-\path{code/cleaning/cog_cleaning.do} uses Stata's \path{odbc} commands for two Census of Governments inputs. The machine running the replication must have an ODBC driver that matches the Stata architecture. For 64-bit Stata on Windows, install the 64-bit Microsoft Access Database Engine / Access ODBC driver if it is not already available, then open the 64-bit ODBC Data Source Administrator at \path{C:/Windows/System32/odbcad32.exe}. For 32-bit Stata, use the 32-bit administrator at \path{C:/Windows/SysWOW64/odbcad32.exe}.
+Two of the inputs to \path{code/cleaning/cog_cleaning.do} are provided in \path{.mdb} format. To use them in Stata requires a connection to an ODBC driver. Below provides instructions on how to create that connection in Windows. For ease of replication, we provide the relevant data from these files converted to \path{.dta} format and allow the replicator to bypass the code which performs the ODBC conversion with the \path{load_odbc} flag in \path{code/master.do}. 
+
+The machine running the replication must have an ODBC driver that matches the Stata architecture. For 64-bit Stata on Windows, install the 64-bit Microsoft Access Database Engine / Access ODBC driver if it is not already available, then open the 64-bit ODBC Data Source Administrator at \path{C:/Windows/System32/odbcad32.exe}. For 32-bit Stata, use the 32-bit administrator at \path{C:/Windows/SysWOW64/odbcad32.exe}.
 
 Create either User DSNs or System DSNs with these exact names:
 
@@ -275,7 +224,6 @@ odbc query "City_Gov_Fin"
 
 If Stata cannot see either DSN, confirm that the DSN was created in the administrator matching the Stata bitness and that the database driver can open the downloaded file. Stata's Windows ODBC FAQ is linked in \path{code/cleaning/cog_cleaning.do}: \url{https://www.stata.com/support/faqs/data-management/configuring-odbc-win/}.
 
-\todo{Confirm the exact database filenames for both DSNs and whether they will be redistributed in the replication package or must be downloaded by replicators.}
 
 \subsection*{Controlled Randomness}
 Random seed is set at line 2 of program \path{code/cleaning/white_lasso.R}.
@@ -304,7 +252,7 @@ Approximate storage requirement:
   \item[$\square$] 25 MB--250 MB
   \item[$\square$] 250 MB--2 GB
   \item[$\square$] 2 GB--25 GB
-  \item[$\square$] 25 GB--250 GB
+  \item[$\rlap{$\checkmark$}\square$] 25 GB--250 GB
   \item[$\square$] More than 250 GB
 \end{itemize}
 
@@ -337,9 +285,10 @@ The analysis stage reads the cleaned datasets and writes manuscript and appendix
 
 \begin{enumerate}
 \item Ensure you have the required versions of Stata 17 and R 4.4.2.
-\item Download the [dcourt] replication package and unzip to \path{data/raw/dcourt/replication_AER/}. Follow their instructions for obtaining [restricted].
+\item Setup Census of Governments ODBC connections and set \path{load_odbc = 1} in \path{code/master.do} or use the pre-converted files and set \path{load_odbc = 0}.
+\item Unzip the \citet{derenoncourt_data} replication package to \path{data/raw/dcourt/replication_AER/}. Follow their instructions for obtaining the data sets which are restricted to non-ICPSR members (ICPSR 20, 7735, 7736, and 8493) and download them to their expected location. 
   \item Edit the path block near the top of \path{code/master.do} so that \path{$DROPBOX}, \path{$REPO}, and \path{$Rterm_path} point to local paths on the replicator's machine.
-  \item In Stata, from the repository root, run \path{do code/master.do}.
+  \item In Stata, from the repository root, run \path{code/master.do}.
   \item Outputs will be written to \path{exhibits/tables} and \path{exhibits/figures}.
 \end{enumerate}
 
@@ -348,8 +297,8 @@ The analysis stage reads the cleaned datasets and writes manuscript and appendix
 The provided code is intended to reproduce:
 
 \begin{itemize}
-  \item[$\square$] All numbers provided in text in the paper.
-  \item[$\square$] All tables and figures in the paper.
+  \item[$\rlap{$\checkmark$}\square$] All numbers provided in text in the paper.
+  \item[$\rlap{$\checkmark$}\square$] All tables and figures in the paper.
   \item[$\square$] Selected tables and figures in the paper, as explained below.
 \end{itemize}
 

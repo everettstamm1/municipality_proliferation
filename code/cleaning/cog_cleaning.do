@@ -1,63 +1,7 @@
-// Crossswalk Construction
-// Creating an xwalk for msa-pmsa codes to their names since it doesn't exist in the cog data.
-// source: https://www2.census.gov/programs-surveys/metro-micro/geographies/reference-files/1999/historical-delineation-files/99mfips.txt
-
-import delimited using "$RAWDATA/census/99mfips.txt", clear rowr(21:2173) delim("@")
-
-g fips_msa_cmsa = substr(v1,1,4)
-g fips_pmsa = substr(v1,9,4)
-g fips_cmsa_alt = substr(v1,17,2)
-g fips_state = substr(v1,25,2)
-g fips_county = substr(v1,27,3)
-g central_outlying = substr(v1,33,1)
-g fips_entity = substr(v1,41,4)
-g name = substr(v1,49,.)
-
-drop v1
-foreach var of varlist _all{
-	replace `var' = strtrim(`var')
-}
-
-g is_cmsa = regexm(name,"CMSA")==1
-g is_pmsa = regexm(name,"PMSA")==1
-g is_msa = regexm(name,"MSA")==1 & regexm(name,"CMSA")==0 & regexm(name,"PMSA")==0
-
-bys fips_msa_cmsa (is_cmsa) : g in_cmsa = is_cmsa[_N]
-bys fips_pmsa (is_pmsa) : g in_pmsa = is_pmsa[_N]
-bys fips_msa_cmsa (is_msa) : g in_msa = is_msa[_N]
-
-g name_cmsa = name if is_cmsa==1
-g name_pmsa = name if is_pmsa==1
-g name_msa = name if is_msa==1
-
-bys fips_msa_cmsa (is_cmsa) : replace name_cmsa = name_cmsa[_N]
-bys fips_pmsa (is_pmsa) : replace name_pmsa = name_pmsa[_N]
-bys fips_msa_cmsa (is_msa) : replace name_msa = name_msa[_N]
-
-g msapmsa_name = cond(name_pmsa!="",name_pmsa,name_msa)
-g fips_msapmsa = cond(fips_pmsa!="",fips_pmsa,fips_msa_cmsa)
-// county-pmsa/msa xwalk
-preserve
-	keep if fips_state!="" &  fips_county!=""
-	destring fips_msapmsa, gen(msapmsa2000)
-	g county = fips_state + fips_county
-	destring county, replace
-	keep msapmsa2000 county msapmsa_name
-	duplicates drop
 	
-	// Some counties repeated between MSAs. Forcing a random drop for now, come up with better solution later
-	duplicates drop county, force
-	rename county cty_fips
-	save "$XWALKS/county_pmsa_xwalk.dta", replace
-restore
 
-// pmsa names xwalk
 
-destring fips_msapmsa, gen(fips_code_msa)
-keep fips_code_msa msapmsa_name
-duplicates drop
-save "$XWALKS/pmsa_names.dta", replace
-
+// Crossswalk Construction
 
 // Crosswalking to 2002 Place FIPS codes
 import excel using "$RAWDATA/cog/4_Govt_Org_Directory_Surveys/GOVS_ID_to_FIPS_Place_Codes_2002.xls",  cellrange(B17) firstrow clear
@@ -111,7 +55,118 @@ rename FIPS_COUNTY fips_county_2012
 
 save "$XWALKS/cog_ID_fips_xwalk_12.dta", replace
 
+if `load_odbc' == 1{
 
+	// Cleaning COG 4 Individual Gov'ts 
+
+	// Note: Need to have odbc setup and 4_Govt_Org_Directory_Surveys linked for this code to work
+	// FAQ for Window's setup: https://www.stata.com/support/faqs/data-management/configuring-odbc-win/
+
+
+	// Need to pre-clean column names as they're 1. too long and 2. contain invalid characters in stata (:)
+	clear
+	local dsnname = "4_Govt_Org_Directory_Surveys"
+	 odbc query "`dsnname'"
+	// Only need tables 2, 3, and 4
+	forv i=2/4{
+		local tablename_i `.__ODBC_INFO.TABLE[`i']'
+		qui odbc describe "`tablename_i'" , dsn("`dsnname'")
+		
+		local nvars `.__ODBC_INFO.VARIABLES.arrnels' 
+		
+		if `nvars'>_N{
+			set obs `nvars'
+		}
+		
+		local colnames
+		forv j=1/`nvars'{
+
+			local varname_i_j  `.__ODBC_INFO.VARIABLES[`j']'
+
+			local varname_i_j = subinstr(`"`varname_i_j'"', ":","",.)
+			local varname_i_j = lower(`"`varname_i_j'"')
+			local varname_i_j = subinstr(`"`varname_i_j'"', " ","_",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "services","serv",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "percent","pct",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "function","fn",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "provided","prov",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "parks_&_recr","p_r",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "natural","nat",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "resource","res",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "&_","",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "#","n",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "contracted","cont",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "effort","ef",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "of_","",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "/","_",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "facilities","facil",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "public_transit","pub_trans",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "authority","auth",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "sector","sect",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "private","priv",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "electronic","elec",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "electric","elec",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "with","w",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "councils","cncl",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "other","oth",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "reported","rep",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "inland_ports","inld_prts",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "solid_waste","sol_wst",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "directly_by","dir_by",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "refuse_collect","refuse_col",.)
+			local varname_i_j = subinstr(`"`varname_i_j'"', "-","_",.)
+
+			local colnames `colnames' `varname_i_j'
+			
+		} 
+		
+		odbc load, dsn("`dsnname'") table("`tablename_i'") clear 
+		
+		local i 1
+		foreach var of varlist _all {
+				rename `var' v`i'
+				rename v`i' `:word `i' of `colnames''
+				local ++i
+		}
+		
+		local tablab = lower(subinstr("4_`tablename_i'"," ","_",.))
+		
+		rename state_code ID_state
+		rename type_code ID_type
+		rename county_code ID_county
+		rename unit_code ID_unit
+		
+		merge m:1 ID_state ID_county ID_type ID_unit using "$XWALKS/cog_ID_fips_place_xwalk_02.dta", keep(1 3) nogen
+		
+		// Looks like some misses
+		replace fips_state = "51" if ID_state=="47" & fips_state==""
+		replace fips_state = "46" if ID_state=="42" & fips_state==""
+
+		
+		g cty_fips = fips_state+fips_county_2002
+		destring cty_fips, replace
+		merge m:1 cty_fips using "$XWALKS/cw_cty_czone.dta", keep(1 3) nogen
+		drop cty_fips
+		
+		// Destringing everything
+		foreach var of varlist *{
+			cap confirm string var `var'
+			if _rc==0 & inlist("`var'","name","source","ID","fips_code_state","fips_code_county","id")==0{
+				replace `var' = "" if `var'=="-"
+				destring `var', replace
+			}
+		}
+			
+		save "$INTDATA/cog/`tablab'.dta", replace
+
+	}
+	clear
+	odbc query "City_Gov_Fin"
+	odbc load, table("City_Govt_Finances")
+
+	save "$INTDATA/census/city_gov_fin.dta", replace
+
+}
 /*
 // Cleaning COG 1 State counts
 import excel using "$RAWDATA/cog/1-3_Govt_Org_Nat_CoArea_ElecOff/1_Govt_Org_Nat_State_Counts.xls", sheet(Table 1) clear
@@ -185,7 +240,6 @@ g cty_fips = fips_state+fips_county_2002
 destring cty_fips, replace
 
 merge m:1 cty_fips using "$XWALKS/cw_cty_czone.dta", nogen keep(1 3)
-merge m:1 cty_fips using "$XWALKS/county_pmsa_xwalk.dta", nogen keep(1 3)
 drop cty_fips
 
 g fips = fips_state+fips_county_2002
@@ -232,123 +286,18 @@ lab var schdist "Number of Dependent and Independent School Districts"
 save "$INTDATA/cog/2_county_counts.dta", replace
 
 
-// Cleaning COG 4 Individual Gov'ts 
-
-// Note: Need to have odbc setup and 4_Govt_Org_Directory_Surveys linked for this code to work
-// FAQ for Window's setup: https://www.stata.com/support/faqs/data-management/configuring-odbc-win/
-
-
-// Need to pre-clean column names as they're 1. too long and 2. contain invalid characters in stata (:)
-clear
-local dsnname = "4_Govt_Org_Directory_Surveys"
- odbc query "`dsnname'"
-// Only need tables 2, 3, and 4
-forv i=2/4{
-	local tablename_i `.__ODBC_INFO.TABLE[`i']'
-	qui odbc describe "`tablename_i'" , dsn("`dsnname'")
-	
-	local nvars `.__ODBC_INFO.VARIABLES.arrnels' 
-	
-	if `nvars'>_N{
-		set obs `nvars'
-	}
-	
-	local colnames
-	forv j=1/`nvars'{
-
-		local varname_i_j  `.__ODBC_INFO.VARIABLES[`j']'
-
-		local varname_i_j = subinstr(`"`varname_i_j'"', ":","",.)
-		local varname_i_j = lower(`"`varname_i_j'"')
-		local varname_i_j = subinstr(`"`varname_i_j'"', " ","_",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "services","serv",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "percent","pct",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "function","fn",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "provided","prov",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "parks_&_recr","p_r",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "natural","nat",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "resource","res",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "&_","",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "#","n",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "contracted","cont",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "effort","ef",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "of_","",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "/","_",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "facilities","facil",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "public_transit","pub_trans",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "authority","auth",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "sector","sect",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "private","priv",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "electronic","elec",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "electric","elec",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "with","w",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "councils","cncl",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "other","oth",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "reported","rep",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "inland_ports","inld_prts",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "solid_waste","sol_wst",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "directly_by","dir_by",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "refuse_collect","refuse_col",.)
-		local varname_i_j = subinstr(`"`varname_i_j'"', "-","_",.)
-
-		local colnames `colnames' `varname_i_j'
-		
-	} 
-	
-	odbc load, dsn("`dsnname'") table("`tablename_i'") clear 
-	
-	local i 1
-	foreach var of varlist _all {
-			rename `var' v`i'
-			rename v`i' `:word `i' of `colnames''
-			local ++i
-	}
-	
-	local tablab = lower(subinstr("4_`tablename_i'"," ","_",.))
-	
-	rename state_code ID_state
-	rename type_code ID_type
-	rename county_code ID_county
-	rename unit_code ID_unit
-	
-	merge m:1 ID_state ID_county ID_type ID_unit using "$XWALKS/cog_ID_fips_place_xwalk_02.dta", keep(1 3) nogen
-	
-	// Looks like some misses
-	replace fips_state = "51" if ID_state=="47" & fips_state==""
-	replace fips_state = "46" if ID_state=="42" & fips_state==""
-
-	
-	g cty_fips = fips_state+fips_county_2002
-	destring cty_fips, replace
-	merge m:1 cty_fips using "$XWALKS/cw_cty_czone.dta", keep(1 3) nogen
-	drop cty_fips
-	
-	// Destringing everything
-	foreach var of varlist *{
-		cap confirm string var `var'
-		if _rc==0 & inlist("`var'","name","source","ID","fips_code_state","fips_code_county","id")==0{
-			replace `var' = "" if `var'=="-"
-			destring `var', replace
-		}
-	}
-	
-	merge m:1 fips_code_msa using "$XWALKS/pmsa_names.dta", keep(1 3) nogen
-	
-	save "$INTDATA/cog/`tablab'.dta", replace
-
-}
 
 
 // Master unit file
 
 * describe sheets
-import excel using "$RAWDATA/cog/Govt_Units_2021_Final.xlsx", describe
+import excel using "$RAWDATA/cog/govt_units_2021/Govt_Units_2021_Final.xlsx", describe
 return list
 local n_worksheet = `r(N_worksheet)'
 
 * loop through all sheets, list data, then save
 forvalues i=1/`n_worksheet' {
-	import excel using "$RAWDATA/cog/Govt_Units_2021_Final.xlsx" ,sheet(`"`r(worksheet_`i')'"') firstrow clear
+	import excel using "$RAWDATA/cog/govt_units_2021/Govt_Units_2021_Final.xlsx" ,sheet(`"`r(worksheet_`i')'"') firstrow clear
 	keep 	CENSUS_ID_PID6	CENSUS_ID_GIDID	UNIT_NAME	UNIT_TYPE	ADDRESS1 ADDRESS2 ///
 				CITY STATE ZIP ZIP4	WEB_ADDRESS	FIPS_STATE FIPS_COUNTY FIPS_PLACE ///
 				COUNTY_AREA_NAME IS_ACTIVE
@@ -396,9 +345,7 @@ save "$INTDATA/cog/master_2021.dta", replace
 
 
 // Historical Finance
-clear
-odbc query "City_Gov_Fin"
-odbc load, table("City_Govt_Finances")
+use "$INTDATA/census/city_gov_fin.dta", clear
 
 keep General_Expenditure Direct_General_Expend Total_Current_Expend Direct_Expenditure Total_Expenditure Total_IG_Expenditure Total_Prop_Sale var41 Total_IG_Revenue var28 Total_Taxes General_Revenue Total_Revenue Population Year_of_Data Name County_Code Type_Code State_Code GID_Compatible_ID ID Year4 Survey_Year Sort_Code
 

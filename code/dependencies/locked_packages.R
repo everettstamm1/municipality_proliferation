@@ -1,130 +1,175 @@
-locked_package_find_repo_root <- function() {
-  candidates <- unique(normalizePath(c(
-    getwd(),
-    file.path(getwd(), ".."),
-    file.path(getwd(), "..", ".."),
-    file.path(getwd(), "..", "..", "..")
-  ), winslash = "/", mustWork = FALSE))
+.locked_package_source_file <- tryCatch({
+  ofile <- sys.frame(1)$ofile
+  if (is.null(ofile)) NA_character_ else normalizePath(ofile, winslash = "/", mustWork = FALSE)
+}, error = function(e) NA_character_)
 
-  for (candidate in candidates) {
-    lock_file <- file.path(candidate, "code", "dependencies", "r_packages.csv")
-    if (file.exists(lock_file)) return(candidate)
+locked_package_truthy <- function(x) {
+  tolower(x) %in% c("1", "true", "t", "yes", "y")
+}
+
+locked_package_parent_dirs <- function(path) {
+  path <- normalizePath(path, winslash = "/", mustWork = FALSE)
+  out <- character()
+  repeat {
+    out <- c(out, path)
+    parent <- dirname(path)
+    if (identical(parent, path)) break
+    path <- parent
   }
+  unique(out)
+}
 
-  for (candidate in candidates) {
-    paths_file <- file.path(candidate, "paths.csv")
-    if (!file.exists(paths_file)) next
-    paths <- tryCatch(read.csv(paths_file, stringsAsFactors = FALSE), error = function(e) NULL)
-    if (is.null(paths) || !all(c("global", "path") %in% names(paths))) next
-    repo <- paths$path[paths$global == "REPO"][1]
-    if (!is.na(repo) && file.exists(file.path(repo, "code", "dependencies", "r_packages.csv"))) {
-      return(normalizePath(repo, winslash = "/", mustWork = TRUE))
+locked_package_find_repo_root <- function(start = getwd()) {
+  starts <- c(
+    Sys.getenv("MUNI_REPO", unset = NA_character_),
+    Sys.getenv("REPO", unset = NA_character_),
+    getOption("muni.repo_root", NA_character_),
+    start,
+    if (!is.na(.locked_package_source_file)) dirname(.locked_package_source_file) else NA_character_
+  )
+  starts <- starts[!is.na(starts) & nzchar(starts)]
+
+  for (root in unique(unlist(lapply(starts, locked_package_parent_dirs)))) {
+    if (file.exists(file.path(root, "code", "dependencies", "r_packages.csv"))) {
+      return(root)
     }
   }
 
-  stop("Could not find code/dependencies/r_packages.csv. Run from the repository root or after paths.csv has been created.")
+  paths_file <- file.path(getwd(), "paths.csv")
+  if (file.exists(paths_file)) {
+    paths <- tryCatch(utils::read.csv(paths_file, stringsAsFactors = FALSE), error = function(e) NULL)
+    if (!is.null(paths) && all(c("global", "path") %in% names(paths))) {
+      repo <- paths$path[paths$global == "REPO"][1]
+      if (!is.na(repo) && file.exists(file.path(repo, "code", "dependencies", "r_packages.csv"))) {
+        return(normalizePath(repo, winslash = "/", mustWork = FALSE))
+      }
+    }
+  }
+
+  stop("Could not find code/dependencies/r_packages.csv. Run from the repository, set MUNI_REPO, or create paths.csv.")
 }
 
-locked_package_read_lock <- function() {
-  lock_file <- file.path(locked_package_find_repo_root(), "code", "dependencies", "r_packages.csv")
-  deps <- read.csv(
-    lock_file,
-    stringsAsFactors = FALSE,
-    na.strings = c("", "NA"),
-    strip.white = TRUE
-  )
-
-  required_cols <- c("package", "version", "source")
-  missing_cols <- setdiff(required_cols, names(deps))
-  if (length(missing_cols) > 0) {
-    stop("R dependency lock is missing columns: ", paste(missing_cols, collapse = ", "))
+locked_package_read_lock <- function(lock_file = NULL) {
+  if (is.null(lock_file)) {
+    lock_file <- file.path(locked_package_find_repo_root(), "code", "dependencies", "r_packages.csv")
   }
+  deps <- utils::read.csv(lock_file, stringsAsFactors = FALSE, na.strings = c("", "NA"), strip.white = TRUE)
+  required <- c("package", "version", "source")
+  missing <- setdiff(required, names(deps))
+  if (length(missing) > 0) stop("R dependency lock is missing columns: ", paste(missing, collapse = ", "))
 
   deps$package <- trimws(deps$package)
   deps$version <- trimws(deps$version)
   deps$source <- tolower(trimws(deps$source))
-  deps[nzchar(deps$package), ]
+  deps[nzchar(deps$package), , drop = FALSE]
 }
 
 locked_package_repos <- function() {
   repos <- getOption("repos")
-  if (is.null(repos) || is.na(repos["CRAN"]) || repos["CRAN"] == "@CRAN@") {
+  if (is.null(repos) || is.na(repos["CRAN"]) || identical(unname(repos["CRAN"]), "@CRAN@")) {
     repos <- c(CRAN = "https://cloud.r-project.org")
   }
   repos
 }
 
-locked_package_version_ok <- function(pkg, required_version) {
-  if (!requireNamespace(pkg, quietly = TRUE)) return(FALSE)
-  if (is.na(required_version) || !nzchar(required_version)) return(TRUE)
-  utils::packageVersion(pkg) == package_version(required_version)
+locked_package_installed_version <- function(pkg) {
+  if (!requireNamespace(pkg, quietly = TRUE)) return(NA_character_)
+  as.character(utils::packageVersion(pkg))
 }
 
-locked_package_install_remotes <- function(repos) {
-  if (requireNamespace("remotes", quietly = TRUE)) return(invisible(TRUE))
-  message("Installing remotes from CRAN to restore locked package versions...")
-  utils::install.packages("remotes", repos = repos)
-  requireNamespace("remotes", quietly = TRUE)
+locked_package_check <- function(deps, strict = FALSE) {
+  installed <- vapply(deps$package, locked_package_installed_version, character(1))
+  exact <- installed == deps$version | is.na(deps$version) | !nzchar(deps$version)
+  data.frame(
+    package = deps$package,
+    required_version = deps$version,
+    installed_version = installed,
+    source = deps$source,
+    installed = !is.na(installed),
+    ok = !is.na(installed) & (!strict | exact),
+    stringsAsFactors = FALSE
+  )
 }
 
-enforce_locked_packages <- function(packages = NULL, install = TRUE, load = FALSE) {
+locked_package_install <- function(pkg, version, source, strict = FALSE, repos = locked_package_repos()) {
+  if (identical(source, "base")) return(invisible(FALSE))
+
+  if (strict && !is.na(version) && nzchar(version)) {
+    if (!requireNamespace("remotes", quietly = TRUE)) {
+      utils::install.packages("remotes", repos = repos)
+    }
+    remotes::install_version(pkg, version = version, repos = repos, upgrade = "never")
+  } else {
+    utils::install.packages(pkg, repos = repos)
+  }
+  invisible(TRUE)
+}
+
+enforce_locked_packages <- function(packages = NULL, install = FALSE, load = FALSE, strict = FALSE, warn = FALSE) {
+  strict <- isTRUE(strict) || locked_package_truthy(Sys.getenv("R_PACKAGE_STRICT"))
   deps <- locked_package_read_lock()
+
   if (!is.null(packages)) {
-    missing_lock <- setdiff(packages, deps$package)
-    if (length(missing_lock) > 0) {
-      stop("Packages missing from R dependency lock: ", paste(missing_lock, collapse = ", "))
+    missing_from_lock <- setdiff(packages, deps$package)
+    if (length(missing_from_lock) > 0) {
+      stop("Packages missing from R dependency lock: ", paste(missing_from_lock, collapse = ", "))
     }
-    deps <- deps[deps$package %in% packages, ]
+    deps <- deps[deps$package %in% packages, , drop = FALSE]
   }
 
-  repos <- locked_package_repos()
-  failures <- character()
+  status <- locked_package_check(deps, strict = strict)
+  needs_work <- status[!status$ok, , drop = FALSE]
 
-  for (i in seq_len(nrow(deps))) {
-    pkg <- deps$package[i]
-    required_version <- deps$version[i]
-    source <- deps$source[i]
-
-    if (!locked_package_version_ok(pkg, required_version)) {
-      if (!install || source == "base" || source != "cran") {
-        failures <- c(failures, pkg)
-        next
-      }
-
-      installed_version <- if (requireNamespace(pkg, quietly = TRUE)) {
-        as.character(utils::packageVersion(pkg))
-      } else {
-        "not installed"
-      }
-      message("Installing ", pkg, " version ", required_version, " from CRAN; current version is ", installed_version, ".")
-
-      tryCatch({
-        if (!locked_package_install_remotes(repos)) stop("could not install or load remotes")
-        remotes::install_version(pkg, version = required_version, repos = repos, upgrade = "never")
-      }, error = function(e) {
-        message("Failed to install ", pkg, ": ", conditionMessage(e))
-      })
+  if (install && nrow(needs_work) > 0) {
+    for (pkg in needs_work$package) {
+      row <- deps[deps$package == pkg, ][1, ]
+      message("Installing R package ", pkg, if (strict) paste0(" ", row$version) else "", "...")
+      tryCatch(
+        locked_package_install(pkg, row$version, row$source, strict = strict),
+        error = function(e) message("Failed to install ", pkg, ": ", conditionMessage(e))
+      )
     }
-
-    if (!locked_package_version_ok(pkg, required_version)) {
-      failures <- c(failures, pkg)
-      next
-    }
-
-    if (isTRUE(load)) {
-      suppressPackageStartupMessages(library(pkg, character.only = TRUE))
-    }
+    status <- locked_package_check(deps, strict = strict)
   }
 
-  if (length(failures) > 0) {
-    action <- if (install) "installed at" else "available at"
+  failures <- status[!status$ok, , drop = FALSE]
+  if (nrow(failures) > 0) {
+    detail <- paste(
+      failures$package,
+      "(required: ", failures$required_version, ", installed: ", ifelse(is.na(failures$installed_version), "missing", failures$installed_version), ")",
+      sep = "",
+      collapse = ", "
+    )
     stop(
-      "The following R packages are not ",
-      action,
-      " the locked version: ",
-      paste(unique(failures), collapse = ", ")
+      "R package requirements are not satisfied: ", detail,
+      ". Run Rscript code/setup_r_packages.R",
+      if (strict) " --strict" else "",
+      " from the repository root."
     )
   }
 
-  invisible(deps)
+  version_mismatch <- status$installed & !is.na(status$required_version) &
+    nzchar(status$required_version) & status$installed_version != status$required_version
+  if (isTRUE(warn) && !strict && any(version_mismatch)) {
+    warning(
+      "Using installed R package versions that differ from code/dependencies/r_packages.csv: ",
+      paste(status$package[version_mismatch], collapse = ", "),
+      ". Use R_PACKAGE_STRICT=TRUE or --strict in setup_r_packages.R to require exact versions.",
+      call. = FALSE
+    )
+  }
+
+  if (isTRUE(load)) {
+    for (pkg in deps$package) {
+      if (!identical(deps$source[deps$package == pkg][1], "base")) {
+        suppressPackageStartupMessages(library(pkg, character.only = TRUE))
+      }
+    }
+  }
+
+  invisible(status)
+}
+
+check_locked_packages <- function(packages = NULL, strict = FALSE) {
+  enforce_locked_packages(packages = packages, install = FALSE, load = FALSE, strict = strict, warn = TRUE)
 }
