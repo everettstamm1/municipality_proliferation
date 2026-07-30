@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.6.16)  22 JUN 2026 18:53
+This is pdfTeX, Version 3.141592653-2.6-1.40.28 (MiKTeX 25.12) (preloaded format=pdflatex 2026.6.16)  30 JUN 2026 12:52
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -983,16 +983,16 @@ LaTeX Warning: No \author given.
 [3
 
 ] (tables/T2.tex) [4]
-<figures/F2a.png, id=129, 1060.96375pt x 771.88374pt>
+<figures/F2a.png, id=129, 1926.19624pt x 1401.235pt>
 File: figures/F2a.png Graphic file (type png)
 <use figures/F2a.png>
 Package pdftex.def Info: figures/F2a.png  used on input line 100.
-(pdftex.def)             Requested size: 375.80048pt x 273.4023pt.
-<figures/F2b.png, id=130, 1060.96375pt x 771.88374pt>
+(pdftex.def)             Requested size: 375.80048pt x 273.37871pt.
+<figures/F2b.png, id=130, 1926.19624pt x 1401.235pt>
 File: figures/F2b.png Graphic file (type png)
 <use figures/F2b.png>
 Package pdftex.def Info: figures/F2b.png  used on input line 106.
-(pdftex.def)             Requested size: 375.80048pt x 273.4023pt.
+(pdftex.def)             Requested size: 375.80048pt x 273.37871pt.
  [5 <./figures/F2a.png (PNG copy)> <./figures/F2b.png (PNG copy)>] (tables/T3.t
 ex) [6
 
@@ -1081,11 +1081,11 @@ Package pdftex.def Info: figures/F3b.pdf  used on input line 158.
 (tables/TA25.tex) [35
 
 ]
-<figures/FA1.png, id=323, 1060.96375pt x 771.88374pt>
+<figures/FA1.png, id=323, 1926.19624pt x 1401.235pt>
 File: figures/FA1.png Graphic file (type png)
 <use figures/FA1.png>
 Package pdftex.def Info: figures/FA1.png  used on input line 431.
-(pdftex.def)             Requested size: 375.80048pt x 273.4023pt.
+(pdftex.def)             Requested size: 375.80048pt x 273.37871pt.
  [36 <./figures/FA1.png (PNG copy)>]
 
 pdfTeX warning: miktex-pdftex.exe (file ./figures/FA2_cgoodman.pdf): PDF inclus
@@ -1324,7 +1324,7 @@ e1/public/amsfonts/cm/cmr8.pfb><C:/Users/Everett Stamm/AppData/Local/Programs/M
 iKTeX/fonts/type1/public/amsfonts/cm/cmr9.pfb><C:/Users/Everett Stamm/AppData/L
 ocal/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmsy7.pfb><C:/Users/Everett
  Stamm/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfonts/cm/cmti7.pfb>
-Output written on replication.pdf (40 pages, 4187546 bytes).
+Output written on replication.pdf (40 pages, 4363535 bytes).
 PDF statistics:
  21172 PDF objects out of 22161 (max. 8388607)
  115 named destinations out of 1000 (max. 500000)
